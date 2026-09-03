@@ -1,0 +1,185 @@
+cmake_minimum_required(VERSION 3.17)
+project(sytorch)
+
+if(APPLE)
+
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang\$")
+        set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp")
+        set(OpenMP_C_LIB_NAMES "omp")
+        set(OpenMP_omp_LIBRARY omp)
+    endif()
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
+        set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
+        set(OpenMP_CXX_LIB_NAMES "omp")
+        set(OpenMP_omp_LIBRARY omp)
+    endif()
+
+endif()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Wno-unused-result -maes -Wno-ignored-attributes -march=native -Wno-deprecated-declarations -fopenmp")
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Threads REQUIRED)
+# find_package(CUDAToolkit REQUIRED)
+
+add_subdirectory(ext/cryptoTools)
+add_subdirectory(ext/bitpack)
+add_subdirectory(ext/FSS)
+# add_subdirectory(ext/sci)
+# add_subdirectory(../SCI ext/sci)
+
+add_library(${PROJECT_NAME} STATIC)
+target_sources(${PROJECT_NAME} 
+PRIVATE
+    src/random.cpp
+    src/backend/cleartext.cpp
+    src/backend/baseline_cleartext.cpp
+    src/backend/float.cpp
+    # src/softmax.cpp
+)
+
+target_include_directories(${PROJECT_NAME}
+PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads FSS cryptoTools) # SCI-FloatML CUDA::cudart
+
+
+# === Benchmarks ===
+# DCF，GROTTO，GTDCF 比较
+add_executable(
+    comparison_primitive
+    tests/bench/comparison_primitive.cpp
+)
+target_link_libraries(comparison_primitive ${PROJECT_NAME})
+
+
+# 二叉树、四叉树、八叉树的对比，加入AES-IN的工程优化，减少密钥生成时间
+add_executable(
+    octdpf_test
+    tests/bench/octdpf_test.cpp
+)
+target_link_libraries(octdpf_test ${PROJECT_NAME})
+
+
+# 多叉树FSS的理论对比，这里没有用AES-IN的工程优化，每次AES加密都是独立实现的
+add_executable(
+    academic_benchmark
+    tests/bench/academic_benchmark.cpp
+)
+target_link_libraries(academic_benchmark ${PROJECT_NAME})
+
+# 测试VDPF效率
+add_executable(
+    verdpf_test
+    tests/bench/verdpf_test.cpp
+)
+target_link_libraries(verdpf_test ${PROJECT_NAME})
+
+# 测试DPF和VDPF密钥大小、密钥生成和评估时间
+add_executable(
+    mp_dpf_verdpf_test
+    tests/bench/mp_dpf_verdpf_test.cpp
+)
+target_link_libraries(mp_dpf_verdpf_test ${PROJECT_NAME})
+
+# IFSS测试
+add_executable(
+    shark_ifss
+    tests/bench/shark_ifss.cpp
+)
+target_link_libraries(shark_ifss ${PROJECT_NAME})
+
+# half-tree测试
+add_executable(
+    halftree_fss_test
+    tests/bench/halftree_fss_test.cpp
+)
+target_link_libraries(halftree_fss_test ${PROJECT_NAME})
+
+# DPF、half-tree DPF 和 WDPF的测试
+add_executable(
+    WDPF_test
+    tests/bench/WDPF_test.cpp
+)
+target_link_libraries(WDPF_test ${PROJECT_NAME})
+
+# DPF、half-tree DPF 、Grotto和 WDPF的测试
+add_executable(
+    WDCF_test
+    tests/bench/WDCF_test.cpp
+)
+target_link_libraries(WDCF_test ${PROJECT_NAME})
+
+# VDCF
+add_executable(
+    VDCF_test
+    tests/bench/VDCF_test.cpp
+)
+target_link_libraries(VDCF_test ${PROJECT_NAME})
+
+# VWDCF
+add_executable(
+    VWDCF_test
+    tests/bench/VWDCF_test.cpp
+)
+target_link_libraries(VWDCF_test ${PROJECT_NAME})
+
+# VIDPF
+add_executable(
+    VIDPF_test
+    tests/bench/VIDPF_test.cpp
+)
+target_link_libraries(VIDPF_test ${PROJECT_NAME})
+
+
+# mp_vidpf_spline
+add_executable(
+    mp_cavern_spline
+    tests/bench/mp_cavern_spline.cpp
+)
+target_link_libraries(mp_cavern_spline ${PROJECT_NAME})
+
+add_executable(
+    mp_cavern_relu
+    tests/bench/mp_cavern_relu.cpp
+)
+target_link_libraries(mp_cavern_relu ${PROJECT_NAME})
+
+# DIF测试
+add_executable(
+    dif
+    tests/bench/dif.cpp
+)
+target_link_libraries(dif ${PROJECT_NAME})
+
+
+
+# 协议测试
+add_executable(
+    GTDCF-ReLU
+    tests/bench/GTDCF-ReLU.cpp
+)
+target_link_libraries(GTDCF-ReLU ${PROJECT_NAME})
+
+
+
+
+# === E2E ===
+# add_executable(
+#     BPGNN
+#     tests/e2e/BPGNN.cpp
+# )
+# target_link_libraries(BPGNN ${PROJECT_NAME})
+
+
+
+# === E2E ===
+add_executable(
+    CNN
+    tests/e2e/CNN.cpp
+)
+target_link_libraries(CNN ${PROJECT_NAME})

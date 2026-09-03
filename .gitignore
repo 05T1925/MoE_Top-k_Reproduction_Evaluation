@@ -1,0 +1,45 @@
+# macOS and editor metadata
+.DS_Store
+.idea/
+.vscode/
+
+# CMake and compiled outputs
+**/build/
+**/CMakeFiles/
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/compile_commands.json
+**/*.o
+**/*.obj
+**/*.a
+**/*.so
+**/*.dylib
+**/*.d
+
+# Generated protocol material and process output
+**/*.bin
+**/*.pkg
+**/*.log
+**/logs/
+**/logs_*/
+**/__pycache__/
+**/*.pyc
+
+# Known generated result locations
+/ADSMPC/experiments/logs/
+/ADSMPC/experiments_protocol3/results/
+/Agarwal_TopK/benchmark_results/
+/Agarwal_TopK/protocol1/results/
+/Agarwal_TopK/protocol1_ca/benchmark_results/
+/Agarwal_TopK/protocol1_ca/results/
+/Agarwal_TopK/protocol3_ca/results/
+/CipherGPT/logs_paper/
+/CipherGPT/results_paper.csv
+
+# Raw reference packages are intentionally local-only in the initial Git
+# baseline.  Their roles, paths, and later distribution decisions are recorded
+# in docs/REFERENCE_MANIFEST.md.  Add a reviewed, source-only snapshot later
+# with an explicit force-add or a dedicated external archive workflow.
+/ADSMPC/
+/Agarwal_TopK/
+/CipherGPT/
