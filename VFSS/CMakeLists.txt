@@ -206,3 +206,11 @@ add_executable(
     tests/moe_topk/cmpagg_test.cpp
 )
 target_link_libraries(moe_topk_m1_cmpagg_test ${PROJECT_NAME})
+
+# Protocol III pre-integration primitive conformance. This validates the
+# existing VFSS DPF implementation and transport without starting M3 routing.
+add_executable(
+    moe_topk_dpf_conformance_test
+    tests/moe_topk/dpf_conformance_test.cpp
+)
+target_link_libraries(moe_topk_dpf_conformance_test FSS)
