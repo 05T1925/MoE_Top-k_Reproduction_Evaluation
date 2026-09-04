@@ -17,9 +17,10 @@ Agarwal Protocol I、Agarwal Protocol III 和 CipherGPT Top-K 的可区分基线
    独立扩展，禁止混入 Protocol I/III 的名称和性能结论；
 4. 所有“论文一致”“轮数一致”“泄露一致”的说法都必须有对应证据。
 
-近期执行优先级以团队统一安排为准：先完成并比较 Agarwal Protocol I 与
-`ciphergpt_native`；Protocol III 暂缓，待这条对比链路稳定后再恢复。暂缓不删除
-其设计约束和未来验收指标。
+近期执行优先级已经冻结：M1 公共底座收尾 → Protocol I 精确基线 → Protocol III
+模块化 3 轮基线 → `ciphergpt_native` → Protocol III 精确 2 轮压缩 → AAV86。
+依赖关系、阶段门和调整理由见
+`docs/decisions/ROADMAP_PRIORITY_2026-09-04.md`。
 
 ## 2. 仓库角色与修改规则
 
@@ -309,8 +310,10 @@ artifacts/                  被忽略的本地产物，不作证据源
 
 ### M1：公共正确性底座
 
-状态：已完成并同步远端。统一语义冻结为 32 位二补码 signed fixed-point、
-scale=12、数值降序、同分 original index 升序；四项 M1 测试均通过。
+状态：核心实现已完成并同步远端。统一语义冻结为 32 位二补码 signed fixed-point、
+scale=12、数值降序、同分 original index 升序；四项 M1 测试已在 macOS 和 Ubuntu
+24.04 上通过。M1.1 仍需注册 CTest、补齐正式 metrics 的 provenance 字段并固定
+Ubuntu 复现入口；该收尾不改变冻结语义。
 
 - 实现 32 位输入、稳定同分和原始位置 `m`-bit mask 的明文 oracle；
 - 建立随机、重复值、全相等、负数、`K=1`、`K=n`、非 2 次幂 `n` 和位宽边界
@@ -329,42 +332,39 @@ scale=12、数值降序、同分 original index 升序；四项 M1 测试均通�
 - 通过重复值、payload 对齐和 secure/test 输出边界检查后，才使用
   `agarwal_protocol_i_exact` 名称。
 
-### M3：CipherGPT 原生基线与首轮统一对比
+### M3：Protocol III 模块化 3 轮基线
+
+- 复用 M1 的全对全 CmpAgg，把 GRank 明确计为 1 个在线轮次；
+- 使用 VFSS 标准 DPF 与秘密共享乘法实现 2 轮路由；
+- 移除旧原型中的明文 `true_rank` Dealer、文件同步、固定等待和调试重构；
+- 输出统一的原始顺序秘密共享 bit-mask，并完成小规模独立进程 E2E；
+- 在未做跨阶段压缩前只使用 `agarwal_protocol_iii_modular_3round` 名称。
+
+### M4：CipherGPT 原生基线
 
 - 在 CipherGPT 原生框架修复 `Top_K_paper` 的终止、基数、同分和错误传播；
 - 将元素与原始索引绑定，逆映射并输出统一的秘密共享 bit-mask；
-- CipherGPT 维持论文两方模式，Protocol I 使用 Dealer + 两个在线方；
-- 使用同一批 32 位输入完成 `(128,2)`、`(128,8)`、`(256,2)`、`(256,8)`
-  的第一轮对比，再推进大规模 `K=80`；
-- 报告统一指标，但明确不同密码学栈和 party topology，不把两者伪装成同一运行时。
+- 保留 CipherGPT 原生两方密码学栈，并先完成 source-only/许可证边界审查；
+- 使用 M1 同一批 32 位输入完成小规模正确性基线；
+- 性能报告明确其运行时和 topology，不把它伪装成 VFSS 实现。
 
-### M4：Protocol I + AAV86 迭代实验
+### M5：Protocol III 精确 2 轮压缩
 
-- 在 Protocol I 精确基线稳定后复用其 shuffle 和比较原语；
+- 只在 M3 的 3 轮路径正确且阶段审计稳定后开始；
+- 明确选择满足论文条件的域表示和非零 payload 编码；
+- 实现 GRank 与 DPF 路由的跨阶段压缩，验证在线因果轮数为 2；
+- 分别记录 paper core 与统一 mask adapter 的开销和轮数；
+- 只有代数条件、消息流、泄露和差分/E2E 都通过后，才使用
+  `agarwal_protocol_iii_exact_2round` 名称。
+
+### M6：AAV86 / Direct Top-K 实验
+
+- 复用已经稳定的精确基线原语，不反向改变 M2/M3/M5 的实现身份；
 - 先解决输入无关、Dealer 在线静默条件下的自适应 exact-edge 预处理；
-- 对 `r=2,3,4,5` 完整记录 `e_A`、`v_A`、PRG 调用、`2r+1` 轮和全部统一指标；
-- 在 LAN/WAN 下分别寻找“比较量下降”与“轮数上升”的实测拐点；
-- Direct Top-K 继续作为独立实验线，未通过一般算法和安全审查前只使用
+- 对 `r=2,3,4,5` 完整记录 `e_A`、`v_A`、PRG 调用、在线轮数和全部统一指标；
+- 在 LAN/WAN 下分别寻找比较量下降与轮数上升的实测拐点；
+- Direct Top-K 保持独立实验标签；未通过一般算法和安全审查前只使用
   `aav86_ca_experimental`、`direct_topk_experimental` 名称。
-
-### M5：暂缓的 Protocol III 路线
-
-- 近期不占用 Protocol I 与 CipherGPT 对比资源；恢复后复用 M1 的全对全 CmpAgg；
-- 用 VFSS DPF + 正确的秘密共享乘法实现标准路由，并移除明文 `true_rank`
-  Dealer、文件同步和调试重构依赖；
-- 先标为 `agarwal_protocol_iii_modular_3round`；
-- 只有解决域表示、非零 payload 编码和跨阶段压缩后，才能建立
-  `agarwal_protocol_iii_exact_2round`；
-- Protocol III + AAV86 另行验证团队目标 `2r`，不得从 Protocol I 的 Theorem 5.1
-  直接推断。
-
-### M6：CryptoMoE 工作负载
-
-- 固定 candidate ID、score、eligibility、payload reference 和容量 `t` 的语义；
-- 从单 expert Top-t 开始，再做多 expert dispatch；
-- 先决定允许公开的 routing transcript，再选择精确 Protocol、CipherGPT 或 CA
-  后端；
-- 最后才接入完整 router、one-hot retrieval、combine 和 HE MatMul。
 
 ### M7：统一实验
 
@@ -373,11 +373,16 @@ scale=12、数值降序、同分 original index 升序；四项 M1 测试均通�
 - 完成 5.1 节固定 `(n,K,r)` 矩阵，无法运行的点标记 `NOT_MEASURED`；
 - 分组比较，不做混合排行榜：
   - B0 与 B1：只比较 shuffle backend；
+  - Protocol I 与 Protocol III 3 轮：统一 CmpAgg，比较 shuffle 与 DPF routing；
+  - Protocol III 3 轮与 2 轮：统一功能，比较跨阶段压缩的轮数与代数代价；
+  - Protocol I/III 与 CipherGPT native：统一输入、输出和指标，明确 topology 与运行时；
   - Protocol I B1 全对全与 AAV86 full-sort：比较排名算法；
   - AAV86 full-sort 与 Direct Top-K：使用相同输入共享、计划和 transcript 口径；
-  - Protocol I 与 CipherGPT native：统一输入、输出和指标，但明确 topology 与运行时；
   - CipherGPT native 与未来 VFSS adapter：并列报告，不混同实现身份。
 - 每个数字标记为历史记录、当前实测、理论值或 `NOT_MEASURED`。
+
+CryptoMoE 保留为 M7 之后的工作负载接入：先冻结 eligibility、dummy、容量和允许
+公开的 routing transcript，再选择已经验收的 Top-K 后端。
 
 ## 8. 验收门槛
 
@@ -413,7 +418,8 @@ scale=12、数值降序、同分 original index 升序；四项 M1 测试均通�
 - VFSS 有 DCF/DPF 等原语，但没有可用的真实安全 shuffle；
 - AAV86 的动态图预处理与 offline-only Dealer 模型尚未闭合；
 - CipherGPT 原生 Top-K 代码已经存在，但边界语义和终止逻辑尚未达到基线要求；
-- 团队近期主比较是 Protocol I 与 CipherGPT native，Protocol III 已明确暂缓；
+- 团队主线已经调整为 Protocol I → Protocol III 3 轮 → CipherGPT native →
+  Protocol III 2 轮 → AAV86；
 - 所有基线和扩展的统一交付输出已经固定为原始顺序下的秘密共享 Top-K bit-mask；
 - 固定测试矩阵、AAV86 `r=2..5` 和统一指标字段已经成为长期验收约束；
 - CryptoMoE 目前应作为工作负载和系统语义来源，而不是第四种 Top-K 原语；
@@ -421,7 +427,7 @@ scale=12、数值降序、同分 original index 升序；四项 M1 测试均通�
 
 ## 10. 后续需要团队明确的输入
 
-M0/M1 已完成，以下问题影响后续里程碑：
+M0 已完成，M1 核心完成且 M1.1 收尾待办；以下问题影响后续里程碑：
 
 1. 目标机器、LAN/WAN 条件和最终需要复现的表格；
 2. 首个 MoE 模型的 `m/n/k/t`、score 编码和 payload 形状；
@@ -431,6 +437,6 @@ M0/M1 已完成，以下问题影响后续里程碑：
 6. 是否为 Protocol III 压缩路由引入域表示，还是只保留标准 DPF + Beaver 路径；
 7. CipherGPT 原生代码的来源、revision、许可证和 source-only 共享方式。
 
-在这些选择确定前，可以先完成统一 oracle、Protocol I 精确基线、CipherGPT
-原生基线及二者的统一对比；Protocol III 保持暂缓。不能提前声称 AAV86、
-CryptoMoE 或 2 轮压缩路由已经满足论文安全模型。
+这些选择不阻塞 M1.1、Protocol I 或 Protocol III 模块化 3 轮基线。CipherGPT
+可以提前做资料与失败用例整理，但主线合并顺序不变。不能提前声称 AAV86、
+CryptoMoE 或 Protocol III 2 轮压缩已经满足论文安全模型。

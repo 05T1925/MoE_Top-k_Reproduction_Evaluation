@@ -7,11 +7,10 @@
 ## 1. 当前结论
 
 - M0：已在远端闭环；
-- M1：已完成并同步远端，四项测试全部通过；
-- 当前开发主线：M2 与 M3-A 并行 → M3 统一对比 → M4；
-- 近期比较对象：Agarwal Protocol I 与 CipherGPT 原生 Top-K；
-- Protocol III：暂缓，保留为 M5；
-- CryptoMoE：在安全 Top-K 基线和统一实验稳定后进入 M6；
+- M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
+- 当前开发主线：M1.1 收尾 → M2 Protocol I → M3 Protocol III 3 轮 →
+  M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
+- CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
 - 任何 AAV86/Direct Top-K 原型在解决自适应预处理前不得标为论文定理实现。
 
 ## 2. 全程不变的统一契约
@@ -87,11 +86,12 @@
 
 ### 当前状态
 
-已完成（2026-09-04）。团队已冻结 32-bit 二补码 fixed-point（scale=12）、测试量化整数均匀范围
+核心已完成（2026-09-04）。团队已冻结 32-bit 二补码 fixed-point（scale=12）、测试量化整数均匀范围
 `[-32*2^12, 32*2^12]`（端点包含）、数值降序及同分 original_index 升序。Oracle、
 全对全 CmpAgg、测试向量、统一比较适配和计量记录均以此语义实现。现有 VFSS CMake
 目标已实际构建并运行 `moe_topk_m1_oracle_test`、`moe_topk_m1_cmpagg_test`、
-`moe_topk_m1_metrics_test` 与 `moe_topk_m1_dcf_conformance_test`；四者均通过。
+`moe_topk_m1_metrics_test` 与 `moe_topk_m1_dcf_conformance_test`；四者在 macOS 与
+Ubuntu 24.04 均通过。M1.1 收尾尚未完成。
 
 ### 输入
 
@@ -125,6 +125,19 @@
 - DCF 测试覆盖等于阈值和位宽边界；
 - 同一原始通信记录可复算 total/per-party；
 - 没有测试专用明文值进入 secure 接口。
+
+### M1.1 收尾门
+
+进入 M2 实现前完成：
+
+1. 为四个 M1 可执行测试注册 CTest，确保 `ctest --output-on-failure` 是统一入口；
+2. 给正式 metrics 记录补齐 seed、输入分布、编译器/flags、CPU/内存/OS、网络环境、
+   warmup 和 repetitions；
+3. 保留 raw per-party sent/received 计数，并验证派生 total/per-party 字段；
+4. 在 Ubuntu 24.04 上执行干净 configure/build/ctest，并把命令和结果写入复现记录；
+5. 再次确认 `VFSS-baseline/` 与冻结标签无差异。
+
+M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。
 
 ## 3.2 M2：Agarwal Protocol I 精确核心与统一输出
 
@@ -170,7 +183,39 @@
 - 角色为 2+1，在线轮数和额外 mask 适配轮数分别可解释；
 - 所有统一指标来自实际计数，不使用模拟 shuffle 成本。
 
-## 3.3 M3：CipherGPT 原生基线与 Protocol I 对比
+## 3.3 M3：Protocol III 模块化 3 轮基线
+
+### 输入
+
+- M1 全对全 CmpAgg、oracle、测试输入与指标；
+- M2 已冻结的运行、通信和统一 mask 边界；
+- Agarwal Protocol III 论文定义；
+- ADSMPC 旧原型仅作调用次序和失败模式参考。
+
+### 任务
+
+1. 画清 GRank 1 轮与标准 DPF 路由 2 轮的角色、预处理和消息依赖。
+2. 复用 M1 CmpAgg，以 VFSS DPF + 秘密共享乘法实现模块化路由。
+3. 删除明文 `true_rank` Dealer、文件轮询、固定 `sleep` 和调试重构依赖。
+4. 把 payload 恢复到原始输入位置，输出统一秘密共享 Top-K bit-mask。
+5. 分离 `test`/`secure` 模式并接入统一 metrics。
+6. 使用独立进程完成 Dealer、Party 0、Party 1 的小规模 E2E。
+
+### 交付物
+
+- `agarwal_protocol_iii_modular_3round` 可执行目标；
+- GRank/DPF routing conformance 与 oracle differential 测试；
+- 阶段、消息、打开值、泄露和 3 轮因果关系审计；
+- 小规模原始运行记录。
+
+### 退出条件
+
+- 重复值、全相等、负值、`K=1/K=n` 和非 2 次幂输入均与 oracle 一致；
+- secure 模式不重构 rank、DPF index 或 selected indices；
+- 在线因果轮数可复算为 3，额外 mask adapter 轮数单独记录；
+- 不使用 `agarwal_protocol_iii_exact_2round` 名称或相关性能声明。
+
+## 3.4 M4：CipherGPT 原生基线
 
 ### 输入
 
@@ -180,41 +225,44 @@
 
 ### 任务
 
-1. 修正输入错误传播，禁止只打印错误后返回不完整结果。
-2. 给 QuickSelect 建立对所有输入都会收缩的算法不变量；解决全相等和重复值，
-   不用轮数上限掩盖不终止。
-3. 与项目统一 tie rule 对齐，并明确这是输出语义适配还是原论文行为。
-4. shuffle 时绑定 original index，最终输出秘密共享 bit-mask。
-5. 将验证模式重构与 secure 输出分离。
-6. 保留 CipherGPT 原生两方密码学栈，不为了“统一框架”提前改写成 VFSS。
+1. 先确认原始代码来源、revision、许可证和 source-only 可审查边界。
+2. 修正输入错误传播，禁止只打印错误后返回不完整结果。
+3. 建立对所有输入都会收缩的 QuickSelect 不变量；解决全相等和重复值，不用轮数
+   上限掩盖不终止。
+4. 与项目统一 tie rule 对齐，并说明它是输出语义适配还是论文原生行为。
+5. shuffle 时绑定 original index，最终输出秘密共享 bit-mask。
+6. 将验证模式重构与 secure 输出分离，保留原生两方密码学栈。
 
-### 对比方法
-
-- 同一批 32 位输入；
-- 先完成 `n=128,256` 与 `K=2,8`；
-- 再尝试 `n=10^3..10^6, K=80`；
-- Protocol I 记录 2+1，CipherGPT 记录两方，不用 per-party 归一化隐藏拓扑差异；
-- 输出、正确性和指标字段统一，运行时和安全模型分栏展示。
-
-### 交付物
+### 交付物与退出条件
 
 - `ciphergpt_native_mask_output` 基线；
-- Protocol I 与 CipherGPT 的统一小规模结果表；
-- 原始 5 次运行记录；
-- 重复值、全相等和错误输入回归测试。
-
-### 退出条件
-
+- 重复值、全相等、错误输入和 `K` 边界回归测试；
+- 小规模原始运行记录及明确的 runtime/topology 字段；
 - 不依赖启发式轮数上限也能终止并返回恰好 `K` 个位置；
-- 统一 mask 与 oracle 一致；
-- 两个实现的计时边界都覆盖索引恢复和 mask 生成；
-- 结果表明确 topology、runtime 和历史/当前实测状态。
+- 统一 mask 与 oracle 一致，计时覆盖索引恢复和 mask 生成。
 
-## 3.4 M4：Protocol I + AAV86 和 Direct Top-K 实验
+## 3.5 M5：Protocol III 精确 2 轮压缩
 
 ### 前置条件
 
-M2 的安全 shuffle、比较原语、mask 输出和计量均已冻结。
+M3 的 3 轮实现通过差分、独立进程 E2E、消息流和泄露审计。
+
+### 任务
+
+1. 选择并记录满足论文要求的域表示，不能继续把 `Z_(2^b)` 当作域。
+2. 定义非零 payload 编码、零值处理和逆元失败语义。
+3. 实现 GRank 与 DPF 路由的跨阶段压缩，证明并实测在线因果轮数为 2。
+4. 分别计量 paper core 和统一 mask adapter，主结果报告两者总和。
+5. 与 M3 使用同一输入和 oracle 做逐项差分，并运行独立进程 E2E。
+
+### 交付物与退出条件
+
+- `agarwal_protocol_iii_exact_2round` 可执行目标；
+- 域、非零 payload、消息流、泄露和轮数决策记录；
+- M3/M5 正确性与开销对照；
+- 只有论文前置条件和 2 轮审计均通过后，才能标为 Theorem 4.2 复现。
+
+## 3.6 M6：AAV86 / Direct Top-K 实验
 
 ### 首要研究问题
 
@@ -227,7 +275,7 @@ M2 的安全 shuffle、比较原语、mask 输出和计量均已冻结。
 1. 写明每轮公开值、bucket 状态、比较图生成时机和 Dealer 行为。
 2. 解决一般性的 exact-edge 自适应预处理，不采用固定完整图预留等局部补丁。
 3. 对 `r=2,3,4,5` 运行统一矩阵。
-4. 实测 `e_A(n,r)`、`v_A(n,r)`、PRG 调用和 `2r+1` 在线轮数。
+4. 实测 `e_A(n,r)`、`v_A(n,r)`、PRG 调用和在线轮数。
 5. 在 LAN/WAN 分别比较轮数增加与比较量下降的拐点。
 6. Direct Top-K 使用独立标签和安全说明，不与 AAV86 full-sort 混名。
 
@@ -238,50 +286,17 @@ M2 的安全 shuffle、比较原语、mask 输出和计量均已冻结。
 - 固定矩阵的原始与汇总结果；
 - 只有 offline-only、安全审查和轮数验证通过后，才升级论文一致性标签。
 
-## 3.5 M5：暂缓的 Protocol III
-
-### 恢复条件
-
-Protocol I 与 CipherGPT 统一对比完成，团队重新确认资源投入和 payload 域策略。
-
-### 两步路线
-
-1. `agarwal_protocol_iii_modular_3round`：全对全 CmpAgg + 标准 DPF + Beaver
-   路由；移除旧原型的明文 `true_rank`、文件同步和调试重构。
-2. `agarwal_protocol_iii_exact_2round`：解决域表示、非零 payload 编码及跨阶段
-   压缩后，验证论文 Theorem 4.2。
-
-Protocol III + AAV86 的 `2r` 是团队目标，不是当前会议版已给出的独立 theorem。
-必须另行完成协议组合、预处理时序和泄露证明。
-
-## 3.6 M6：CryptoMoE 工作负载
-
-### 前置决策
-
-- 模型的 `m/n/k/t`；
-- score 编码、eligibility 和 dummy 的严格顺序；
-- 允许公开的 routing transcript；
-- 容量溢出 drop 是否属于模型语义。
-
-### 顺序
-
-1. 单 expert 候选 Top-t；
-2. 多 expert dispatch；
-3. one-hot retrieval 与 combine；
-4. 最后连接 router 和 HE MatMul。
-
-CryptoMoE 容量 Top-t 与精确 Top-K oracle 分层实现；不得用 score=0 的 dummy
-启发式处理零分合法候选。
-
 ## 3.7 M7：统一性能报告
 
 ### 比较组
 
 1. B0 vs B1：只比较 shuffle backend；
-2. Protocol I B1 全对全 vs AAV86 full-sort：比较排名算法；
-3. AAV86 full-sort vs Direct Top-K：相同输入、计划和 transcript 口径；
-4. Protocol I vs CipherGPT native：统一输入/输出/指标，拓扑与运行时分栏；
-5. CipherGPT native vs 未来 VFSS adapter：不同实现身份，不合并结果。
+2. Protocol I vs Protocol III 3 轮：统一 CmpAgg，比较 shuffle 与 DPF routing；
+3. Protocol III 3 轮 vs 2 轮：统一功能，比较压缩前后的轮数与代数代价；
+4. Protocol I/III vs CipherGPT native：统一输入/输出/指标，拓扑与运行时分栏；
+5. Protocol I B1 全对全 vs AAV86 full-sort：比较排名算法；
+6. AAV86 full-sort vs Direct Top-K：相同输入、计划和 transcript 口径；
+7. CipherGPT native vs 未来 VFSS adapter：不同实现身份，不合并结果。
 
 ### 报告规则
 
@@ -290,15 +305,19 @@ CryptoMoE 容量 Top-t 与精确 Top-K oracle 分层实现；不得用 score=0 �
 - 图表必须能追溯到原始运行文件、revision、环境和命令；
 - 不把不同安全模型、输出功能或计时边界放进同一速度排名。
 
+CryptoMoE 位于 M7 之后：先冻结 eligibility、dummy、容量 `t` 和允许公开的 routing
+transcript，再从已经验收的精确 Top-K 后端开始接入。
+
 ## 4. 两人协作方案
 
 两人从同一个最新 `main` 建立独立分支，不直接在 `main` 上并行修改。先自行选择
 角色 A/B，选择结果记录在首个 PR 描述中，不在代码里写个人姓名。
 
-### 4.1 角色 A：Protocol I / VFSS（M2）
+### 4.1 角色 A：公共底座收尾与 Protocol I（M1.1/M2）
 
 负责：
 
+- 完成 CTest 注册、metrics provenance 和 Ubuntu 干净复现；
 - 依据 M2 顺序梳理 Dealer、Party 0、Party 1 的离线材料和三轮在线消息；
 - 在 `VFSS/` 中实现真实 B1 secret-shared shuffle 的最小路径；
 - 接入全对全 CmpAgg、稳定 rank 和统一 bit-mask 输出；
@@ -316,26 +335,28 @@ docs/decisions/              Protocol I 消息流和安全边界
 
 不得修改 `VFSS-baseline/`，不得把 `Agarwal_TopK/` 代码树或旧 FSS ABI 复制进来。
 
-### 4.2 角色 B：CipherGPT 原生准备（M3-A）
+### 4.2 角色 B：Protocol III 设计与实现（M3/M5）
 
-在 CipherGPT 代码尚不能公开进入主仓库的前提下，先负责：
+M2 合并前可先做只读设计与测试准备；M2 的公共运行边界冻结后再合并实现：
 
-- 按 `docs/LOCAL_REFERENCES_SETUP.md` 准备并复现本地 CipherGPT 工作包；
-- 记录原生构建依赖、命令、测试入口、当前输出和失败样例；
-- 验证 `Top_K_paper` 的全相等、重复值、`K` 边界和轮数上限问题；
-- 设计 original index 绑定、稳定 tie 和 `mask_output` 的最小改动；
-- 查明原始代码来源、revision 和许可证，提出可共享的 source-only 边界；
-- 先提交不含受限源码的证据文档，未批准前不把整个 `CipherGPT/` 强制加入 Git。
+- 把论文 Protocol III 拆成 GRank、标准 DPF 路由和跨阶段压缩三个可审计阶段；
+- 为 M3 写消息流、3 轮因果关系、打开值/泄露和独立进程 E2E 方案；
+- 复用公共 CmpAgg、oracle 与 metrics，不复制另一套 score/tie/output 语义；
+- 先交付 `agarwal_protocol_iii_modular_3round`，通过后再研究 M5 的域表示、非零
+  payload 和 2 轮压缩；
+- 对 ADSMPC 只做证据映射，不迁移明文 Dealer、文件同步或旧 key layout；
+- CipherGPT 的资料、许可证和失败用例可以提前整理，但实现合并服从 M4 顺序。
 
-第一阶段主要写入边界：
+主要写入边界：
 
 ```text
-docs/decisions/              CipherGPT 原生行为、失败用例和 source-only 决策
-docs/experiments/            可复现命令与不含受限原文/源码的结果说明（需要时创建）
+VFSS/include/moe_topk/       仅新增 M3/M5 实际需要的 DPF/routing 接口
+VFSS/src/moe_topk/           Protocol III 与必要运行绑定
+VFSS/tests/moe_topk/         DPF routing、差分和 E2E 测试
+docs/decisions/              Protocol III 阶段、代数条件、轮数与泄露
 ```
 
-只有 source-only 分发方式通过团队审查后，才确定 CipherGPT 可提交源码的最终路径；
-不能为了并行方便先复制整个本地目录。
+角色 B 不在 M3 中提前实现 2 轮压缩，也不为了推进样例而修改 M1 冻结语义。
 
 ### 4.3 共享资产与所有权
 
@@ -351,7 +372,7 @@ PROJECT.md
 ```
 
 - 共享输入、种子和 oracle 只保留一份；禁止两条线复制后各自改变 tie rule；
-- 角色 A 不改 CipherGPT 本地工作包，角色 B 不改 Protocol I 的 VFSS 实现；
+- 角色 A 不改 Protocol III 路由实现，角色 B 不改 Protocol I shuffle 实现；
 - 两个 PR 不同时修改 `README.md` 或 `IMPLEMENTATION_PLAN.md` 的同一区域；状态汇总由
   后合并者在代码 PR 通过后单独更新；
 - 原始性能输出留在被忽略目录，进入文档的数字必须带 revision、环境和运行命令；
@@ -359,12 +380,12 @@ PROJECT.md
 
 ### 4.4 合并顺序
 
-1. 先合并本地参考配置和协作边界文档；
-2. 角色 B 可先合并 M3-A 证据/source-only 决策文档；
+1. 先合并本次路线、协作边界和 PR 模板；
+2. 角色 A 合并 M1.1 收尾；角色 B 可并行提交不改代码的 M3 消息流设计；
 3. 角色 A 的 M2 实现满足退出条件后合并；
-4. source-only 边界获批后，角色 B 再提交 CipherGPT 修正；
-5. 两条实现都得到统一 bit-mask 后，单独提交统一对比 runner 和结果，避免任一协议
-   PR 顺带修改另一个协议。
+4. 角色 B 基于冻结的 M2 公共边界合并 M3 模块化 3 轮实现；
+5. M4 CipherGPT 原生基线完成后，再进入 M5 2 轮压缩；
+6. M5 通过后才合并 M6 AAV86/Direct Top-K，实现 PR 不顺带改另一协议。
 
 ## 5. 每个合并请求的检查项
 
@@ -379,11 +400,10 @@ PROJECT.md
 
 ## 6. 立即下一步
 
-1. 两名队友克隆/更新最新 `main`，按 `docs/LOCAL_REFERENCES_SETUP.md` 准备各自
-   所需本地资料并复现 M1 四项测试；
-2. 明确角色 A/B，各自从同一 `main` 建立独立分支；
-3. 角色 A 进入 M2，但第一份 PR 先提交 Protocol I 消息流、依赖映射和最小测试
-   骨架，不在同一提交中完成整个协议；
-4. 角色 B 进入 M3-A，先提交 CipherGPT 原生复现、失败用例和 source-only 分发决策；
-5. 双方确认共享输入、统一 mask 和 metrics 没有分叉后，再分别推进实现；
-6. M2 与 CipherGPT 原生修正都满足各自退出条件后，才开始统一性能对比。
+1. 两名队友更新最新 `main`，在 Ubuntu 24.04 复现 M1 四项测试；
+2. 角色 A 从独立分支完成 M1.1：CTest、metrics provenance 与复现记录；
+3. 角色 B 从独立分支提交 M3 的阶段/消息/轮数/泄露设计，不等待 M2 代码完成；
+4. M1.1 合并后，角色 A 进入 M2；第一份 M2 PR 先提交 Protocol I 消息流、依赖
+   映射和最小测试骨架；
+5. M2 通过阶段门后，角色 B 基于最新 `main` 开始 M3 模块化 3 轮实现；
+6. 两人每次合并前确认共享输入、统一 mask、metrics 和冻结 baseline 没有分叉。

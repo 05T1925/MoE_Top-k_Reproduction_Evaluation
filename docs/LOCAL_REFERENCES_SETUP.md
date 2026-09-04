@@ -117,12 +117,15 @@ git add -n .
 - `Papers/Agarwal与CipherGPT实验对比.pdf`；
 - `CipherGPT/` 原生工作包。
 
-### 当前可选
+### 按里程碑准备
 
 - `FSS基础.pdf` 和 Boneh 等论文用于补基础；
-- `CryptoMoE.pdf` 在 M6 前不是近期实现依赖；
+- M3 前准备 `ADSMPC/` 与 `Agarwal_TopK/protocol3_ca/`，但只用于 Protocol III
+  调用次序、失败模式和局部 conformance 参考；
+- M4 前准备 CipherGPT 原生工作包并确认 source-only/许可证边界；
+- `CryptoMoE.pdf` 在 M7 统一实验完成前不是近期实现依赖；
 - `协议2shuffle.pdf` 只用于未来 Ruffle/恶意安全路线；
-- `ADSMPC/` 和 `Agarwal_TopK/protocol3_ca/` 在 Protocol III 暂缓期间只作备用。
+- AAV86/Direct Top-K 资料在 M6 前只作研究参考，不提前改变精确基线。
 
 ## 7. 使用边界
 

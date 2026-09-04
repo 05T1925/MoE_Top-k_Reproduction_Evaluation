@@ -9,8 +9,9 @@ M0 提交为 `354c40d`，M1 实现提交为 `0d82dce`，当前 `main` 已包含�
 复检文档更新；冻结标签仍指向 `993696e`。本次没有把本地论文或大型参考工程加入
 Git。
 
-M1 的 oracle、CmpAgg、metrics 和 DCF conformance 测试已在本机 Apple Clang/CMake
-环境构建并全部通过。参考资料仍需单独完成许可证确认和 source-only 清理后再决定分发方式。
+M1 的 oracle、CmpAgg、metrics 和 DCF conformance 测试已在 Apple Clang/CMake
+环境和 Ubuntu 24.04.4、GCC 13.3 环境构建并全部通过。参考资料仍需单独完成许可证
+确认和 source-only 清理后再决定分发方式。
 
 ## 2. 已通过项目
 
@@ -58,7 +59,7 @@ M0/M1 已在远端闭环。本轮为两人协作新增或更新：
 | M0 文档提交 | 已完成 | `354c40d docs: finalize M0 repository and deployment baseline` |
 | M1 提交 | 已完成 | `0d82dce feat: add M1 Top-K oracle and metrics conformance` |
 | 远端推送 | 已完成 | `main` 与 `vfss-baseline-2026-09-03` 均已推送并核验 |
-| 目标环境构建 | 部分完成 | 本机四个 M1 测试目标构建并通过；Linux/LAN/WAN 尚未测量 |
+| 目标环境构建 | 功能基线通过 | macOS 与 Ubuntu 24.04 四个 M1 测试目标构建并通过；LAN/WAN 性能尚未测量 |
 | 论文与参考工程 | 暂不提交 | 原目录含未确认再分发资料、构建物、日志、二进制、压缩包和嵌套 Git |
 
 ## 5. 推送前人工检查顺序（已执行）

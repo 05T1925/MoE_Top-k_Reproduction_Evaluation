@@ -60,6 +60,23 @@ Protocol I 的边界应在生成 stable key 前把 raw 32-bit word 映射为
 
 ## M1 复现命令
 
+Ubuntu 24.04.4（GCC 13.3、Eigen 3.4、OpenMP 4.5）已使用以下命令完成 configure、
+build 和四个测试目标的显式运行：
+
+```sh
+cmake -S VFSS -B /tmp/moe_topk_m1_build -DCMAKE_BUILD_TYPE=Debug
+cmake --build /tmp/moe_topk_m1_build --target \
+  moe_topk_m1_oracle_test moe_topk_m1_cmpagg_test \
+  moe_topk_m1_metrics_test moe_topk_m1_dcf_conformance_test -j2
+/tmp/moe_topk_m1_build/moe_topk_m1_oracle_test
+/tmp/moe_topk_m1_build/moe_topk_m1_cmpagg_test
+/tmp/moe_topk_m1_build/moe_topk_m1_metrics_test
+/tmp/moe_topk_m1_build/moe_topk_m1_dcf_conformance_test
+```
+
+四个目标均返回 0。此结果证明当前功能测试通过，不代表 LAN/WAN 性能已测量。
+M1.1 将这些目标注册到 CTest，之后以 `ctest --output-on-failure` 作为统一入口。
+
 本机 Apple Clang 需要 Homebrew 的 `eigen@3` 和 `libomp`；不需要 Homebrew GCC。配置时
 显式选择 Eigen 3，避免已链接的 Eigen 5 被 `find_package(Eigen3 3.3)` 误选：
 
