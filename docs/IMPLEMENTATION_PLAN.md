@@ -92,7 +92,17 @@
 全对全 CmpAgg、测试向量、统一比较适配和计量记录均以此语义实现。现有 VFSS CMake
 目标已实际构建并运行 `moe_topk_m1_oracle_test`、`moe_topk_m1_cmpagg_test`、
 `moe_topk_m1_metrics_test` 与 `moe_topk_m1_dcf_conformance_test`；四者在 macOS 与
-Ubuntu 24.04 均通过。M1.1 收尾尚未完成。
+Ubuntu 24.04 均通过。
+
+### M1.1 当前状态
+
+已在 Ubuntu 24.04.4 LTS（WSL2、x86_64）的新 `/tmp` Debug 构建目录验收测试代码 revision
+`a2efe5e3d2d22bb3c031fb24dc3246c37d442fad`：`ctest -N` 恰发现四项，
+`ctest --output-on-failure` 为 4/4 通过。正式 metrics 已补齐输入 seed/分布、
+编译器/flags、构建类型、CPU/内存/OS、网络、warmup 和 repetitions provenance；未测网络
+和性能字段仍是 `NOT_MEASURED`。完整环境、命令、警告检查和 baseline 复检见
+`docs/M1_1_UBUNTU_HANDOFF.md`。本验收只闭合 M1.1，不授权开始 M2，也不将 DPF
+conformance 前置原语测试写成完整 M3 实现证据。
 
 ### 输入
 
@@ -404,10 +414,8 @@ PROJECT.md
 
 ## 6. 立即下一步
 
-1. 两名队友更新最新 `main`，在 Ubuntu 24.04 复现 M1 四项测试；
-2. 角色 A 从独立分支完成 M1.1：CTest、metrics provenance 与复现记录；
-3. 角色 B 从独立分支提交 M3 的阶段/消息/轮数/泄露设计，不等待 M2 代码完成；
-4. M1.1 合并后，角色 A 进入 M2；第一份 M2 PR 先提交 Protocol I 消息流、依赖
+1. 评审并合并已验收的 M1.1 整合分支；
+2. M1.1 合并后，角色 A 才可进入 M2；第一份 M2 PR 先提交 Protocol I 消息流、依赖
    映射和最小测试骨架；
-5. M2 通过阶段门后，角色 B 基于最新 `main` 开始 M3 模块化 3 轮实现；
-6. 两人每次合并前确认共享输入、统一 mask、metrics 和冻结 baseline 没有分叉。
+3. M2 通过阶段门后，角色 B 基于最新 `main` 开始 M3 模块化 3 轮实现；
+4. 两人每次合并前确认共享输入、统一 mask、metrics 和冻结 baseline 没有分叉。
