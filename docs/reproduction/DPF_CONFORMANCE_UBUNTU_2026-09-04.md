@@ -36,10 +36,10 @@ Protocol III 设计文档第 8.3 节在 M3 集成阶段验证。
 - DPF 点为 0 和 `n-1`；
 - 对每个 `n` 求值完整的最小二进制域，因此非 2 次幂时包含 padding 位置；
 - payload 为 0、1 和一般非零 64-bit 值；
-- 输出位宽为 1、8、17、32、64，覆盖 `send_ge` 的各序列化宽度分支；
+- 输出位宽为 1、8、9、16、17、32、33、64，覆盖 `send_ge` 的各序列化宽度分支及边界；
 - 对传输后的 party 0 和 party 1 key 分别比较每个输入点的 share，而不只比较最终
   重构值；
-- 共执行 41 组 key generation / full-domain evaluation / transport case。
+- 共执行 44 组 key generation / full-domain evaluation / transport case。
 
 ## 命令与结果
 
@@ -53,7 +53,7 @@ cmake --build VFSS/build-dpf-conformance \
 结果：
 
 ```text
-DPF local and Peer/Dealer transport conformance passed: 41 cases
+DPF local and Peer/Dealer transport conformance passed: 44 cases
 ```
 
 结论：在上述 revision、环境和覆盖范围内，本地 DPF payload 重构与内存通道

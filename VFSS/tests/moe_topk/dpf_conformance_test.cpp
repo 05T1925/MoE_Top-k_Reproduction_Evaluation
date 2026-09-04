@@ -159,7 +159,7 @@ int main() {
         }
 
         // Exercise each serialized GroupElement width used by the channel.
-        constexpr std::array<int, 5> output_widths = {1, 8, 17, 32, 64};
+        constexpr std::array<int, 8> output_widths = {1, 8, 9, 16, 17, 32, 33, 64};
         for (const int bout : output_widths) {
             verify_case(5, bout, 4, UINT64_C(0x0123456789abcdef));
             ++cases;
