@@ -10,6 +10,7 @@
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
 - 当前开发主线：M1.1 收尾 → M2 Protocol I → M3 Protocol III 3 轮 →
   M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
+- 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
 - 任何 AAV86/Direct Top-K 原型在解决自适应预处理前不得标为论文定理实现。
 
