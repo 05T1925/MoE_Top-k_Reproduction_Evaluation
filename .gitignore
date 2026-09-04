@@ -26,6 +26,9 @@
 **/*.pyc
 
 # Known generated result locations
+/tmp/
+/artifacts/
+/output/
 /ADSMPC/experiments/logs/
 /ADSMPC/experiments_protocol3/results/
 /Agarwal_TopK/benchmark_results/
@@ -40,6 +43,7 @@
 # baseline.  Their roles, paths, and later distribution decisions are recorded
 # in docs/REFERENCE_MANIFEST.md.  Add a reviewed, source-only snapshot later
 # with an explicit force-add or a dedicated external archive workflow.
+/Papers/
 /ADSMPC/
 /Agarwal_TopK/
 /CipherGPT/

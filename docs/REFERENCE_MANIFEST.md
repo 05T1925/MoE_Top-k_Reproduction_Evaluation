@@ -1,83 +1,81 @@
-# Reference Material Manifest
+# 本地参考资料清单
 
-## Status
+## 1. 状态与用途
 
-This manifest defines the M0-A boundary before Git initialization.  It does
-not delete, move, or modify the local reference directories.  It prevents them
-from being accidentally staged in the initial project repository.
+本清单定义 M0 完成后的远端仓库边界。它不删除、移动或修改本地参考目录，只防止
+这些目录被普通 `git add .` 意外加入远端历史。
 
-The active Git baseline will contain only:
+远端首版只包含：
 
-- `VFSS/` — active target framework;
-- `VFSS-baseline/` — frozen source-level comparison snapshot;
-- `PROJECT.markdown`, this manifest, future project documentation, and project
-  governance files.
+- `VFSS/`：唯一活动实现目录；
+- `VFSS-baseline/`：冻结的源码级恢复与比较基线；
+- `README.md`、`PROJECT.md`、`AGENTS.md`、`.gitignore`；
+- `docs/` 下的来源、复检和实施计划文档。
 
-The raw directories below remain local reference material until a source-only
-snapshot or an external immutable archive is explicitly approved.
+下列原始论文和参考工程保留在本地，等待后续明确来源、许可证和分发方式。
 
-| Local path | Role | Initial Git state | Reason |
+| 本地路径 | 角色 | 首版 Git 状态 | 原因 |
 | --- | --- | --- | --- |
-| `ADSMPC/` | Older Sytorch/FSS prototype for Protocol III and a CipherGPT-style Top-K experiment | Local-only, ignored | Contains a 35 MB build tree and experiment output; source remains available locally |
-| `Agarwal_TopK/` | Protocol I main reference, Protocol III algorithmic reference, locked material and benchmark harnesses | Local-only, ignored | Approximately 2.4 GB; includes benchmark packages, archives, static libraries, generated outputs, and nested Git metadata |
-| `CipherGPT/` | Native two-party CipherGPT baseline | Local-only, ignored | Contains bundled dependencies, a 57 MB build tree, and generated paper logs/results |
+| `Papers/` | 论文、学习笔记和团队测试要求 | 本地保留、忽略 | 版权与再分发状态未逐项确认 |
+| `ADSMPC/` | Protocol III 和 CipherGPT-style 旧原型 | 本地保留、忽略 | 含构建树、实验输出，且不是目标运行时 |
+| `Agarwal_TopK/` | Protocol I、CA、Protocol III 算法参考 | 本地保留、忽略 | 约 2.4GB，含归档、依赖、静态库、生成结果和嵌套 Git 数据 |
+| `CipherGPT/` | CipherGPT 原生两方基线 | 本地保留、忽略 | 含捆绑依赖、构建树和实验结果 |
 
-## Required local preservation
-
-The ignored status is a version-control decision, not a disposal decision.
-Keep these paths in the shared local workspace:
+## 2. 必须保留的本地目录
 
 ```text
+Papers/
 ADSMPC/
 Agarwal_TopK/
 CipherGPT/
 ```
 
-They remain the first reference for code reading, differential testing,
-algorithm tracing, and later source extraction.
+“被 Git 忽略”不是“可以删除”。这些目录仍是论文核对、代码追踪、差分测试和
+后续来源提取的第一参考。
 
-## Reference entry points
+## 3. 主要参考入口
 
-| Implementation | Primary files to consult | Purpose |
+| 对象 | 主要入口 | 用途与边界 |
 | --- | --- | --- |
-| Protocol I | `Agarwal_TopK/protocol1_ca/include/protocol1_ca/`, `src/ca.cpp`, `src/aav86.cpp`, tests | Compare-Aggregate, AAV86 planning, rank shares, Direct Top-K |
-| Protocol III algorithm | `Agarwal_TopK/protocol3_ca/src/aav86.cpp`, tests | AAV86 graph and DCF conformance reference |
-| Protocol III prototype | `ADSMPC/src/protocol3.cpp`, `RankingPhase.h`, `valiant_graph.cpp`, `routing_dpf.h` | Old end-to-end staging reference only |
-| CipherGPT native | `CipherGPT/test/Top_K_paper_test.cpp`, `src/globals.cpp`, `src/shuffle.cpp` | Native two-party paper Top-K baseline |
-| CipherGPT-style prototype | `ADSMPC/src/ciphergpt_topk_dcf_shuffle.cpp` | Experimental FSS/DCF comparison point; not native CipherGPT |
+| Protocol I B0/B1 | `Agarwal_TopK/protocol1/`、`protocol1_ca/` | 全对全排名、参考 shuffle、CA 与测试；不直接复用其 FSS ABI |
+| Protocol III 算法 | `Agarwal_TopK/protocol3_ca/` | DCF conformance 和明文 AAV86 图测试；不是完整实现 |
+| Protocol III 旧原型 | `ADSMPC/src/protocol3.cpp`、`RankingPhase.h`、`routing_dpf.h` | 调用顺序参考；文件轮询、明文 Dealer 和旧密钥格式不迁移 |
+| CipherGPT 原生 | `CipherGPT/src/globals.cpp`、`test/Top_K_paper_test.cpp`、`src/shuffle.cpp` | 原生 Top-K 基线；当前仍需修正终止、同分和统一 mask 输出 |
+| CipherGPT-style 旧实验 | `ADSMPC/src/ciphergpt_topk_dcf_shuffle.cpp` | FSS/DCF 对照原型；不是原生 CipherGPT |
+| 测试规范 | `Papers/测试指标.md`、`Papers/Agarwal与CipherGPT实验对比.pdf` | 团队统一输出、测试矩阵与指标来源；约束已同步到 `PROJECT.md` |
 
-## Explicit exclusions from ordinary Git history
+## 4. 普通 Git 历史明确排除项
 
-The following are retained locally but must not enter the first remote Git
-history:
+- 所有论文 PDF 和未确认可再分发的资料；
+- `build/`、`CMakeFiles/`、对象文件、静态/动态库；
+- 生成的 DCF/DPF 密钥、离线包、临时通信文件和日志；
+- benchmark 输出、原始结果 CSV 和本地临时输入；
+- `Agarwal_TopK/protocol1_ca/frozen_b1_stage4c/` 等 clean-room 运行产物；
+- `Agarwal_TopK/frozen_inputs/` 下的压缩依赖或源码包；
+- 参考包内的嵌套 `.git` 元数据。
 
-- all `build/`, `CMakeFiles/`, object files, static/shared libraries, and
-  generated key/package files;
-- benchmark outputs, experiment logs, raw result CSVs, and temporary inputs;
-- `Agarwal_TopK/protocol1_ca/frozen_b1_stage4c/` and other clean-room runtime
-  products;
-- compressed dependency/source bundles under `Agarwal_TopK/frozen_inputs/`;
-- nested `.git` directories in bundled third-party material.
+## 5. 后续共享方式
 
-## Later distribution decision
+队友确实需要完全相同的参考代码时，每个实现只选择一种经过审查的方式：
 
-Before any teammate needs an identical reference copy, choose one documented
-method per implementation:
+1. 在 `reference-snapshots/` 放置最小、只含源码的快照；
+2. 使用不可变外部归档，并记录 SHA-256 与获取方式；
+3. 仅在资料必要、许可允许且普通 Git 不适合时使用 Git LFS。
 
-1. source-only snapshot in a reviewed `reference-snapshots/` directory;
-2. immutable external archive with SHA-256 and acquisition instructions; or
-3. Git LFS only when the material is necessary, licensed for sharing, and too
-   large for normal Git.
+决策必须记录来源、许可证/再分发状态、revision 或归档哈希、包含/排除路径和构建
+说明。不得为了方便直接强制加入整套本地参考目录。
 
-The decision must record origin, license/redistribution status, revision or
-archive hash, included paths, excluded generated paths, and build instructions.
-No raw reference directory is force-added merely for convenience.
+## 6. VFSS 基线校验
 
-## Baseline verification
+基线提交为 `993696e`，标签为 `vfss-baseline-2026-09-03`。2026-09-04 复检时，
+排除构建产物和 `.DS_Store` 后，`VFSS/` 与 `VFSS-baseline/` 的 131 个源文件仍
+逐文件一致；`diff -qr VFSS VFSS-baseline` 返回 0。
 
-On 2026-09-03, `VFSS/` and `VFSS-baseline/` matched for 131 source files after
-excluding generated build files and `.DS_Store`.  Normalized manifest SHA-1:
+初始归一化清单 SHA-1：
 
 ```text
 972fcd23187ecb603b22e37a2fefe608b2cb830b
 ```
+
+首次修改 `VFSS/` 前，应保留本状态作为 M0 完成证据；后续不得同步修改
+`VFSS-baseline/` 来消除差异。
