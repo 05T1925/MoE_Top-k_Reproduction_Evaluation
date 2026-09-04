@@ -75,7 +75,39 @@ cmake --build /tmp/moe_topk_m1_build --target \
 ```
 
 四个目标均返回 0。此结果证明当前功能测试通过，不代表 LAN/WAN 性能已测量。
-M1.1 将这些目标注册到 CTest，之后以 `ctest --output-on-failure` 作为统一入口。
+
+### M1.1 CTest 统一入口
+
+实现标签为 `m1_1_test_and_metrics_foundation`，证据等级为**项目工程基础设施**；它只
+增加测试入口和实验 provenance，不改变任何论文协议角色、输入、预处理、消息、打开值、
+安全输出、在线轮数或泄露边界。
+
+M1.1 已将上述四个目标注册到 CTest。当前实际验证环境为 macOS 15.7.9（x86_64）、
+Apple Clang 17.0.0、CMake 4.4.3、Homebrew `eigen@3` 3.4.1 与 `libomp` 23.1.0。
+以下命令在新的临时构建目录成功配置、构建，`ctest -N` 发现恰好四项测试，
+`ctest --output-on-failure` 四项均通过：
+
+```sh
+m11_build_dir="$(mktemp -d /tmp/moe_topk_m1_1.XXXXXX)"
+cmake -S VFSS -B "$m11_build_dir" -DCMAKE_BUILD_TYPE=Debug \
+  -DEigen3_DIR="$(brew --prefix eigen@3)/share/eigen3/cmake"
+cmake --build "$m11_build_dir" --target \
+  moe_topk_m1_oracle_test moe_topk_m1_cmpagg_test \
+  moe_topk_m1_metrics_test moe_topk_m1_dcf_conformance_test -j2
+ctest --test-dir "$m11_build_dir" -N
+ctest --test-dir "$m11_build_dir" --output-on-failure
+```
+
+单独直接运行四个 executable 仍是诊断方式；统一验证入口是 CTest。M1.1 已在真实
+Ubuntu 24.04.4 LTS WSL2 环境对测试代码 revision
+`a2efe5e3d2d22bb3c031fb24dc3246c37d442fad` 完成干净 Debug 验收：
+`ctest -N` 为 4，`ctest --output-on-failure` 为 4/4 通过。CPU 为 13th Gen Intel
+Core i9-13980HX（32 个在线逻辑 CPU），内存总量为 8122372096 bytes；GCC/G++ 13.3.0、
+CMake 3.28.3、Eigen 3.4.0、OpenMP 4.5。配置使用项目固定的 C++ flags
+`-Wno-write-strings -Wno-unused-result -maes -Wno-ignored-attributes -march=native
+-Wno-deprecated-declarations` 和 `CMAKE_BUILD_TYPE=Debug`。完整命令、警告检查和
+冻结 baseline 复检记录在 `docs/M1_1_UBUNTU_HANDOFF.md`。网络及性能指标仍为
+`NOT_MEASURED`；本结果不是 LAN/WAN 性能数据，也不是 M3 完成证据。
 
 本机 Apple Clang 需要 Homebrew 的 `eigen@3` 和 `libomp`；不需要 Homebrew GCC。配置时
 显式选择 Eigen 3，避免已链接的 Eigen 5 被 `find_package(Eigen3 3.3)` 误选：

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 project(sytorch)
+include(CTest)
 
 if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
     find_path(LIBOMP_INCLUDE_DIR omp.h
@@ -214,3 +215,10 @@ add_executable(
     tests/moe_topk/dpf_conformance_test.cpp
 )
 target_link_libraries(moe_topk_dpf_conformance_test FSS)
+
+if(BUILD_TESTING)
+    add_test(NAME moe_topk_m1_metrics_test COMMAND moe_topk_m1_metrics_test)
+    add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
+    add_test(NAME moe_topk_m1_oracle_test COMMAND moe_topk_m1_oracle_test)
+    add_test(NAME moe_topk_m1_cmpagg_test COMMAND moe_topk_m1_cmpagg_test)
+endif()

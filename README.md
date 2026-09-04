@@ -9,8 +9,10 @@
 - M0 已在远端闭环，`main` 与冻结标签均已推送；
 - M1 核心已完成：score 语义、oracle、CmpAgg、metrics 和真实 VFSS DCF
   conformance 测试均通过；
-- M1.1 收尾待完成：注册 CTest、补齐正式运行的 provenance 字段并固定 Ubuntu
-  复现入口；这些工作不改变已冻结的 Q20.12 score 语义；
+- M1.1 已在 Ubuntu 24.04.4 的干净 Debug 构建中验收：`ctest -N` 恰发现四项，
+  `ctest --output-on-failure` 为 4/4 通过；验收记录见
+  `docs/M1_1_UBUNTU_HANDOFF.md`。此结论只覆盖 M1.1 的测试入口和 provenance，
+  不表示 LAN/WAN 性能已测量，也不表示 M2/M3 已实现；
 - `VFSS/` 已产生 M1 的预期改动，`VFSS-baseline/` 仍保持冻结标签内容；
 - M2 Protocol I 是下一条实现主线；M3 Protocol III 3 轮基线在 M2 后进入；
 - 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
@@ -24,6 +26,7 @@
 - [路线优先级决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
 - [Protocol III 模块化 3 轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
+- [M1.1 Ubuntu 24.04 验收记录](docs/M1_1_UBUNTU_HANDOFF.md)
 - [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
 - [M0/M1 仓库复检](docs/M0_REVIEW.md)
 - [本地参考资料边界](docs/REFERENCE_MANIFEST.md)
