@@ -1,26 +1,24 @@
 cmake_minimum_required(VERSION 3.17)
 project(sytorch)
 
-if(APPLE)
-
-    if(CMAKE_C_COMPILER_ID MATCHES "Clang\$")
-        set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp")
-        set(OpenMP_C_LIB_NAMES "omp")
-        set(OpenMP_omp_LIBRARY omp)
+if(APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
+    find_path(LIBOMP_INCLUDE_DIR omp.h
+        HINTS /opt/homebrew/opt/libomp/include /usr/local/opt/libomp/include)
+    find_library(LIBOMP_LIBRARY omp
+        HINTS /opt/homebrew/opt/libomp/lib /usr/local/opt/libomp/lib)
+    if(NOT LIBOMP_INCLUDE_DIR OR NOT LIBOMP_LIBRARY)
+        message(FATAL_ERROR "Apple Clang requires libomp; install it with Homebrew.")
     endif()
-
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang\$")
-        set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp")
-        set(OpenMP_CXX_LIB_NAMES "omp")
-        set(OpenMP_omp_LIBRARY omp)
-    endif()
-
+    set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I${LIBOMP_INCLUDE_DIR}")
+    set(OpenMP_CXX_LIB_NAMES "omp")
+    set(OpenMP_omp_LIBRARY "${LIBOMP_LIBRARY}")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Wno-unused-result -maes -Wno-ignored-attributes -march=native -Wno-deprecated-declarations -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Wno-unused-result -maes -Wno-ignored-attributes -march=native -Wno-deprecated-declarations")
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
+find_package(OpenMP COMPONENTS CXX REQUIRED)
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
@@ -45,7 +43,7 @@ PUBLIC
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads FSS cryptoTools) # SCI-FloatML CUDA::cudart
+target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
 
 
 # === Benchmarks ===
@@ -183,3 +181,28 @@ add_executable(
     tests/e2e/CNN.cpp
 )
 target_link_libraries(CNN ${PROJECT_NAME})
+
+# M1 conformance tests use the repository's existing CMake target structure.
+add_executable(
+    moe_topk_m1_metrics_test
+    tests/moe_topk/metrics_test.cpp
+)
+target_link_libraries(moe_topk_m1_metrics_test ${PROJECT_NAME})
+
+add_executable(
+    moe_topk_m1_dcf_conformance_test
+    tests/moe_topk/dcf_conformance_test.cpp
+)
+target_link_libraries(moe_topk_m1_dcf_conformance_test ${PROJECT_NAME})
+
+add_executable(
+    moe_topk_m1_oracle_test
+    tests/moe_topk/topk_oracle_test.cpp
+)
+target_link_libraries(moe_topk_m1_oracle_test ${PROJECT_NAME})
+
+add_executable(
+    moe_topk_m1_cmpagg_test
+    tests/moe_topk/cmpagg_test.cpp
+)
+target_link_libraries(moe_topk_m1_cmpagg_test ${PROJECT_NAME})

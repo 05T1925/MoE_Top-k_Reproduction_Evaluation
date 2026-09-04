@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <cassert>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <iostream>
 #include <random.h>
 #include <graph.h>

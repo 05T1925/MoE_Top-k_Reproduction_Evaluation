@@ -82,6 +82,14 @@
 
 ## 3.1 M1：统一 oracle、数据和计量底座
 
+### 当前状态
+
+已完成（2026-09-04）。团队已冻结 32-bit 二补码 fixed-point（scale=12）、测试量化整数均匀范围
+`[-32*2^12, 32*2^12]`（端点包含）、数值降序及同分 original_index 升序。Oracle、
+全对全 CmpAgg、测试向量、统一比较适配和计量记录均以此语义实现。现有 VFSS CMake
+目标已实际构建并运行 `moe_topk_m1_oracle_test`、`moe_topk_m1_cmpagg_test`、
+`moe_topk_m1_metrics_test` 与 `moe_topk_m1_dcf_conformance_test`；四者均通过。
+
 ### 输入
 
 - `PROJECT.md` 第 5 节契约；

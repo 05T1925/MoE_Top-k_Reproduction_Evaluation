@@ -16,6 +16,7 @@
 
 - [项目范围、论文映射与统一指标](PROJECT.md)
 - [详细实施计划](docs/IMPLEMENTATION_PLAN.md)
+- [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
 - [M0 上传前复检](docs/M0_REVIEW.md)
 - [本地参考资料边界](docs/REFERENCE_MANIFEST.md)
 - [项目实现约束](AGENTS.md)
