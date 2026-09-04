@@ -20,6 +20,7 @@
 
 - [项目范围、论文映射与统一指标](PROJECT.md)
 - [详细实施计划](docs/IMPLEMENTATION_PLAN.md)
+- [双人实施分工与交接计划](docs/TEAM_WORK_PLAN.md)
 - [路线优先级决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
 - [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
