@@ -310,10 +310,10 @@ artifacts/                  被忽略的本地产物，不作证据源
 
 ### M1：公共正确性底座
 
-状态：核心实现已完成并同步远端。统一语义冻结为 32 位二补码 signed fixed-point、
-scale=12、数值降序、同分 original index 升序；四项 M1 测试已在 macOS 和 Ubuntu
-24.04 上通过。M1.1 仍需注册 CTest、补齐正式 metrics 的 provenance 字段并固定
-Ubuntu 复现入口；该收尾不改变冻结语义。
+状态：M1 与 M1.1 已完成并合入 `main`。统一语义冻结为 32 位二补码 signed
+fixed-point、scale=12、数值降序、同分 original index 升序；M1.1 已在 Ubuntu 24.04.4
+干净 Debug 构建中通过四项 CTest，并补齐正式 metrics provenance。该收尾不改变冻结
+语义；网络与性能仍为 `NOT_MEASURED`，详见 `docs/M1_1_UBUNTU_HANDOFF.md`。
 
 - 实现 32 位输入、稳定同分和原始位置 `m`-bit mask 的明文 oracle；
 - 建立随机、重复值、全相等、负数、`K=1`、`K=n`、非 2 次幂 `n` 和位宽边界
@@ -427,7 +427,7 @@ CryptoMoE 保留为 M7 之后的工作负载接入：先冻结 eligibility、dum
 
 ## 10. 后续需要团队明确的输入
 
-M0 已完成，M1 核心完成且 M1.1 收尾待办；以下问题影响后续里程碑：
+M0、M1 和 M1.1 已完成；以下问题影响后续里程碑：
 
 1. 目标机器、LAN/WAN 条件和最终需要复现的表格；
 2. 首个 MoE 模型的 `m/n/k/t`、score 编码和 payload 形状；

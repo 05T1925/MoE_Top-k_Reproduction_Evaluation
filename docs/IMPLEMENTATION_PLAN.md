@@ -8,8 +8,8 @@
 
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
-- 当前开发主线：M1.1 收尾 → M2 Protocol I → M3 Protocol III 3 轮 →
-  M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
+- 当前开发主线：已完成 M1.1；M2 Protocol I 先完成实施前设计门批准，再进入实现，
+  随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
 - 任何 AAV86/Direct Top-K 原型在解决自适应预处理前不得标为论文定理实现。
@@ -137,7 +137,7 @@ conformance 前置原语测试写成完整 M3 实现证据。
 - 同一原始通信记录可复算 total/per-party；
 - 没有测试专用明文值进入 secure 接口。
 
-### M1.1 收尾门
+### M1.1 收尾门（已满足）
 
 进入 M2 实现前完成：
 
@@ -148,7 +148,8 @@ conformance 前置原语测试写成完整 M3 实现证据。
 4. 在 Ubuntu 24.04 上执行干净 configure/build/ctest，并把命令和结果写入复现记录；
 5. 再次确认 `VFSS-baseline/` 与冻结标签无差异。
 
-M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。
+M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。该门已
+满足；M2 代码仍受 `docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md` 的四项批准决策约束。
 
 ## 3.2 M2：Agarwal Protocol I 精确核心与统一输出
 
@@ -395,7 +396,7 @@ PROJECT.md
 ### 4.4 合并顺序
 
 1. 先合并本次路线、协作边界和 PR 模板；
-2. 角色 A 合并 M1.1 收尾；角色 B 可并行提交不改代码的 M3 消息流设计；
+2. M1.1 已合并；角色 A 先完成并获批准的 M2 实施前设计门，角色 B 可并行提交不改代码的 M3 消息流设计；
 3. 角色 A 的 M2 实现满足退出条件后合并；
 4. 角色 B 基于冻结的 M2 公共边界合并 M3 模块化 3 轮实现；
 5. M4 CipherGPT 原生基线完成后，再进入 M5 2 轮压缩；
@@ -414,8 +415,7 @@ PROJECT.md
 
 ## 6. 立即下一步
 
-1. 评审并合并已验收的 M1.1 整合分支；
-2. M1.1 合并后，角色 A 才可进入 M2；第一份 M2 PR 先提交 Protocol I 消息流、依赖
-   映射和最小测试骨架；
+1. 评审并批准 M2 Protocol I 实施前设计门的四项决策；
+2. 批准后，角色 A 才可创建 M2 代码；首个 M2 PR 先提交已批准的消息流、依赖映射和最小测试骨架；
 3. M2 通过阶段门后，角色 B 基于最新 `main` 开始 M3 模块化 3 轮实现；
 4. 两人每次合并前确认共享输入、统一 mask、metrics 和冻结 baseline 没有分叉。
