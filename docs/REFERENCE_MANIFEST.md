@@ -5,14 +5,15 @@
 本清单定义 M0 完成后的远端仓库边界。它不删除、移动或修改本地参考目录，只防止
 这些目录被普通 `git add .` 意外加入远端历史。
 
-远端首版只包含：
+远端仓库的追踪范围包括：
 
 - `VFSS/`：唯一活动实现目录；
 - `VFSS-baseline/`：冻结的源码级恢复与比较基线；
 - `README.md`、`PROJECT.md`、`AGENTS.md`、`.gitignore`；
-- `docs/` 下的来源、复检和实施计划文档。
+- `docs/` 下的来源、复检、决策和实施计划文档。
 
 下列原始论文和参考工程保留在本地，等待后续明确来源、许可证和分发方式。
+队友的具体放置、校验和按分工准备方式见 `docs/LOCAL_REFERENCES_SETUP.md`。
 
 | 本地路径 | 角色 | 首版 Git 状态 | 原因 |
 | --- | --- | --- | --- |
@@ -43,6 +44,9 @@ CipherGPT/
 | CipherGPT 原生 | `CipherGPT/src/globals.cpp`、`test/Top_K_paper_test.cpp`、`src/shuffle.cpp` | 原生 Top-K 基线；当前仍需修正终止、同分和统一 mask 输出 |
 | CipherGPT-style 旧实验 | `ADSMPC/src/ciphergpt_topk_dcf_shuffle.cpp` | FSS/DCF 对照原型；不是原生 CipherGPT |
 | 测试规范 | `Papers/测试指标.md`、`Papers/Agarwal与CipherGPT实验对比.pdf` | 团队统一输出、测试矩阵与指标来源；约束已同步到 `PROJECT.md` |
+
+当前论文副本的逐文件 SHA-256 记录在 `docs/PAPERS.sha256`。哈希只用于确认团队
+版本一致，不表示仓库对相应资料拥有再分发权。
 
 ## 4. 普通 Git 历史明确排除项
 
@@ -77,5 +81,7 @@ CipherGPT/
 972fcd23187ecb603b22e37a2fefe608b2cb830b
 ```
 
-首次修改 `VFSS/` 前，应保留本状态作为 M0 完成证据；后续不得同步修改
-`VFSS-baseline/` 来消除差异。
+M1 已在 `VFSS/` 中加入统一语义、oracle、CmpAgg、metrics、测试及必要构建修正，
+因此活动树现在与冻结树存在预期差异。2026-09-04 复检确认
+`VFSS-baseline/` 相对冻结标签没有变化。后续不得同步修改冻结树来消除活动实现的
+差异。

@@ -6,8 +6,9 @@
 
 ## 1. 当前结论
 
-- M0：本地复检完成，等待所有者提交并推送 GitHub；
-- 当前开发主线：M1 → M2 → M3 → M4；
+- M0：已在远端闭环；
+- M1：已完成并同步远端，四项测试全部通过；
+- 当前开发主线：M2 与 M3-A 并行 → M3 统一对比 → M4；
 - 近期比较对象：Agarwal Protocol I 与 CipherGPT 原生 Top-K；
 - Protocol III：暂缓，保留为 M5；
 - CryptoMoE：在安全 Top-K 基线和统一实验稳定后进入 M6；
@@ -69,12 +70,14 @@
 - 固定协议命名、证据层级、bit-mask 输出、测试矩阵和性能字段；
 - 忽略论文、参考工程、构建产物、密钥、日志和临时输出；
 - 建立根 README、来源清单和本实施计划。
+- 配置 SSH 远端并推送 `main` 与冻结标签；
+- 在 GitHub 核验公开仓库与文档入口。
 
-### 待所有者完成
+### 尚未决定
 
-- 确认仓库可见性和许可证；
-- 配置 GitHub remote；
-- 复核 staged diff，提交并推送 `main` 与冻结标签。
+- 项目级 LICENSE 尚未添加；
+- 论文和大型参考工程的公开再分发未获逐项确认，因此继续保持本地；
+- 队友按 `docs/LOCAL_REFERENCES_SETUP.md` 自行准备获准使用的副本。
 
 ### 退出条件
 
@@ -287,18 +290,81 @@ CryptoMoE 容量 Top-t 与精确 Top-K oracle 分层实现；不得用 score=0 �
 - 图表必须能追溯到原始运行文件、revision、环境和命令；
 - 不把不同安全模型、输出功能或计时边界放进同一速度排名。
 
-## 4. 并行协作建议
+## 4. 两人协作方案
 
-在不制造重复抽象的前提下，可以并行以下工作：
+两人从同一个最新 `main` 建立独立分支，不直接在 `main` 上并行修改。先自行选择
+角色 A/B，选择结果记录在首个 PR 描述中，不在代码里写个人姓名。
 
-- 契约/测试负责人：M1 oracle、向量、指标验证；
-- Protocol I 负责人：M2 shuffle 与 CmpAgg；
-- CipherGPT 负责人：M3 终止、tie rule 和 mask adapter；
-- 实验负责人：固定输入、环境记录和 runner，但不提前虚构尚未产生的字段；
-- 安全复核负责人：逐阶段记录公开值、Dealer 行为和测试专用重构。
+### 4.1 角色 A：Protocol I / VFSS（M2）
 
-每项代码任务只修改其当前需要的最小接口。跨协议共用代码只有在第二个真实调用方
-出现后再提取；不得为了计划中的未来协议一次性建立大而全框架。
+负责：
+
+- 依据 M2 顺序梳理 Dealer、Party 0、Party 1 的离线材料和三轮在线消息；
+- 在 `VFSS/` 中实现真实 B1 secret-shared shuffle 的最小路径；
+- 接入全对全 CmpAgg、稳定 rank 和统一 bit-mask 输出；
+- 增加 Protocol I 单元、差分和独立进程 E2E 测试；
+- 记录每个阶段的公开值、轮数、通信和 mask adapter 开销。
+
+主要写入边界：
+
+```text
+VFSS/include/moe_topk/       仅新增 M2 实际需要的接口
+VFSS/src/moe_topk/           Protocol I 与必要运行绑定
+VFSS/tests/moe_topk/         Protocol I 测试
+docs/decisions/              Protocol I 消息流和安全边界
+```
+
+不得修改 `VFSS-baseline/`，不得把 `Agarwal_TopK/` 代码树或旧 FSS ABI 复制进来。
+
+### 4.2 角色 B：CipherGPT 原生准备（M3-A）
+
+在 CipherGPT 代码尚不能公开进入主仓库的前提下，先负责：
+
+- 按 `docs/LOCAL_REFERENCES_SETUP.md` 准备并复现本地 CipherGPT 工作包；
+- 记录原生构建依赖、命令、测试入口、当前输出和失败样例；
+- 验证 `Top_K_paper` 的全相等、重复值、`K` 边界和轮数上限问题；
+- 设计 original index 绑定、稳定 tie 和 `mask_output` 的最小改动；
+- 查明原始代码来源、revision 和许可证，提出可共享的 source-only 边界；
+- 先提交不含受限源码的证据文档，未批准前不把整个 `CipherGPT/` 强制加入 Git。
+
+第一阶段主要写入边界：
+
+```text
+docs/decisions/              CipherGPT 原生行为、失败用例和 source-only 决策
+docs/experiments/            可复现命令与不含受限原文/源码的结果说明（需要时创建）
+```
+
+只有 source-only 分发方式通过团队审查后，才确定 CipherGPT 可提交源码的最终路径；
+不能为了并行方便先复制整个本地目录。
+
+### 4.3 共享资产与所有权
+
+以下 M1 文件已经冻结，任何一方需要修改都必须先说明对另一条线的影响并由双方
+复核：
+
+```text
+VFSS/include/moe_topk/score_semantics.h
+VFSS/include/moe_topk/topk_oracle.h
+VFSS/include/moe_topk/metrics.h
+docs/decisions/M1_SCORE_SEMANTICS.md
+PROJECT.md
+```
+
+- 共享输入、种子和 oracle 只保留一份；禁止两条线复制后各自改变 tie rule；
+- 角色 A 不改 CipherGPT 本地工作包，角色 B 不改 Protocol I 的 VFSS 实现；
+- 两个 PR 不同时修改 `README.md` 或 `IMPLEMENTATION_PLAN.md` 的同一区域；状态汇总由
+  后合并者在代码 PR 通过后单独更新；
+- 原始性能输出留在被忽略目录，进入文档的数字必须带 revision、环境和运行命令；
+- 跨协议共用代码只有第二个真实调用方出现后再提取，不提前建立大而全抽象。
+
+### 4.4 合并顺序
+
+1. 先合并本地参考配置和协作边界文档；
+2. 角色 B 可先合并 M3-A 证据/source-only 决策文档；
+3. 角色 A 的 M2 实现满足退出条件后合并；
+4. source-only 边界获批后，角色 B 再提交 CipherGPT 修正；
+5. 两条实现都得到统一 bit-mask 后，单独提交统一对比 runner 和结果，避免任一协议
+   PR 顺带修改另一个协议。
 
 ## 5. 每个合并请求的检查项
 
@@ -313,7 +379,11 @@ CryptoMoE 容量 Top-t 与精确 Top-K oracle 分层实现；不得用 score=0 �
 
 ## 6. 立即下一步
 
-1. 所有者完成 M0 的 GitHub 提交与推送；
-2. 团队决定 32 位 score 的 signedness、定点 scale 和输入分布；
-3. 在 M1 只建立 oracle、测试向量、DCF conformance 和指标最小结构；
-4. M1 退出条件全部通过后，再开始 Protocol I 的真实安全 shuffle 迁移。
+1. 两名队友克隆/更新最新 `main`，按 `docs/LOCAL_REFERENCES_SETUP.md` 准备各自
+   所需本地资料并复现 M1 四项测试；
+2. 明确角色 A/B，各自从同一 `main` 建立独立分支；
+3. 角色 A 进入 M2，但第一份 PR 先提交 Protocol I 消息流、依赖映射和最小测试
+   骨架，不在同一提交中完成整个协议；
+4. 角色 B 进入 M3-A，先提交 CipherGPT 原生复现、失败用例和 source-only 分发决策；
+5. 双方确认共享输入、统一 mask 和 metrics 没有分叉后，再分别推进实现；
+6. M2 与 CipherGPT 原生修正都满足各自退出条件后，才开始统一性能对比。

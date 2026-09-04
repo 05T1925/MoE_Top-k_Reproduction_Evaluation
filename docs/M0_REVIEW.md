@@ -5,8 +5,9 @@
 ## 1. 复检结论
 
 M0 的“代码基线冻结、仓库边界、协议命名、统一输出和指标规范”已完成复检并在远端闭环。
-M0 提交为 `354c40d`，当前 `main` 已推进到 M1 提交 `0d82dce`；冻结标签仍指向
-`993696e`。本次没有把本地论文或大型参考工程加入 Git。
+M0 提交为 `354c40d`，M1 实现提交为 `0d82dce`，当前 `main` 已包含这两项及本次
+复检文档更新；冻结标签仍指向 `993696e`。本次没有把本地论文或大型参考工程加入
+Git。
 
 M1 的 oracle、CmpAgg、metrics 和 DCF conformance 测试已在本机 Apple Clang/CMake
 环境构建并全部通过。参考资料仍需单独完成许可证确认和 source-only 清理后再决定分发方式。
@@ -18,7 +19,9 @@ M1 的 oracle、CmpAgg、metrics 和 DCF conformance 测试已在本机 Apple Cl
 | 主分支存在 | 通过 | 当前分支为 `main` |
 | 基线提交存在 | 通过 | `993696e chore: establish VFSS project baseline` |
 | 冻结标签存在 | 通过 | `vfss-baseline-2026-09-03` |
-| 活动树与冻结树一致 | 通过 | `diff -qr VFSS VFSS-baseline` 返回 0 |
+| M0 时活动树与冻结树一致 | 通过 | M0 基线中两侧各 131 个源文件 |
+| 当前冻结树未被改动 | 通过 | `git diff vfss-baseline-2026-09-03 -- VFSS-baseline` 为空 |
+| 当前活动树差异可解释 | 通过 | 仅包含 M1 的 CMake、Eigen include、`moe_topk` 头文件和测试 |
 | 基线规模一致 | 通过 | 两侧各 131 个源文件，共 262 个 |
 | Git 对象完整 | 通过 | `git fsck --full --no-reflogs` 无错误，仅报告 1 个 dangling tree |
 | 符号链接 | 通过 | 已追踪文件中没有符号链接 |
@@ -32,20 +35,18 @@ M1 的 oracle、CmpAgg、metrics 和 DCF conformance 测试已在本机 Apple Cl
 | 来源清单 | 通过 | `docs/REFERENCE_MANIFEST.md` 已改为当前 Git 状态和中文说明 |
 | M1 基础测试 | 通过 | oracle、CmpAgg、metrics、DCF conformance 四个目标均返回 0 |
 
-## 3. 当前工作区预期变更
+## 3. 本轮本地参考配置文档变更
 
-本轮应只包含以下项目治理变更：
+M0/M1 已在远端闭环。本轮为两人协作新增或更新：
 
-- `PROJECT.markdown` 重命名为 `PROJECT.md`，并更新内容；
-- 更新 `.gitignore`；
-- 更新 `docs/REFERENCE_MANIFEST.md`；
-- 新增 `README.md`；
-- 新增 `docs/M0_REVIEW.md`；
-- 新增 `docs/IMPLEMENTATION_PLAN.md`。
+- `docs/LOCAL_REFERENCES_SETUP.md`：本地论文与大型参考目录的放置和校验；
+- `docs/PAPERS.sha256`：当前 9 个论文/规范文件的逐文件哈希；
+- `README.md`：增加本地配置入口并更新 M1 状态；
+- `docs/REFERENCE_MANIFEST.md`：同步 M1 后活动树状态；
+- `docs/IMPLEMENTATION_PLAN.md`：增加两人角色、写入边界和合并顺序；
+- 本文件：改正 M1 后 `VFSS/` 已与冻结树产生预期差异的状态。
 
-`Papers/` 及三个本地参考工程不应出现在待提交文件列表中。Git 在未暂存时会把
-重命名显示为“删除旧文件 + 新增新文件”；暂存后应复核它是否被识别为 rename，
-但识别形式不影响内容正确性。
+`Papers/` 及三个本地参考工程仍不应出现在待提交文件列表中。
 
 ## 4. 当前状态与仍需决定的事项
 

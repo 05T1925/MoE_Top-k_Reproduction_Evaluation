@@ -35,11 +35,14 @@ Agarwal Protocol I、Agarwal Protocol III 和 CipherGPT Top-K 的可区分基线
 
 Git 基线已经建立：当前基线提交为 `993696e`，标签为
 `vfss-baseline-2026-09-03`。截至 2026-09-04，排除构建产物和 `.DS_Store`
-后，`VFSS/` 与 `VFSS-baseline/` 的 131 个源文件逐文件一致。后续首次修改
-`VFSS/` 前应再次记录差异；`VFSS-baseline/` 只用于比较、恢复和回归定位。
+后，M0 中 `VFSS/` 与 `VFSS-baseline/` 的 131 个源文件逐文件一致。M1 已在
+`VFSS/` 中产生预期改动，冻结树仍与标签一致；`VFSS-baseline/` 只用于比较、恢复
+和回归定位，禁止随活动实现同步修改。
 
 引用目录的追踪与分发策略见 `docs/REFERENCE_MANIFEST.md`。不得提交构建目录、
 静态库、实验生成密钥、临时通信文件或嵌套 Git 元数据。
+队友克隆后应按 `docs/LOCAL_REFERENCES_SETUP.md` 自行准备获准使用的本地论文和
+参考工程，并用 `docs/PAPERS.sha256` 校验论文版本。
 
 面向执行的里程碑、交付物和退出条件见 `docs/IMPLEMENTATION_PLAN.md`；本轮 M0
 上传前审计见 `docs/M0_REVIEW.md`。本文仍是项目范围、语义和证据边界的总纲。
@@ -306,6 +309,9 @@ artifacts/                  被忽略的本地产物，不作证据源
 
 ### M1：公共正确性底座
 
+状态：已完成并同步远端。统一语义冻结为 32 位二补码 signed fixed-point、
+scale=12、数值降序、同分 original index 升序；四项 M1 测试均通过。
+
 - 实现 32 位输入、稳定同分和原始位置 `m`-bit mask 的明文 oracle；
 - 建立随机、重复值、全相等、负数、`K=1`、`K=n`、非 2 次幂 `n` 和位宽边界
   向量，并验证 `z_j∈{0,1}`、`Σz_j=K`；
@@ -398,7 +404,9 @@ artifacts/                  被忽略的本地产物，不作证据源
 
 ## 9. 当前已确认状态
 
-- `VFSS/` 与冻结 baseline 尚未分叉，可以从干净共同起点迁移；
+- M0 和 M1 已同步远端；`VFSS/` 只包含 M1 的预期差异，冻结 baseline 未改；
+- M1 已冻结 32 位二补码 fixed-point（scale=12）、统一随机范围、稳定同分、
+  oracle、CmpAgg、metrics 和 DCF 边界映射；
 - Protocol I 的 B0/B1 和 CA 测试材料较完整，但 B0 不是高效论文 shuffle，CA
   不是 Protocol I 本体；
 - Protocol III 没有可直接迁移的完整论文级实现，ADSMPC 只能作为旧原型参考；
@@ -413,15 +421,15 @@ artifacts/                  被忽略的本地产物，不作证据源
 
 ## 10. 后续需要团队明确的输入
 
-这些问题不阻塞 M0/M1，但会影响后续选择：
+M0/M1 已完成，以下问题影响后续里程碑：
 
 1. 目标机器、LAN/WAN 条件和最终需要复现的表格；
-2. 32 位输入的 signedness、定点 scale 和统一随机输入分布；
-3. 首个 MoE 模型的 `m/n/k/t`、score 编码和 payload 形状；
-4. 是否把 selected payload 作为 bit-mask 之外的附加诊断输出；
-5. CryptoMoE 集成允许公开哪些 routing transcript；
-6. 是否需要把 Ruffle/恶意安全 3PC 纳入后续独立路线；
-7. 是否为 Protocol III 压缩路由引入域表示，还是只保留标准 DPF + Beaver 路径。
+2. 首个 MoE 模型的 `m/n/k/t`、score 编码和 payload 形状；
+3. 是否把 selected payload 作为 bit-mask 之外的附加诊断输出；
+4. CryptoMoE 集成允许公开哪些 routing transcript；
+5. 是否需要把 Ruffle/恶意安全 3PC 纳入后续独立路线；
+6. 是否为 Protocol III 压缩路由引入域表示，还是只保留标准 DPF + Beaver 路径；
+7. CipherGPT 原生代码的来源、revision、许可证和 source-only 共享方式。
 
 在这些选择确定前，可以先完成统一 oracle、Protocol I 精确基线、CipherGPT
 原生基线及二者的统一对比；Protocol III 保持暂缓。不能提前声称 AAV86、
