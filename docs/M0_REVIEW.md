@@ -1,14 +1,15 @@
-# M0 上传前复检记录
+# M0 复检记录
 
 复检日期：2026-09-04
 
 ## 1. 复检结论
 
-M0 的“代码基线冻结、仓库边界、协议命名、统一输出和指标规范”已经具备上传条件。
-本轮没有修改 VFSS 源码，也没有把本地论文或参考工程加入 Git。
+M0 的“代码基线冻结、仓库边界、协议命名、统一输出和指标规范”已完成复检并在远端闭环。
+M0 提交为 `354c40d`，当前 `main` 已推进到 M1 提交 `0d82dce`；冻结标签仍指向
+`993696e`。本次没有把本地论文或大型参考工程加入 Git。
 
-真正推送前仍有三项外部操作：配置 GitHub 远端、决定仓库可见性/许可证、提交本轮
-文档变更。它们需要仓库所有者决定，本次复检不代替执行。
+M1 的 oracle、CmpAgg、metrics 和 DCF conformance 测试已在本机 Apple Clang/CMake
+环境构建并全部通过。参考资料仍需单独完成许可证确认和 source-only 清理后再决定分发方式。
 
 ## 2. 已通过项目
 
@@ -19,7 +20,7 @@ M0 的“代码基线冻结、仓库边界、协议命名、统一输出和指�
 | 冻结标签存在 | 通过 | `vfss-baseline-2026-09-03` |
 | 活动树与冻结树一致 | 通过 | `diff -qr VFSS VFSS-baseline` 返回 0 |
 | 基线规模一致 | 通过 | 两侧各 131 个源文件，共 262 个 |
-| Git 对象完整 | 通过 | `git fsck --full --no-reflogs` 无错误 |
+| Git 对象完整 | 通过 | `git fsck --full --no-reflogs` 无错误，仅报告 1 个 dangling tree |
 | 符号链接 | 通过 | 已追踪文件中没有符号链接 |
 | 明显凭据文件 | 通过 | 仓库两层内未发现 `.env`、PEM、key、credential/secret 文件 |
 | 参考工程边界 | 通过 | `ADSMPC/`、`Agarwal_TopK/`、`CipherGPT/` 被忽略 |
@@ -29,6 +30,7 @@ M0 的“代码基线冻结、仓库边界、协议命名、统一输出和指�
 | 队友入口 | 通过 | 根目录 `README.md` 提供中文导航 |
 | 详细计划 | 通过 | `docs/IMPLEMENTATION_PLAN.md` 定义里程碑与退出条件 |
 | 来源清单 | 通过 | `docs/REFERENCE_MANIFEST.md` 已改为当前 Git 状态和中文说明 |
+| M1 基础测试 | 通过 | oracle、CmpAgg、metrics、DCF conformance 四个目标均返回 0 |
 
 ## 3. 当前工作区预期变更
 
@@ -45,18 +47,20 @@ M0 的“代码基线冻结、仓库边界、协议命名、统一输出和指�
 重命名显示为“删除旧文件 + 新增新文件”；暂存后应复核它是否被识别为 rename，
 但识别形式不影响内容正确性。
 
-## 4. 尚未执行或需要所有者决定
+## 4. 当前状态与仍需决定的事项
 
 | 项目 | 状态 | 说明 |
 | --- | --- | --- |
-| GitHub 远端 | 待配置 | 当前 `git remote -v` 为空，需要实际仓库 URL |
-| 仓库可见性 | 待决定 | 参考资料虽被忽略，项目研究内容是否公开仍由所有者决定 |
-| LICENSE | 待决定 | 当前没有许可证；公开仓库无许可证时默认不授予他人复用权限 |
-| 本轮提交 | 未执行 | 尚未 stage/commit，避免代替所有者确认最终 diff |
-| 远端推送 | 未执行 | 用户确认远端与提交后再执行 |
-| 目标环境构建 | 不属于 M0 | VFSS 原始基线未改；新协议尚未进入 M1，因此本轮未做协议构建测试 |
+| GitHub 远端 | 已完成 | `origin` 为 `git@github.com:05T1925/MoE_Top-k_Reproduction_Evaluation.git` |
+| 仓库可见性 | 已确认 | GitHub 页面显示为 Public |
+| LICENSE | 未添加 | 当前没有项目级许可证，公开仓库默认不授予复用权限 |
+| M0 文档提交 | 已完成 | `354c40d docs: finalize M0 repository and deployment baseline` |
+| M1 提交 | 已完成 | `0d82dce feat: add M1 Top-K oracle and metrics conformance` |
+| 远端推送 | 已完成 | `main` 与 `vfss-baseline-2026-09-03` 均已推送并核验 |
+| 目标环境构建 | 部分完成 | 本机四个 M1 测试目标构建并通过；Linux/LAN/WAN 尚未测量 |
+| 论文与参考工程 | 暂不提交 | 原目录含未确认再分发资料、构建物、日志、二进制、压缩包和嵌套 Git |
 
-## 5. 推送前人工检查顺序
+## 5. 推送前人工检查顺序（已执行）
 
 ```bash
 git status --short
@@ -76,10 +80,10 @@ git diff --cached --name-status
 git diff --cached --check
 ```
 
-配置远端和推送需要使用实际 URL，例如：
+本次使用 SSH 远端：
 
 ```bash
-git remote add origin <实际 GitHub 仓库 URL>
+git remote set-url origin git@github.com:05T1925/MoE_Top-k_Reproduction_Evaluation.git
 git push -u origin main
 git push origin vfss-baseline-2026-09-03
 ```
@@ -95,4 +99,4 @@ git push origin vfss-baseline-2026-09-03
 3. `main` 与 `vfss-baseline-2026-09-03` 均已推送；
 4. GitHub 页面能从 `README.md` 进入总纲、实施计划和来源清单；
 5. 仓库可见性和许可证状态已经明确告知队友；
-6. M1 开始前再次确认 `VFSS-baseline/` 未被修改。
+6. M1 开始后再次确认 `VFSS-baseline/` 仍未被修改；本次复检通过。
