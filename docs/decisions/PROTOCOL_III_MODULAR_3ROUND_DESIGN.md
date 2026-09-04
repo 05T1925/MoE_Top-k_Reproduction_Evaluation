@@ -159,6 +159,11 @@ mask 或任意调试 oracle。随机性复用、key/triple 数量不足、party 
 4. 乘法 adapter 覆盖 0、1、最大 ring word 和随机值，输出只以 shares 存在；
 5. 验证加法 bit share 的最低位转换为 XOR bit share。
 
+截至 2026-09-04，前 3 项中的标准 DPF 本地重构和 key 传输已按
+`docs/reproduction/DPF_CONFORMANCE_UBUNTU_2026-09-04.md` 完成首轮验证。传输验证
+使用 VFSS `Peer`/Dealer 的内存通道，覆盖与 socket 通道相同的 DPF key
+序列化函数；独立进程 socket E2E 仍保留在 8.3 节，不视为已经完成。
+
 ### 8.2 Oracle differential
 
 - 重复值、全相等、负值、`INT32_MIN/MAX`、`K=1`、`K=n` 和非 2 次幂 `n`；
