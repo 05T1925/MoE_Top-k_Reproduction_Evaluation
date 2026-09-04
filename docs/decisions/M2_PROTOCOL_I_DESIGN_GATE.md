@@ -2,6 +2,11 @@
 
 状态：**待团队批准；本文件不是 M2 代码授权。**
 
+M2.1 对 D1--D4 的可实现性、精确泄露条款、域宽表、inverse-routing 证据缺口和
+transport/metrics contract 见
+[`M2_PROTOCOL_I_FEASIBILITY_AUDIT.md`](M2_PROTOCOL_I_FEASIBILITY_AUDIT.md)。该审计的
+结论仍是 `m2_protocol_i_design_blocked`；链接不构成任何实现授权。
+
 实现候选标签为 `agarwal_protocol_i_exact_mask_output`。在本文件的四项决策均获明确
 批准、其最小原语经审计且 secure mask adapter 可验证之前，任何实现只能使用
 `m2_protocol_i_design_blocked`，不得声称 Protocol I exact。
