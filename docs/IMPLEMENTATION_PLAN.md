@@ -186,6 +186,9 @@ M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score
 
 ## 3.3 M3：Protocol III 模块化 3 轮基线
 
+阶段、消息、表示、泄露、统一 mask 适配和实现门以
+`docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md` 为准。
+
 ### 输入
 
 - M1 全对全 CmpAgg、oracle、测试输入与指标；
