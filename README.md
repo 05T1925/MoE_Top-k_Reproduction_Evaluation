@@ -22,6 +22,7 @@
 - [详细实施计划](docs/IMPLEMENTATION_PLAN.md)
 - [双人实施分工与交接计划](docs/TEAM_WORK_PLAN.md)
 - [路线优先级决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
+- [Protocol III 模块化 3 轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
 - [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
 - [M0/M1 仓库复检](docs/M0_REVIEW.md)
