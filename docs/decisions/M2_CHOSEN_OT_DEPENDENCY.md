@@ -35,9 +35,14 @@ unresolved macoro licensing/packaging boundary is not carried into this route.
 | conformance | TEST_ONLY controller independently supplies role inputs and checks receiver output. | `socketpair` + `fork` + `execv`; no TCP port, file, sleep, retry, online Dealer or direct selection path. | Controller-only reconstruction checks selected block equality and child exit codes. |
 
 `EmpBoundedFdIO` handles short read/write, `EINTR`, EOF, `POLLERR`, `POLLHUP`,
-`POLLNVAL` and timeout as hard errors. It uses no `emp::*` or OpenSSL type in
-the public header. A process-local `(session,fingerprint,material_id,role)`
-consumption set rejects replay after a valid preamble.
+`POLLNVAL` and timeout as hard errors.  Every `EINTR` poll retry recomputes
+the remaining time against one absolute steady-clock deadline. It uses no
+`emp::*` or OpenSSL type in the public header. A process-local
+`(session,fingerprint,material_id,role)` consumption set is a **process-local
+duplicate invocation guard** after a valid preamble; it is neither persistent
+nor cross-process replay protection. Runtime uniqueness instead requires the
+controller to allocate fresh IDs, both roles to bind them in the preamble, and
+secure code never to reuse material IDs.
 
 ## Ubuntu 24.04.4 qualification result
 
@@ -73,6 +78,7 @@ The public C++17 header uses `ProtocolIBlock128 = std::array<std::uint8_t,16>`.
 
 ## Admission condition
 
-This closes only chosen-OT conformance. Performance, LAN/WAN measurements,
-OPV, Share Translation, Permute+Share, secure shuffle, inverse routing and
-complete Protocol I remain `NOT_MEASURED` or unimplemented.
+This closes the standalone chosen-OT boundary. M2.9 independently consumes it
+for OPV/Share Translation conformance; see `M2_OPV_SHARE_TRANSLATION.md`.
+Performance, LAN/WAN measurements, Permute+Share, secure shuffle, inverse
+routing and complete Protocol I remain `NOT_MEASURED` or unimplemented.

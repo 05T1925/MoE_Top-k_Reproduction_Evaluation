@@ -12,10 +12,13 @@
   但完整 Protocol I 仍须通过设计门、真实 shuffle、inverse routing 和统一 mask；
   M2.8 的项目扩展 `m2_emp_iknp_chosen_ot_conformance` 已在 Ubuntu-24.04 上完成固定
   EMP 依赖构建、upstream base-OT/IKNP smoke、C++20 隔离的 connected-fd adapter 和
-  sender/receiver 独立进程 conformance；它不是 OPV/PS/shuffle 或完整 Protocol I，状态与
+  sender/receiver 独立进程 conformance；M2.9 项目扩展
+  `m2_emp_opv_share_translation_conformance` 已在其上完成真实 GGM OPV 与 Share
+  Translation 的独立进程 conformance；两者仍不是 Permute+Share/shuffle 或完整 Protocol I，状态与
   可复现命令见
   `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
-  `docs/reproduction/M2_CHOSEN_OT_CONFORMANCE_UBUNTU_2026-09-05.md`；
+  `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`、
+  `docs/reproduction/M2_OPV_SHARE_TRANSLATION_UBUNTU_2026-09-05.md`；
   随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
