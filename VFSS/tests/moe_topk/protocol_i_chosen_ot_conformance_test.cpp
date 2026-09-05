@@ -1,6 +1,7 @@
 #include <moe_topk/protocol_i_chosen_ot.h>
 
 #include <array>
+#include <chrono>
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
@@ -12,6 +13,7 @@
 #include <string>
 #include <signal.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/wait.h>
 #include <thread>
 #include <unistd.h>
@@ -20,6 +22,14 @@
 namespace {
 using moe_topk::ProtocolIBlock128;
 using moe_topk::ProtocolIChosenOtConfig;
+volatile sig_atomic_t deadline_interrupts = 0;
+void deadline_signal(int) {
+  ++deadline_interrupts;
+  if (deadline_interrupts == 10) {
+    itimerval stop{};
+    ::setitimer(ITIMER_REAL, &stop, nullptr);
+  }
+}
 
 void require(bool condition, const char* message) { if (!condition) throw std::runtime_error(message); }
 void close_fd(int& fd) { if (fd >= 0) { ::close(fd); fd = -1; } }
@@ -110,6 +120,23 @@ void expect_eof_and_timeout() {
   require(threw, "preamble timeout"); close_fd(fds[0]); close_fd(fds[1]);
 }
 
+void expect_interrupted_absolute_deadline() {
+  int fds[2]{}; pair(fds);
+  struct sigaction old_action{}, action{};
+  action.sa_handler = deadline_signal; ::sigemptyset(&action.sa_mask);
+  require(::sigaction(SIGALRM, &action, &old_action) == 0, "signal setup");
+  deadline_interrupts = 0;
+  itimerval timer{}; timer.it_value.tv_usec = 2000; timer.it_interval.tv_usec = 2000;
+  require(::setitimer(ITIMER_REAL, &timer, nullptr) == 0, "timer setup");
+  const auto began = std::chrono::steady_clock::now(); bool threw = false;
+  try { (void)moe_topk::protocol_i_chosen_ot_receiver({9,8,7,1,40}, fds[0], {0}); } catch (...) { threw = true; }
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-began).count();
+  itimerval stop{}; ::setitimer(ITIMER_REAL, &stop, nullptr); ::sigaction(SIGALRM, &old_action, nullptr);
+  require(threw && deadline_interrupts >= 5, "interrupted deadline failure");
+  require(elapsed < 56, "absolute deadline overrun after EINTR");
+  close_fd(fds[0]); close_fd(fds[1]);
+}
+
 void run_mismatch(const std::string& executable, const ProtocolIChosenOtConfig& sender_config,
                   const ProtocolIChosenOtConfig& receiver_config, bool sender_on_both) {
   int ot[2]{}, sender_input[2]{}, receiver_input[2]{}, sender_result[2]{}, receiver_result[2]{}; pair(ot); pair(sender_input); pair(receiver_input); pair(sender_result); pair(receiver_result);
@@ -154,7 +181,7 @@ int main(int argc, char** argv) {
   try {
     ::signal(SIGPIPE, SIG_IGN);
     if (argc > 1) return role_main(argc, argv);
-    const auto executable = self(argv[0]); negative_inputs(); expect_eof_and_timeout(); expect_preamble_errors(executable); expect_replay(); std::uint64_t material = 1;
+    const auto executable = self(argv[0]); negative_inputs(); expect_eof_and_timeout(); expect_interrupted_absolute_deadline(); expect_preamble_errors(executable); expect_replay(); std::uint64_t material = 1;
     for (const auto n : {1U,2U,17U,128U}) for (int choice_mode=0; choice_mode<4; ++choice_mode) for (int message_mode=0; message_mode<5; ++message_mode) run_case(executable, n, choice_mode, message_mode, material++);
     run_case(executable, 17, 3, 0, material++); run_case(executable, 17, 3, 1, material++);  // fresh-material batches
     return 0;

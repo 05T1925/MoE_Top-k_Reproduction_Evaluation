@@ -25,7 +25,6 @@ constexpr std::uint32_t kMagic = UINT32_C(0x4d324f54);  // M2OT
 constexpr std::uint16_t kVersion = 1;
 constexpr std::uint8_t kSenderRole = 1;
 constexpr std::uint8_t kReceiverRole = 2;
-constexpr std::uint32_t kProtocolId = UINT32_C(0x494b4e50);  // IKNP
 constexpr std::size_t kPreambleBytes = 48;
 
 using Clock = std::chrono::steady_clock;
@@ -81,12 +80,14 @@ class EmpBoundedFdIO final : public emp::IOChannel {
   Clock::time_point deadline_;
 
   void wait(short requested) {
-    const auto now = Clock::now();
-    if (now >= deadline_) fail("chosen OT deadline exceeded");
-    const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(deadline_ - now).count();
-    const auto timeout = static_cast<int>(std::min<std::int64_t>(remaining + 1, INT_MAX));
     pollfd descriptor{fd_, requested, 0};
     for (;;) {
+      // poll() may be interrupted arbitrarily often.  Recompute against the
+      // absolute deadline before every retry rather than restarting a timeout.
+      const auto now = Clock::now();
+      if (now >= deadline_) fail("chosen OT deadline exceeded");
+      const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(deadline_ - now).count();
+      const auto timeout = static_cast<int>(std::min<std::int64_t>(remaining + 1, INT_MAX));
       const int result = ::poll(&descriptor, 1, timeout);
       if (result < 0 && errno == EINTR) continue;
       if (result == 0) fail("chosen OT deadline exceeded");
@@ -124,7 +125,7 @@ std::array<std::uint8_t, kPreambleBytes> preamble(const ProtocolIChosenOtConfig&
   put_u64(bytes, 16, config.fingerprint);
   put_u64(bytes, 24, config.material_id);
   put_u32(bytes, 32, config.item_count);
-  put_u32(bytes, 36, kProtocolId);
+  put_u32(bytes, 36, config.protocol_id);
   return bytes;
 }
 
@@ -138,7 +139,7 @@ void exchange_preamble(EmpBoundedFdIO& io, const ProtocolIChosenOtConfig& config
   if (get_u32(peer, 0) != kMagic || get_u16(peer, 4) != kVersion || peer[6] != peer_role ||
       get_u64(peer, 8) != config.session || get_u64(peer, 16) != config.fingerprint ||
       get_u64(peer, 24) != config.material_id || get_u32(peer, 32) != config.item_count ||
-      get_u32(peer, 36) != kProtocolId) {
+      get_u32(peer, 36) != config.protocol_id) {
     fail("chosen OT preamble mismatch");
   }
 }
@@ -149,6 +150,8 @@ void consume_material(const ProtocolIChosenOtConfig& config, std::uint8_t role) 
   const auto key = std::to_string(config.session) + ":" + std::to_string(config.fingerprint) +
                    ":" + std::to_string(config.material_id) + ":" + std::to_string(role);
   std::lock_guard<std::mutex> lock(mutex);
+  // This is deliberately only a process-local duplicate invocation guard;
+  // it is neither persistent nor a cross-process replay defence.
   if (!consumed.insert(key).second) fail("chosen OT material replay");
 }
 

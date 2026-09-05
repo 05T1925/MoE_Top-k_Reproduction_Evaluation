@@ -15,6 +15,9 @@ struct ProtocolIChosenOtConfig {
   std::uint64_t material_id;
   std::uint32_t item_count;
   int timeout_ms;
+  // Binds this invocation to a protocol stage.  The default is the standalone
+  // M2.8 IKNP conformance boundary; higher-level adapters must use their own.
+  std::uint32_t protocol_id = UINT32_C(0x494b4e50);  // IKNP
 };
 
 struct ProtocolIChosenOtCounters {
