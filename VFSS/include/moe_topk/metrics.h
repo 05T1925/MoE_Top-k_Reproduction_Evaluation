@@ -4,6 +4,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -21,6 +22,11 @@ struct Measurement {
     std::optional<T> value;
 
     static Measurement measured(T measured_value) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            if (measured_value.empty()) {
+                throw std::invalid_argument("measured string must not be empty");
+            }
+        }
         return {MeasurementState::MEASURED, std::move(measured_value)};
     }
 
@@ -52,6 +58,27 @@ struct MetricsRecord {
     std::string party_topology;
     std::uint64_t n = 0;
     std::uint64_t K = 0;
+    Measurement<std::uint64_t> input_seed =
+        Measurement<std::uint64_t>::not_measured();
+    Measurement<std::string> input_distribution =
+        Measurement<std::string>::not_measured();
+    Measurement<std::string> compiler = Measurement<std::string>::not_measured();
+    Measurement<std::string> compiler_flags =
+        Measurement<std::string>::not_measured();
+    Measurement<std::string> build_type = Measurement<std::string>::not_measured();
+    Measurement<std::string> cpu_model = Measurement<std::string>::not_measured();
+    Measurement<std::uint64_t> system_memory_bytes =
+        Measurement<std::uint64_t>::not_measured();
+    Measurement<std::string> operating_system =
+        Measurement<std::string>::not_measured();
+    Measurement<std::string> network_environment =
+        Measurement<std::string>::not_measured();
+    Measurement<double> network_bandwidth_mbps = Measurement<double>::not_measured();
+    Measurement<double> network_rtt_ms = Measurement<double>::not_measured();
+    Measurement<std::uint64_t> warmup_runs =
+        Measurement<std::uint64_t>::not_measured();
+    Measurement<std::uint64_t> repetitions =
+        Measurement<std::uint64_t>::not_measured();
     Measurement<std::uint64_t> aav86_iterations_r =
         Measurement<std::uint64_t>::not_applicable();
     std::uint32_t score_bit_width = 32;

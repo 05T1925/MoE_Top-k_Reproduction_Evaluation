@@ -21,6 +21,11 @@
 
 ### 2.1 M1.1 公共底座收尾
 
+当前状态：M1.1 已在 Ubuntu 24.04.4 LTS（WSL2）的全新 Debug 构建目录通过 CTest 4/4；
+测试代码 revision 为 `a2efe5e3d2d22bb3c031fb24dc3246c37d442fad`，详细记录见
+`docs/M1_1_UBUNTU_HANDOFF.md`。这只闭合 M1.1 → M2 的公共测试/provenance 门，
+不改变 M2 → M3 阶段门，亦不构成 M3 实现、路由或性能证据。
+
 1. 为四个 M1 测试注册 CTest，使 `ctest --output-on-failure` 成为统一测试入口；
 2. 给正式 metrics 补齐 seed、输入分布、编译器/flags、CPU、内存、操作系统、
    网络环境、warmup 和 repetitions；
