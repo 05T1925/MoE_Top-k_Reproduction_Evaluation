@@ -65,3 +65,7 @@ dependency and component boundaries.
 
 M2.10 adds only a single-pass PS conformance component. It does not alter the
 two-pass or inverse-routing gates in this document.
+
+Update 2026-09-06: M2.11/M2.12 provide an EMP/VFSS two-pass reverse carrier
+roundtrip conformance and priority-key-input E2E respectively. These are C
+project components; they do not promote the paper/security conclusion above.

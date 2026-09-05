@@ -1,4 +1,4 @@
-#include <moe_topk/protocol_i_permute_share.h>
+#include <moe_topk/protocol_i_secret_shared_shuffle.h>
 
 #include <array>
 #include <cerrno>
@@ -58,38 +58,22 @@ int run_party(int argc, char** argv) {
   const std::uint32_t t = static_cast<std::uint32_t>(std::stoul(argv[13]));
   const std::uint64_t seed = std::stoull(argv[14]); const unsigned type = std::stoul(argv[15]);
   require(party < 2, "invalid party id");
+  const auto permutation = protocol_i_test_permutation(n, seed + 1U + party);
+  ProtocolIShufflePartyConfig shuffle_config{0x211000U + n, 0x212000U + t,
+                                              seed + 10U, seed + 1010U, n, t,
+                                              static_cast<std::uint8_t>(party), 15000};
+  auto material = protocol_i_shuffle_preprocess_party(shuffle_config, fds.offline, permutation);
   std::uint8_t barrier_byte = 1; write_exact(fds.barrier, &barrier_byte, sizeof(barrier_byte));
   read_exact(fds.barrier, &barrier_byte, sizeof(barrier_byte));
   const auto input = share_for_party(n, seed, type, party);
-  const auto c1 = config(n, t, seed + 10U, 0), c2 = config(n, t, seed + 20U, 1), c3 = config(n, t, seed + 30U, 1), c4 = config(n, t, seed + 40U, 0);
   if (party == 0) {
-    const auto p0 = protocol_i_test_permutation(n, seed + 1U);
-    const auto inverse_p0 = protocol_i_inverse_permutation(p0);
-    auto po_f1 = protocol_i_permute_share_preprocess_po(c1, fds.offline[0], p0);
-    auto do_f2 = protocol_i_permute_share_preprocess_do(c2, fds.offline[1]);
-    auto do_r1 = protocol_i_permute_share_preprocess_do(c3, fds.offline[2]);
-    auto po_r2 = protocol_i_permute_share_preprocess_po(c4, fds.offline[3], inverse_p0);
-    const auto a0 = protocol_i_permute_share_online_po(c1, fds.online[0], p0, std::move(po_f1));
-    const auto b0 = add_vectors(protocol_i_apply_permutation(p0, input), a0.share);
-    const auto c0 = protocol_i_permute_share_online_do(c2, fds.online[1], b0, std::move(do_f2));
-    const auto e0 = protocol_i_permute_share_online_do(c3, fds.online[2], c0.share, std::move(do_r1));
-    const auto g0 = protocol_i_permute_share_online_po(c4, fds.online[3], inverse_p0, std::move(po_r2));
-    const auto h0 = add_vectors(protocol_i_apply_permutation(inverse_p0, e0.share), g0.share);
-    write_exact(fds.report, h0.data(), h0.size() * sizeof(h0.front()));
+    const auto forward = protocol_i_shuffle_forward_party(0, {fds.online[0], fds.online[1]}, input, material);
+    const auto reverse = protocol_i_shuffle_reverse_party(0, {fds.online[2], fds.online[3]}, forward.share, material);
+    write_exact(fds.report, reverse.share.data(), reverse.share.size() * sizeof(reverse.share.front()));
   } else {
-    const auto p1 = protocol_i_test_permutation(n, seed + 2U);
-    const auto inverse_p1 = protocol_i_inverse_permutation(p1);
-    auto do_f1 = protocol_i_permute_share_preprocess_do(c1, fds.offline[0]);
-    auto po_f2 = protocol_i_permute_share_preprocess_po(c2, fds.offline[1], p1);
-    auto po_r1 = protocol_i_permute_share_preprocess_po(c3, fds.offline[2], inverse_p1);
-    auto do_r2 = protocol_i_permute_share_preprocess_do(c4, fds.offline[3]);
-    const auto a1 = protocol_i_permute_share_online_do(c1, fds.online[0], input, std::move(do_f1));
-    const auto e1 = protocol_i_permute_share_online_po(c2, fds.online[1], p1, std::move(po_f2));
-    const auto z1 = add_vectors(protocol_i_apply_permutation(p1, a1.share), e1.share);
-    const auto g0 = protocol_i_permute_share_online_po(c3, fds.online[2], inverse_p1, std::move(po_r1));
-    const auto f1 = add_vectors(protocol_i_apply_permutation(inverse_p1, z1), g0.share);
-    const auto h1 = protocol_i_permute_share_online_do(c4, fds.online[3], f1, std::move(do_r2));
-    write_exact(fds.report, h1.share.data(), h1.share.size() * sizeof(h1.share.front()));
+    const auto forward = protocol_i_shuffle_forward_party(1, {fds.online[0], fds.online[1]}, input, material);
+    const auto reverse = protocol_i_shuffle_reverse_party(1, {fds.online[2], fds.online[3]}, forward.share, material);
+    write_exact(fds.report, reverse.share.data(), reverse.share.size() * sizeof(reverse.share.front()));
   }
   return 0;
 }

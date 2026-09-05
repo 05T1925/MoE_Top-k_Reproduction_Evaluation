@@ -126,3 +126,8 @@ offline material、连接建立、启动同步、online messages 和 R4 adapter 
 只有 D1--D4 全部同时具备可批准精确定义、无已知安全语义冲突、文件级最小实现边界，以及可执行的 conformance → differential → independent-process E2E 验收条件，才可建议用户创建 `codex/m2-protocol-i`。当前不满足，且没有任何 M2 代码、CMake 或测试修改。
 
 **M2.1 只闭合可实现性与决策证据；未经用户明确批准 D1–D4，不授权开始 M2 代码修改。**
+
+Update 2026-09-06: M2.12 has explicit user approval for the D1 restricted
+shuffled-domain `rank_P` reveal and validates a bounded P2/P0/P1 E2E with the
+M2.11 reverse composition. This does not supply a paper-exact proof, padding,
+or raw-score-share input adapter.

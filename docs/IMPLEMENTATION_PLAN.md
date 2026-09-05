@@ -19,12 +19,17 @@
   conformance；M2.11 项目扩展
   `m2_emp_two_pass_shuffle_roundtrip_conformance` 随后在独立 P0/P1 exec 进程中完成
   两遍前向/逆向 carrier roundtrip conformance。它仍不是完整 Protocol I，状态与
+  M2.12 项目 E2E `m2_protocol_i_priority_key_input_small_e2e` 已将 priority-key
+  additive shares、两遍 shuffle、CmpAgg、受控 shuffled rank 泄露和 reverse carrier
+  串联为原顺序 XOR mask shares；它仍不是 raw-score-input 或论文 exact 基线，状态与
   可复现命令见
   `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
   `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`、
   `docs/decisions/M2_PERMUTE_SHARE.md`、
   `docs/decisions/M2_SECRET_SHARED_SHUFFLE.md`、
+  `docs/decisions/M2_PROTOCOL_I_SMALL_E2E.md`、
   `docs/reproduction/M2_PERMUTE_SHARE_UBUNTU_2026-09-06.md` 和
+  `docs/reproduction/M2_PROTOCOL_I_SMALL_E2E_UBUNTU_2026-09-06.md`、
   `docs/reproduction/M2_SECRET_SHARED_SHUFFLE_UBUNTU_2026-09-06.md`；
   随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；

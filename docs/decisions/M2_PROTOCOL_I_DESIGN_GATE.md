@@ -1,6 +1,6 @@
 # M2 Protocol I 实施前设计门
 
-状态：**待团队批准；本文件不是 M2 代码授权。**
+状态：**D1 已针对 M2.12 受控 shuffled `rank_P` 泄露获批准；本文件仍不是 paper-exact 声明。**
 
 M2.1 对 D1--D4 的可实现性、精确泄露条款、域宽表、inverse-routing 证据缺口和
 transport/metrics contract 见

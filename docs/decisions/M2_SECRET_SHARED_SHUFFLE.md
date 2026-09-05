@@ -21,3 +21,6 @@ counting are C. Two-pass composition is a project conformance component, not
 `secure_shuffle_complete`, complete Protocol I, rank reveal, or Top-K mask.
 Padding for non-power-of-two N is not implemented. LAN/WAN and performance are
 `NOT_MEASURED`.
+
+M2.12 now consumes this composition through a priority-key-input E2E. That
+changes neither the evidence level nor its non-power-of-two limitation.
