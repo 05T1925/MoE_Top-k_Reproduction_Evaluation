@@ -38,6 +38,7 @@ PRIVATE
     src/moe_topk/protocol_i_ucmp.cpp
     src/moe_topk/protocol_i_cmpagg.cpp
     src/moe_topk/protocol_i_transport.cpp
+    src/moe_topk/protocol_i_party_package.cpp
     # src/softmax.cpp
 )
 
@@ -222,7 +223,9 @@ add_executable(moe_topk_m2_ucmp_conformance_test tests/moe_topk/protocol_i_ucmp_
 target_link_libraries(moe_topk_m2_ucmp_conformance_test ${PROJECT_NAME})
 add_executable(moe_topk_m2_cmpagg_conformance_test tests/moe_topk/protocol_i_cmpagg_conformance_test.cpp)
 target_link_libraries(moe_topk_m2_cmpagg_conformance_test ${PROJECT_NAME})
-add_executable(moe_topk_m2_cmpagg_process_e2e_test tests/moe_topk/protocol_i_cmpagg_process_e2e_test.cpp)
+add_executable(moe_topk_m2_transport_conformance_test tests/moe_topk/protocol_i_transport_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_transport_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_cmpagg_process_e2e_test tests/moe_topk/protocol_i_cmpagg_three_process_e2e_test.cpp)
 target_link_libraries(moe_topk_m2_cmpagg_process_e2e_test ${PROJECT_NAME})
 
 # Protocol III pre-integration primitive conformance. This validates the
@@ -243,5 +246,6 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m2_reverse_shuffle_model_test COMMAND moe_topk_m2_reverse_shuffle_model_test)
     add_test(NAME moe_topk_m2_ucmp_conformance_test COMMAND moe_topk_m2_ucmp_conformance_test)
     add_test(NAME moe_topk_m2_cmpagg_conformance_test COMMAND moe_topk_m2_cmpagg_conformance_test)
+    add_test(NAME moe_topk_m2_transport_conformance_test COMMAND moe_topk_m2_transport_conformance_test)
     add_test(NAME moe_topk_m2_cmpagg_process_e2e_test COMMAND moe_topk_m2_cmpagg_process_e2e_test)
 endif()
