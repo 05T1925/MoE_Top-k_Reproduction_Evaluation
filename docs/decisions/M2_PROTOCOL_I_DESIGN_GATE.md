@@ -9,6 +9,8 @@ transport/metrics contract 见
 
 M2.2 对 priority-rank 语义和 reverse-shuffle 规格的纠错审计见
 [`M2_PROTOCOL_I_PRIORITY_RANK_CORRECTION.md`](M2_PROTOCOL_I_PRIORITY_RANK_CORRECTION.md)。
+M2.3 的 reverse Permute+Share ideal-functionality 候选见
+[`M2_PROTOCOL_I_REVERSE_SHUFFLE_SPEC.md`](M2_PROTOCOL_I_REVERSE_SHUFFLE_SPEC.md)。
 
 实现候选标签为 `agarwal_protocol_i_exact_mask_output`。在本文件的四项决策均获明确
 批准、其最小原语经审计且 secure mask adapter 可验证之前，任何实现只能使用
@@ -55,7 +57,7 @@ shuffle transcript，故下表不虚构论文逐消息轮次。
 | 阶段 | 输入/输出与角色 | 原语、发送与打开值 | 禁止打开/轮次/泄露 | 位置与证据 |
 | --- | --- | --- | --- | --- |
 | O0 离线包 | P2 对 P0/P1；输入未知。输出仅为各方的 input-independent correlated randomness。 | 候选：经批准的两方 secret-shared shuffle、DCF/uCMP keys、掩码及 adapter 预处理，P2→P0/P1。 | P2 在线不连接、不收输入、不补发材料；不计 online round。离线材料大小必须计量。 | A：2+1 Dealer 模型、Table 1；C：VFSS 重新生成/传输；D：具体包布局未批准。 |
-| R1 shuffle | P0/P1 的 record shares → 同一随机秘密置换下的 record shares，及论文 §4.1 允许的公开 masked shuffled list。 | A：secret-shared shuffle；C：记录绑定 `(score share, original-index share, carrier share)`。P0↔P1 消息由批准 shuffle primitive 决定。 | 不开 permutation、原始 index、原顺序 rank、selected index 或 mask。是否把该 primitive 的在线交互折入论文总 3 轮，尚无会议版逐消息证据。 | A：§4.1、[21]；B：B1 是两次 Permute+Share 方向；D：VFSS 可审计实例缺失。 |
+| R1 shuffle | P0/P1 的 score 与必要 secret original-index binding shares → 同一随机秘密置换下的 record shares，及论文 §4.1 允许的公开 masked shuffled list。 | A：secret-shared shuffle；C：record binding。selection carrier 在 R3 后才于 shuffled domain 创建，不存在于 R1。P0↔P1 消息由批准 shuffle primitive 决定。 | 不开 permutation、原始 index、原顺序 rank、selected index 或 mask。是否把该 primitive 的在线交互折入论文总 3 轮，尚无会议版逐消息证据。 | A：§4.1、[21]；B：B1 是两次 Permute+Share 方向；C/D：M2.3 reverse candidate、VFSS 实例缺失。 |
 | R2 CmpAgg | shuffled score/key shares → shuffled-domain stable rank shares。 | `binom(n,2)` DCF/uCMP evaluations；两方按 M1 已冻结比较语义交换并打开该 FSS gate 所需 masked values。 | 不开 score、comparison bit、original index 或 rank shares。M1 CmpAgg 仅是测试/明文 oracle 证据，不是 secure M2 runtime。 | A：§3.1、§4.1；C：priority-rank mapping；D：uCMP range proof 未完成。 |
 | R3 controlled rank reveal + clear-domain selection | shuffled rank shares → public shuffled-domain ranks；选中 record carrier 仍为 shares。 | P0↔P1 仅在批准泄露契约下重构 `rank_P`；按公开 rank 在 shuffled domain 路由。 | 仅可向 P0/P1 公开 `(shuffled position, priority rank)`；不公开 permutation、original mapping、scores、selected/original index、最终 mask。论文表总计 3 rounds；本阶段与 R1/R2 的精确消息归属待 primitive 审计。 | A：§4.1 的 shuffle-then-reveal；C：精确定义泄露；D：未获团队批准。 |
 | R4 inverse routing + mask adapter | selected shuffled carriers → original-order arithmetic mask shares → XOR mask shares。 | 仅可用批准的 inverse secret-shared shuffle / secure scatter；算术到 XOR 转换必须明确并计入主路径。 | 不开 selected index、original index、mask、rank 或 oracle。若需要额外因果消息，单列 `mask_adapter_rounds`，不得伪称论文的 3 轮。 | C：统一输出契约；D：当前无已审计 VFSS primitive。 |
@@ -86,7 +88,7 @@ shuffle transcript，故下表不虚构论文逐消息轮次。
 | 正确性 | record 至少绑定 score share、original-index share、selection carrier share。shuffle 与 inverse 路由对三字段使用同一置换；carrier 是 `rank_P < K` 的秘密或由公开 shuffled rank 派生的 share。inverse scatter 输出每个 original slot 的 arithmetic bit share。仅在此后转换为 XOR bit share。 |
 | 轮次/指标 | offline：inverse permutation/translation 材料；online：其所有消息与 `mask_adapter_rounds` 单列。shuffle、index binding、inverse mapping、share conversion、mask generation 全部进入主时间/通信，另报 paper core。 |
 | 标签 | 只有 (a) 有经审计 primitive、conformance、differential、E2E 后才可使用 `agarwal_protocol_i_exact_mask_output`。 |
-| 推荐与缺证 | **推荐 (a)，当前为 D 阻塞。**现有 B1 本地文件接口依赖 helper、私有 artifact 和路径，不可作为 VFSS 方案；尚无可审计 inverse scatter 的消息、预处理和轮次证据。 |
+| 推荐与缺证 | M2.3 给出以任意置换 Permute+Share ideal functionality 为边界的两次 role-swapped reverse 候选；**仍为 D 阻塞。**现有 B1 helper/artifact/path 不可作为 VFSS 方案，且缺独立组合安全审查、VFSS 内部消息/预处理、conformance 与 E2E。 |
 
 ### D3：priority key、公开 `n` 上界与 uCMP/DCF 域宽
 

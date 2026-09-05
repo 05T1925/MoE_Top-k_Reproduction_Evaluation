@@ -35,7 +35,7 @@ shuffle 隐藏的是 shuffled slot 与 original position 的映射，而不是 r
 
 ### 所需的目标构造（C）
 
-这是**规范化的待审计目标**，不是已可调用的构造。每条 record 从输入绑定到结束，须在同一置换下携带：
+这是**规范化的待审计目标**，不是已可调用的构造。M2.3 已给出 reverse 的 ideal-functionality 候选；每条 record 从输入绑定到结束，须在同一置换下携带：
 
 | 字段 | 共享类型与创建时机 | 允许用途 |
 | --- | --- | --- |
@@ -45,7 +45,7 @@ shuffle 隐藏的是 shuffled slot 与 original position 的映射，而不是 r
 | `mask_X` | P0/P1 原顺序 1-bit arithmetic shares；R4 输出 | 只在 share 形式存在 |
 | `mask_B` | P0/P1 原顺序 XOR-bit shares；R4 最终输出 | 统一 Top-K 输出 |
 
-正向 R1 必须以同一个未知合成 permutation `pi` 同时作用于所有 record 字段，输出 `pi(score)`, `pi(original_index)`, `pi(carrier_A)`；P0 保留其 secret permutation/pass state 与只属于自己的离线材料，P1 亦然，任一方不得获得 `pi`。R4 的数学输入应为同一 `pi` 下的 `carrier_A` shares，输出为原顺序 `pi^{-1}(carrier_A)` 的 arithmetic bit shares。这样 score、index、carrier 始终同置换，且 carrier 的第 `j` 个原顺序输出仅来自原 record `j`，构成 record-preserving 证明；`score`、`original_index` 不需要因 selection 而打开。
+正向 R1 必须以同一个未知合成 permutation `pi` 作用于 score 和必要的 original-index binding；`carrier_A` 在 R1 不存在。R3 后才在 shuffled domain 由公开 `rank_P` 创建 carrier shares，R4 对其执行 `pi^{-1}`，输出原顺序 arithmetic bit shares。carrier 的第 `j` 个原顺序输出只来自原 record `j`；`score`、`original_index` 不因 selection 而打开。精确 reverse 代数、freshness 和边界见 `M2_PROTOCOL_I_REVERSE_SHUFFLE_SPEC.md`。
 
 若得到了 arithmetic bit shares `(a0,a1)`，先验证其承诺为 `a0+a1 mod 2^w=b in {0,1}`。此时 `((a0&1) xor (a1&1))=b`：模 2 的加法正是 XOR，因此不需要相关随机性、通信或额外 adapter round。此结论仅适用于已经由 routing 产生的 0/1 arithmetic shares；它不允许重构，也不适用于一般 `Z_(2^w)` 值，secure path 必须保留 shares。它不解决 D2 inverse-routing 的缺口。
 
@@ -55,7 +55,7 @@ shuffle 隐藏的是 shuffled slot 与 original position 的映射，而不是 r
 
 | 必需项目 | 需要精确给出 | 现有证据与结论 |
 | --- | --- | --- |
-| inverse 的性质 | 是复用同一 primitive 的逆方向、重新调用 Permute+Share，还是新 secure scatter；两方各自离线材料、输入/输出和每条 online 消息 | Chase 文本描述 Permute+Share/secret-shared shuffle 的高层安全性（A），未给本项目可直接采用的 inverse transcript；B1 两 pass 的 offline/online 实现也未给 VFSS 可迁移 reverse API。**未知，不得选择其一。** |
+| inverse 的性质 | 两次 role-swapped、fresh Permute+Share 调用的 owner/data-owner、输入输出 shares 与局部相加项 | M2.3 已在 arbitrary-permutation ideal functionality 边界给出代数候选（C）；Chase 未给 VFSS 可迁移 reverse transcript，故组合安全与 adapter 仍未获证（D）。 |
 | 在线打开值 | 每条消息的 phase、sender/receiver、长度、内容，及唯一允许的 opened value | 无满足目标边界的 VFSS adapter；B1 的 helper/artifact/ports 是禁止依赖。**未知，不能以伪代码填补。** |
 | 预处理 | inverse permutation/translation、OT/OPV 或 related correlation 的生成与 P2→P0/P1 发放 | B1 方向包含本地 OT/OPV 类材料（B），但 ABI、artifact 和独立 runtime 不可复用；VFSS 没有审计过的替代物（D）。 |
 | arithmetic→XOR | 已有 0/1 arithmetic shares 的逐 share LSB 映射与其 0/1 precondition | 模 2 恒等式足够；无需独立原语、消息或预处理。仍需在未来 conformance 中验证 routing 输出满足该 precondition（C）。 |
