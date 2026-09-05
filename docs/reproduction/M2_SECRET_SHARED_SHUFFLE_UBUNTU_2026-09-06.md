@@ -11,7 +11,8 @@ on an explicit barrier before deterministic TEST_ONLY shares are generated.
 ```bash
 cmake -S /mnt/c/Users/28641/Desktop/MoE_Top-k_Reproduction_Evaluation/VFSS \
   -B /tmp/moe_m211_full -DCMAKE_BUILD_TYPE=Debug \
-  -DMOE_TOPK_ENABLE_EMP_IKNP=ON -DMOE_TOPK_EMP_PREFIX=/opt/emp-toolkit
+  -DMOE_TOPK_ENABLE_EMP_OT=ON \
+  -DCMAKE_PREFIX_PATH=/tmp/moe_m28_emp.ok9WzQ/prefix
 cmake --build /tmp/moe_m211_full \
   --target moe_topk_m2_secret_shared_shuffle_conformance_test -j1
 cd /tmp/moe_m211_full
