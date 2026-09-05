@@ -41,6 +41,7 @@ PRIVATE
     src/moe_topk/protocol_i_transport.cpp
     src/moe_topk/protocol_i_party_package.cpp
     src/moe_topk/protocol_i_score_input.cpp
+    src/moe_topk/masked_mul_adapter.cpp
     # src/softmax.cpp
 )
 
@@ -48,6 +49,8 @@ target_include_directories(${PROJECT_NAME}
 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
 )
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
@@ -282,6 +285,14 @@ add_executable(
 )
 target_link_libraries(moe_topk_dpf_conformance_test FSS)
 
+# Protocol III pre-integration multiplication conformance. The adapter returns
+# additive product shares and deliberately stops before the M3 runtime boundary.
+add_executable(
+    moe_topk_masked_mul_adapter_test
+    tests/moe_topk/masked_mul_adapter_test.cpp
+)
+target_link_libraries(moe_topk_masked_mul_adapter_test ${PROJECT_NAME})
+
 if(BUILD_TESTING)
     add_test(NAME moe_topk_m1_metrics_test COMMAND moe_topk_m1_metrics_test)
     add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
@@ -296,6 +307,8 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m2_cmpagg_process_e2e_test COMMAND moe_topk_m2_cmpagg_process_e2e_test)
     add_test(NAME moe_topk_m2_score_input_conformance_test COMMAND moe_topk_m2_score_input_conformance_test)
     add_test(NAME moe_topk_m2_paper_core_alignment_test COMMAND moe_topk_m2_paper_core_alignment_test)
+    add_test(NAME moe_topk_dpf_conformance_test COMMAND moe_topk_dpf_conformance_test)
+    add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     if(MOE_TOPK_ENABLE_EMP_OT)
         add_test(NAME moe_topk_m2_chosen_ot_conformance_test COMMAND moe_topk_m2_chosen_ot_conformance_test)
         add_test(NAME moe_topk_m2_opv_conformance_test COMMAND moe_topk_m2_opv_conformance_test)
