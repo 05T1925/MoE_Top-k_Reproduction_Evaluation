@@ -1,6 +1,7 @@
 #pragma once
 #include <moe_topk/protocol_i_ucmp.h>
 #include <cstdint>
+#include <utility>
 #include <vector>
 namespace moe_topk {
 struct ProtocolIEdgePartyMaterial {
