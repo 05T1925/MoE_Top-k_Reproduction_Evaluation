@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <vector>
 
 namespace moe_topk {
@@ -12,9 +13,15 @@ struct ProtocolIFrameConfig {
   std::uint8_t bits, sender, receiver, phase, type;
 };
 
+struct ProtocolIFramedChannelOptions {
+  int timeout_ms = 2000;
+  std::size_t max_io_chunk = std::numeric_limits<std::size_t>::max();
+};
+
 class ProtocolIFramedChannel {
  public:
-  ProtocolIFramedChannel(int, ProtocolIFrameConfig, int = 2000);
+  ProtocolIFramedChannel(int, ProtocolIFrameConfig, ProtocolIFramedChannelOptions = {});
+  ProtocolIFramedChannel(int, ProtocolIFrameConfig, int);
   ProtocolIFramedChannel(const ProtocolIFramedChannel&) = delete;
   ProtocolIFramedChannel& operator=(const ProtocolIFramedChannel&) = delete;
   ~ProtocolIFramedChannel();
@@ -27,6 +34,7 @@ class ProtocolIFramedChannel {
  private:
   using Clock = std::chrono::steady_clock;
   int fd_, timeout_;
+  std::size_t max_io_chunk_;
   ProtocolIFrameConfig c_;
   std::uint64_t out_ = 0, in_ = 0, sent_ = 0, received_ = 0;
   void exact(void*, std::size_t, bool, Clock::time_point);

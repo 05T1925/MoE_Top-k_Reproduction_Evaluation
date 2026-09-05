@@ -1,7 +1,55 @@
 #include <moe_topk/protocol_i_cmpagg.h>
 #include <moe_topk/protocol_i_ucmp.h>
+
 #include <stdexcept>
-namespace moe_topk { namespace { std::uint64_t mask(int b){if(b<34||b>53)throw std::invalid_argument("comparison bits");return (UINT64_C(1)<<b)-1;} }
-std::uint64_t protocol_i_mask_priority_key_share(int b,std::uint64_t k,std::uint64_t m){return (k+m)&mask(b);}
-std::vector<std::uint64_t> protocol_i_cmpagg_eval_party(int party,int b,const std::vector<std::uint64_t>& z,std::vector<ProtocolIUcmpMaterial>& e){if(party<0||party>1||z.empty())throw std::invalid_argument("CmpAgg input");auto rm=mask(b);for(auto x:z)if(x&~rm)throw std::invalid_argument("masked key outside ring");if(e.size()!=z.size()*(z.size()-1)/2)throw std::invalid_argument("edge material count");std::vector<std::uint64_t> r(z.size());size_t q=0;for(size_t i=0;i<z.size();++i)for(size_t j=i+1;j<z.size();++j){if(e[q].comparison_bits()!=b)throw std::invalid_argument("edge width");auto lt=e[q++].eval_strict_lt(party,z[i],z[j]);r[i]+=(party==0?1:0)-lt;r[j]+=lt;}return r;}}
-namespace moe_topk { std::vector<std::uint64_t> protocol_i_cmpagg_eval_party(int party,int b,const std::vector<std::uint64_t>&z,std::vector<ProtocolIUcmpPartyMaterial>&e){if(party<0||party>1||z.empty())throw std::invalid_argument("CmpAgg input");auto rm=mask(b);for(auto x:z)if(x&~rm)throw std::invalid_argument("masked key outside ring");if(e.size()!=z.size()*(z.size()-1)/2)throw std::invalid_argument("edge material count");std::vector<std::uint64_t>r(z.size());size_t q=0;for(size_t i=0;i<z.size();++i)for(size_t j=i+1;j<z.size();++j){if(e[q].comparison_bits()!=b||e[q].party_id()!=party)throw std::invalid_argument("edge material mismatch");auto lt=e[q++].eval_strict_lt(z[i],z[j]);r[i]+=(party==0?1:0)-lt;r[j]+=lt;}return r;} }
+
+namespace moe_topk {
+namespace {
+
+std::uint64_t mask(int bits) {
+  if (bits < 34 || bits > 53) {
+    throw std::invalid_argument("comparison bits");
+  }
+  return (UINT64_C(1) << bits) - 1;
+}
+
+}  // namespace
+
+std::uint64_t protocol_i_mask_priority_key_share(int comparison_bits, std::uint64_t key_share,
+                                                 std::uint64_t mask_share) {
+  return (key_share + mask_share) & mask(comparison_bits);
+}
+
+std::vector<std::uint64_t> protocol_i_cmpagg_eval_party(
+    int party, int comparison_bits, const std::vector<std::uint64_t>& masked_keys,
+    std::vector<ProtocolIUcmpPartyMaterial>& edge_materials) {
+  if (party < 0 || party > 1 || masked_keys.empty()) {
+    throw std::invalid_argument("CmpAgg input");
+  }
+  const auto ring_mask = mask(comparison_bits);
+  for (const auto key : masked_keys) {
+    if ((key & ~ring_mask) != 0) {
+      throw std::invalid_argument("masked key outside ring");
+    }
+  }
+  if (edge_materials.size() != masked_keys.size() * (masked_keys.size() - 1) / 2) {
+    throw std::invalid_argument("edge material count");
+  }
+
+  std::vector<std::uint64_t> ranks(masked_keys.size());
+  std::size_t edge = 0;
+  for (std::size_t left = 0; left < masked_keys.size(); ++left) {
+    for (std::size_t right = left + 1; right < masked_keys.size(); ++right) {
+      auto& material = edge_materials[edge++];
+      if (material.comparison_bits() != comparison_bits || material.party_id() != party) {
+        throw std::invalid_argument("edge material mismatch");
+      }
+      const auto less_than = material.eval_strict_lt(masked_keys[left], masked_keys[right]);
+      ranks[left] += (party == 0 ? 1 : 0) - less_than;
+      ranks[right] += less_than;
+    }
+  }
+  return ranks;
+}
+
+}  // namespace moe_topk

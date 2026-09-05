@@ -1,5 +1,6 @@
 #include <moe_topk/protocol_i_transport.h>
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <limits>
@@ -92,14 +93,18 @@ WireHeader decode(const std::array<std::uint8_t, kWireHeaderBytes>& bytes) {
 
 }  // namespace
 
-ProtocolIFramedChannel::ProtocolIFramedChannel(int fd, ProtocolIFrameConfig config, int timeout)
-    : fd_(fd), timeout_(timeout), c_(config) {
-  if (fd < 0 || timeout <= 0 || c_.bits < 34 || c_.bits > 53 || c_.sender > 1 ||
+ProtocolIFramedChannel::ProtocolIFramedChannel(int fd, ProtocolIFrameConfig config,
+                                               ProtocolIFramedChannelOptions options)
+    : fd_(fd), timeout_(options.timeout_ms), max_io_chunk_(options.max_io_chunk), c_(config) {
+  if (fd < 0 || timeout_ <= 0 || max_io_chunk_ == 0 || c_.bits < 34 || c_.bits > 53 || c_.sender > 1 ||
       c_.receiver > 1 || c_.sender == c_.receiver || c_.phase == 0 || c_.type == 0 ||
       c_.n == 0 || c_.k == 0 || c_.k > c_.n) {
     throw std::invalid_argument("frame config");
   }
 }
+
+ProtocolIFramedChannel::ProtocolIFramedChannel(int fd, ProtocolIFrameConfig config, int timeout)
+    : ProtocolIFramedChannel(fd, config, ProtocolIFramedChannelOptions{timeout, std::numeric_limits<std::size_t>::max()}) {}
 
 ProtocolIFramedChannel::~ProtocolIFramedChannel() {
   if (fd_ >= 0) {
@@ -135,7 +140,8 @@ void ProtocolIFramedChannel::exact(void* data, std::size_t size, bool writing,
     if ((descriptor.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0) {
       throw std::runtime_error("frame poll error");
     }
-    const auto count = writing ? ::write(fd_, cursor, size) : ::read(fd_, cursor, size);
+    const auto chunk = std::min(size, max_io_chunk_);
+    const auto count = writing ? ::write(fd_, cursor, chunk) : ::read(fd_, cursor, chunk);
     if (count < 0 && errno == EINTR) {
       continue;
     }
@@ -190,11 +196,11 @@ std::vector<std::uint8_t> ProtocolIFramedChannel::receive() {
       header.phase != c_.phase || header.type != c_.type || header.length > kMaxPayload) {
     throw std::runtime_error("frame header");
   }
-  ++in_;
   std::vector<std::uint8_t> payload(header.length);
   if (!payload.empty()) {
     exact(payload.data(), payload.size(), false, deadline);
   }
+  ++in_;
   return payload;
 }
 }  // namespace moe_topk

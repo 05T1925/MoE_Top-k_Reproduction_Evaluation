@@ -75,8 +75,9 @@ and frame byte counters above are the raw observed communication evidence.
 
 The process target rejects `n=0`, `K=0`, `K>n`, wrong party, wrong comparison width, missing
 or incorrect edge count, duplicate/unordered edge identity, truncated packages and
-trailing bytes, and observes a child non-zero exit. The transport target covers fixed
-header/version/byte order, partial I/O, header+payload counters, wrong session/role/sequence,
-oversize length, truncated header, EOF, timeout, and preservation of receive sequence after
-a rejected header. The full M2 package/transport/process evidence is bounded local IPC
+trailing bytes, and observes a child non-zero exit. The transport target uses controlled
+`1`, `2`, `3`, and `7` byte system-call chunks and covers header+payload counters, bad
+magic/version/reserved bytes, wrong session/fingerprint/role/sequence, oversize length,
+truncated header and payload, payload absolute-deadline timeout, EOF, and preservation of
+receive sequence after a rejected header. The full M2 package/transport/process evidence is bounded local IPC
 evidence, not a secure shuffle or network performance result.

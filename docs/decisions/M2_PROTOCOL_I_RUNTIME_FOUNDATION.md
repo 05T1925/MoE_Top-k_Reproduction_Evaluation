@@ -18,6 +18,8 @@ The tested code revision is `119e527`.
 The project uCMP adapter uses two independent DCF evaluations to evaluate strict
 priority-key order. It is a VFSS two-evaluation adapter and must not be described as
 the paper's complete Protocol I shuffle or as a paper-level secure implementation.
+The production CmpAgg entry point accepts only party-specific uCMP material; the paired
+`ProtocolIUcmpMaterial` type remains confined to P2 generation and primitive/test setup.
 
 ## Package and transport invariants
 
@@ -42,7 +44,8 @@ fingerprint and sequence. The entire header-plus-payload has one absolute deadli
 partial I/O and `EINTR` preserve that deadline. `POLLERR`, `POLLHUP`, `POLLNVAL`, EOF,
 timeouts, wrong headers, role/session/sequence mismatches and oversize payloads are
 hard failures. A rejected header does not advance the receive sequence. Counters count
-actual header and payload bytes.
+actual header and payload bytes. An accepted receive sequence advances only after the
+entire payload is received successfully; a truncated or timed-out payload is not accepted.
 
 No file polling, fixed sleep, online Dealer, old FSS ABI, secure shuffle, inverse
 routing, final mask adapter or secure-path rank/index reconstruction is used.
@@ -58,9 +61,10 @@ P2/P0/P1. Negative checks cover `n=0`, `K=0`, `K>n`, wrong party/width, missing,
 duplicate and unordered edges, wrong material count, truncation, trailing bytes and
 child non-zero exit propagation.
 
-The transport conformance target separately covers successful partial-frame accounting,
-wrong session/role/sequence, oversize length, truncated header, EOF, timeout and
-rejected-header sequence preservation.
+The transport conformance target separately covers controlled one-system-call chunks of
+`1`, `2`, `3`, and `7` bytes; header-plus-payload counters; bad magic, version and reserved
+bytes; wrong session, fingerprint, role and sequence; oversize length; truncated header and
+payload; payload absolute-deadline timeout; EOF; and rejected-header sequence preservation.
 
 The completed foundation exposes no final secure Top-K bit-mask. Secure shuffle,
 reverse routing, final mask generation, full Protocol I round accounting, PRG metrics,

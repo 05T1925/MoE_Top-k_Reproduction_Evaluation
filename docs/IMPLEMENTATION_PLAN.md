@@ -209,7 +209,7 @@ M2.7 的十个独立进程用例覆盖 `n=1,2,5,7,11`、`K=1`、`K=n`、`K=2 (n=
 随机/重复/全相等值及 `INT32_MIN/MAX`，并通过 package/transport 错误矩阵。Ubuntu
 24.04.4 全新 Debug 构建中 CTest 发现 11 项且全量 11/11 通过；实际命令、字节计数、
 退出码和未测字段见
-`docs/reproduction/M2_CMPAGG_THREE_PROCESS_E2E_UBUNTU_2026-09-05.md`。
+`docs/reproduction/M2_CMPAGG_PROCESS_E2E_UBUNTU_2026-09-05.md`。
 
 该交付只闭合 CmpAgg process foundation：uCMP 是项目 two-evaluation adapter；secure
 shuffle、inverse routing、最终原始顺序 bit-mask、完整 Protocol I 论文轮数/泄露与网络
