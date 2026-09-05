@@ -19,3 +19,6 @@ offline OT counters are reported separately. TEST_ONLY reconstruction checks
 
 This is not a two-pass shuffle, inverse routing, secure Protocol I, or
 `agarwal_protocol_i_exact`. LAN/WAN and performance results are `NOT_MEASURED`.
+
+M2.11 splits this adapter into offline material and online consumption for
+two-pass roundtrip conformance.

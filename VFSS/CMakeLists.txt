@@ -247,7 +247,8 @@ if(MOE_TOPK_ENABLE_EMP_OT)
         src/moe_topk/protocol_i_share_translation.cpp
         src/moe_topk/protocol_i_permutation.cpp
         src/moe_topk/protocol_i_benes.cpp
-        src/moe_topk/protocol_i_permute_share.cpp)
+        src/moe_topk/protocol_i_permute_share.cpp
+        src/moe_topk/protocol_i_secret_shared_shuffle.cpp)
     target_include_directories(moe_topk_share_translation_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(moe_topk_share_translation_backend PRIVATE moe_topk_emp_ot_backend)
     add_executable(moe_topk_m2_opv_conformance_test tests/moe_topk/protocol_i_opv_conformance_test.cpp)
@@ -259,6 +260,9 @@ if(MOE_TOPK_ENABLE_EMP_OT)
     add_executable(moe_topk_m2_permute_share_conformance_test tests/moe_topk/protocol_i_permute_share_conformance_test.cpp)
     target_include_directories(moe_topk_m2_permute_share_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(moe_topk_m2_permute_share_conformance_test PRIVATE moe_topk_share_translation_backend)
+    add_executable(moe_topk_m2_secret_shared_shuffle_conformance_test tests/moe_topk/protocol_i_secret_shared_shuffle_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE moe_topk_share_translation_backend)
 endif()
 
 # Protocol III pre-integration primitive conformance. This validates the
@@ -286,5 +290,6 @@ if(BUILD_TESTING)
         add_test(NAME moe_topk_m2_opv_conformance_test COMMAND moe_topk_m2_opv_conformance_test)
         add_test(NAME moe_topk_m2_share_translation_conformance_test COMMAND moe_topk_m2_share_translation_conformance_test)
         add_test(NAME moe_topk_m2_permute_share_conformance_test COMMAND moe_topk_m2_permute_share_conformance_test)
+        add_test(NAME moe_topk_m2_secret_shared_shuffle_conformance_test COMMAND moe_topk_m2_secret_shared_shuffle_conformance_test)
     endif()
 endif()
