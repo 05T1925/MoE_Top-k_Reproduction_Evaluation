@@ -62,3 +62,6 @@ not a PS transcript: no two-pass composition, inverse routing or shuffle
 security claim follows, and none of the D2 gates change. See
 `M2_CHOSEN_OT_DEPENDENCY.md` and `M2_OPV_SHARE_TRANSLATION.md` for the exact
 dependency and component boundaries.
+
+M2.10 adds only a single-pass PS conformance component. It does not alter the
+two-pass or inverse-routing gates in this document.

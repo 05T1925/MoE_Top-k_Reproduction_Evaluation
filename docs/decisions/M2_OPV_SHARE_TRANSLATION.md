@@ -68,3 +68,7 @@ identity, reverse, cycle, pair-swap, and fixed-seed permutations.
 This does **not** implement `permute_share_complete`, `secure_shuffle_complete`,
 `agarwal_protocol_i_exact`, or `paper_3_round_exact`.  LAN/WAN performance is
 `NOT_MEASURED`.
+
+M2.10 consumes the component through batched local permutations and rejects
+every unexpected missing leaf before row/column aggregation; see
+`M2_PERMUTE_SHARE.md`.
