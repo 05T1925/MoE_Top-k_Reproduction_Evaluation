@@ -20,6 +20,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Wno-unused-result -m
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(OpenMP COMPONENTS CXX REQUIRED)
+option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
@@ -228,6 +229,19 @@ target_link_libraries(moe_topk_m2_transport_conformance_test ${PROJECT_NAME})
 add_executable(moe_topk_m2_cmpagg_process_e2e_test tests/moe_topk/protocol_i_cmpagg_three_process_e2e_test.cpp)
 target_link_libraries(moe_topk_m2_cmpagg_process_e2e_test ${PROJECT_NAME})
 
+if(MOE_TOPK_ENABLE_EMP_OT)
+    find_package(emp-tool 1.0 CONFIG REQUIRED)
+    find_package(emp-ot 1.0 CONFIG REQUIRED)
+    add_library(moe_topk_emp_ot_backend STATIC src/moe_topk/protocol_i_chosen_ot_emp.cpp)
+    target_include_directories(moe_topk_emp_ot_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_compile_features(moe_topk_emp_ot_backend PRIVATE cxx_std_20)
+    set_target_properties(moe_topk_emp_ot_backend PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(moe_topk_emp_ot_backend PRIVATE emp-ot::emp-ot emp-tool::emp-tool Threads::Threads)
+    add_executable(moe_topk_m2_chosen_ot_conformance_test tests/moe_topk/protocol_i_chosen_ot_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_chosen_ot_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_chosen_ot_conformance_test PRIVATE moe_topk_emp_ot_backend)
+endif()
+
 # Protocol III pre-integration primitive conformance. This validates the
 # existing VFSS DPF implementation and transport without starting M3 routing.
 add_executable(
@@ -248,4 +262,7 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m2_cmpagg_conformance_test COMMAND moe_topk_m2_cmpagg_conformance_test)
     add_test(NAME moe_topk_m2_transport_conformance_test COMMAND moe_topk_m2_transport_conformance_test)
     add_test(NAME moe_topk_m2_cmpagg_process_e2e_test COMMAND moe_topk_m2_cmpagg_process_e2e_test)
+    if(MOE_TOPK_ENABLE_EMP_OT)
+        add_test(NAME moe_topk_m2_chosen_ot_conformance_test COMMAND moe_topk_m2_chosen_ot_conformance_test)
+    endif()
 endif()
