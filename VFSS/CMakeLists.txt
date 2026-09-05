@@ -208,6 +208,14 @@ add_executable(
 )
 target_link_libraries(moe_topk_m1_cmpagg_test ${PROJECT_NAME})
 
+# M2.4 C/B conformance only: no Protocol I runtime or secure shuffle.
+add_executable(moe_topk_m2_priority_key_test tests/moe_topk/protocol_i_priority_key_test.cpp)
+target_link_libraries(moe_topk_m2_priority_key_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_priority_dcf_conformance_test tests/moe_topk/protocol_i_priority_dcf_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_priority_dcf_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_reverse_shuffle_model_test tests/moe_topk/protocol_i_reverse_shuffle_model_test.cpp)
+target_link_libraries(moe_topk_m2_reverse_shuffle_model_test ${PROJECT_NAME})
+
 # Protocol III pre-integration primitive conformance. This validates the
 # existing VFSS DPF implementation and transport without starting M3 routing.
 add_executable(
@@ -221,4 +229,7 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
     add_test(NAME moe_topk_m1_oracle_test COMMAND moe_topk_m1_oracle_test)
     add_test(NAME moe_topk_m1_cmpagg_test COMMAND moe_topk_m1_cmpagg_test)
+    add_test(NAME moe_topk_m2_priority_key_test COMMAND moe_topk_m2_priority_key_test)
+    add_test(NAME moe_topk_m2_priority_dcf_conformance_test COMMAND moe_topk_m2_priority_dcf_conformance_test)
+    add_test(NAME moe_topk_m2_reverse_shuffle_model_test COMMAND moe_topk_m2_reverse_shuffle_model_test)
 endif()
