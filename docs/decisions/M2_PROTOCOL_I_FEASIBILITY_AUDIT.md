@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | Paper core | Protocol I 是 `2+1`、安全 shuffle routing、`binom(n,2)` CmpAgg，表中为 3 个 online rounds。论文 §4.1 使用 shuffle-then-reveal：shuffle 后公开 rank，清晰域 routing。 | A，Table 1、§3.1、§4.1 |
 | 论文 rank | 论文稳定 rank 是升序：较小元素数；同分时较小原始下标在前。因此最小项为 `rank_A=0`，最大项为 `n-1`。 | A，§3.1/Figure 2 |
-| 项目语义 | 项目选择最大 score、同分较小 `original_index`，M1 CmpAgg 的 priority rank 为 `rank_C=0` 最高优先级。 | C，`M1_SCORE_SEMANTICS.md`；B，`topk_oracle.h` |
+| 项目语义 | 项目选择最大 score、同分较小 `original_index`；其 priority rank 记为 `rank_P=0` 最高优先级。它须由 priority key 的 stable ascending rank 直接定义，不能以 `n-1-rank_A` 推导。 | C，`M1_SCORE_SEMANTICS.md`、M2.2 纠错；B，`topk_oracle.h` |
 | B1 参考 | B1 是两次 Permute+Share/OPV 方向的本地材料；其 adapter fork helper、写读私有 artifact，并传递路径、端口和 session。它不是可迁移 VFSS primitive。 | B，`protocol1/runtime/src/protocol1_b1_shuffle_adapter.cpp`、`src/b1/real_*` |
 | VFSS 现状 | `GroupElement` 为 `uint64_t`；DCF API 接受 `int Bin/Bout`，本审计未发现对 M2 priority-key/uCMP 的端点 conformance。`SocketBuf` 无限 connect retry（`usleep(1000)`）且固定 `sleep(1)`。 | B，`group_element.h`、`dcf.h`/`dcf.cpp`、`comms.cpp` |
 | 已通过的测试 | M1 raw 32-bit DCF conformance 只覆盖 VFSS raw unsigned `x < threshold`；M1 oracle/CmpAgg 是明文/测试层语义证据。它们不是 secure Protocol I、priority-key 或 uCMP conformance。 | B/C，M1 tests 与 M1.1 记录 |
@@ -21,9 +21,9 @@
 
 ### 拟批准条款（C，基于 A 的高层范式）
 
-在 R3，P0 与 P1 **仅**重构每一个公开 shuffled slot `s in [0,n)` 的稳定论文升序 rank `rank_A[s] in [0,n)`；二者在 CmpAgg 输出的 rank shares 完整就绪后、任何 clear-domain selection 前同时收到同一向量 `(s, rank_A[s])`。它不是单独一方获得的值，也不发给 P2 或日志/监控系统。每个 slot 恰有一个 rank，向量因此泄露 shuffled domain 中的完整严格总序。
+在 R3，P0 与 P1 **仅**重构每一个公开 shuffled slot `s in [0,n)` 的 project priority rank `rank_P[s] in [0,n)`；二者在 priority-key CmpAgg 输出的 rank shares 完整就绪后、任何 clear-domain selection 前同时收到同一向量 `(s, rank_P[s])`。它不是单独一方获得的值，也不发给 P2 或日志/监控系统。每个 slot 恰有一个 rank，向量因此泄露 shuffled domain 中按 project priority key 排列的完整严格总序。
 
-项目的选择逻辑可在本地将公开的 `rank_A[s]` 转成 `rank_C[s] = n - 1 - rank_A[s]`，再以 `rank_C[s] < K` 决定该 **shuffled slot** 是否被选择。转换发生在公开后；不能把转换后的 rank 与论文 rank 混称，且不得声称此编码是论文规定。
+项目选择直接以公开 `rank_P[s] < K` 决定该 **shuffled slot** 是否被选择。`rank_P` 是 priority key 的 stable ascending rank；它不可由论文 raw-score ascending `rank_A` 作 `n-1-rank_A` 转换得到，特别是在同分时该映射会反转 index tie-break。该编码是 C 项目扩展，不是论文规定。
 
 严禁打开、发送、持久化或调试打印：合成 permutation 或任一方的 permutation、任何 `original_index`、原顺序 rank、score/raw score/priority key、单边 comparison bit、selected index、最终原顺序 mask，以及能够把 slot 关联回原始位置的表。仅可记录公共 run metadata（revision、`n`、`K`、实现标签、阶段成功/失败、计数）；rank 向量、slot-rank 对、permutation、消息 payload 和密钥均不得进入 transcript。运行结束后只保留该 metadata；内存中的敏感向量按实现语言可行的最短生命周期释放，持久化期限为零。
 
@@ -41,13 +41,13 @@ shuffle 隐藏的是 shuffled slot 与 original position 的映射，而不是 r
 | --- | --- | --- |
 | `score` | P0/P1 的 32-bit arithmetic shares；R1 前 | R2 secure CmpAgg；不得打开 |
 | `original_index` | P0/P1 arithmetic shares（或经批准的等价秘密 carrier）；R1 前 | record binding 与 inverse correctness；不得打开 |
-| `carrier_A` | P0/P1 的 1-bit arithmetic shares；R3 后由 public `rank_A` 产生：P0 取 `1{n-1-rank_A<K}`，P1 取 0（或相反的固定公共 convention） | 唯一进入 inverse 的 selection carrier；公开 rank 不使 carrier 的原始位置公开 |
+| `carrier_A` | P0/P1 的 1-bit arithmetic shares；R3 后由 public `rank_P` 产生：P0 取 `1{rank_P<K}`，P1 取 0（或相反的固定公共 convention） | 唯一进入 inverse 的 selection carrier；公开 rank 不使 carrier 的原始位置公开 |
 | `mask_X` | P0/P1 原顺序 1-bit arithmetic shares；R4 输出 | 只在 share 形式存在 |
 | `mask_B` | P0/P1 原顺序 XOR-bit shares；R4 最终输出 | 统一 Top-K 输出 |
 
 正向 R1 必须以同一个未知合成 permutation `pi` 同时作用于所有 record 字段，输出 `pi(score)`, `pi(original_index)`, `pi(carrier_A)`；P0 保留其 secret permutation/pass state 与只属于自己的离线材料，P1 亦然，任一方不得获得 `pi`。R4 的数学输入应为同一 `pi` 下的 `carrier_A` shares，输出为原顺序 `pi^{-1}(carrier_A)` 的 arithmetic bit shares。这样 score、index、carrier 始终同置换，且 carrier 的第 `j` 个原顺序输出仅来自原 record `j`，构成 record-preserving 证明；`score`、`original_index` 不需要因 selection 而打开。
 
-若得到了 arithmetic bit shares `(a0,a1)`，必须先有并验证 `a0+a1 mod 2 = b in {0,1}`，再以公开的固定转换 convention 产生 XOR shares，例如采样/离线提供随机 bit `r` 给 P0、给 P1 `r xor b` 所需的**安全**相关材料；不得直接把一般的 `Z_(2^w)` share 按位 XOR。该转换本身须具备原语、消息和 conformance 后才能进入 secure path。
+若得到了 arithmetic bit shares `(a0,a1)`，先验证其承诺为 `a0+a1 mod 2^w=b in {0,1}`。此时 `((a0&1) xor (a1&1))=b`：模 2 的加法正是 XOR，因此不需要相关随机性、通信或额外 adapter round。此结论仅适用于已经由 routing 产生的 0/1 arithmetic shares；它不允许重构，也不适用于一般 `Z_(2^w)` 值，secure path 必须保留 shares。它不解决 D2 inverse-routing 的缺口。
 
 ### 缺失的实现性证据（D，阻塞）
 
@@ -58,7 +58,7 @@ shuffle 隐藏的是 shuffled slot 与 original position 的映射，而不是 r
 | inverse 的性质 | 是复用同一 primitive 的逆方向、重新调用 Permute+Share，还是新 secure scatter；两方各自离线材料、输入/输出和每条 online 消息 | Chase 文本描述 Permute+Share/secret-shared shuffle 的高层安全性（A），未给本项目可直接采用的 inverse transcript；B1 两 pass 的 offline/online 实现也未给 VFSS 可迁移 reverse API。**未知，不得选择其一。** |
 | 在线打开值 | 每条消息的 phase、sender/receiver、长度、内容，及唯一允许的 opened value | 无满足目标边界的 VFSS adapter；B1 的 helper/artifact/ports 是禁止依赖。**未知，不能以伪代码填补。** |
 | 预处理 | inverse permutation/translation、OT/OPV 或 related correlation 的生成与 P2→P0/P1 发放 | B1 方向包含本地 OT/OPV 类材料（B），但 ABI、artifact 和独立 runtime 不可复用；VFSS 没有审计过的替代物（D）。 |
-| arithmetic→XOR | 全输入域 0/1 arithmetic shares 到 XOR shares 的原语、泄露与通信 | M3 设计只列为未来 primitive conformance；没有 M2 adapter 证据（D）。 |
+| arithmetic→XOR | 已有 0/1 arithmetic shares 的逐 share LSB 映射与其 0/1 precondition | 模 2 恒等式足够；无需独立原语、消息或预处理。仍需在未来 conformance 中验证 routing 输出满足该 precondition（C）。 |
 
 因而本审计**没有**获得可审计的 D2 secure inverse-routing 构造。明确拒绝 B0 permutation matrix、单方 permutation、打开 index/mask、明文后处理、文件/共享目录以及 "先做 demo"。未来实现必须先用文件级最小 primitive 边界证明上表四项，再写代码。
 
@@ -74,7 +74,7 @@ priority_key = ((UINT32_MAX - ordered_score) << index_bits) | original_index
 index_bits = max(1, ceil(log2(n)))
 ```
 
-它使较大的 signed score 具有较小 key，tie 时较小 index 具有较小 key；因此 secure comparator 的方向、`rank_A` 升序与项目 Top-K 转换必须各自明确，不能仅凭 key 小于 64 位推断正确性。
+它使较大的 signed score 具有较小 key，tie 时较小 index 具有较小 key；priority key 的 stable ascending rank 直接就是 `rank_P`，无需也不得转换为 `rank_A`。不能仅凭 key 小于 64 位推断正确性。
 
 | n | index_bits | key_bits | 合法 `original_index` | 64-bit 拼接的纸面上界 |
 | ---: | ---: | ---: | --- | --- |
@@ -88,7 +88,7 @@ index_bits = max(1, ceil(log2(n)))
 
 对于此表，`0 <= UINT32_MAX-ordered_score <= 2^32-1`、`index_bits <= 20`，故左移在 `uint64_t` 中不丢位；`original_index < 2^index_bits`，所以 OR 不重叠且最终 `<2^(32+index_bits) <= 2^52`。实现必须在移位前验证 `1 <= n <= 1,000,000`（当前候选审计上界）、`1 <= K <= n`、`index < n`、`key < 2^key_bits`，并把任何非法 `n/K/index/key` 作为硬错误。`n` 非二次幂时 `[n,2^index_bits)` 是未使用 index 域点：不得生成 record、DCF key 或 carrier；任何对它们的输入/输出均为硬错误，不能静默映射到真实 slot。
 
-这只是**位宽表和 C++ 无溢出前提，不是完整 range proof**。现有 VFSS DCF 的签名是 `keyGenDCF(int Bin, int Bout, ...)`/`evalDCF(...)`（B）；`GroupElement` 为 `uint64_t`（B），但未见 M2 对 `Bin=33..52`、阈值端点、payload/ring 宽度或非法 bit-width 的 conformance。B1 `eval_ucmp_gt` 以 `1ULL << (comparison_bits-1)`、`(left-right) mod 2^bits`、再以阈值校正实现其本地 uCMP（B）；这要求至少明确：比较环为 `Z_(2^key_bits)`、每个 masked difference 的真实值与 mask difference 均满足该 uCMP 的无歧义范围、方向为“较小 priority key 胜出”（或在 rank 聚合处显式反转）、阈值/`Bin`/shift 不触及 64 或未定义行为。上述前提尚未被证明或在 VFSS conformance 中验证（D）。
+这只是**位宽表和 C++ 无溢出前提，不是完整 range proof**。未 mask key 的候选 `key_bits` 要满足 Agarwal uCMP 的 `|x-y|<N/2` 前提，故候选比较环为 `N=2^(key_bits+1)`，候选 DCF/uCMP `Bin=key_bits+1`（本表为 34、40、41、43、47、50、53）。现有 VFSS DCF 的签名是 `keyGenDCF(int Bin, int Bout, ...)`/`evalDCF(...)`（B）；`GroupElement` 为 `uint64_t`（B），但未见对这些候选参数、阈值端点、masked difference、payload/ring 宽度或非法 bit-width 的 conformance。B1 `eval_ucmp_gt` 的本地实现不能代替 VFSS 证明。必须明确比较方向为“较小 priority key 胜出”，并证明 mask difference、阈值、`Bin`、shift 不触及未定义行为。上述前提尚未被证明或在 VFSS conformance 中验证（D）。
 
 结论：M1 raw 32-bit DCF conformance 已通过；priority-key DCF/uCMP conformance **未验证**；纸面 `key_bits <= 52` **不等于**当前 VFSS 可安全调用。D3 仍阻塞，直到有完整 range proof、所有表点及端点/unused-domain/invalid-input conformance，并审计比较方向。
 
@@ -106,7 +106,7 @@ index_bits = max(1, ceil(log2(n)))
 | P0/P1 online start | 建立/验证一次会话，完成公开配置同步；连接建立和启动同步不增加 causal online round，但真实时间单列，不能用 fixed sleep 隐藏。online 计数开始点是同步完成、第一条 R1 protocol message 前，双方将 counters reset 为零。 |
 | R1 shuffle | 仅允许经 D1/D2 批准的 shuffle primitive 所定义的 framed messages；其因果 barrier 计入实际 paper-core audit。当前消息集未知（D），不得借 B1 helper 的 ports/artifacts 填充。 |
 | R2 CmpAgg | 每个方向的 masked FSS gate/input exchange 均以 phase/sequence 独立框定；仅原语允许的 masked values 可打开。该阶段的依赖 barrier 记入实际 paper-core audit。 |
-| R3 rank reveal | P0/P1 交换 rank shares并只重构 D1 指定的 `(slot,rank_A)`；交换属于 R3 的一个因果 barrier。 |
+| R3 rank reveal | P0/P1 交换 rank shares并只重构 D1 指定的 `(slot,rank_P)`；交换属于 R3 的一个因果 barrier。 |
 | R4 mask adapter | 仅 D2 获证后出现；其所有消息、打开值和 barriers 分别计入 `mask_adapter_rounds`。当前不得假定消息或轮数。 |
 | online end | 完成 XOR mask shares后读取双方 `sent_bits/received_bits`，先保存每方原始值，再导出 `online_comm_total_bits=(P0.sent_bits+P1.sent_bits)*8`、per-party 为 total/2。所有未接通字段保持 `NOT_MEASURED`。 |
 
