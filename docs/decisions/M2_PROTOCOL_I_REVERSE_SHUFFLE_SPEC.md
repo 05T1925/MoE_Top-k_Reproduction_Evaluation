@@ -52,3 +52,13 @@ reverse 仅作用于 R3 后创建的 carrier：由正向 `Pi` 下 slot 得到的
 结论：D2 从“无候选”推进为**可审查的 ideal-functionality / minimal-adapter 候选**，但未满足进入代码的全部退出门。D1 泄露策略仍须用户批准；D3 需 range conformance；D4 需 bounded transport、真实计量和三进程 E2E。
 
 **D2 未经独立审查与用户批准前，M2 仍为 design_blocked；不授权开始完整 Protocol I 实现。**
+
+## 6. M2.8 chosen-OT boundary (C/D)
+
+M2.8 separately evaluates a possible chosen-OT dependency boundary; it does
+not supply a PS/OPV/Share Translation implementation and does not alter this
+reverse-shuffle candidate. The pinned EMP dependency audit is currently
+blocked before any supported-host build or E2E, so no OT backend source,
+transcript, byte count or security conclusion is admitted. See
+`M2_CHOSEN_OT_DEPENDENCY.md` for exact revisions, archive hashes, notice scope
+and the supported-host gate. This leaves every D2 condition above unchanged.
