@@ -8,7 +8,8 @@
 
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
-- 当前开发主线：已完成 M1.1；M2 Protocol I 先完成实施前设计门批准，再进入实现，
+- 当前开发主线：M1.1 已完成；M2.7 CmpAgg 三进程运行基础已作为项目扩展完成，
+  但完整 Protocol I 仍须通过设计门、真实 shuffle、inverse routing 和统一 mask；
   随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
@@ -194,6 +195,25 @@ M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score
 - secure 模式不重构 rank、comparison bits 或 selected indices；
 - 角色为 2+1，在线轮数和额外 mask 适配轮数分别可解释；
 - 所有统一指标来自实际计数，不使用模拟 shuffle 成本。
+
+### M2.7 CmpAgg 三进程运行基础（已完成）
+
+实现标签固定为 `m2_priority_cmpagg_three_process_e2e`，属于项目扩展（C），不等同于
+`agarwal_protocol_i_exact_mask_output`。P2 在离线阶段为公开 canonical comparison
+graph 生成 node-mask shares 和 party-separated VFSS uCMP/DCF edge material，分别发送
+给 P0/P1 后退出；controller 仅在该 barrier 后发送 TEST_ONLY priority-key shares；
+P0/P1 通过一个有界 framed masked-key exchange 计算 additive rank shares，controller
+才在测试层重构并与 oracle 比较。
+
+M2.7 的十个独立进程用例覆盖 `n=1,2,5,7,11`、`K=1`、`K=n`、`K=2 (n=11)`、非二次幂、
+随机/重复/全相等值及 `INT32_MIN/MAX`，并通过 package/transport 错误矩阵。Ubuntu
+24.04.4 全新 Debug 构建中 CTest 发现 11 项且全量 11/11 通过；实际命令、字节计数、
+退出码和未测字段见
+`docs/reproduction/M2_CMPAGG_THREE_PROCESS_E2E_UBUNTU_2026-09-05.md`。
+
+该交付只闭合 CmpAgg process foundation：uCMP 是项目 two-evaluation adapter；secure
+shuffle、inverse routing、最终原始顺序 bit-mask、完整 Protocol I 论文轮数/泄露与网络
+性能仍未实现或为 `NOT_MEASURED`。因此不改变 M2 设计门的阻塞状态，也不提前进入 M3。
 
 ## 3.3 M3：Protocol III 模块化 3 轮基线
 

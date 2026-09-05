@@ -663,7 +663,11 @@ int run_controller(const CaseConfig& config, const std::vector<std::uint32_t>& s
                 << " p2_to_p1_bytes=" << stats.p1_package_bytes << '\n'
                 << "p0_to_p1_bytes=" << result0.sent_bytes
                 << " p1_to_p0_bytes=" << result1.sent_bytes << '\n'
-                << "test_only_result_bytes=" << (56 + sizeof(std::uint64_t) * config.n) * 2 << '\n'
+                << "test_only_controller_to_p0_bytes=" << (40 + sizeof(std::uint64_t) * config.n)
+                << " test_only_controller_to_p1_bytes=" << (40 + sizeof(std::uint64_t) * config.n) << '\n'
+                << "test_only_result_p0_bytes=" << (56 + sizeof(std::uint64_t) * config.n)
+                << " test_only_result_p1_bytes=" << (56 + sizeof(std::uint64_t) * config.n)
+                << " test_only_p2_stats_bytes=32\n"
                 << "oracle_ranks=";
       for (std::size_t index = 0; index < oracle_ranks.size(); ++index) {
         if (index != 0) std::cout << ',';
