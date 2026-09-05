@@ -34,6 +34,7 @@ PRIVATE
     src/backend/cleartext.cpp
     src/backend/baseline_cleartext.cpp
     src/backend/float.cpp
+    src/moe_topk/masked_mul_adapter.cpp
     # src/softmax.cpp
 )
 
@@ -41,6 +42,8 @@ target_include_directories(${PROJECT_NAME}
 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
 )
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
@@ -214,3 +217,11 @@ add_executable(
     tests/moe_topk/dpf_conformance_test.cpp
 )
 target_link_libraries(moe_topk_dpf_conformance_test FSS)
+
+# Protocol III pre-integration multiplication conformance. The adapter returns
+# additive product shares and deliberately stops before the M2 runtime boundary.
+add_executable(
+    moe_topk_masked_mul_adapter_test
+    tests/moe_topk/masked_mul_adapter_test.cpp
+)
+target_link_libraries(moe_topk_masked_mul_adapter_test ${PROJECT_NAME})

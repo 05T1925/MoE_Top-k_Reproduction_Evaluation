@@ -164,6 +164,10 @@ mask 或任意调试 oracle。随机性复用、key/triple 数量不足、party 
 使用 VFSS `Peer`/Dealer 的内存通道，覆盖与 socket 通道相同的 DPF key
 序列化函数；独立进程 socket E2E 仍保留在 8.3 节，不视为已经完成。
 
+第 4 项的无重构乘法 adapter 接口、一次性材料状态、传输边界和测试计划见
+`docs/decisions/PROTOCOL_III_MASKED_MUL_ADAPTER.md`。该前置工作停在 M2
+rank/runtime 接口之前，不提前建立第二套 party、通信或 metrics 语义。
+
 ### 8.2 Oracle differential
 
 - 重复值、全相等、负值、`INT32_MIN/MAX`、`K=1`、`K=n` 和非 2 次幂 `n`；
