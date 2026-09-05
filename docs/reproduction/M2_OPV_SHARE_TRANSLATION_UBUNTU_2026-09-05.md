@@ -6,8 +6,8 @@ Validated on Ubuntu 24.04.4 LTS x86_64, GCC 13.3.0, CMake 3.28.3 and OpenSSL
 3.0.13.  EMP dependencies are the pinned prefix recorded in
 `M2_CHOSEN_OT_DEPENDENCY.md`; no dependency selection was repeated for M2.9.
 
-Validated source revision: `50ef3c6` (the implementation commits immediately
-preceding this documentation record). Commands were:
+Validated source revision: `15b1153` (implementation plus final negative-test
+coverage; this documentation commit follows it). Commands were:
 
 ```bash
 cmake -S "$workspace/VFSS" -B /tmp/moe_m29_off -DCMAKE_BUILD_TYPE=Debug
