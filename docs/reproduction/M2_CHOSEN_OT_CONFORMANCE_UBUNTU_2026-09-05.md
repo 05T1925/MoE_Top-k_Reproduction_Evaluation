@@ -4,15 +4,12 @@ Implementation label: `m2_emp_iknp_chosen_ot_conformance`.
 
 ## Result
 
-**NOT_RUN / blocked before configuration.** The controlling Windows host has
-no installed/registered `Ubuntu` WSL distribution (`Wsl/Service/WSL_E_DISTRO_NOT_FOUND`).
-Its available GNU toolchain is MinGW/MSYS, while the pinned `emp-tool` CMake
-source explicitly accepts only Linux or Darwin. No Windows configure, mock
-transport, direct selection, or borrowed performance result was used.
-
-This record is deliberately not an Ubuntu validation claim. It records the
-exact failed prerequisite so a supported host can repeat the qualification
-without ambiguity.
+**PASS.** The prior `WSL_E_DISTRO_NOT_FOUND` observation applied only to the
+incorrect distribution name `Ubuntu`. This run used `wsl.exe -d Ubuntu-24.04`:
+Ubuntu 24.04.4 LTS, x86_64, GCC 13.3.0, CMake 3.28.3 and OpenSSL 3.0.13.
+`libssl-dev` was the only missing system build package and was installed before
+configuration. No Windows build, mock transport, direct selection or borrowed
+result was used.
 
 ## Pinned input and observed archive hashes
 
@@ -50,8 +47,20 @@ cmake --build "$root/vfss-on" --parallel
 ctest --test-dir "$root/vfss-on" --output-on-failure
 ```
 
-Expected only after the source implementation exists: upstream base-OT + IKNP
-smoke passes; default-off CTest discovers 11 and passes 11/11; enabled CTest
-discovers 12 and passes 12/12. At this revision all three are `NOT_MEASURED`.
-Performance, byte counts, rounds, seeds, runtime topology and link output are
-also `NOT_MEASURED`; none has been inferred from an EMP upstream test.
+Actual results in fresh `/tmp/moe_m28_emp.ok9WzQ`:
+
+- `ctest -R '^(test_base_ot|test_iknp)$'` in the pinned EMP build: **2/2
+  passed**, 0.22 seconds.
+- Enabled Debug VFSS: CTest discovers **12** and all **12/12 pass** (4.28
+  seconds). The new process test took 1.81 seconds.
+- Default-off fresh Debug discovers **11** and passes **11/11** (2.49
+  seconds); no chosen-OT target is generated with the option off.
+- The project test's reported `n=1` seeded case used real EMP IKNP bytes:
+  sender 8843 sent / 38694 received, receiver 38694 sent / 8843 received;
+  preamble bytes are excluded from these EMP counters.
+- `ldd` shows only `libcrypto.so.3`, libc, libstdc++ and loader dependencies.
+  It does not show libOTe, coproto, macoro, function2 or cryptoTools.
+
+This is conformance rather than performance measurement: timing distribution,
+LAN/WAN, repetitions and all Protocol I shuffle/OPV metrics remain
+`NOT_MEASURED`.

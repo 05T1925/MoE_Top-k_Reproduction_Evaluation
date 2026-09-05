@@ -1,6 +1,6 @@
 # M2.8 EMP chosen-OT dependency qualification
 
-Status: **not admitted; `m2_emp_iknp_chosen_ot_conformance` remains blocked.**
+Status: **implemented and validated as `m2_emp_iknp_chosen_ot_conformance` (C).**
 
 This is an engineering dependency investigation (**C**), not an Agarwal
 Protocol I, OPV, Share Translation, Permute+Share, or shuffle implementation
@@ -26,27 +26,53 @@ FetchContent, vendored source, online Dealer, or file-polling component.
 The earlier libOTe/coproto/macoro route is rejected and was not re-run. Its
 unresolved macoro licensing/packaging boundary is not carried into this route.
 
-## Required stage gate before source is admitted
+## Implemented stage contract
 
-| stage | required evidence | present result |
+| stage | roles / input | messages and opened values | output / allowed leakage |
 | --- | --- | --- |
-| dependency configure/build/install | fresh Linux/Darwin build from the pinned archives | **blocked**: this host has no registered Ubuntu WSL distribution and emp-tool rejects Windows/MSYS. |
-| upstream primitive smoke | run the upstream base-OT and IKNP two-party CTest cases from that build | `NOT_RUN` (no supported host). |
-| isolated backend compile | C++20-only private static `moe_topk_emp_ot_backend`; public C++17 headers contain only `std::array<uint8_t,16>` | `NOT_RUN`; source intentionally not added before its dependency can be compiled. |
-| chosen-OT conformance/differential/E2E | fresh `socketpair` + `fork` + `execv` role processes; real EMP IKNP bytes and no choice disclosure to sender | `NOT_RUN`; no simulated/direct-selection substitute exists. |
-| project acceptance | default-off fresh Debug 11/11 and enabled fresh Debug 12/12 | default-off remains M2.7 evidence only; enabled result is `NOT_RUN`. |
+| preamble | Sender has two 128-bit message vectors; receiver has only 0/1 choices. | Each writes then verifies a fixed 48-byte preamble: magic/version, role, session, fingerprint, material ID, item count and `IKNP` protocol ID. No values are opened. | Role/config mismatch, EOF, timeout and replay hard-fail before EMP. |
+| base OT + extension | Sender/receiver use a controller-created connected Unix fd. | EMP semi-honest IKNP performs its base OT and chosen-message COT wrapper over `EmpBoundedFdIO`, with one absolute poll deadline. | Sender returns counters only; receiver returns exactly selected blocks and counters. |
+| conformance | TEST_ONLY controller independently supplies role inputs and checks receiver output. | `socketpair` + `fork` + `execv`; no TCP port, file, sleep, retry, online Dealer or direct selection path. | Controller-only reconstruction checks selected block equality and child exit codes. |
 
-The intended enabled CMake boundary remains explicit and non-discovering:
-`MOE_TOPK_ENABLE_EMP_OT=ON` with `EMP_TOOL_DIR` and `EMP_OT_DIR` pointing to
-the installed package-config directories. It must fail at configure time if
-either is missing. The backend must be the only target including EMP/OpenSSL;
-the public API must use `ProtocolIBlock128 = std::array<std::uint8_t, 16>`.
+`EmpBoundedFdIO` handles short read/write, `EINTR`, EOF, `POLLERR`, `POLLHUP`,
+`POLLNVAL` and timeout as hard errors. It uses no `emp::*` or OpenSSL type in
+the public header. A process-local `(session,fingerprint,material_id,role)`
+consumption set rejects replay after a valid preamble.
+
+## Ubuntu 24.04.4 qualification result
+
+The initial WSL observation was a name error: `wsl.exe -d Ubuntu` returned
+`WSL_E_DISTRO_NOT_FOUND`. The actual installed distribution is
+`Ubuntu-24.04`, which was subsequently used successfully; the earlier record
+is historical and was not an EMP build failure.
+
+- Host: Ubuntu 24.04.4 LTS, x86_64, GCC 13.3.0, CMake 3.28.3, OpenSSL
+  3.0.13 (with `libssl-dev` installed as the only missing build package).
+- Both pinned archives passed the hashes above; `emp-tool` and `emp-ot` built,
+  installed to a fresh `/tmp/moe_m28_emp.ok9WzQ/prefix`, and upstream
+  `test_base_ot` plus `test_iknp` passed 2/2 in 0.22 seconds.
+- `ldd` for the upstream and project chosen-OT executables lists OpenSSL,
+  libc and C++ runtime only; it has no libOTe, coproto, macoro, function2 or
+  cryptoTools dynamic dependency.
+- A fresh enabled Debug configuration discovers exactly 12 tests and passes
+  12/12 in 4.28 seconds. The new conformance covers `n=1,2,17,128`, all-zero/all-one/
+  alternating/seeded choices, distinct/equal/zero/`0xff`/boundary/seeded
+  messages, invalid vector/choice/config inputs, session/fingerprint/material
+  mismatch, role mismatch, truncated preamble EOF, timeout, replay and fresh
+  material batches.
+- One actual `n=1` trace counted EMP-only bytes (preamble excluded): sender
+  sent 8843 / received 38694; receiver sent 38694 / received 8843. These are
+  a conformance observation, not a benchmark.
+
+The enabled CMake boundary is explicit and non-discovering:
+`MOE_TOPK_ENABLE_EMP_OT=ON` calls `find_package(emp-tool 1.0 CONFIG REQUIRED)`
+and `find_package(emp-ot 1.0 CONFIG REQUIRED)`. Qualification used only
+`-DCMAKE_PREFIX_PATH=<prefix>`; absent packages hard-fail at configure time.
+Only static target `moe_topk_emp_ot_backend` uses C++20 and includes EMP.
+The public C++17 header uses `ProtocolIBlock128 = std::array<std::uint8_t,16>`.
 
 ## Admission condition
 
-Resume only on Ubuntu or another supported POSIX host with CMake, a supported
-compiler and OpenSSL 3. Build/install the exact archives in a fresh temporary
-directory, preserve the link-dependency output, run upstream `test_base_ot`
-and `test_iknp`, then implement and test the bounded-fd adapter. Until that
-evidence exists, adding a plausible but uncompiled EMP backend would violate
-the repository's conformance and provenance rules.
+This closes only chosen-OT conformance. Performance, LAN/WAN measurements,
+OPV, Share Translation, Permute+Share, secure shuffle, inverse routing and
+complete Protocol I remain `NOT_MEASURED` or unimplemented.

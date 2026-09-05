@@ -55,10 +55,10 @@ reverse 仅作用于 R3 后创建的 carrier：由正向 `Pi` 下 slot 得到的
 
 ## 6. M2.8 chosen-OT boundary (C/D)
 
-M2.8 separately evaluates a possible chosen-OT dependency boundary; it does
-not supply a PS/OPV/Share Translation implementation and does not alter this
-reverse-shuffle candidate. The pinned EMP dependency audit is currently
-blocked before any supported-host build or E2E, so no OT backend source,
-transcript, byte count or security conclusion is admitted. See
-`M2_CHOSEN_OT_DEPENDENCY.md` for exact revisions, archive hashes, notice scope
-and the supported-host gate. This leaves every D2 condition above unchanged.
+M2.8 now supplies a separately validated EMP IKNP chosen-OT conformance
+boundary, but it does not supply PS/OPV/Share Translation or alter this
+reverse-shuffle candidate. Its C++20 backend, bounded-fd preamble and
+sender/receiver E2E are engineering evidence C only; they do not admit a
+shuffle transcript or change any D2 condition above. See
+`M2_CHOSEN_OT_DEPENDENCY.md` for exact revisions, archive hashes, notices and
+the supported-host results.

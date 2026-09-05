@@ -10,9 +10,10 @@
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
 - 当前开发主线：M1.1 已完成；M2.7 CmpAgg 三进程运行基础已作为项目扩展完成，
   但完整 Protocol I 仍须通过设计门、真实 shuffle、inverse routing 和统一 mask；
-  M2.8 的候选 `m2_emp_iknp_chosen_ot_conformance` 已完成固定 EMP 依赖、许可证与
-  ABI/API 纸面审计，但因当前主机没有受支持的 Linux/Darwin 运行环境而未配置、未引入
-  后端、未运行 upstream IKNP 或 12/12；状态与可复现命令见
+  M2.8 的项目扩展 `m2_emp_iknp_chosen_ot_conformance` 已在 Ubuntu-24.04 上完成固定
+  EMP 依赖构建、upstream base-OT/IKNP smoke、C++20 隔离的 connected-fd adapter 和
+  sender/receiver 独立进程 conformance；它不是 OPV/PS/shuffle 或完整 Protocol I，状态与
+  可复现命令见
   `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
   `docs/reproduction/M2_CHOSEN_OT_CONFORMANCE_UBUNTU_2026-09-05.md`；
   随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
