@@ -6,11 +6,13 @@
 #include <FSS/prng.h>
 #include <algorithm>
 #include <array>
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <random>
+#include <signal.h>
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
@@ -19,7 +21,57 @@
 #include <vector>
 namespace {
 using namespace moe_topk; using Bytes=std::vector<std::uint8_t>;
-void require(bool value,const char* message){if(!value)throw std::runtime_error(message);} void socket_pair(int p[2]){require(::socketpair(AF_UNIX,SOCK_STREAM,0,p)==0,"socketpair");}void seed_fss(){for(int i=0;i<256;++i)FSSConfig::prngs[i].SetSeed(osuCrypto::toBlock(UINT64_C(0x4d323133),i));}
+void require(bool value,const char* message){if(!value)throw std::runtime_error(message);}
+
+class FdPool final {
+ public:
+  ~FdPool() { close_all(); }
+
+  void socket_pair(std::array<int,2>& pair) {
+    pair = {{-1,-1}};
+    require(::socketpair(AF_UNIX,SOCK_STREAM,0,pair.data())==0,"socketpair");
+    fds_.push_back(&pair[0]);
+    fds_.push_back(&pair[1]);
+  }
+
+  void close_except(const std::vector<int>& keep) {
+    for (auto* fd : fds_) {
+      if (*fd >= 0 && std::find(keep.begin(),keep.end(),*fd)==keep.end()) {
+        ::close(*fd);
+        *fd=-1;
+      }
+    }
+  }
+
+  void close_all() { close_except({}); }
+
+ private:
+  std::vector<int*> fds_;
+};
+
+class ChildSet final {
+ public:
+  ~ChildSet() {
+    for (const auto child : children_) if (child > 0) ::kill(child,SIGTERM);
+    for (const auto child : children_) if (child > 0) while (::waitpid(child,nullptr,0)<0 && errno==EINTR) {}
+  }
+
+  void add(pid_t child) { children_.push_back(child); }
+
+  void wait_ok(pid_t child) {
+    int status=0;
+    pid_t result;
+    do result=::waitpid(child,&status,0); while (result<0 && errno==EINTR);
+    require(result==child && WIFEXITED(status) && WEXITSTATUS(status)==0,"child failure");
+    for (auto& tracked : children_) if (tracked==child) { tracked=-1; return; }
+    throw std::runtime_error("unknown child");
+  }
+
+ private:
+  std::vector<pid_t> children_;
+};
+
+void seed_fss(){for(int i=0;i<256;++i)FSSConfig::prngs[i].SetSeed(osuCrypto::toBlock(UINT64_C(0x4d323133),i));}
 struct Case{std::uint32_t logical_n,k;std::uint64_t session,fingerprint,seed;unsigned p0_style,p1_style,score_style;};
 ProtocolIPriorityPipelineConfig config_for(const Case&t,int party){const auto l=protocol_i_make_input_layout(t.logical_n,t.k);return{t.session,t.fingerprint,l.logical_n,l.padded_n,t.k,l.minimum_comparison_bits,static_cast<std::uint8_t>(party),15000};}
 std::pair<ProtocolIPartyPackage,ProtocolIPartyPackage> make_packages(const ProtocolIPriorityPipelineConfig&c,std::uint64_t seed){seed_fss();std::mt19937_64 r(seed);const auto ring=(UINT64_C(1)<<c.comparison_bits)-1U,score_ring=(UINT64_C(1)<<34)-1U;ProtocolIPartyPackage p0,p1;for(auto*p:{&p0,&p1}){p->session=c.session;p->fingerprint=c.fingerprint;p->n=c.padded_n;p->k=c.k;p->comparison_bits=c.comparison_bits;}p0.party=0;p1.party=1;p0.node_mask_shares.resize(c.padded_n);p1.node_mask_shares.resize(c.padded_n);std::vector<std::uint64_t>full(c.padded_n);for(std::size_t i=0;i<full.size();++i){full[i]=r()&ring;p0.node_mask_shares[i]=r()&ring;p1.node_mask_shares[i]=(full[i]-p0.node_mask_shares[i])&ring;}for(std::uint32_t a=0;a<c.padded_n;++a)for(std::uint32_t b=a+1;b<c.padded_n;++b){ProtocolIUcmpMaterial m(c.comparison_bits,full[a],full[b]);p0.edge_materials.emplace_back(a,b,m.export_party_material(0));p1.edge_materials.emplace_back(a,b,m.export_party_material(1));}auto score=[&](std::uint8_t stage){for(std::uint32_t slot=0;slot<c.padded_n;++slot){const auto left=r()&score_ring,right=r()&score_ring,l0=r()&score_ring,r0=r()&score_ring;ProtocolIUcmpMaterial m(34,left,right);ProtocolIScoreInputPartyMaterial a(slot,stage,l0,r0,m.export_party_material(0)),b(slot,stage,(left-l0)&score_ring,(right-r0)&score_ring,m.export_party_material(1));if(stage==1){p0.carry_materials.push_back(std::move(a));p1.carry_materials.push_back(std::move(b));}else{p0.sign_materials.push_back(std::move(a));p1.sign_materials.push_back(std::move(b));}}};score(1);score(2);return{std::move(p0),std::move(p1)};}
@@ -28,9 +80,82 @@ Bytes encode_words(const std::vector<std::uint64_t>&v){Bytes b;for(auto x:v)for(
 Bytes encode_result(const ProtocolIPriorityPipelineOutput&o,const ProtocolIScoreInputMetrics&s,std::uint64_t package_bytes){Bytes b=o.xor_mask_share;const std::vector<std::uint64_t>m{package_bytes,s.carry_sent_bytes,s.carry_received_bytes,s.sign_sent_bytes,s.sign_received_bytes,s.ucmp_calls,s.raw_dcf_calls,s.rounds,o.metrics.forward_sent_bytes,o.metrics.forward_received_bytes,o.metrics.cmpagg_sent_bytes,o.metrics.cmpagg_received_bytes,o.metrics.rank_reveal_sent_bytes,o.metrics.rank_reveal_received_bytes,o.metrics.reverse_sent_bytes,o.metrics.reverse_received_bytes,o.metrics.comparison_edges,o.metrics.raw_dcf_calls,o.metrics.online_rounds};const auto tail=encode_words(m);b.insert(b.end(),tail.begin(),tail.end());return b;}
 int p2_main(const Case&t,int fd0,int fd1){try{const auto c0=config_for(t,0),c1=config_for(t,1);auto[p0,p1]=make_packages(c0,t.seed);ProtocolIFramedChannel to0(fd0,{t.session,t.fingerprint,c0.padded_n,t.k,c0.comparison_bits,2,0,1,1},c0.timeout_ms),to1(fd1,{t.session,t.fingerprint,c1.padded_n,t.k,c1.comparison_bits,2,1,1,1},c1.timeout_ms);protocol_i_send_framed_chunks(to0,serialize_party_package(p0));protocol_i_send_framed_chunks(to1,serialize_party_package(p1));return 0;}catch(const std::exception&e){std::cerr<<"P2: "<<e.what()<<'\n';return 1;}}
 int party_main(const Case&t,int who,const std::array<int,4>&offline,const std::array<int,2>&forward,const std::array<int,2>&reverse,const std::array<int,2>&score_fds,int package_fd,int ready_fd,int input_fd,int cmp_fd,int rank_fd,int result_fd){try{const auto c=config_for(t,who);ProtocolIFramedChannel package_channel(package_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,1,1},c.timeout_ms);auto package=deserialize_party_package(protocol_i_receive_framed_chunks(package_channel,64U*1024U*1024U),who);auto material=protocol_i_shuffle_preprocess_party({t.session,t.fingerprint,t.seed+100,t.seed+200,c.padded_n,2,static_cast<std::uint8_t>(who),c.timeout_ms},offline,permutation(c.padded_n,who?t.p1_style:t.p0_style,t.seed+who));ProtocolIFramedChannel ready(ready_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,5,1},c.timeout_ms);ready.send({1});ProtocolIFramedChannel input(input_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,4,1},c.timeout_ms);const auto encoded=decode_words(input.receive());require(encoded.size()==t.logical_n,"raw input length");std::vector<std::uint32_t> shares;for(const auto x:encoded){require(x<=UINT32_MAX,"raw input width");shares.push_back(static_cast<std::uint32_t>(x));}ProtocolIScoreInputMetrics score_metrics;const auto keys=protocol_i_raw_score_input_party({t.session,t.fingerprint,c.logical_n,c.padded_n,t.k,protocol_i_make_input_layout(t.logical_n,t.k).index_bits,c.comparison_bits,static_cast<std::uint8_t>(who),c.timeout_ms},package,shares,score_fds,&score_metrics);const auto output=protocol_i_priority_pipeline_party(c,std::move(package),material,keys,forward,cmp_fd,rank_fd,reverse);require(material.forward_consumed&&material.reverse_consumed,"shuffle material consumption");ProtocolIFramedChannel result(result_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,6,1},c.timeout_ms);result.send(encode_result(output,score_metrics,package_channel.received_bytes()));return 0;}catch(const std::exception&e){std::cerr<<"P"<<who<<": "<<e.what()<<'\n';return 1;}}
-pid_t launch(const char*self,const std::vector<std::string>&v){const auto p=fork();require(p>=0,"fork");if(!p){std::vector<char*>a{const_cast<char*>(self)};for(const auto&s:v)a.push_back(const_cast<char*>(s.c_str()));a.push_back(nullptr);execv(self,a.data());_exit(127);}return p;}std::string executable(const char*fallback){char p[4096]{};const auto n=readlink("/proc/self/exe",p,sizeof(p)-1);return n>0?std::string(p,n):fallback;}void wait_ok(pid_t p){int s=0;require(waitpid(p,&s,0)==p&&WIFEXITED(s)&&WEXITSTATUS(s)==0,"child failure");}
+pid_t launch(const char*self,const std::vector<std::string>&v,FdPool&fds,
+             const std::vector<int>&keep,ChildSet&children){
+  const auto p=fork();
+  require(p>=0,"fork");
+  if(!p){
+    fds.close_except(keep);
+    std::vector<char*>a{const_cast<char*>(self)};
+    for(const auto&s:v)a.push_back(const_cast<char*>(s.c_str()));
+    a.push_back(nullptr);
+    execv(self,a.data());
+    _exit(127);
+  }
+  children.add(p);
+  return p;
+}
+std::string executable(const char*fallback){char p[4096]{};const auto n=readlink("/proc/self/exe",p,sizeof(p)-1);return n>0?std::string(p,n):fallback;}
 std::vector<std::uint32_t> scores_for(const Case&t){std::vector<std::uint32_t>s(t.logical_n);std::mt19937_64 r(t.seed+900);for(auto&x:s)x=static_cast<std::uint32_t>(r());if(t.score_style==1)std::fill(s.begin(),s.end(),5);if(t.score_style==2)std::fill(s.begin(),s.end(),UINT32_C(0x80000000));if(t.score_style==3)for(std::size_t i=0;i<s.size();++i)s[i]=i%2?UINT32_C(0x7fffffff):UINT32_C(0x80000000);if(t.score_style==4)for(std::size_t i=0;i<s.size();++i)s[i]=static_cast<std::uint32_t>(i);return s;}
-void run_case(const char*self,const Case&t){const auto c=config_for(t,0);const auto scores=scores_for(t);std::array<std::array<int,2>,4>offline{};std::array<std::array<int,2>,2>forward{},reverse{},score{};for(auto&x:offline)socket_pair(x.data());for(auto&x:forward)socket_pair(x.data());for(auto&x:reverse)socket_pair(x.data());for(auto&x:score)socket_pair(x.data());int package0[2]{},package1[2]{},ready0[2]{},ready1[2]{},input0[2]{},input1[2]{},cmp[2]{},rank[2]{},result0[2]{},result1[2]{};for(auto*x:{package0,package1,ready0,ready1,input0,input1,cmp,rank,result0,result1})socket_pair(x);auto role_args=[&](int who){std::vector<std::string>v{"party",std::to_string(who)};for(const auto&x:offline)v.push_back(std::to_string(x[who]));for(const auto&x:forward)v.push_back(std::to_string(x[who]));for(const auto&x:reverse)v.push_back(std::to_string(x[who]));for(const auto&x:score)v.push_back(std::to_string(x[who]));v.insert(v.end(),{std::to_string(who?package1[1]:package0[1]),std::to_string(who?ready1[1]:ready0[1]),std::to_string(who?input1[1]:input0[1]),std::to_string(cmp[who]),std::to_string(rank[who]),std::to_string(who?result1[1]:result0[1]),std::to_string(t.logical_n),std::to_string(t.k),std::to_string(t.session),std::to_string(t.fingerprint),std::to_string(t.seed),std::to_string(t.p0_style),std::to_string(t.p1_style),std::to_string(t.score_style)});return v;};std::vector<std::string>dealer{"p2",std::to_string(package0[0]),std::to_string(package1[0]),std::to_string(t.logical_n),std::to_string(t.k),std::to_string(t.session),std::to_string(t.fingerprint),std::to_string(t.seed),std::to_string(t.p0_style),std::to_string(t.p1_style),std::to_string(t.score_style)};const auto p0=launch(self,role_args(0)),p1=launch(self,role_args(1)),p2=launch(self,dealer);wait_ok(p2);ProtocolIFramedChannel ready_p0(ready0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,5,1},c.timeout_ms),ready_p1(ready1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,5,1},c.timeout_ms);require(ready_p0.receive()==Bytes{1}&&ready_p1.receive()==Bytes{1},"offline readiness");std::mt19937_64 r(t.seed+999);std::vector<std::uint64_t>x0(t.logical_n),x1(t.logical_n);for(std::size_t i=0;i<x0.size();++i){x0[i]=static_cast<std::uint32_t>(r());x1[i]=static_cast<std::uint32_t>(scores[i]-static_cast<std::uint32_t>(x0[i]));}ProtocolIFramedChannel input_p0(input0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,4,1},c.timeout_ms),input_p1(input1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,4,1},c.timeout_ms);input_p0.send(encode_words(x0));input_p1.send(encode_words(x1));ProtocolIFramedChannel result_p0(result0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,6,1},c.timeout_ms),result_p1(result1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,6,1},c.timeout_ms);const auto out0=result_p0.receive(),out1=result_p1.receive();wait_ok(p0);wait_ok(p1);require(out0.size()==t.logical_n+19*8&&out1.size()==out0.size(),"result shape");const auto want=top_k_mask(scores,t.k);for(std::size_t i=0;i<t.logical_n;++i)require((out0[i]^out1[i])==want[i],"oracle mask");const auto m0=decode_words(Bytes(out0.begin()+t.logical_n,out0.end())),m1=decode_words(Bytes(out1.begin()+t.logical_n,out1.end()));for(const auto&m:{m0,m1})require(m[0]>48&&m[5]==2U*c.padded_n&&m[6]==4U*c.padded_n&&m[7]==2&&m[16]==static_cast<std::uint64_t>(c.padded_n)*(c.padded_n-1U)/2U&&m[17]==m[16]*2U&&m[18]==6,"metrics audit");}
+void run_case(const char*self,const Case&t){
+  FdPool fds;
+  ChildSet children;
+  const auto c=config_for(t,0);
+  const auto scores=scores_for(t);
+  std::array<std::array<int,2>,4>offline;
+  std::array<std::array<int,2>,2>forward,reverse,score;
+  for(auto&x:offline)fds.socket_pair(x);
+  for(auto&x:forward)fds.socket_pair(x);
+  for(auto&x:reverse)fds.socket_pair(x);
+  for(auto&x:score)fds.socket_pair(x);
+  std::array<int,2> package0,package1,ready0,ready1,input0,input1,cmp,rank,result0,result1;
+  for(auto*x:{&package0,&package1,&ready0,&ready1,&input0,&input1,&cmp,&rank,&result0,&result1})fds.socket_pair(*x);
+  auto party_fds=[&](int who){
+    std::vector<int>v;
+    for(const auto&x:offline)v.push_back(x[who]);
+    for(const auto&x:forward)v.push_back(x[who]);
+    for(const auto&x:reverse)v.push_back(x[who]);
+    for(const auto&x:score)v.push_back(x[who]);
+    v.insert(v.end(),{who?package1[1]:package0[1],who?ready1[1]:ready0[1],who?input1[1]:input0[1],cmp[who],rank[who],who?result1[1]:result0[1]});
+    return v;
+  };
+  auto role_args=[&](int who){
+    std::vector<std::string>v{"party",std::to_string(who)};
+    for(const auto&x:offline)v.push_back(std::to_string(x[who]));
+    for(const auto&x:forward)v.push_back(std::to_string(x[who]));
+    for(const auto&x:reverse)v.push_back(std::to_string(x[who]));
+    for(const auto&x:score)v.push_back(std::to_string(x[who]));
+    v.insert(v.end(),{std::to_string(who?package1[1]:package0[1]),std::to_string(who?ready1[1]:ready0[1]),std::to_string(who?input1[1]:input0[1]),std::to_string(cmp[who]),std::to_string(rank[who]),std::to_string(who?result1[1]:result0[1]),std::to_string(t.logical_n),std::to_string(t.k),std::to_string(t.session),std::to_string(t.fingerprint),std::to_string(t.seed),std::to_string(t.p0_style),std::to_string(t.p1_style),std::to_string(t.score_style)});
+    return v;
+  };
+  const std::vector<std::string>dealer{"p2",std::to_string(package0[0]),std::to_string(package1[0]),std::to_string(t.logical_n),std::to_string(t.k),std::to_string(t.session),std::to_string(t.fingerprint),std::to_string(t.seed),std::to_string(t.p0_style),std::to_string(t.p1_style),std::to_string(t.score_style)};
+  const auto p0=launch(self,role_args(0),fds,party_fds(0),children);
+  const auto p1=launch(self,role_args(1),fds,party_fds(1),children);
+  const auto p2=launch(self,dealer,fds,{package0[0],package1[0]},children);
+  // The production framed transport rejects a terminal HUP even when the
+  // final frame is readable.  Keep the controller aliases for this case so
+  // the harness preserves that transport contract; FdPool closes them before
+  // the next case rather than accumulating them across the test matrix.
+  children.wait_ok(p2);
+  ProtocolIFramedChannel ready_p0(ready0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,5,1},c.timeout_ms),ready_p1(ready1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,5,1},c.timeout_ms);
+  require(ready_p0.receive()==Bytes{1}&&ready_p1.receive()==Bytes{1},"offline readiness");
+  std::mt19937_64 r(t.seed+999);
+  std::vector<std::uint64_t>x0(t.logical_n),x1(t.logical_n);
+  for(std::size_t i=0;i<x0.size();++i){x0[i]=static_cast<std::uint32_t>(r());x1[i]=static_cast<std::uint32_t>(scores[i]-static_cast<std::uint32_t>(x0[i]));}
+  ProtocolIFramedChannel input_p0(input0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,4,1},c.timeout_ms),input_p1(input1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,4,1},c.timeout_ms);
+  input_p0.send(encode_words(x0));
+  input_p1.send(encode_words(x1));
+  ProtocolIFramedChannel result_p0(result0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,6,1},c.timeout_ms),result_p1(result1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,6,1},c.timeout_ms);
+  const auto out0=result_p0.receive(),out1=result_p1.receive();
+  fds.close_all();
+  children.wait_ok(p0);
+  children.wait_ok(p1);
+  require(out0.size()==t.logical_n+19*8&&out1.size()==out0.size(),"result shape");
+  const auto want=top_k_mask(scores,t.k);
+  for(std::size_t i=0;i<t.logical_n;++i)require((out0[i]^out1[i])==want[i],"oracle mask");
+  const auto m0=decode_words(Bytes(out0.begin()+t.logical_n,out0.end())),m1=decode_words(Bytes(out1.begin()+t.logical_n,out1.end()));
+  for(const auto&m:{m0,m1})require(m[0]>48&&m[5]==2U*c.padded_n&&m[6]==4U*c.padded_n&&m[7]==2&&m[16]==static_cast<std::uint64_t>(c.padded_n)*(c.padded_n-1U)/2U&&m[17]==m[16]*2U&&m[18]==6,"metrics audit");
+}
 Case parse_case(int n,char**v,int at){require(n>=at+8,"case arguments");return{static_cast<std::uint32_t>(std::stoul(v[at])),static_cast<std::uint32_t>(std::stoul(v[at+1])),std::stoull(v[at+2]),std::stoull(v[at+3]),std::stoull(v[at+4]),static_cast<unsigned>(std::stoul(v[at+5])),static_cast<unsigned>(std::stoul(v[at+6])),static_cast<unsigned>(std::stoul(v[at+7]))};}int fd(const char*x){return std::stoi(x);}
 }
 int main(int argc,char**argv){try{if(argc>1&&std::string(argv[1])=="p2"){const auto t=parse_case(argc,argv,4);return p2_main(t,fd(argv[2]),fd(argv[3]));}if(argc>1&&std::string(argv[1])=="party"){const int who=std::stoi(argv[2]);int at=3;std::array<int,4>o{};std::array<int,2>f{},r{},s{};for(auto&x:o)x=fd(argv[at++]);for(auto&x:f)x=fd(argv[at++]);for(auto&x:r)x=fd(argv[at++]);for(auto&x:s)x=fd(argv[at++]);const int package=fd(argv[at++]),ready=fd(argv[at++]),input=fd(argv[at++]),cmp=fd(argv[at++]),rank=fd(argv[at++]),result=fd(argv[at++]);return party_main(parse_case(argc,argv,at),who,o,f,r,s,package,ready,input,cmp,rank,result);}const auto self=executable(argv[0]);if(const auto*n=std::getenv("MOE_TOPK_M2_E2E_N")){const auto logical=static_cast<std::uint32_t>(std::stoul(n));const auto*k=std::getenv("MOE_TOPK_M2_E2E_K");run_case(self.c_str(),{logical,k?static_cast<std::uint32_t>(std::stoul(k)):1,0x213888,0x313888,888,4,3,0});return 0;}const std::array<std::uint32_t,11>sizes{{1,2,3,4,5,7,8,11,16,17,31}};std::uint64_t serial=0;for(const auto n:sizes){std::vector<std::uint32_t>ks{1,n,static_cast<std::uint32_t>((n+1)/2)};std::sort(ks.begin(),ks.end());ks.erase(std::unique(ks.begin(),ks.end()),ks.end());for(const auto k:ks){run_case(self.c_str(),{n,k,0x213000+serial,0x313000+serial,100+serial,static_cast<unsigned>(serial%5),static_cast<unsigned>((serial+1)%5),static_cast<unsigned>(serial%5)});++serial;}}return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
