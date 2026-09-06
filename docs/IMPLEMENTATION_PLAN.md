@@ -18,6 +18,21 @@ shuffled list under the same hidden permutation. The measured current graph is
 8 rounds (2 raw adapter + 4 current core + 2 reverse mask adapter). This is an
 engineering closeout and M2-to-M3 handoff, not a paper-exact claim.
 
+### M2.16 status (2026-09-06)
+
+M2.16 completed a paper-exact feasibility and leakage audit without changing the
+runtime. Agarwal §2.4/§4.1 requires a shuffle output `pi(x)+r` under the same
+hidden permutation as the secret payload, where `r` is unknown to either single
+party and is the subsequent FSS-gate secret parameter. The current VFSS
+Permute+Share/P2 material contract has no auditable public-list output,
+same-permutation binding, or correlated `r`/GRank material. No primitive, round
+label, or leakage approval was upgraded: the 3-round core and 7-round unified
+candidate remain blocked, while the C-level 4-round core / 8-round total baseline
+and M3 implementation mainline remain unchanged. See
+`docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md`,
+`docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`, and
+`docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md`.
+
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
 - 当前开发主线：M1/M1.1 已完成并冻结；M2.0--M2.15 已形成并完成验收的 C 级 Protocol I

@@ -34,6 +34,15 @@ party-local secret shares；当前没有同置换 public-list 输出、输入相
 只作为 D 级未实现目标记录，详见
 [`M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md`](M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md)。
 
+M2.16 directly verified the conference-paper functionality as public
+`pi(x)+r`, where `r` is unknown to any one party and acts as the FSS-gate secret
+parameter. The current VFSS PS/P2 contract still cannot produce or bind that
+same-permutation public list and correlated material. The exact primitive is
+therefore blocked; the C-level 8-round label and M3 mainline are unchanged. The
+blocked design and leakage records are
+[`M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md`](M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
+and [`M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`](M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md).
+
 ## M2 closeout and M3 handoff (2026-09-06)
 
 M2.0--M2.15 is now closed as a C-level Protocol I engineering baseline. The

@@ -19,6 +19,9 @@
   core 为 4 轮、总路径为 8 轮；
 - M2 未达成 Agarwal paper-exact 3-round core 或 7-round total candidate，这些
   仍是明确记录的后续研究目标，不得反写成当前实现能力；
+- M2.16 已完成 paper-exact 3-round feasibility/leakage audit：论文要求的同置换
+  public `pi(x)+r` 与当前 VFSS PS/GRank material 绑定仍无可审计实现，因此保留
+  8-round C 级基线；
 - M3 Protocol III 模块化 3 轮是当前实现主线，可从最新 `main` 开始；
 - 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
 - 论文和大型参考工程不进入普通远端 Git 历史，需要队友在本地自行补齐。
@@ -34,6 +37,9 @@
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
 - [M1.1 Ubuntu 24.04 验收记录](docs/M1_1_UBUNTU_HANDOFF.md)
 - [M2 Protocol I 实施前设计门](docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md)
+- [M2.16 paper-exact 3-round 阻塞规格](docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
+- [M2.16 paper-exact 泄露审计](docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md)
+- [M2.16 Ubuntu 研究记录](docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md)
 - [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
 - [M0/M1 仓库复检](docs/M0_REVIEW.md)
 - [本地参考资料边界](docs/REFERENCE_MANIFEST.md)

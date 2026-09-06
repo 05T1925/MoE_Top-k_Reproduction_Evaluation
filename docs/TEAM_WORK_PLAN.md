@@ -94,6 +94,15 @@ because the current VFSS PS interface cannot emit a same-permutation public
 masked shuffled list. This unresolved paper gap is intentionally carried into
 future research and does not block the M2-to-M3 engineering handoff.
 
+M2.16 subsequently verified the paper's public-list wording as `pi(x)+r`, with
+`r` unknown to any single party and used by the FSS gate, but found no auditable
+VFSS implementation or same-permutation/material binding for it. This research
+does not reopen the frozen M2 C-level interfaces: M3 must continue from the
+existing M1/M2 contract and must not introduce a second score, rank, mask,
+leakage, role, or metrics contract. The exact candidate remains blocked; see
+`docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md` and
+`docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`.
+
 After the closeout merge, M3 may start from `main`. M3 must preserve the input,
 stable-rank, original-order mask, role, metrics, and secure/test boundaries
 below; it must not fork a second semantic contract.

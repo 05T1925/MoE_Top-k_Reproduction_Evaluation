@@ -415,7 +415,8 @@ CryptoMoE 保留为 M7 之后的工作负载接入：先冻结 eligibility、dum
 - Protocol I 的 B0/B1 和 CA 测试材料较完整，但 B0 不是高效论文 shuffle，CA
   不是 Protocol I 本体；
 - Protocol III 没有可直接迁移的完整论文级实现，ADSMPC 只能作为旧原型参考；
-- VFSS 有 DCF/DPF 等原语，但没有可用的真实安全 shuffle；
+- VFSS 有 DCF/DPF 和已验收的 C 级两遍 secret-shared shuffle，但没有
+  paper-compatible public masked-list shuffle；
 - AAV86 的动态图预处理与 offline-only Dealer 模型尚未闭合；
 - CipherGPT 原生 Top-K 代码已经存在，但边界语义和终止逻辑尚未达到基线要求；
 - 团队主线已经调整为 Protocol I → Protocol III 3 轮 → CipherGPT native →
@@ -433,6 +434,13 @@ M1/M1.1 已完成并冻结。M2.0--M2.15 已完成当前 C 级模块化 Protocol
 `agarwal_protocol_iii_modular_3round`。Agarwal paper-exact 3-round core、7-round
 total candidate、paper-compatible public masked-list primitive 和 formal leakage
 proof 尚未完成，作为后续独立研究目标保留；不得把 M2 C 级基线写成论文精确复现。
+
+M2.16 已完成该精确目标的 feasibility/leakage audit：会议论文 §2.4/§4.1 所需的
+同置换 public `pi(x)+r`、任一单方未知且与后续 FSS gate 关联的 `r`，在当前
+VFSS PS/P2 API 中没有可审计功能或材料契约。因此未新增运行时原语，未改变上述
+C 级标签或 M3 主线；详见
+`docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md` 和
+`docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`。
 
 ## 11. 后续需要团队明确的输入
 

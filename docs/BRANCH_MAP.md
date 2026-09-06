@@ -25,4 +25,9 @@ M2.15 收尾分支对应的实际 closeout 提交为 `25f4cff8f62818aff3968e4bb8
 当前实现仍是 C 级模块化 8-round 路径；3-round paper core 和 7-round candidate
 不因分支重命名而变为已实现。
 
+M2.16 从 `main` 的 `6c72ec8a18a44c1d3d441758017b9807fe1dc090` 建立为
+`m2.16-paper-exact-3round-protocol-i`。本阶段只完成 paper-exact feasibility 和
+leakage audit；由于同置换 public `pi(x)+r`、相关 `r`/GRank material 与 3-round
+message transcript 仍缺乏可审计实现，未修改 VFSS 生产代码，当前 8-round C 级标签保持。
+
 M1.1、M3 设计和 Protocol III DPF 测试分支不属于本次 M2 重命名范围。

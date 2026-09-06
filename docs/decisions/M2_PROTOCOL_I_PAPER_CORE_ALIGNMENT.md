@@ -162,3 +162,15 @@ M2.15 even when completed can only establish the current VFSS Protocol I
 paper-core alignment candidate. Unless the paper message graph, shuffle output,
 leakage boundary, preprocessing model and round count all obtain independent
 evidence, do not use `agarwal_protocol_i_exact` or `paper_3_round_exact` labels.
+
+## M2.16 follow-up (2026-09-06)
+
+M2.16 directly confirmed the conference-paper wording that the shuffle emits
+`pi(x)+r`, with `r` unknown to any single party and used as the FSS secret
+parameter. The conference version still defers the formal functionality and
+concrete transcript to an unavailable full version, and the current VFSS
+implementation has no auditable public-list, same-permutation, or correlated
+material contract. This does not prove a VFSS paper-exact implementation. The
+resulting blocked specification and leakage audit are
+[`M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md`](M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
+and [`M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`](M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md).
