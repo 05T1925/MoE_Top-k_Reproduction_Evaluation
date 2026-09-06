@@ -1,7 +1,7 @@
 # M2.14 Ubuntu reproduction
 
 Implementation label: `m2_protocol_i_raw_score_input_modular_8round_mask_output`.
-Code revision: `627cb81d8a5bd6ad3f0e81aa1282ca220ed99d77` on
+Code revision: `a259deb` (full revision is the branch tip) on
 `m2-protocol-i-raw-score-input`.
 
 Environment: Ubuntu 24.04 WSL, GNU 13.3, Debug, fixed EMP prefix
