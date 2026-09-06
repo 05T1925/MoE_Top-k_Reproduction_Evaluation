@@ -92,9 +92,10 @@ class EmpBoundedFdIO final : public emp::IOChannel {
       if (result < 0 && errno == EINTR) continue;
       if (result == 0) fail("chosen OT deadline exceeded");
       if (result < 0) fail("chosen OT poll failure");
-      if ((descriptor.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0) fail("chosen OT peer failure");
-      if ((descriptor.revents & requested) == 0) fail("chosen OT poll event");
-      return;
+      if ((descriptor.revents & (POLLERR | POLLNVAL)) != 0) fail("chosen OT peer failure");
+      if ((descriptor.revents & requested) != 0) return;
+      if ((descriptor.revents & POLLHUP) != 0) fail("chosen OT peer failure");
+      fail("chosen OT poll event");
     }
   }
   void exact(void* data, std::size_t count, bool sending) {
@@ -172,6 +173,18 @@ std::vector<ProtocolIBlock128> from_emp_blocks(const std::vector<emp::block>& so
 }
 
 }  // namespace
+
+namespace testing {
+
+void protocol_i_chosen_ot_test_raw_receive(
+    int connected_fd, void* data, std::size_t count, int timeout_ms) {
+  if (timeout_ms <= 0) fail("chosen OT test raw receive invalid timeout");
+  const auto deadline = Clock::now() + std::chrono::milliseconds(timeout_ms);
+  EmpBoundedFdIO io(connected_fd, deadline);
+  io.raw_receive(data, count);
+}
+
+}  // namespace testing
 
 ProtocolIChosenOtCounters protocol_i_chosen_ot_sender(
     const ProtocolIChosenOtConfig& config, int connected_fd,
