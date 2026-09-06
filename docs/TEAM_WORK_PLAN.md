@@ -103,15 +103,16 @@ leakage, role, or metrics contract. The exact candidate remains blocked; see
 `docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md` and
 `docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`.
 
-The M2.16 documentation is currently on branch
-`m2.16-paper-exact-3round-protocol-i` (initial audit commit `5fbc24f`);
-`origin/main` remains `6c72ec8`. The team must review and merge this documentation-only PR before
-describing M2.16 as mainline history. This merge is a governance closeout and
-does not create an exact Protocol I implementation. M3 read-only design work
-may continue, but M3 implementation branches should start from the merged
-`main` and retain the frozen contract below.
+The M2.16 documentation is now mainline history through `f800f96`. It remains
+a governance/audit closeout and does not create an exact Protocol I
+implementation. The later chosen-OT and modular E2E harness fixes establish,
+on recorded Ubuntu 24.04.4 with soft `RLIMIT_NOFILE=1024`, an EMP-ON 19/19 and
+EMP-OFF 13/13 CTest result without raising the limit to 4096. They do not
+change the secure Protocol I contract; their evidence records are
+`docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md` and
+`docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md`.
 
-After the closeout merge, M3 may start from `main`. M3 must preserve the input,
+M3 may start from the current `main`. It must preserve the input,
 stable-rank, original-order mask, role, metrics, and secure/test boundaries
 below; it must not fork a second semantic contract.
 

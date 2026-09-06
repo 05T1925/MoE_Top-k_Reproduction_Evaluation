@@ -442,11 +442,21 @@ C 级标签或 M3 主线；详见
 `docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md` 和
 `docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`。
 
-M2.16 当前仍处于待合并状态：首次审计提交为 `5fbc24f`，后续文档同步继续在
-`m2.16-paper-exact-3round-protocol-i` 上进行，而 `origin/main` 仍为 `6c72ec8`。
-完成该文档 PR 的审核与合并后，才把 M2.16 作为正式 mainline 进度
-同步；在此之前，不能把分支上的审计记录描述为已经进入 `main`。这不阻塞 M3
-的只读设计准备，但 M3 实现分支应从合并后的 `main` 建立。
+M2.16 的审计文档已随 `f800f96` 合入 `main`。该 Git 集成不改变上述协议
+决定：paper-exact primitive 仍被阻塞，M3 继续复用冻结的 C 级契约。
+
+随后合入的验证可靠性修复解决了两个与协议语义无关的问题：chosen-OT adapter
+会在 `POLLIN|POLLHUP` 时先排空合法缓冲数据；modular E2E harness 会在每个 case
+关闭其 20 个 socketpair 的端点并回收 P0/P1/P2。Ubuntu 24.04.4 的 fresh EMP-ON
+CTest 在显式 soft `RLIMIT_NOFILE=1024` 下发现 19 项并通过 19/19；EMP-OFF 为
+13/13，`(128,2/8)`、`(256,2/8)` 与重复 E2E 矩阵均通过。该证据说明当前 C 级
+基线不依赖预先提高到 4096 的 FD limit；它不是 paper-exact 证明，性能和网络项
+仍保持 `NOT_MEASURED`。详见
+`docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md` 与
+`docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md`。
+
+因此 M3 实现分支可从本次更新后的 `main` 建立，并必须保留冻结的输入、rank、
+mask、role、transport、metrics 与 secure/test 边界。
 
 ## 11. 后续需要团队明确的输入
 

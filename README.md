@@ -6,10 +6,8 @@
 
 ## 当前状态
 
-- M2.16 的首次审计提交为 `5fbc24f9dd67c1275bf52c1c9701c01859951df9`，其文档已在
-  分支 `m2.16-paper-exact-3round-protocol-i` 推送；截至 2026-09-06，
-  `origin/main` 仍为 `6c72ec8a18a44c1d3d441758017b9807fe1dc090`，M2.16 尚未合入
-  `main`，需经文档 PR 审核后再合并；
+- M2.16 paper-exact feasibility/leakage audit 已随 `f800f96` 合入 `main`；
+  它记录 exact 目标被当前 VFSS 架构阻塞，而非已实现；
 - M0 已在远端闭环，`main` 与冻结标签均已推送；
 - M1 核心已完成：score 语义、oracle、CmpAgg、metrics 和真实 VFSS DCF
   conformance 测试均通过；
@@ -26,9 +24,10 @@
 - M2.16 已完成 paper-exact 3-round feasibility/leakage audit：论文要求的同置换
   public `pi(x)+r` 与当前 VFSS PS/GRank material 绑定仍无可审计实现，因此保留
   8-round C 级基线；
-- M3 Protocol III 模块化 3 轮是当前实现主线，可从最新 `main` 开始；
-- M2.16 合并后不改变 M3 入口契约；在合并前，队友可继续进行 M3 只读设计和测试准备，
-  但实现分支应以合并后的 `main` 为起点；
+- M2 验证可靠性修复已合入：Ubuntu 24.04.4 的 fresh EMP-ON CTest 在显式 soft
+  `RLIMIT_NOFILE=1024` 下发现 19 项并通过 19/19；EMP-OFF 通过 13/13。此结果恢复
+  C 级基线的默认资源限制可复现性，不改变协议标签或 paper-exact 状态；
+- M3 Protocol III 模块化 3 轮是当前实现主线，可从本次更新后的 `main` 开始；
 - 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
 - 论文和大型参考工程不进入普通远端 Git 历史，需要队友在本地自行补齐。
 
@@ -46,6 +45,8 @@
 - [M2.16 paper-exact 3-round 阻塞规格](docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
 - [M2.16 paper-exact 泄露审计](docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md)
 - [M2.16 Ubuntu 研究记录](docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md)
+- [M2 chosen-OT POLLIN/HUP 修复记录](docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md)
+- [M2 modular E2E FD 生命周期修复记录](docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md)
 - [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
 - [M0/M1 仓库复检](docs/M0_REVIEW.md)
 - [本地参考资料边界](docs/REFERENCE_MANIFEST.md)

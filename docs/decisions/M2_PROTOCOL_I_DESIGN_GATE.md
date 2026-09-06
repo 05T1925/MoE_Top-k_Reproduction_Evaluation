@@ -55,12 +55,12 @@ functionality, combined shuffle proof, paper-compatible transcript and formal
 leakage proof remain unresolved. The frozen M2-to-M3 contract is the one in
 `docs/TEAM_WORK_PLAN.md`; M3 may begin on a new branch from the merged `main`.
 
-At the time of this M2.16 audit, the documentation closeout is branch-local:
-its initial audit commit is `5fbc24f`, while `origin/main` is still `6c72ec8`.
-A documentation-only PR review and merge remains before this
-audit becomes mainline history. That Git step does not alter the protocol
-decision: the exact primitive remains blocked and M3 must reuse the frozen
-contract after starting from the merged `main`.
+The M2.16 audit became mainline history through `f800f96`. The subsequent
+chosen-OT readable-HUP and modular E2E FD-lifecycle repairs restored reliable
+validation at soft `RLIMIT_NOFILE=1024` on recorded Ubuntu 24.04.4: the
+combined EMP-ON suite was 19/19 and EMP-OFF was 13/13. This validation result
+does not alter the protocol decision: the exact primitive remains blocked and
+M3 must reuse the frozen contract from current `main`.
 
 ## 1. 入口、证据纪律与不变量
 
