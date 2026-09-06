@@ -1,5 +1,12 @@
 # M2.13 Protocol I modular 6-round mask-output
 
+## Current status (2026-09-06)
+
+M2.13 is the frozen padded-priority-key predecessor of the successor
+`m2_protocol_i_raw_score_input_modular_8round_mask_output` baseline. The
+successor adds the raw Q20.12 arithmetic-share carry/lift/sign adapter in two
+online rounds. This document preserves the M2.13 historical input boundary.
+
 Implementation label: `m2_protocol_i_modular_6round_mask_output`.
 
 Status: C-level project-engineering baseline. It is not
@@ -38,8 +45,9 @@ and all offline preprocessing.
 capped at 1,048,576. Padded slots are `(INT32_MIN, logical_n...padded_n-1)`,
 so real `INT32_MIN` entries precede dummies. The runtime accepts caller-prepared
 additive comparison-ring priority-key shares. Legacy 32-bit arithmetic score
-share conversion is `NOT_IMPLEMENTED`: it needs widening/carry handling and is
-not replaced by truncation or fixed public randomness.
+share conversion was not implemented in that milestone; it is implemented by
+the dated M2.14 successor decision and reproduction record, not by this
+historical baseline.
 
 Output is cropped to `logical_n` and uses only word0's LSB. Test-only code
 reconstructs final shares for the frozen oracle. The E2E emits actual P2 package

@@ -20,9 +20,12 @@ M2.2 对 priority-rank 语义和 reverse-shuffle 规格的纠错审计见
 M2.3 的 reverse Permute+Share ideal-functionality 候选见
 [`M2_PROTOCOL_I_REVERSE_SHUFFLE_SPEC.md`](M2_PROTOCOL_I_REVERSE_SHUFFLE_SPEC.md)。
 
-实现候选标签为 `agarwal_protocol_i_exact_mask_output`。在本文件的四项决策均获明确
-批准、其最小原语经审计且 secure mask adapter 可验证之前，任何实现只能使用
-`m2_protocol_i_design_blocked`，不得声称 Protocol I exact。
+历史实现候选标签曾写作 `agarwal_protocol_i_exact_mask_output`；该命名不适用于
+当前 C 级路径。当前实现标签是
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`，仍受四项设计门和
+paper-exact 审查约束，绝不得声称 Protocol I exact。M2.0--M2.3 的
+`m2_protocol_i_design_blocked` 结论作为历史记录保留；M2.12/M2.13 的 D1
+受控 shuffled `rank_P` reveal 已获批准，D2/D3/D4 仅有组件/E2E 工程证据。
 
 ## 1. 入口、证据纪律与不变量
 

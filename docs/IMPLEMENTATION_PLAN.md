@@ -26,7 +26,7 @@
   有界分片帧、逻辑/填充布局、全 rank-permutation 审计和 6 轮模块化 mask 输出；M2.14
   `m2_protocol_i_raw_score_input_modular_8round_mask_output` 已将 raw Q20.12 算术 shares
   经 two-stage carry/lift/sign adapter 接入该路径，实际因果总数为 8 轮；
-  它仍不是 raw-score-share input 或论文 exact 基线，状态与
+  它仍不是 Agarwal paper-exact 基线，状态与
   可复现命令见
   `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
   `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`、
@@ -461,10 +461,11 @@ PROJECT.md
 
 ## 6. 立即下一步
 
-1. 完成 M2.14 raw Q20.12 arithmetic-share input adapter：由 P0/P1 在 34-bit
+1. 维护 M2.14 raw Q20.12 arithmetic-share input adapter：由 P0/P1 在 34-bit
    uCMP material 下完成 carry/lift/sign，禁止 controller 预先重构或生成 priority key；
-2. 对该入口运行 primitive differential、P2/P0/P1 独立进程 E2E、全量 CTest 与
+2. 对该入口持续运行 primitive differential、P2/P0/P1 独立进程 E2E、全量 CTest 与
    `(128,2/8)`、`(256,2/8)` 记录；
 3. 将实际 8 轮因果图、P2 input-independence、D1 受控泄露与未获得的 paper-exact
    证明同步写入决策和复现记录；
-4. M2 的纸面 3-round 对齐与 D2/D3/D4 证明仍是后续评审门，不能由 C 级实现替代。
+4. M2.15 处理 paper-core round alignment；M2 的纸面 3-round 对齐与 D2/D3/D4
+   证明仍是后续评审门，不能由 C 级实现替代。
