@@ -5,7 +5,10 @@ P2 包时序、padded priority-key 输入和原顺序 mask 适配审计；其 6 
 论文 Table 1 的 3 轮声明，完整边界见
 [`M2_PROTOCOL_I_MODULAR_6ROUND.md`](M2_PROTOCOL_I_MODULAR_6ROUND.md)。
 
-状态：**D1 已针对 M2.12 受控 shuffled `rank_P` 泄露获批准；本文件仍不是 paper-exact 声明。**
+状态：**D1 已针对 M2.12/M2.13 的受控 shuffled `rank_P` 泄露获批准；本文件仍不是
+paper-exact 声明。** D2（reverse carrier routing）、D3（priority-key/range）和 D4
+（P2-first framed transport）已有 C 级实现证据，但尚未获得 paper-exact 证明；M2.0--M2.3
+的历史 `blocked` 结论继续保留。
 
 M2.1 对 D1--D4 的可实现性、精确泄露条款、域宽表、inverse-routing 证据缺口和
 transport/metrics contract 见

@@ -459,7 +459,10 @@ PROJECT.md
 
 ## 6. 立即下一步
 
-1. 评审并批准 M2 Protocol I 实施前设计门的四项决策；
-2. 批准后，角色 A 才可创建 M2 代码；首个 M2 PR 先提交已批准的消息流、依赖映射和最小测试骨架；
-3. M2 通过阶段门后，角色 B 基于最新 `main` 开始 M3 模块化 3 轮实现；
-4. 两人每次合并前确认共享输入、统一 mask、metrics 和冻结 baseline 没有分叉。
+1. 完成 M2.14 raw Q20.12 arithmetic-share input adapter：由 P0/P1 在 34-bit
+   uCMP material 下完成 carry/lift/sign，禁止 controller 预先重构或生成 priority key；
+2. 对该入口运行 primitive differential、P2/P0/P1 独立进程 E2E、全量 CTest 与
+   `(128,2/8)`、`(256,2/8)` 记录；
+3. 将实际 8 轮因果图、P2 input-independence、D1 受控泄露与未获得的 paper-exact
+   证明同步写入决策和复现记录；
+4. M2 的纸面 3-round 对齐与 D2/D3/D4 证明仍是后续评审门，不能由 C 级实现替代。
