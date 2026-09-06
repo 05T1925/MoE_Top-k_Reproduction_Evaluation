@@ -23,9 +23,9 @@
 
 ## 3. carrier 生命周期（C）
 
-R1 仅正向 shuffle score、秘密 original-index binding 和所需 record 数据；**carrier 不存在于 R1**。R2 产生 shuffled `rank_P` shares，R3 仅按获批 D1 公开 `(shuffled_slot,rank_P)`。双方以固定公开 convention 创建 carrier arithmetic shares：例如 P0 持 `1{rank_P<K}`，P1 持 0。公开 rank 已使 shuffled slot 的选择可推导；该 convention 不额外关联原始位置。R4 只逆路由 carrier，输出原顺序 arithmetic bit shares；双方局部取 LSB 得 XOR mask shares，无消息且不增 round。
+R1 仅正向 shuffle score、秘密 original-index binding 和所需 record 数据；**carrier 不存在于 R1**。R2 产生 shuffled `rank_P` shares，R3 仅按获批 D1 公开 `(shuffled_slot,rank_P)`。双方以固定公开 convention 创建 carrier arithmetic shares：例如 P0 持 `1{rank_P<K}`，P1 持 0。公开 rank 已使 shuffled slot 的选择可推导；该 convention 不额外关联原始位置。R4 只逆路由 carrier，输出原顺序 arithmetic bit shares；双方局部取 LSB 得 XOR mask shares。理想功能规格不规定 VFSS 消息轮数；当前 M2.13/M2.14 实现使用两次真实 Permute+Share，因此计为 2 个 `mask_adapter_rounds`，不能写成零轮。
 
-## 4. reverse 两次 PS 候选（C；代数正确，未实现）
+## 4. reverse 两次 PS 候选（C；代数规格）
 
 设 R4 输入 `z0+z1=Pi(x)`，目标 `Pi^-1=T_rho0^-1 o T_rho1^-1`。使用**新鲜**两份 PS 离线材料：
 
@@ -34,7 +34,7 @@ R1 仅正向 shuffle score、秘密 original-index binding 和所需 record 数�
 
 输出 `(h0,g1)`，其和为 `Pi^-1(z)`。这证明“若 PS 对任意置换均以该 ideal interface 可用”，两次 role-swapped 调用在代数上足够。它**不**指定 VFSS 内部 OT/translation transcript；正向材料绝不可复用。缺材料、长度/角色/phase 不符、EOF 或任何 PS 失败均 hard-fail、清除未完成输出且不重试/降级。
 
-R4 的唯一抽象在线操作是上述两个 PS invocations；其实际 P0↔P1 causal barriers、opened values、sent/received bytes 在 VFSS adapter 尚不存在前均为 `NOT_MEASURED`。新鲜 reverse 材料计入 offline material；R4 barriers 单列为 `mask_adapter_rounds`，不得计作论文 Table 1 的 3 rounds。
+R4 的唯一抽象在线操作是上述两个 PS invocations。当前 VFSS adapter 已有组件/E2E 工程证据，但该证据不升级为 paper-exact shuffle 证明；实际 P0↔P1 barriers、opened values 和 sent/received bytes 以当前 reproduction record 为准。新鲜 reverse 材料计入 offline material；R4 barriers 单列为 `mask_adapter_rounds`，不得计作论文 Table 1 的 3 rounds。
 
 ## 5. record-preserving 与退出门
 
