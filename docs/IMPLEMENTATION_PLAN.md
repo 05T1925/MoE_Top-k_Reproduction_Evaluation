@@ -6,10 +6,55 @@
 
 ## 1. 当前结论
 
+### M2 closeout status (2026-09-06)
+
+M2 Protocol I is closed as the project's C-level modular baseline at M2.15.
+The validated implementation label is
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`; EMP-OFF and EMP-ON
+full suites, raw-score independent-process E2E, and the explicit `(128,2/8)` and
+`(256,2/8)` smokes have passed. M2.15 did not achieve the paper's 3-round core:
+the current VFSS two-pass PS API cannot emit the paper-compatible public masked
+shuffled list under the same hidden permutation. The measured current graph is
+8 rounds (2 raw adapter + 4 current core + 2 reverse mask adapter). This is an
+engineering closeout and M2-to-M3 handoff, not a paper-exact claim.
+
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
-- 当前开发主线：M1.1 收尾 → M2 Protocol I → M3 Protocol III 3 轮 →
-  M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
+- 当前开发主线：M1.1 已完成；M2.7--M2.15 已形成并完成验收的 C 级 Protocol I
+  工程基线；M2 的历史设计门、真实 shuffle、inverse routing 和统一 mask 证据均按
+  各阶段记录保留，但不再作为当前 M2 未完成状态；
+  M2.8 的项目扩展 `m2_emp_iknp_chosen_ot_conformance` 已在 Ubuntu-24.04 上完成固定
+  EMP 依赖构建、upstream base-OT/IKNP smoke、C++20 隔离的 connected-fd adapter 和
+  sender/receiver 独立进程 conformance；M2.9 项目扩展
+  `m2_emp_opv_share_translation_conformance` 已在其上完成真实 GGM OPV 与 Share
+  Translation 的独立进程 conformance；M2.10 项目扩展
+  `m2_emp_single_pass_permute_share_conformance` 完成单遍 Permute+Share
+  conformance；M2.11 项目扩展
+  `m2_emp_two_pass_shuffle_roundtrip_conformance` 随后在独立 P0/P1 exec 进程中完成
+  两遍前向/逆向 carrier roundtrip conformance。它仍不是完整 Protocol I，状态与
+  M2.12 项目 E2E `m2_protocol_i_priority_key_input_small_e2e` 已将 priority-key
+  additive shares、两遍 shuffle、CmpAgg、受控 shuffled rank 泄露和 reverse carrier
+  串联为原顺序 XOR mask shares；M2.13 的 C 级候选
+  `m2_protocol_i_modular_6round_mask_output` 闭合 P2 包先收后预处理的离线屏障、
+  有界分片帧、逻辑/填充布局、全 rank-permutation 审计和 6 轮模块化 mask 输出；M2.14
+  `m2_protocol_i_raw_score_input_modular_8round_mask_output` 已将 raw Q20.12 算术 shares
+  经 two-stage carry/lift/sign adapter 接入该路径，实际因果总数为 8 轮；
+  它仍不是 Agarwal paper-exact 基线，状态与
+  可复现命令见
+  `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
+  `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`、
+  `docs/decisions/M2_PERMUTE_SHARE.md`、
+  `docs/decisions/M2_SECRET_SHARED_SHUFFLE.md`、
+  `docs/decisions/M2_PROTOCOL_I_SMALL_E2E.md`、
+  `docs/reproduction/M2_PERMUTE_SHARE_UBUNTU_2026-09-06.md` 和
+  `docs/reproduction/M2_PROTOCOL_I_SMALL_E2E_UBUNTU_2026-09-06.md`、
+  `docs/reproduction/M2_SECRET_SHARED_SHUFFLE_UBUNTU_2026-09-06.md`；
+  M2.15 已完成 paper-core alignment audit：Agarwal §4.1 的 public masked
+  shuffled list 不能由当前 VFSS 两遍 PS API 表达，故保留当前 4-round core、8-round
+  total baseline，并将 3-round/7-round candidate 保留为 D 级未实现目标；见
+  `docs/decisions/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md` 和
+  `docs/reproduction/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT_UBUNTU_2026-09-06.md`；
+  随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
 - 任何 AAV86/Direct Top-K 原型在解决自适应预处理前不得标为论文定理实现。
@@ -137,7 +182,7 @@ conformance 前置原语测试写成完整 M3 实现证据。
 - 同一原始通信记录可复算 total/per-party；
 - 没有测试专用明文值进入 secure 接口。
 
-### M1.1 收尾门
+### M1.1 收尾门（已满足）
 
 进入 M2 实现前完成：
 
@@ -148,9 +193,14 @@ conformance 前置原语测试写成完整 M3 实现证据。
 4. 在 Ubuntu 24.04 上执行干净 configure/build/ctest，并把命令和结果写入复现记录；
 5. 再次确认 `VFSS-baseline/` 与冻结标签无差异。
 
-M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。
+M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。该门已
+满足；M2 代码仍受 `docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md` 的四项批准决策约束。
 
-## 3.2 M2：Agarwal Protocol I 精确核心与统一输出
+## 3.2 M2：Agarwal Protocol I 精确核心与统一输出（历史目标；当前 C 级基线已收尾）
+
+本节的 `精确` 是 M2 入口时的目标身份，不是当前实现声明。M2.0--M2.15
+已完成当前 C 级模块化工程路径并满足 M2→M3 交接条件；论文精确 3 轮与正式
+`agarwal_protocol_i_exact_mask_output` 仍未完成。
 
 ### 输入
 
@@ -193,6 +243,26 @@ M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score
 - secure 模式不重构 rank、comparison bits 或 selected indices；
 - 角色为 2+1，在线轮数和额外 mask 适配轮数分别可解释；
 - 所有统一指标来自实际计数，不使用模拟 shuffle 成本。
+
+### M2.7 CmpAgg 三进程运行基础（已完成）
+
+实现标签固定为 `m2_priority_cmpagg_three_process_e2e`，属于项目扩展（C），不等同于
+`agarwal_protocol_i_exact_mask_output`。P2 在离线阶段为公开 canonical comparison
+graph 生成 node-mask shares 和 party-separated VFSS uCMP/DCF edge material，分别发送
+给 P0/P1 后退出；controller 仅在该 barrier 后发送 TEST_ONLY priority-key shares；
+P0/P1 通过一个有界 framed masked-key exchange 计算 additive rank shares，controller
+才在测试层重构并与 oracle 比较。
+
+M2.7 的十个独立进程用例覆盖 `n=1,2,5,7,11`、`K=1`、`K=n`、`K=2 (n=11)`、非二次幂、
+随机/重复/全相等值及 `INT32_MIN/MAX`，并通过 package/transport 错误矩阵。Ubuntu
+24.04.4 全新 Debug 构建中 CTest 发现 11 项且全量 11/11 通过；实际命令、字节计数、
+退出码和未测字段见
+`docs/reproduction/M2_CMPAGG_PROCESS_E2E_UBUNTU_2026-09-05.md`。
+
+该记录保留 M2.7 当时只闭合 CmpAgg process foundation 的历史边界；后续 M2.10--M2.15
+已补齐项目级 shuffle、inverse routing、raw-score adapter 和原始顺序 bit-mask 的
+C 级工程路径。它仍不是 Protocol I paper-exact 证据，论文轮数/泄露证明与网络性能
+仍按各 reproduction record 标为 `NOT_MEASURED` 或未解决。
 
 ## 3.3 M3：Protocol III 模块化 3 轮基线
 
@@ -395,7 +465,7 @@ PROJECT.md
 ### 4.4 合并顺序
 
 1. 先合并本次路线、协作边界和 PR 模板；
-2. 角色 A 合并 M1.1 收尾；角色 B 可并行提交不改代码的 M3 消息流设计；
+2. M1.1 已合并；角色 A 先完成并获批准的 M2 实施前设计门，角色 B 可并行提交不改代码的 M3 消息流设计；
 3. 角色 A 的 M2 实现满足退出条件后合并；
 4. 角色 B 基于冻结的 M2 公共边界合并 M3 模块化 3 轮实现；
 5. M4 CipherGPT 原生基线完成后，再进入 M5 2 轮压缩；
@@ -412,10 +482,13 @@ PROJECT.md
 - 不吞错误，不加入启发式兜底和仅对当前样例有效的后处理；
 - 文档状态必须与代码实际状态同步。
 
-## 6. 立即下一步
+## 6. 立即下一步（M2 已收尾，进入 M3）
 
-1. 评审并合并已验收的 M1.1 整合分支；
-2. M1.1 合并后，角色 A 才可进入 M2；第一份 M2 PR 先提交 Protocol I 消息流、依赖
-   映射和最小测试骨架；
-3. M2 通过阶段门后，角色 B 基于最新 `main` 开始 M3 模块化 3 轮实现；
-4. 两人每次合并前确认共享输入、统一 mask、metrics 和冻结 baseline 没有分叉。
+1. 将本分支以单独 M2 closeout merge 合入 `main`，保留当前实现标签和全部 M2.13--M2.15
+   reproduction records；不得改名为 exact。
+2. M3 复用 M1/M2 的 score semantics、oracle、CmpAgg、transport、metrics 和
+   original-order mask 契约，不复制第二套 rank 或输出语义。
+3. M3 先实现 `agarwal_protocol_iii_modular_3round` 的 GRank 1 轮 + 标准 DPF
+   routing 2 轮；Protocol III 的 2 轮压缩和域条件留到 M5。
+4. 在 M3 代码合并前完成 DPF payload/rank conformance、独立 P2/P0/P1 E2E、泄露和
+   causal-round 审计；所有未测量指标继续写 `NOT_MEASURED`。

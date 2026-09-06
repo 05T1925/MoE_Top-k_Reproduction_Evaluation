@@ -27,6 +27,7 @@
 - [Protocol III 模块化 3 轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
 - [M1.1 Ubuntu 24.04 验收记录](docs/M1_1_UBUNTU_HANDOFF.md)
+- [M2 Protocol I 实施前设计门](docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md)
 - [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
 - [M0/M1 仓库复检](docs/M0_REVIEW.md)
 - [本地参考资料边界](docs/REFERENCE_MANIFEST.md)

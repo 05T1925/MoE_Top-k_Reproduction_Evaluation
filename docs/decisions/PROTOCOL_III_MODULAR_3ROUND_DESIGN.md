@@ -46,8 +46,9 @@ Protocol III 的模块化 3 轮中间基线，不是论文 Theorem 4.2 的精确
   始终位于 `0..n-1`；
 - 仓库 rank 是降序优先级 rank：最大 score 的 rank 为 0，同分时较小原始下标
   优先；Top-K 目标集合固定为 `0..K-1`；
-- 论文 rank 是“更小元素数量”，最大值的 rank 为 `n-1`。两者关系为
-  `paper_rank = n - 1 - priority_rank`，实现和报告中不得混用；
+- 论文 raw-score rank 是“更小元素数量”，最大值的 rank 为 `n-1`；项目 priority
+  rank 则由带 original-index tie-break 的 priority key 直接定义。它们在同分时不能用
+  `n-1-rank` 全局互换；实现和报告中不得把项目 rank 反写为论文 rank；
 - DPF 必须调用返回加法 share 的 `evalDPF_Payload`，不得把 XOR-share 接口
   `evalDPF_EQ` 直接送入算术乘法；
 - M3 的 DPF payload 与乘法适配首先使用 64-bit `GroupElement` 环。所有中间结果

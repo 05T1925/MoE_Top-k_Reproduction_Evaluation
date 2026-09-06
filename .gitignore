@@ -26,6 +26,7 @@
 **/*.pyc
 
 # Known generated result locations
+/Testing/
 /tmp/
 /artifacts/
 /output/

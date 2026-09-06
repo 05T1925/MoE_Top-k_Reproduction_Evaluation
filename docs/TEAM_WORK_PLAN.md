@@ -44,7 +44,9 @@ M1.1 只完成测试入口和复现元数据，不重新讨论或修改已冻结
 5. 依次通过 shuffle payload 对齐、角色随机性、stable rank、mask adapter、
    小规模 E2E，以及 `(128,2/8)`、`(256,2/8)` 基线测试。
 
-交付目标为 `agarwal_protocol_i_exact_mask_output`。secure 路径不得使用文件轮询、
+这是 M2 入口阶段的原始交付目标；实际 M2 收尾交付为 C 级
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`，不升级为 exact 标签。
+secure 路径不得使用文件轮询、
 固定 sleep、明文 rank、selected index 或调试重构。
 
 ## 3. 角色 B：Protocol III
@@ -81,14 +83,53 @@ M1.1 只完成测试入口和复现元数据，不重新讨论或修改已冻结
 
 ## 4. M2 → M3 交接契约
 
-Protocol I 在进入 M3 前必须冻结以下行为边界：
+### M2 closeout status (2026-09-06)
+
+M2 Protocol I is closed at the C-level modular baseline
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`. The branch has
+completed M2.0--M2.15 implementation, validation, and documentation. Its
+current measured path is 8 rounds: raw adapter 2, Protocol-I-shaped core 4,
+and reverse mask adapter 2. The paper 3-round core candidate was not achieved
+because the current VFSS PS interface cannot emit a same-permutation public
+masked shuffled list. This unresolved paper gap is intentionally carried into
+future research and does not block the M2-to-M3 engineering handoff.
+
+After the closeout merge, M3 may start from `main`. M3 must preserve the input,
+stable-rank, original-order mask, role, metrics, and secure/test boundaries
+below; it must not fork a second semantic contract.
+
+The following handoff contract is frozen for M3:
+
+Input and rank:
 
 - 输入为仓库规定的 Q20.12 signed score 算术共享；
+- `raw=(x0+x1) mod 2^32`；controller 不重构 raw，也不预计算 priority key；
 - stable rank 按 score 降序、同分 original index 升序，最高优先级 rank 为 0；
 - rank 的有效范围是 `0..n-1`；
+
+Output:
+
 - 最终输出是原始输入顺序下、长度为 `n` 的秘密共享 Top-K bit-mask；
+- shares 重构后每位只能为 0/1，且恰有 K 个 1；只有 test harness 可以重构最终结果；
+
+Roles and public values:
+
+- P2 是 input-independent offline material provider；向 P0/P1 发送完成后退出，
+  不参与在线 score 或 rank 计算；P0/P1 是 online parties；
+- 公开值仅包括 `logical_n`、`padded_n`、`K`、ring/comparison width、
+  `session/fingerprint/phase/sequence`、D1 允许的 shuffled `(slot, rank_P)`，以及
+  当前 C 级路径的 masked-key opening；
+
+禁止公开：raw score、carry、sign、unmasked priority key、comparison bits、
+original-index mapping、任一方完整 permutation、composed permutation、selected
+original index、original-order mask、oracle 数据和 secure transcript 中的 test
+reconstruction。
+
+Metrics and reuse:
 - 运行、通信、轮数和 metrics 接口足以被 M3 复用，额外 mask adapter 成本可单独
   解释但不得从主结果扣除。
+- M3 必须复用 M2 的输入、rank、mask、transport 和 metrics 契约，不重新实现 M1/M2
+  公共底座，不复制第二套 oracle、rank 或 mask 语义。
 
 角色 A 在 M2 PR 合并前提供接口说明和最小调用示例；角色 B 在其基础上 rebase，
 不得复制或分叉出第二套 rank、mask 或计量语义。

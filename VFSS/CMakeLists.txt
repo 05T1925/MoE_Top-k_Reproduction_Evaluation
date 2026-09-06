@@ -20,6 +20,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Wno-unused-result -m
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(OpenMP COMPONENTS CXX REQUIRED)
+option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
@@ -35,6 +36,11 @@ PRIVATE
     src/backend/cleartext.cpp
     src/backend/baseline_cleartext.cpp
     src/backend/float.cpp
+    src/moe_topk/protocol_i_ucmp.cpp
+    src/moe_topk/protocol_i_cmpagg.cpp
+    src/moe_topk/protocol_i_transport.cpp
+    src/moe_topk/protocol_i_party_package.cpp
+    src/moe_topk/protocol_i_score_input.cpp
     # src/softmax.cpp
 )
 
@@ -208,6 +214,66 @@ add_executable(
 )
 target_link_libraries(moe_topk_m1_cmpagg_test ${PROJECT_NAME})
 
+# M2.4 C/B conformance only: no Protocol I runtime or secure shuffle.
+add_executable(moe_topk_m2_priority_key_test tests/moe_topk/protocol_i_priority_key_test.cpp)
+target_link_libraries(moe_topk_m2_priority_key_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_priority_dcf_conformance_test tests/moe_topk/protocol_i_priority_dcf_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_priority_dcf_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_reverse_shuffle_model_test tests/moe_topk/protocol_i_reverse_shuffle_model_test.cpp)
+target_link_libraries(moe_topk_m2_reverse_shuffle_model_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_ucmp_conformance_test tests/moe_topk/protocol_i_ucmp_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_ucmp_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_cmpagg_conformance_test tests/moe_topk/protocol_i_cmpagg_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_cmpagg_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_transport_conformance_test tests/moe_topk/protocol_i_transport_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_transport_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_cmpagg_process_e2e_test tests/moe_topk/protocol_i_cmpagg_three_process_e2e_test.cpp)
+target_link_libraries(moe_topk_m2_cmpagg_process_e2e_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_score_input_conformance_test tests/moe_topk/protocol_i_score_input_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_score_input_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_paper_core_alignment_test tests/moe_topk/protocol_i_paper_core_alignment_test.cpp)
+target_link_libraries(moe_topk_m2_paper_core_alignment_test ${PROJECT_NAME})
+
+if(MOE_TOPK_ENABLE_EMP_OT)
+    find_package(emp-tool 1.0 CONFIG REQUIRED)
+    find_package(emp-ot 1.0 CONFIG REQUIRED)
+    find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto)
+    add_library(moe_topk_emp_ot_backend STATIC
+        src/moe_topk/protocol_i_chosen_ot_emp.cpp
+        src/moe_topk/protocol_i_opv_emp.cpp)
+    target_include_directories(moe_topk_emp_ot_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_compile_features(moe_topk_emp_ot_backend PRIVATE cxx_std_20)
+    set_target_properties(moe_topk_emp_ot_backend PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(moe_topk_emp_ot_backend PRIVATE emp-ot::emp-ot emp-tool::emp-tool OpenSSL::Crypto Threads::Threads)
+    add_executable(moe_topk_m2_chosen_ot_conformance_test tests/moe_topk/protocol_i_chosen_ot_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_chosen_ot_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_chosen_ot_conformance_test PRIVATE moe_topk_emp_ot_backend)
+    add_library(moe_topk_share_translation_backend STATIC
+        src/moe_topk/protocol_i_share_translation.cpp
+        src/moe_topk/protocol_i_permutation.cpp
+        src/moe_topk/protocol_i_benes.cpp
+        src/moe_topk/protocol_i_permute_share.cpp
+        src/moe_topk/protocol_i_secret_shared_shuffle.cpp
+        src/moe_topk/protocol_i_pipeline.cpp)
+    target_include_directories(moe_topk_share_translation_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include)
+    target_link_libraries(moe_topk_share_translation_backend PRIVATE moe_topk_emp_ot_backend FSS)
+    add_executable(moe_topk_m2_opv_conformance_test tests/moe_topk/protocol_i_opv_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_opv_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_opv_conformance_test PRIVATE moe_topk_emp_ot_backend)
+    add_executable(moe_topk_m2_share_translation_conformance_test tests/moe_topk/protocol_i_share_translation_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_share_translation_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_share_translation_conformance_test PRIVATE moe_topk_share_translation_backend)
+    add_executable(moe_topk_m2_permute_share_conformance_test tests/moe_topk/protocol_i_permute_share_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_permute_share_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_permute_share_conformance_test PRIVATE moe_topk_share_translation_backend)
+    add_executable(moe_topk_m2_secret_shared_shuffle_conformance_test tests/moe_topk/protocol_i_secret_shared_shuffle_conformance_test.cpp)
+    target_include_directories(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE moe_topk_share_translation_backend)
+    add_executable(moe_topk_m2_protocol_i_modular_e2e_test tests/moe_topk/protocol_i_small_e2e_test.cpp)
+    target_include_directories(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/cryptoTools)
+    target_link_libraries(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE moe_topk_share_translation_backend sytorch)
+endif()
+
 # Protocol III pre-integration primitive conformance. This validates the
 # existing VFSS DPF implementation and transport without starting M3 routing.
 add_executable(
@@ -221,4 +287,21 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
     add_test(NAME moe_topk_m1_oracle_test COMMAND moe_topk_m1_oracle_test)
     add_test(NAME moe_topk_m1_cmpagg_test COMMAND moe_topk_m1_cmpagg_test)
+    add_test(NAME moe_topk_m2_priority_key_test COMMAND moe_topk_m2_priority_key_test)
+    add_test(NAME moe_topk_m2_priority_dcf_conformance_test COMMAND moe_topk_m2_priority_dcf_conformance_test)
+    add_test(NAME moe_topk_m2_reverse_shuffle_model_test COMMAND moe_topk_m2_reverse_shuffle_model_test)
+    add_test(NAME moe_topk_m2_ucmp_conformance_test COMMAND moe_topk_m2_ucmp_conformance_test)
+    add_test(NAME moe_topk_m2_cmpagg_conformance_test COMMAND moe_topk_m2_cmpagg_conformance_test)
+    add_test(NAME moe_topk_m2_transport_conformance_test COMMAND moe_topk_m2_transport_conformance_test)
+    add_test(NAME moe_topk_m2_cmpagg_process_e2e_test COMMAND moe_topk_m2_cmpagg_process_e2e_test)
+    add_test(NAME moe_topk_m2_score_input_conformance_test COMMAND moe_topk_m2_score_input_conformance_test)
+    add_test(NAME moe_topk_m2_paper_core_alignment_test COMMAND moe_topk_m2_paper_core_alignment_test)
+    if(MOE_TOPK_ENABLE_EMP_OT)
+        add_test(NAME moe_topk_m2_chosen_ot_conformance_test COMMAND moe_topk_m2_chosen_ot_conformance_test)
+        add_test(NAME moe_topk_m2_opv_conformance_test COMMAND moe_topk_m2_opv_conformance_test)
+        add_test(NAME moe_topk_m2_share_translation_conformance_test COMMAND moe_topk_m2_share_translation_conformance_test)
+        add_test(NAME moe_topk_m2_permute_share_conformance_test COMMAND moe_topk_m2_permute_share_conformance_test)
+        add_test(NAME moe_topk_m2_secret_shared_shuffle_conformance_test COMMAND moe_topk_m2_secret_shared_shuffle_conformance_test)
+        add_test(NAME moe_topk_m2_protocol_i_modular_e2e_test COMMAND moe_topk_m2_protocol_i_modular_e2e_test)
+    endif()
 endif()
