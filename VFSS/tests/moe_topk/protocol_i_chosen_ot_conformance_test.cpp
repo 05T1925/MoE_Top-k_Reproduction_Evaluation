@@ -3,11 +3,13 @@
 #include <array>
 #include <chrono>
 #include <cerrno>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
+#include <poll.h>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -18,6 +20,13 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+
+namespace moe_topk::testing {
+
+void protocol_i_chosen_ot_test_raw_receive(
+    int connected_fd, void* data, std::size_t count, int timeout_ms);
+
+}  // namespace moe_topk::testing
 
 namespace {
 using moe_topk::ProtocolIBlock128;
@@ -108,6 +117,49 @@ void negative_inputs() {
   threw = false; try { (void)moe_topk::protocol_i_chosen_ot_sender({1,2,3,2,1}, fds[0], messages(1,0,false), messages(1,0,true)); } catch (...) { threw = true; } require(threw, "sender length"); close_fd(fds[0]); close_fd(fds[1]);
 }
 
+void expect_readable_hup_drains_buffered_payload() {
+  int fds[2]{};
+  pair(fds);
+
+  std::array<std::uint8_t, 64> payload{};
+  for (std::size_t i = 0; i < payload.size(); ++i)
+    payload[i] = static_cast<std::uint8_t>(0xa5U ^ i);
+
+  const auto child = ::fork();
+  require(child >= 0, "POLLIN+POLLHUP fork");
+
+  if (child == 0) {
+    close_fd(fds[0]);
+    exact_write(fds[1], payload.data(), payload.size());
+    close_fd(fds[1]);
+    _exit(0);
+  }
+
+  close_fd(fds[1]);
+
+  // Wait until the writer has both delivered the payload and closed its end.
+  // On Linux AF_UNIX SOCK_STREAM this leaves buffered readable data together
+  // with peer hangup, i.e. POLLIN|POLLHUP.
+  wait_code(child, 0, "POLLIN+POLLHUP writer");
+
+  pollfd descriptor{fds[0], POLLIN, 0};
+  int poll_result = -1;
+  do {
+    poll_result = ::poll(&descriptor, 1, 1000);
+  } while (poll_result < 0 && errno == EINTR);
+
+  require(poll_result == 1, "POLLIN+POLLHUP poll");
+  require((descriptor.revents & POLLIN) != 0, "POLLIN+POLLHUP missing POLLIN");
+  require((descriptor.revents & POLLHUP) != 0, "POLLIN+POLLHUP missing POLLHUP");
+
+  std::array<std::uint8_t, 64> received{};
+  moe_topk::testing::protocol_i_chosen_ot_test_raw_receive(
+      fds[0], received.data(), received.size(), 1000);
+
+  require(received == payload, "POLLIN+POLLHUP buffered payload");
+  close_fd(fds[0]);
+}
+
 void expect_eof_and_timeout() {
   int fds[2]{}; pair(fds);
   const auto child = ::fork(); require(child >= 0, "EOF fork");
@@ -181,7 +233,7 @@ int main(int argc, char** argv) {
   try {
     ::signal(SIGPIPE, SIG_IGN);
     if (argc > 1) return role_main(argc, argv);
-    const auto executable = self(argv[0]); negative_inputs(); expect_eof_and_timeout(); expect_interrupted_absolute_deadline(); expect_preamble_errors(executable); expect_replay(); std::uint64_t material = 1;
+    const auto executable = self(argv[0]); negative_inputs(); expect_readable_hup_drains_buffered_payload(); expect_eof_and_timeout(); expect_interrupted_absolute_deadline(); expect_preamble_errors(executable); expect_replay(); std::uint64_t material = 1;
     for (const auto n : {1U,2U,17U,128U}) for (int choice_mode=0; choice_mode<4; ++choice_mode) for (int message_mode=0; message_mode<5; ++message_mode) run_case(executable, n, choice_mode, message_mode, material++);
     run_case(executable, 17, 3, 0, material++); run_case(executable, 17, 3, 1, material++);  // fresh-material batches
     return 0;
