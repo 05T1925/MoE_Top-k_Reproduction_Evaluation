@@ -1,8 +1,8 @@
 # MoE Top-K 安全协议统一项目
 
 本仓库以 VFSS 为唯一活动实现框架，目标是建立可复现、可横向比较的安全 Top-K
-基线。当前顺序已经冻结为：公共底座 → Protocol I 精确基线 → Protocol III
-模块化 3 轮基线 → CipherGPT 原生基线 → Protocol III 精确 2 轮压缩 → AAV86。
+基线。长期顺序已经冻结为：公共底座 → Protocol I → Protocol III 模块化 3 轮
+基线 → CipherGPT 原生基线 → Protocol III 精确 2 轮压缩 → AAV86。
 
 ## 当前状态
 
@@ -11,10 +11,15 @@
   conformance 测试均通过；
 - M1.1 已在 Ubuntu 24.04.4 的干净 Debug 构建中验收：`ctest -N` 恰发现四项，
   `ctest --output-on-failure` 为 4/4 通过；验收记录见
-  `docs/M1_1_UBUNTU_HANDOFF.md`。此结论只覆盖 M1.1 的测试入口和 provenance，
-  不表示 LAN/WAN 性能已测量，也不表示 M2/M3 已实现；
+  `docs/M1_1_UBUNTU_HANDOFF.md`；M1/M1.1 的语义、oracle、metrics 和冻结基线
+  已完成并保持不变；
 - `VFSS/` 已产生 M1 的预期改动，`VFSS-baseline/` 仍保持冻结标签内容；
-- M2 Protocol I 是下一条实现主线；M3 Protocol III 3 轮基线在 M2 后进入；
+- M2.0--M2.15 已完成当前 C 级模块化 Protocol I 工程基线，并已合入 `main`；
+  当前实现标签为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，
+  core 为 4 轮、总路径为 8 轮；
+- M2 未达成 Agarwal paper-exact 3-round core 或 7-round total candidate，这些
+  仍是明确记录的后续研究目标，不得反写成当前实现能力；
+- M3 Protocol III 模块化 3 轮是当前实现主线，可从最新 `main` 开始；
 - 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
 - 论文和大型参考工程不进入普通远端 Git 历史，需要队友在本地自行补齐。
 
@@ -23,6 +28,7 @@
 - [项目范围、论文映射与统一指标](PROJECT.md)
 - [详细实施计划](docs/IMPLEMENTATION_PLAN.md)
 - [双人实施分工与交接计划](docs/TEAM_WORK_PLAN.md)
+- [M2 分支阶段映射与重命名记录](docs/BRANCH_MAP.md)
 - [路线优先级决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
 - [Protocol III 模块化 3 轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)

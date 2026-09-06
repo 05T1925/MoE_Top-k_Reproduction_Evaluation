@@ -17,8 +17,8 @@ Agarwal Protocol I、Agarwal Protocol III 和 CipherGPT Top-K 的可区分基线
    独立扩展，禁止混入 Protocol I/III 的名称和性能结论；
 4. 所有“论文一致”“轮数一致”“泄露一致”的说法都必须有对应证据。
 
-近期执行优先级已经冻结：M1 公共底座收尾 → Protocol I 精确基线 → Protocol III
-模块化 3 轮基线 → `ciphergpt_native` → Protocol III 精确 2 轮压缩 → AAV86。
+近期执行优先级已经冻结：M1 公共底座收尾 → Protocol I C 级模块化基线 → Protocol
+III 模块化 3 轮基线 → `ciphergpt_native` → Protocol III 精确 2 轮压缩 → AAV86。
 依赖关系、阶段门和调整理由见
 `docs/decisions/ROADMAP_PRIORITY_2026-09-04.md`。
 
@@ -68,7 +68,7 @@ Git 基线已经建立：当前基线提交为 `993696e`，标签为
 
 | 名称 | 排名 | 路由 | 拓扑/在线轮数 | 本项目状态 |
 | --- | --- | --- | --- | --- |
-| Protocol I | 全对全 CmpAgg | 安全 shuffle | 2+1，论文表中 3 轮 | 第一条精确基线 |
+| Protocol I | 全对全 CmpAgg | 安全 shuffle | 2+1，论文表中 3 轮 | 当前为 C 级模块化基线；paper-exact 仍是后续目标 |
 | Protocol II | 多点 DPF | 安全 shuffle | 3 方 | 当前不实施 |
 | Protocol III | 全对全 CmpAgg | DPF 路由及跨阶段压缩 | 2+1，论文表中 2 轮 | 第二个论文目标；先做 3 轮模块化中间基线 |
 | Protocol IV | 多点 DPF | 标准 DPF | 3 方 | 当前不实施 |
@@ -425,7 +425,16 @@ CryptoMoE 保留为 M7 之后的工作负载接入：先冻结 eligibility、dum
 - CryptoMoE 目前应作为工作负载和系统语义来源，而不是第四种 Top-K 原语；
 - Agarwal full version 不再列为待获取材料，会议版之外的细节保持“未知”。
 
-## 10. 后续需要团队明确的输入
+## 10. 当前里程碑状态与后续需要团队明确的输入
+
+M1/M1.1 已完成并冻结。M2.0--M2.15 已完成当前 C 级模块化 Protocol I 基线，
+实现标签为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，core 为
+4 轮、总路径为 8 轮，且已合入 `main`。M2→M3 交接条件满足，当前实现主线为
+`agarwal_protocol_iii_modular_3round`。Agarwal paper-exact 3-round core、7-round
+total candidate、paper-compatible public masked-list primitive 和 formal leakage
+proof 尚未完成，作为后续独立研究目标保留；不得把 M2 C 级基线写成论文精确复现。
+
+## 11. 后续需要团队明确的输入
 
 M0、M1 和 M1.1 已完成；以下问题影响后续里程碑：
 
