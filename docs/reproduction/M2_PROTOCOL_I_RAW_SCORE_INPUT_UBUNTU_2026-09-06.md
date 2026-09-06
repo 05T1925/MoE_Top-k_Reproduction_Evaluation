@@ -1,7 +1,7 @@
 # M2.14 Ubuntu reproduction
 
 Implementation label: `m2_protocol_i_raw_score_input_modular_8round_mask_output`.
-Code revision: `1a6af9232971a741b4ec0ab0e5bc0b9b72204b5d` on
+Code revision: `dc2e12e` (full revision recorded below) on
 `m2-protocol-i-raw-score-input`.
 
 Environment: Ubuntu 24.04 WSL, GNU 13.3, Debug, fixed EMP prefix
@@ -25,10 +25,25 @@ bytes at `n=256` over the two adapter stages.  Score adapter calls are `2n`
 uCMP and `4n` raw DCF evaluations per party; CmpAgg remains
 `n(n-1)/2` edges and twice that many raw DCF evaluations per party.
 
-Fresh EMP-OFF configuration discovered 12 CTests.  Fresh EMP-ON configuration
-discovered 18; after its complete build, full CTest ran 17/18 successfully.
-The sole failure was `moe_topk_m2_chosen_ot_conformance_test` with `test read`;
-its source was not changed in this milestone, but recurrence outside this run
-was not established.  The new score-input conformance and raw-input modular
-E2E both passed.  EMP-OFF full build/run is `NOT_MEASURED`.  Timing, PRG,
-LAN/WAN and repetitions remain `NOT_MEASURED`.
+Fresh EMP-OFF configuration/build discovered 12 CTests and passed 12/12.
+Fresh EMP-ON configuration/build discovered 18 CTests and passed 18/18,
+including `moe_topk_m2_chosen_ot_conformance_test`.  The four explicit
+correctness smokes above all exited 0.  The documentation-only follow-up
+commit is `dc2e12e`; the complete branch tip at validation time is recorded by
+the final Git check, and this record must be updated if later commits change
+that tip.  Timing, PRG, LAN/WAN and benchmark repetitions remain
+`NOT_MEASURED`.
+
+Validation commands:
+
+```text
+cmake -S VFSS -B /tmp/moe_m214_off_final -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_EMP_OT=OFF
+cmake --build /tmp/moe_m214_off_final -j1
+ctest --test-dir /tmp/moe_m214_off_final -N
+ctest --test-dir /tmp/moe_m214_off_final --output-on-failure
+
+cmake -S VFSS -B /tmp/moe_m214_on_final -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_EMP_OT=ON -DCMAKE_PREFIX_PATH=/tmp/moe_m28_emp.ok9WzQ/prefix
+cmake --build /tmp/moe_m214_on_final -j1
+ctest --test-dir /tmp/moe_m214_on_final -N
+ctest --test-dir /tmp/moe_m214_on_final --output-on-failure
+```
