@@ -23,7 +23,9 @@
   additive shares、两遍 shuffle、CmpAgg、受控 shuffled rank 泄露和 reverse carrier
   串联为原顺序 XOR mask shares；M2.13 的 C 级候选
   `m2_protocol_i_modular_6round_mask_output` 闭合 P2 包先收后预处理的离线屏障、
-  有界分片帧、逻辑/填充布局、全 rank-permutation 审计和 6 轮模块化 mask 输出；
+  有界分片帧、逻辑/填充布局、全 rank-permutation 审计和 6 轮模块化 mask 输出；M2.14
+  `m2_protocol_i_raw_score_input_modular_8round_mask_output` 已将 raw Q20.12 算术 shares
+  经 two-stage carry/lift/sign adapter 接入该路径，实际因果总数为 8 轮；
   它仍不是 raw-score-share input 或论文 exact 基线，状态与
   可复现命令见
   `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
