@@ -81,6 +81,21 @@ M1.1 只完成测试入口和复现元数据，不重新讨论或修改已冻结
 
 ## 4. M2 → M3 交接契约
 
+### M2 closeout status (2026-09-06)
+
+M2 Protocol I is closed at the C-level modular baseline
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`. The branch has
+completed M2.0--M2.15 implementation, validation, and documentation. Its
+current measured path is 8 rounds: raw adapter 2, Protocol-I-shaped core 4,
+and reverse mask adapter 2. The paper 3-round core candidate was not achieved
+because the current VFSS PS interface cannot emit a same-permutation public
+masked shuffled list. This unresolved paper gap is intentionally carried into
+future research and does not block the M2-to-M3 engineering handoff.
+
+After the closeout merge, M3 may start from `main`. M3 must preserve the input,
+stable-rank, original-order mask, role, metrics, and secure/test boundaries
+below; it must not fork a second semantic contract.
+
 Protocol I 在进入 M3 前必须冻结以下行为边界：
 
 - 输入为仓库规定的 Q20.12 signed score 算术共享；

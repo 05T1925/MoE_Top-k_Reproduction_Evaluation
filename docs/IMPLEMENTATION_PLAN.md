@@ -6,6 +6,18 @@
 
 ## 1. 当前结论
 
+### M2 closeout status (2026-09-06)
+
+M2 Protocol I is closed as the project's C-level modular baseline at M2.15.
+The validated implementation label is
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`; EMP-OFF and EMP-ON
+full suites, raw-score independent-process E2E, and the explicit `(128,2/8)` and
+`(256,2/8)` smokes have passed. M2.15 did not achieve the paper's 3-round core:
+the current VFSS two-pass PS API cannot emit the paper-compatible public masked
+shuffled list under the same hidden permutation. The measured current graph is
+8 rounds (2 raw adapter + 4 current core + 2 reverse mask adapter). This is an
+engineering closeout and M2-to-M3 handoff, not a paper-exact claim.
+
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
 - 当前开发主线：M1.1 已完成；M2.7 CmpAgg 三进程运行基础已作为项目扩展完成，
@@ -464,13 +476,13 @@ PROJECT.md
 - 不吞错误，不加入启发式兜底和仅对当前样例有效的后处理；
 - 文档状态必须与代码实际状态同步。
 
-## 6. 立即下一步
+## 6. 立即下一步（M2 已收尾，进入 M3）
 
-1. 维护 M2.14 raw Q20.12 arithmetic-share input adapter：由 P0/P1 在 34-bit
-   uCMP material 下完成 carry/lift/sign，禁止 controller 预先重构或生成 priority key；
-2. 对该入口持续运行 primitive differential、P2/P0/P1 独立进程 E2E、全量 CTest 与
-   `(128,2/8)`、`(256,2/8)` 记录；
-3. 将实际 8 轮因果图、P2 input-independence、D1 受控泄露与未获得的 paper-exact
-   证明同步写入决策和复现记录；
-4. M2.15 处理 paper-core round alignment；M2 的纸面 3-round 对齐与 D2/D3/D4
-   证明仍是后续评审门，不能由 C 级实现替代。
+1. 将本分支以单独 M2 closeout merge 合入 `main`，保留当前实现标签和全部 M2.13--M2.15
+   reproduction records；不得改名为 exact。
+2. M3 复用 M1/M2 的 score semantics、oracle、CmpAgg、transport、metrics 和
+   original-order mask 契约，不复制第二套 rank 或输出语义。
+3. M3 先实现 `agarwal_protocol_iii_modular_3round` 的 GRank 1 轮 + 标准 DPF
+   routing 2 轮；Protocol III 的 2 轮压缩和域条件留到 M5。
+4. 在 M3 代码合并前完成 DPF payload/rank conformance、独立 P2/P0/P1 E2E、泄露和
+   causal-round 审计；所有未测量指标继续写 `NOT_MEASURED`。

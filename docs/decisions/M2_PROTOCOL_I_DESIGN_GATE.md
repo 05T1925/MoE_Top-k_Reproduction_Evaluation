@@ -34,6 +34,18 @@ party-local secret shares；当前没有同置换 public-list 输出、输入相
 只作为 D 级未实现目标记录，详见
 [`M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md`](M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md)。
 
+## M2 closeout and M3 handoff (2026-09-06)
+
+M2.0--M2.15 is now closed as a C-level Protocol I engineering baseline. The
+current branch has passed the documented EMP-OFF/EMP-ON suites and independent
+raw-score E2E matrix. The historical `m2_protocol_i_design_blocked` wording
+describes the earlier exact-design gate and remains history; it must not be
+read as evidence that the validated C-level code is unfinished. Conversely,
+the closeout does not approve any exact label: the public masked-list
+functionality, combined shuffle proof, paper-compatible transcript and formal
+leakage proof remain unresolved. The frozen M2-to-M3 contract is the one in
+`docs/TEAM_WORK_PLAN.md`; M3 may begin on a new branch from the merged `main`.
+
 ## 1. 入口、证据纪律与不变量
 
 M1.1 已完成并合入 `main`：Ubuntu 24.04.4 的干净 Debug 构建中，四个 M1 CTest 为
