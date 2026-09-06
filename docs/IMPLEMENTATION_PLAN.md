@@ -20,8 +20,9 @@ engineering closeout and M2-to-M3 handoff, not a paper-exact claim.
 
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
-- 当前开发主线：M1.1 已完成；M2.7 CmpAgg 三进程运行基础已作为项目扩展完成，
-  但完整 Protocol I 仍须通过设计门、真实 shuffle、inverse routing 和统一 mask；
+- 当前开发主线：M1.1 已完成；M2.7--M2.15 已形成并完成验收的 C 级 Protocol I
+  工程基线；M2 的历史设计门、真实 shuffle、inverse routing 和统一 mask 证据均按
+  各阶段记录保留，但不再作为当前 M2 未完成状态；
   M2.8 的项目扩展 `m2_emp_iknp_chosen_ot_conformance` 已在 Ubuntu-24.04 上完成固定
   EMP 依赖构建、upstream base-OT/IKNP smoke、C++20 隔离的 connected-fd adapter 和
   sender/receiver 独立进程 conformance；M2.9 项目扩展
@@ -195,7 +196,11 @@ conformance 前置原语测试写成完整 M3 实现证据。
 M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。该门已
 满足；M2 代码仍受 `docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md` 的四项批准决策约束。
 
-## 3.2 M2：Agarwal Protocol I 精确核心与统一输出
+## 3.2 M2：Agarwal Protocol I 精确核心与统一输出（历史目标；当前 C 级基线已收尾）
+
+本节的 `精确` 是 M2 入口时的目标身份，不是当前实现声明。M2.0--M2.15
+已完成当前 C 级模块化工程路径并满足 M2→M3 交接条件；论文精确 3 轮与正式
+`agarwal_protocol_i_exact_mask_output` 仍未完成。
 
 ### 输入
 
@@ -254,9 +259,10 @@ M2.7 的十个独立进程用例覆盖 `n=1,2,5,7,11`、`K=1`、`K=n`、`K=2 (n=
 退出码和未测字段见
 `docs/reproduction/M2_CMPAGG_PROCESS_E2E_UBUNTU_2026-09-05.md`。
 
-该交付只闭合 CmpAgg process foundation：uCMP 是项目 two-evaluation adapter；secure
-shuffle、inverse routing、最终原始顺序 bit-mask、完整 Protocol I 论文轮数/泄露与网络
-性能仍未实现或为 `NOT_MEASURED`。因此不改变 M2 设计门的阻塞状态，也不提前进入 M3。
+该记录保留 M2.7 当时只闭合 CmpAgg process foundation 的历史边界；后续 M2.10--M2.15
+已补齐项目级 shuffle、inverse routing、raw-score adapter 和原始顺序 bit-mask 的
+C 级工程路径。它仍不是 Protocol I paper-exact 证据，论文轮数/泄露证明与网络性能
+仍按各 reproduction record 标为 `NOT_MEASURED` 或未解决。
 
 ## 3.3 M3：Protocol III 模块化 3 轮基线
 

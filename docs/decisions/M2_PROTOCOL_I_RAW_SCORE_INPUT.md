@@ -25,7 +25,10 @@ key_1 =  q_1 << b
 Here `b=index_bits`, `W=33+b`, and every final-key operation is modulo
 `2^W`.  Thus the reconstructed key is `(raw XOR 0x7fffffff)<<b + index`, the
 frozen descending-score/stable-index key.  Padded slots are public legal
-shares of `INT32_MIN` (P0 has `0x80000000`, P1 has zero).
+shares of `INT32_MIN` (P0 has `0x80000000`, P1 has zero), with dummy original
+indices `logical_n..padded_n-1`. Consequently, a real `INT32_MIN` at any
+logical original index precedes every padded dummy under the frozen stable
+original-index tie rule.
 
 P2 sees no raw share: it creates per-slot carry/sign mask shares and party
 uCMP material, bound by package session, fingerprint, party, canonical slot,

@@ -65,4 +65,7 @@ Timing, PRG-call counts, WAN/LAN and benchmark repetitions are `NOT_MEASURED`.
 
 This closes neither a paper-exact 3-round claim nor a raw-score-share input
 adapter. The composed shuffle proof and rank-reveal leakage policy remain
-project-review gates.
+project-review gates in the historical M2.13 record. M2.14 subsequently supplied
+the raw-score successor, and M2.15 closed the current C-level engineering baseline;
+the unresolved paper-exact gaps and their current 4-core/8-total accounting are
+tracked by `M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md`.

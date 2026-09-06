@@ -6,7 +6,11 @@ Branch: `m2-protocol-i-raw-score-input`
 
 Implementation label: `m2_protocol_i_raw_score_input_modular_8round_mask_output`
 
-Validated code revision for this record: `a9d9dd61746a71ce02a14ea172e297394bc4e7ad`
+Validated code revision for this record: `90486a58c637eb55d67bba3ec2b22749873252db`
+
+The validation includes the alignment test and CMake registration introduced by
+that revision. The later `2f7320fc9d2dffba969fc536841743cda296ff29` commit is a
+documentation-only M2 closeout update and does not change the validated code.
 
 Environment: Ubuntu-24.04, Ubuntu 24.04.4 LTS, WSL2 x86_64, GCC 13.3.0,
 CMake 3.28.3, Debug, EMP prefix `/tmp/moe_m28_emp.ok9WzQ/prefix`.
@@ -45,9 +49,20 @@ MOE_TOPK_M2_E2E_N=256 MOE_TOPK_M2_E2E_K=2  /tmp/moe_m215_on/moe_topk_m2_protocol
 MOE_TOPK_M2_E2E_N=256 MOE_TOPK_M2_E2E_K=8  /tmp/moe_m215_on/moe_topk_m2_protocol_i_modular_e2e_test
 ```
 
+## M2 closeout revalidation
+
+At the closeout checkout `2f7320fc9d2dffba969fc536841743cda296ff29`, which is
+documentation-only after the validated implementation revision above, the
+fresh-build commands were rerun in `/tmp/m2_close_off` and `/tmp/m2_close_on`.
+The actual discovery counts were 13 and 19, respectively, and the full suites
+passed 13/13 and 19/19. The four explicit E2E commands were then rerun against
+`/tmp/m2_close_on/moe_topk_m2_protocol_i_modular_e2e_test`; `(128,2)`, `(128,8)`,
+`(256,2)` and `(256,8)` each exited 0. This confirms the closeout documentation
+does not change the validated implementation behavior.
+
 ## Observed results
 
-At this revision EMP-OFF was 13/13 and EMP-ON was 19/19. The four explicit
+At the validated implementation state EMP-OFF was 13/13 and EMP-ON was 19/19. The four explicit
 E2E cases `(128,2)`, `(128,8)`, `(256,2)` and `(256,8)` each exited 0 and
 matched the existing test-only oracle reconstruction. The new alignment test
 passed in both suites.

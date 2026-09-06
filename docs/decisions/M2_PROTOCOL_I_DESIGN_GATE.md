@@ -68,7 +68,9 @@ Top-K bit-mask share；test 重构与 secure 接口隔离。P2 是输入无关�
 绝对静默；不得使用旧 ABI、文件轮询、共享目录、固定 sleep、在线 Dealer、B0 矩阵
 shuffle 或 `MockShuffle`。
 
-M2 可以进行本设计冻结；M2 代码必须等待本决策记录及四个阻塞决策获得团队批准。
+上述“代码必须等待四个阻塞决策批准”是 M2 入口阶段的历史门，保留用于解释当时的
+实现授权边界。M2.0--M2.15 收尾状态见上方 dated closeout；当前 C 级工程基线已经
+完成，但不因此解除 paper-exact 标签门。
 
 ## 2. 精确 Protocol I 阶段表
 
@@ -180,5 +182,7 @@ PRG calls、comparison edges、total time 与 correctness status。没有实际�
 `NOT_MEASURED`，绝不填 0、估算或借用 B1 历史数。
 
 只有 D1 受控泄露、D2 secure inverse routing、D3 宽度/range proof、D4 独立进程传输
-与计量均批准并通过上述验收，才允许 `agarwal_protocol_i_exact_mask_output`。否则唯一
-准确状态是 `m2_protocol_i_design_blocked`。
+与计量均批准并通过上述验收，才允许 `agarwal_protocol_i_exact_mask_output`。否则，在
+M2 入口/精确设计门语境下唯一准确状态是 `m2_protocol_i_design_blocked`；当前 C 级
+收尾路径的准确实现标签仍为
+`m2_protocol_i_raw_score_input_modular_8round_mask_output`，两者不可混用。
