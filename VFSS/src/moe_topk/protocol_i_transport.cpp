@@ -14,6 +14,7 @@ namespace {
 constexpr std::uint32_t kMagic = UINT32_C(0x4d325446);
 constexpr std::uint8_t kVersion = 1;
 constexpr std::uint32_t kMaxPayload = 1U << 20;
+constexpr std::size_t kChunkEnvelopeBytes = 16;
 constexpr std::size_t kWireHeaderBytes = 48;
 
 void put_u32(std::array<std::uint8_t, kWireHeaderBytes>& bytes, std::size_t offset,
@@ -96,8 +97,8 @@ WireHeader decode(const std::array<std::uint8_t, kWireHeaderBytes>& bytes) {
 ProtocolIFramedChannel::ProtocolIFramedChannel(int fd, ProtocolIFrameConfig config,
                                                ProtocolIFramedChannelOptions options)
     : fd_(fd), timeout_(options.timeout_ms), max_io_chunk_(options.max_io_chunk), c_(config) {
-  if (fd < 0 || timeout_ <= 0 || max_io_chunk_ == 0 || c_.bits < 34 || c_.bits > 53 || c_.sender > 1 ||
-      c_.receiver > 1 || c_.sender == c_.receiver || c_.phase == 0 || c_.type == 0 ||
+  if (fd < 0 || timeout_ <= 0 || max_io_chunk_ == 0 || c_.bits < 34 || c_.bits > 53 || c_.sender > 2 ||
+      c_.receiver > 2 || c_.sender == c_.receiver || c_.phase == 0 || c_.type == 0 ||
       c_.n == 0 || c_.k == 0 || c_.k > c_.n) {
     throw std::invalid_argument("frame config");
   }
@@ -202,5 +203,49 @@ std::vector<std::uint8_t> ProtocolIFramedChannel::receive() {
   }
   ++in_;
   return payload;
+}
+
+void protocol_i_send_framed_chunks(ProtocolIFramedChannel& channel,
+                                   const std::vector<std::uint8_t>& message) {
+  constexpr std::size_t kChunkBytes = kMaxPayload - kChunkEnvelopeBytes;
+  if (message.empty()) {
+    throw std::invalid_argument("chunked message is empty");
+  }
+  for (std::size_t offset = 0; offset < message.size(); offset += kChunkBytes) {
+    const auto length = std::min(kChunkBytes, message.size() - offset);
+    std::vector<std::uint8_t> chunk;
+    chunk.reserve(kChunkEnvelopeBytes + length);
+    for (int shift = 56; shift >= 0; shift -= 8) {
+      chunk.push_back(static_cast<std::uint8_t>(message.size() >> shift));
+    }
+    for (int shift = 56; shift >= 0; shift -= 8) {
+      chunk.push_back(static_cast<std::uint8_t>(offset >> shift));
+    }
+    chunk.insert(chunk.end(), message.begin() + offset, message.begin() + offset + length);
+    channel.send(chunk);
+  }
+}
+
+std::vector<std::uint8_t> protocol_i_receive_framed_chunks(ProtocolIFramedChannel& channel,
+                                                            std::size_t max_message_bytes) {
+  std::vector<std::uint8_t> message;
+  std::size_t expected = 0;
+  for (;;) {
+    const auto chunk = channel.receive();
+    if (chunk.size() < kChunkEnvelopeBytes) {
+      throw std::runtime_error("chunked frame envelope");
+    }
+    std::uint64_t total = 0, offset = 0;
+    for (int index = 0; index < 8; ++index) total = (total << 8U) | chunk[index];
+    for (int index = 0; index < 8; ++index) offset = (offset << 8U) | chunk[8 + index];
+    if (total == 0 || total > max_message_bytes || total > std::numeric_limits<std::size_t>::max() ||
+        offset != expected || offset > total || chunk.size() - kChunkEnvelopeBytes > total - offset) {
+      throw std::runtime_error("chunked frame bounds");
+    }
+    if (message.empty()) message.reserve(static_cast<std::size_t>(total));
+    message.insert(message.end(), chunk.begin() + kChunkEnvelopeBytes, chunk.end());
+    expected = message.size();
+    if (expected == total) return message;
+  }
 }
 }  // namespace moe_topk

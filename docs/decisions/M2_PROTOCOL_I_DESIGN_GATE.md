@@ -1,5 +1,10 @@
 # M2 Protocol I 实施前设计门
 
+M2.13 的 `m2_protocol_i_modular_6round_mask_output` 只以 C 级工程候选闭合离线
+P2 包时序、padded priority-key 输入和原顺序 mask 适配审计；其 6 轮因果分解不覆盖
+论文 Table 1 的 3 轮声明，完整边界见
+[`M2_PROTOCOL_I_MODULAR_6ROUND.md`](M2_PROTOCOL_I_MODULAR_6ROUND.md)。
+
 状态：**D1 已针对 M2.12 受控 shuffled `rank_P` 泄露获批准；本文件仍不是 paper-exact 声明。**
 
 M2.1 对 D1--D4 的可实现性、精确泄露条款、域宽表、inverse-routing 证据缺口和

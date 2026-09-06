@@ -39,4 +39,12 @@ class ProtocolIFramedChannel {
   std::uint64_t out_ = 0, in_ = 0, sent_ = 0, received_ = 0;
   void exact(void*, std::size_t, bool, Clock::time_point);
 };
+
+// Bounded package transport for the offline P2 -> P0/P1 handoff.  Each chunk
+// remains a normal authenticated ProtocolIFramedChannel frame; the small
+// envelope only binds the whole-message size and its ordered offset.
+void protocol_i_send_framed_chunks(ProtocolIFramedChannel& channel,
+                                   const std::vector<std::uint8_t>& message);
+std::vector<std::uint8_t> protocol_i_receive_framed_chunks(ProtocolIFramedChannel& channel,
+                                                            std::size_t max_message_bytes);
 }  // namespace moe_topk

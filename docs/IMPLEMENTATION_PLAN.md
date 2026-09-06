@@ -21,7 +21,10 @@
   两遍前向/逆向 carrier roundtrip conformance。它仍不是完整 Protocol I，状态与
   M2.12 项目 E2E `m2_protocol_i_priority_key_input_small_e2e` 已将 priority-key
   additive shares、两遍 shuffle、CmpAgg、受控 shuffled rank 泄露和 reverse carrier
-  串联为原顺序 XOR mask shares；它仍不是 raw-score-input 或论文 exact 基线，状态与
+  串联为原顺序 XOR mask shares；M2.13 的 C 级候选
+  `m2_protocol_i_modular_6round_mask_output` 闭合 P2 包先收后预处理的离线屏障、
+  有界分片帧、逻辑/填充布局、全 rank-permutation 审计和 6 轮模块化 mask 输出；
+  它仍不是 raw-score-share input 或论文 exact 基线，状态与
   可复现命令见
   `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
   `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`、
