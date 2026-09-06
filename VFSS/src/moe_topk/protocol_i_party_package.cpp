@@ -62,12 +62,65 @@ void validate_common(const ProtocolIPartyPackage& package, std::size_t expected_
       package.edge_materials.size() != expected_edges) {
     throw std::invalid_argument("invalid party package");
   }
+  if ((package.carry_materials.empty() != package.sign_materials.empty()) ||
+      (!package.carry_materials.empty() &&
+       (package.carry_materials.size() != package.n || package.sign_materials.size() != package.n))) {
+    throw std::invalid_argument("party package score material count");
+  }
   const auto mask = ring_mask(package.comparison_bits);
   for (const auto share : package.node_mask_shares) {
     if ((share & ~mask) != 0) {
       throw std::invalid_argument("party package node mask outside ring");
     }
   }
+}
+
+void validate_score_material(const ProtocolIScoreInputPartyMaterial& item,
+                             std::uint32_t expected_slot, std::uint8_t expected_stage,
+                             const ProtocolIPartyPackage& package) {
+  constexpr int kScoreBits = 34;
+  const auto score_mask = (UINT64_C(1) << kScoreBits) - 1U;
+  if (item.slot != expected_slot || item.stage != expected_stage || item.slot >= package.n ||
+      item.material.party_id() != package.party || item.material.comparison_bits() != kScoreBits ||
+      (item.left_mask_share & ~score_mask) != 0 || (item.right_mask_share & ~score_mask) != 0) {
+    throw std::invalid_argument("party package score material binding");
+  }
+}
+
+void put_score_material(std::vector<std::uint8_t>& output,
+                        const ProtocolIScoreInputPartyMaterial& item) {
+  const auto material = item.material.serialize();
+  put_u64(output, item.slot);
+  put_u64(output, item.stage);
+  put_u64(output, item.left_mask_share);
+  put_u64(output, item.right_mask_share);
+  put_u64(output, material.size());
+  if (output.size() > kMaxPackageBytes - material.size()) {
+    throw std::invalid_argument("party package exceeds allocation limit");
+  }
+  output.insert(output.end(), material.begin(), material.end());
+}
+
+ProtocolIScoreInputPartyMaterial get_score_material(const std::vector<std::uint8_t>& bytes,
+                                                    std::size_t& offset, std::uint32_t slot,
+                                                    std::uint8_t stage,
+                                                    const ProtocolIPartyPackage& package) {
+  const auto encoded_slot = get_u64(bytes, offset);
+  const auto encoded_stage = get_u64(bytes, offset);
+  const auto left = get_u64(bytes, offset);
+  const auto right = get_u64(bytes, offset);
+  const auto material_size = get_u64(bytes, offset);
+  if (encoded_slot != slot || encoded_stage != stage || material_size > bytes.size() - offset ||
+      material_size > std::numeric_limits<std::size_t>::max()) {
+    throw std::invalid_argument("party package score identity or material length");
+  }
+  const auto material_length = static_cast<std::size_t>(material_size);
+  std::vector<std::uint8_t> encoded(bytes.begin() + offset, bytes.begin() + offset + material_length);
+  offset += material_length;
+  ProtocolIScoreInputPartyMaterial item(slot, stage, left, right,
+      ProtocolIUcmpPartyMaterial::deserialize(encoded));
+  validate_score_material(item, slot, stage, package);
+  return item;
 }
 
 void validate_edge(const ProtocolIEdgePartyMaterial& edge,
@@ -89,7 +142,7 @@ std::vector<std::uint8_t> serialize_party_package(const ProtocolIPartyPackage& p
   std::vector<std::uint8_t> output;
   output.reserve(std::min(kMaxPackageBytes, kHeaderBytes +
                                                sizeof(std::uint64_t) * package.n));
-  output.insert(output.end(), {'M', '2', 'P', 'K', 1,
+  output.insert(output.end(), {'M', '2', 'P', 'K', 2,
                                static_cast<std::uint8_t>(package.party),
                                static_cast<std::uint8_t>(package.comparison_bits), 0});
   put_u64(output, package.session);
@@ -98,6 +151,17 @@ std::vector<std::uint8_t> serialize_party_package(const ProtocolIPartyPackage& p
   put_u64(output, package.k);
   for (const auto share : package.node_mask_shares) {
     put_u64(output, share);
+  }
+  put_u64(output, package.carry_materials.size());
+  if (!package.carry_materials.empty()) {
+    for (std::uint32_t slot = 0; slot < package.n; ++slot) {
+      validate_score_material(package.carry_materials[slot], slot, 1, package);
+      put_score_material(output, package.carry_materials[slot]);
+    }
+    for (std::uint32_t slot = 0; slot < package.n; ++slot) {
+      validate_score_material(package.sign_materials[slot], slot, 2, package);
+      put_score_material(output, package.sign_materials[slot]);
+    }
   }
 
   std::size_t edge_index = 0;
@@ -122,7 +186,7 @@ ProtocolIPartyPackage deserialize_party_package(const std::vector<std::uint8_t>&
                                                 int expected_party) {
   if (expected_party < 0 || expected_party > 1 || bytes.size() > kMaxPackageBytes ||
       bytes.size() < kHeaderBytes || bytes[0] != 'M' || bytes[1] != '2' || bytes[2] != 'P' ||
-      bytes[3] != 'K' || bytes[4] != 1 || bytes[5] != expected_party || bytes[7] != 0) {
+      bytes[3] != 'K' || bytes[4] != 2 || bytes[5] != expected_party || bytes[7] != 0) {
     throw std::invalid_argument("party package header");
   }
 
@@ -155,6 +219,21 @@ ProtocolIPartyPackage deserialize_party_package(const std::vector<std::uint8_t>&
     share = get_u64(bytes, offset);
     if ((share & ~mask) != 0) {
       throw std::invalid_argument("party package node mask outside ring");
+    }
+  }
+
+  const auto score_count = get_u64(bytes, offset);
+  if (score_count != 0 && score_count != package.n) {
+    throw std::invalid_argument("party package score material count");
+  }
+  if (score_count != 0) {
+    package.carry_materials.reserve(package.n);
+    package.sign_materials.reserve(package.n);
+    for (std::uint32_t slot = 0; slot < package.n; ++slot) {
+      package.carry_materials.push_back(get_score_material(bytes, offset, slot, 1, package));
+    }
+    for (std::uint32_t slot = 0; slot < package.n; ++slot) {
+      package.sign_materials.push_back(get_score_material(bytes, offset, slot, 2, package));
     }
   }
 
