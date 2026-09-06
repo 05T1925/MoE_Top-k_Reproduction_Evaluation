@@ -36,6 +36,11 @@
   `docs/reproduction/M2_PERMUTE_SHARE_UBUNTU_2026-09-06.md` 和
   `docs/reproduction/M2_PROTOCOL_I_SMALL_E2E_UBUNTU_2026-09-06.md`、
   `docs/reproduction/M2_SECRET_SHARED_SHUFFLE_UBUNTU_2026-09-06.md`；
+  M2.15 已完成 paper-core alignment audit：Agarwal §4.1 的 public masked
+  shuffled list 不能由当前 VFSS 两遍 PS API 表达，故保留当前 4-round core、8-round
+  total baseline，并将 3-round/7-round candidate 保留为 D 级未实现目标；见
+  `docs/decisions/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md` 和
+  `docs/reproduction/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT_UBUNTU_2026-09-06.md`；
   随后才是 M3 Protocol III 3 轮 → M4 CipherGPT → M5 Protocol III 2 轮 → M6 AAV86；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；

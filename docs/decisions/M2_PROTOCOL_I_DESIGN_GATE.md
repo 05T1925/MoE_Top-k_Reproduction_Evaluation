@@ -27,6 +27,13 @@ paper-exact 审查约束，绝不得声称 Protocol I exact。M2.0--M2.3 的
 `m2_protocol_i_design_blocked` 结论作为历史记录保留；M2.12/M2.13 的 D1
 受控 shuffled `rank_P` reveal 已获批准，D2/D3/D4 仅有组件/E2E 工程证据。
 
+M2.15 的 alignment audit（2026-09-06）进一步确认：论文 §4.1 的 public masked
+shuffled list 是 shuffle functionality 的额外输出，而当前 VFSS B1 两遍 PS 只返回
+party-local secret shares；当前没有同置换 public-list 输出、输入相关预处理或消息契约。
+因此当前 core 仍为 4 rounds、total 仍为 8 rounds；3-round candidate/7-round total
+只作为 D 级未实现目标记录，详见
+[`M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md`](M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md)。
+
 ## 1. 入口、证据纪律与不变量
 
 M1.1 已完成并合入 `main`：Ubuntu 24.04.4 的干净 Debug 构建中，四个 M1 CTest 为

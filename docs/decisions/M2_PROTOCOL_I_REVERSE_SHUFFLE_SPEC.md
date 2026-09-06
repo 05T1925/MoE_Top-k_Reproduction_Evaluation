@@ -53,6 +53,14 @@ reverse 仅作用于 R3 后创建的 carrier：由正向 `Pi` 下 slot 得到的
 
 **D2 未经独立审查与用户批准前，M2 仍为 design_blocked；不授权开始完整 Protocol I 实现。**
 
+## M2.15 alignment update (2026-09-06)
+
+The paper-core audit confirms that the missing public masked shuffled list is not
+provided by the current reverse-shuffle or forward PS contracts. Reverse remains a
+fresh two-pass mask adapter with two measured causal rounds. The current path keeps
+`2 + 1 + 1 + 2 = 6` rounds after priority-key input and `2 + 4 + 2 = 8` rounds with
+the raw-score adapter; the proposed `2 + 3 + 2 = 7` total is not achieved.
+
 ## 6. M2.8 chosen-OT boundary (C/D)
 
 M2.8 supplies a separately validated EMP IKNP chosen-OT conformance boundary.

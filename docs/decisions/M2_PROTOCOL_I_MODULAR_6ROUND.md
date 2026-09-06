@@ -2,6 +2,12 @@
 
 ## Current status (2026-09-06)
 
+M2.15 alignment update (2026-09-06): the paper's 3-round Protocol-I core assumes a
+shuffle functionality that additionally outputs a public masked shuffled list. The
+current VFSS two-pass PS composition has no such output or bound material/message
+contract, so the successor raw-score path remains a 4-round core and is not a
+3-round candidate. This historical M2.13 record is unchanged.
+
 M2.13 is the frozen padded-priority-key predecessor of the successor
 `m2_protocol_i_raw_score_input_modular_8round_mask_output` baseline. The
 successor adds the raw Q20.12 arithmetic-share carry/lift/sign adapter in two
