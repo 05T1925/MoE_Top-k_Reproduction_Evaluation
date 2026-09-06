@@ -1,8 +1,10 @@
 # M2.14 Ubuntu reproduction
 
 Implementation label: `m2_protocol_i_raw_score_input_modular_8round_mask_output`.
-Code revision: `a259deb` (full revision is the branch tip) on
+Code revision used for the validation run: `a259deb8e1876ebdf3629ef3fdc5ca8a2d6c8686` on
 `m2-protocol-i-raw-score-input`.
+Subsequent commits `d1f7fa8` and this documentation-only update do not change
+the validated implementation.
 
 Environment: Ubuntu 24.04 WSL, GNU 13.3, Debug, fixed EMP prefix
 `/tmp/moe_m28_emp.ok9WzQ/prefix`.  The raw-input primitive conformance target
