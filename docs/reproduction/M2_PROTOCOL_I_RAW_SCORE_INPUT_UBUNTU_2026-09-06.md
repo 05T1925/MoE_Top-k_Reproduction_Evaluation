@@ -25,6 +25,9 @@ bytes at `n=256` over the two adapter stages.  Score adapter calls are `2n`
 uCMP and `4n` raw DCF evaluations per party; CmpAgg remains
 `n(n-1)/2` edges and twice that many raw DCF evaluations per party.
 
-Actual CTest discovery/pass counts, package bytes and full EMP-OFF run are
-added only from the commands below; timing, PRG, LAN/WAN and repetitions remain
-`NOT_MEASURED`.
+Fresh EMP-OFF configuration discovered 12 CTests.  Fresh EMP-ON configuration
+discovered 18; after its complete build, full CTest ran 17/18 successfully.
+The sole failure was the pre-existing `moe_topk_m2_chosen_ot_conformance_test`
+with `test read`; the new score-input conformance and raw-input modular E2E
+both passed.  EMP-OFF full build/run is `NOT_MEASURED`.  Timing, PRG, LAN/WAN
+and repetitions remain `NOT_MEASURED`.
