@@ -30,4 +30,10 @@ M2.16 从 `main` 的 `6c72ec8a18a44c1d3d441758017b9807fe1dc090` 建立为
 leakage audit；由于同置换 public `pi(x)+r`、相关 `r`/GRank material 与 3-round
 message transcript 仍缺乏可审计实现，未修改 VFSS 生产代码，当前 8-round C 级标签保持。
 
+当前 Git 集成状态：首次审计提交 `5fbc24f9dd67c1275bf52c1c9701c01859951df9` 已推送到
+`origin/m2.16-paper-exact-3round-protocol-i`，后续文档同步也保留在该分支；`origin/main` 仍为
+`6c72ec8a18a44c1d3d441758017b9807fe1dc090`。M2.16 仍待文档 PR 审核与合并；合并
+前不得把本阶段记录写成 `main` 已包含。合并后，M3 实现仍应从更新后的 `main` 建立，
+而不是从 exact 目标或旧 M2 分支派生。
+
 M1.1、M3 设计和 Protocol III DPF 测试分支不属于本次 M2 重命名范围。

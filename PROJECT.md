@@ -442,6 +442,12 @@ C 级标签或 M3 主线；详见
 `docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md` 和
 `docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`。
 
+M2.16 当前仍处于待合并状态：首次审计提交为 `5fbc24f`，后续文档同步继续在
+`m2.16-paper-exact-3round-protocol-i` 上进行，而 `origin/main` 仍为 `6c72ec8`。
+完成该文档 PR 的审核与合并后，才把 M2.16 作为正式 mainline 进度
+同步；在此之前，不能把分支上的审计记录描述为已经进入 `main`。这不阻塞 M3
+的只读设计准备，但 M3 实现分支应从合并后的 `main` 建立。
+
 ## 11. 后续需要团队明确的输入
 
 M0、M1 和 M1.1 已完成；以下问题影响后续里程碑：

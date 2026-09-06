@@ -6,6 +6,10 @@
 
 ## 当前状态
 
+- M2.16 的首次审计提交为 `5fbc24f9dd67c1275bf52c1c9701c01859951df9`，其文档已在
+  分支 `m2.16-paper-exact-3round-protocol-i` 推送；截至 2026-09-06，
+  `origin/main` 仍为 `6c72ec8a18a44c1d3d441758017b9807fe1dc090`，M2.16 尚未合入
+  `main`，需经文档 PR 审核后再合并；
 - M0 已在远端闭环，`main` 与冻结标签均已推送；
 - M1 核心已完成：score 语义、oracle、CmpAgg、metrics 和真实 VFSS DCF
   conformance 测试均通过；
@@ -23,6 +27,8 @@
   public `pi(x)+r` 与当前 VFSS PS/GRank material 绑定仍无可审计实现，因此保留
   8-round C 级基线；
 - M3 Protocol III 模块化 3 轮是当前实现主线，可从最新 `main` 开始；
+- M2.16 合并后不改变 M3 入口契约；在合并前，队友可继续进行 M3 只读设计和测试准备，
+  但实现分支应以合并后的 `main` 为起点；
 - 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
 - 论文和大型参考工程不进入普通远端 Git 历史，需要队友在本地自行补齐。
 

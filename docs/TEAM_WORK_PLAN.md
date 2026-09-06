@@ -103,6 +103,14 @@ leakage, role, or metrics contract. The exact candidate remains blocked; see
 `docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md` and
 `docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`.
 
+The M2.16 documentation is currently on branch
+`m2.16-paper-exact-3round-protocol-i` (initial audit commit `5fbc24f`);
+`origin/main` remains `6c72ec8`. The team must review and merge this documentation-only PR before
+describing M2.16 as mainline history. This merge is a governance closeout and
+does not create an exact Protocol I implementation. M3 read-only design work
+may continue, but M3 implementation branches should start from the merged
+`main` and retain the frozen contract below.
+
 After the closeout merge, M3 may start from `main`. M3 must preserve the input,
 stable-rank, original-order mask, role, metrics, and secure/test boundaries
 below; it must not fork a second semantic contract.

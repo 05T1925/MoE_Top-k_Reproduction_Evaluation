@@ -33,6 +33,13 @@ and M3 implementation mainline remain unchanged. See
 `docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`, and
 `docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md`.
 
+The M2.16 documentation is complete on branch
+`m2.16-paper-exact-3round-protocol-i` (initial audit commit `5fbc24f`), but it
+is not yet in `main`: `origin/main` remains `6c72ec8`. The remaining integration step is a
+documentation-only PR review and merge. Until that merge, report M2.16 as
+completed on its branch and pending mainline integration; do not report the
+exact target as implemented or the branch documentation as part of `main`.
+
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
 - 当前开发主线：M1/M1.1 已完成并冻结；M2.0--M2.15 已形成并完成验收的 C 级 Protocol I
@@ -500,8 +507,9 @@ PROJECT.md
 
 ## 6. 立即下一步（M2 已收尾，进入 M3）
 
-1. 将本分支以单独 M2 closeout merge 合入 `main`，保留当前实现标签和全部 M2.13--M2.15
-   reproduction records；不得改名为 exact。
+1. 审核并合并 M2.16 的文档 PR；合并后保留当前实现标签和全部 M2.13--M2.16
+   reproduction/decision records，且不得改名为 exact。M2.16 合并前，`main` 仍以
+   `6c72ec8` 为准，分支提交为 `5fbc24f`。
 2. M3 复用 M1/M2 的 score semantics、oracle、CmpAgg、transport、metrics 和
    original-order mask 契约，不复制第二套 rank 或输出语义。
 3. M3 先实现 `agarwal_protocol_iii_modular_3round` 的 GRank 1 轮 + 标准 DPF
