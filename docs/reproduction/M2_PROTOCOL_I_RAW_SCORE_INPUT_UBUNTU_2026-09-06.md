@@ -27,7 +27,8 @@ uCMP and `4n` raw DCF evaluations per party; CmpAgg remains
 
 Fresh EMP-OFF configuration discovered 12 CTests.  Fresh EMP-ON configuration
 discovered 18; after its complete build, full CTest ran 17/18 successfully.
-The sole failure was the pre-existing `moe_topk_m2_chosen_ot_conformance_test`
-with `test read`; the new score-input conformance and raw-input modular E2E
-both passed.  EMP-OFF full build/run is `NOT_MEASURED`.  Timing, PRG, LAN/WAN
-and repetitions remain `NOT_MEASURED`.
+The sole failure was `moe_topk_m2_chosen_ot_conformance_test` with `test read`;
+its source was not changed in this milestone, but recurrence outside this run
+was not established.  The new score-input conformance and raw-input modular
+E2E both passed.  EMP-OFF full build/run is `NOT_MEASURED`.  Timing, PRG,
+LAN/WAN and repetitions remain `NOT_MEASURED`.
