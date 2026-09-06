@@ -1,7 +1,7 @@
 # M2.14 Ubuntu reproduction
 
 Implementation label: `m2_protocol_i_raw_score_input_modular_8round_mask_output`.
-Code revision: `dc2e12e` (full revision recorded below) on
+Code revision: `627cb81d8a5bd6ad3f0e81aa1282ca220ed99d77` on
 `m2-protocol-i-raw-score-input`.
 
 Environment: Ubuntu 24.04 WSL, GNU 13.3, Debug, fixed EMP prefix
@@ -29,9 +29,7 @@ Fresh EMP-OFF configuration/build discovered 12 CTests and passed 12/12.
 Fresh EMP-ON configuration/build discovered 18 CTests and passed 18/18,
 including `moe_topk_m2_chosen_ot_conformance_test`.  The four explicit
 correctness smokes above all exited 0.  The documentation-only follow-up
-commit is `dc2e12e`; the complete branch tip at validation time is recorded by
-the final Git check, and this record must be updated if later commits change
-that tip.  Timing, PRG, LAN/WAN and benchmark repetitions remain
+commits are `dc2e12e` and `627cb81`. Timing, PRG, LAN/WAN and benchmark repetitions remain
 `NOT_MEASURED`.
 
 Validation commands:
