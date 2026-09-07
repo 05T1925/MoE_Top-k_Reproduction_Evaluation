@@ -54,8 +54,9 @@ struct ProtocolIIIGrankOutput {
 //              v
 // priority-rank additive shares
 //
-// The current skeleton validates runtime/package bindings and then fails with
-// NOT_IMPLEMENTED. It does not reconstruct priority keys or ranks.
+// The runtime validates all public/package bindings, performs one masked
+// CmpAgg exchange, and returns additive priority-rank shares. It never
+// reconstructs priority keys or ranks.
 [[nodiscard]] ProtocolIIIGrankOutput protocol_iii_grank_party(
     const ProtocolIIIGrankConfig& config,
     ProtocolIPartyPackage& package,
