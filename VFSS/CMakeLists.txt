@@ -28,7 +28,16 @@ add_subdirectory(ext/bitpack)
 add_subdirectory(ext/FSS)
 # add_subdirectory(ext/sci)
 # add_subdirectory(../SCI ext/sci)
+add_library(moe_topk_gate_routing
+    src/moe_topk/gate_routing.cpp
+)
 
+
+target_include_directories(
+    moe_topk_gate_routing
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 add_library(${PROJECT_NAME} STATIC)
 target_sources(${PROJECT_NAME} 
 PRIVATE
@@ -304,4 +313,27 @@ if(BUILD_TESTING)
         add_test(NAME moe_topk_m2_secret_shared_shuffle_conformance_test COMMAND moe_topk_m2_secret_shared_shuffle_conformance_test)
         add_test(NAME moe_topk_m2_protocol_i_modular_e2e_test COMMAND moe_topk_m2_protocol_i_modular_e2e_test)
     endif()
+
+    # ===== 新增 M3 gate routing 测试 =====
+    add_executable(
+        moe_topk_m3_gate_routing_test
+        tests/moe_topk/gate_routing_test.cpp
+    )
+
+    target_include_directories(
+        moe_topk_m3_gate_routing_test
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+
+    target_link_libraries(
+        moe_topk_m3_gate_routing_test
+        PRIVATE
+        moe_topk_gate_routing
+    )
+
+    add_test(
+        NAME moe_topk_m3_gate_routing_test
+        COMMAND moe_topk_m3_gate_routing_test
+    )
 endif()
