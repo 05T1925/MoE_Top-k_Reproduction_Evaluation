@@ -16,7 +16,9 @@
   `docs/M1_1_UBUNTU_HANDOFF.md`；M1/M1.1 的语义、oracle、metrics 和冻结基线
   已完成并保持不变；
 - `VFSS/` 已产生 M1 的预期改动，`VFSS-baseline/` 仍保持冻结标签内容；
-- M2.0--M2.15 已完成当前 C 级模块化 Protocol I 工程基线，并已合入 `main`；
+- M2.0--M2.16 documentation/validation closeout 已完成当前 C 级模块化 Protocol I
+  工程基线，并已合入 `main`；M2.16 仅是 feasibility/leakage audit，不是 exact
+  Protocol I 实现；
   当前实现标签为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，
   core 为 4 轮、总路径为 8 轮；
 - M2 未达成 Agarwal paper-exact 3-round core 或 7-round total candidate，这些

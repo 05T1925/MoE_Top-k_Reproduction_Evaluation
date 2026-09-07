@@ -1,6 +1,6 @@
 # M2 分支阶段映射
 
-更新时间：2026-09-06。本文记录 M2 历史分支的阶段归属和新名称，便于从
+更新时间：2026-09-07。本文记录 M2 历史分支的阶段归属和新名称，便于从
 `main` 追溯阶段证据。分支重命名只改变 Git ref，不改变提交内容或论文结论。
 
 | 原名称 | 新名称 | 阶段归属 |
@@ -30,7 +30,9 @@ M2.16 从 `main` 的 `6c72ec8a18a44c1d3d441758017b9807fe1dc090` 建立为
 leakage audit；由于同置换 public `pi(x)+r`、相关 `r`/GRank material 与 3-round
 message transcript 仍缺乏可审计实现，未修改 VFSS 生产代码，当前 8-round C 级标签保持。
 
-当前 Git 集成状态：M2.16 审计已通过 `f800f96` 进入 `main`。其后两个独立修复分支
+当前 Git 集成状态：M2.0–M2.16 documentation/validation closeout 已通过
+`f800f96` 及后续验证修复进入 `main`。M2.16 仍仅是 feasibility/leakage audit，
+不是 exact implementation。其后两个独立修复分支
 `fix/m2-chosen-ot-pollhup` 和 `fix/m2-modular-e2e-fd-lifecycle` 分别修复 chosen-OT
 的 readable-HUP 行为和 modular E2E 的每-case FD 生命周期；它们不改变协议标签或
 paper-exact 结论。Ubuntu 24.04.4 的 soft `RLIMIT_NOFILE=1024` 组合验证为 EMP-ON

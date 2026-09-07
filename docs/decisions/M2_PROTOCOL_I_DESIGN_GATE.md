@@ -43,9 +43,11 @@ blocked design and leakage records are
 [`M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md`](M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
 and [`M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`](M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md).
 
-## M2 closeout and M3 handoff (2026-09-06)
+## M2.0–M2.16 documentation/validation closeout and M3 handoff (2026-09-07)
 
-M2.0--M2.15 is now closed as a C-level Protocol I engineering baseline. The
+M2.0--M2.16 documentation and validation closeout is now complete for the C-level
+Protocol I engineering baseline. M2.16 is a feasibility/leakage audit only, not
+an exact Protocol I implementation. The
 current branch has passed the documented EMP-OFF/EMP-ON suites and independent
 raw-score E2E matrix. The historical `m2_protocol_i_design_blocked` wording
 describes the earlier exact-design gate and remains history; it must not be
@@ -85,7 +87,8 @@ Top-K bit-mask share；test 重构与 secure 接口隔离。P2 是输入无关�
 shuffle 或 `MockShuffle`。
 
 上述“代码必须等待四个阻塞决策批准”是 M2 入口阶段的历史门，保留用于解释当时的
-实现授权边界。M2.0--M2.15 收尾状态见上方 dated closeout；当前 C 级工程基线已经
+实现授权边界。M2.0--M2.16 documentation/validation closeout 状态见上方 dated
+closeout；当前 C 级工程基线已经
 完成，但不因此解除 paper-exact 标签门。
 
 ## 2. 精确 Protocol I 阶段表

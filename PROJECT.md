@@ -428,7 +428,8 @@ CryptoMoE 保留为 M7 之后的工作负载接入：先冻结 eligibility、dum
 
 ## 10. 当前里程碑状态与后续需要团队明确的输入
 
-M1/M1.1 已完成并冻结。M2.0--M2.15 已完成当前 C 级模块化 Protocol I 基线，
+M1/M1.1 已完成并冻结。M2.0--M2.16 documentation/validation closeout 已完成当前
+C 级模块化 Protocol I 基线，
 实现标签为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，core 为
 4 轮、总路径为 8 轮，且已合入 `main`。M2→M3 交接条件满足，当前实现主线为
 `agarwal_protocol_iii_modular_3round`。Agarwal paper-exact 3-round core、7-round

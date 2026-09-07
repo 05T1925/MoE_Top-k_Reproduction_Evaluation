@@ -83,11 +83,12 @@ secure 路径不得使用文件轮询、
 
 ## 4. M2 → M3 交接契约
 
-### M2 closeout status (2026-09-06)
+### M2.0–M2.16 documentation/validation closeout status (2026-09-07)
 
-M2 Protocol I is closed at the C-level modular baseline
+M2 Protocol I documentation and validation are closed at the C-level modular baseline
 `m2_protocol_i_raw_score_input_modular_8round_mask_output`. The branch has
-completed M2.0--M2.15 implementation, validation, and documentation. Its
+completed M2.0--M2.16 implementation, validation, and documentation closeout. M2.16
+is a feasibility/leakage audit only and did not implement an exact primitive. Its
 current measured path is 8 rounds: raw adapter 2, Protocol-I-shaped core 4,
 and reverse mask adapter 2. The paper 3-round core candidate was not achieved
 because the current VFSS PS interface cannot emit a same-permutation public

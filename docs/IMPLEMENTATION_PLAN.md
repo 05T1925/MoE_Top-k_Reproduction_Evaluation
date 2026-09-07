@@ -6,9 +6,10 @@
 
 ## 1. 当前结论
 
-### M2 closeout status (2026-09-06)
+### M2.0–M2.16 documentation/validation closeout status (2026-09-07)
 
-M2 Protocol I is closed as the project's C-level modular baseline at M2.15.
+M2 Protocol I is closed as the project's C-level modular baseline after the
+M2.16 documentation and validation closeout.
 The validated implementation label is
 `m2_protocol_i_raw_score_input_modular_8round_mask_output`; EMP-OFF and EMP-ON
 full suites, raw-score independent-process E2E, and the explicit `(128,2/8)` and
@@ -52,7 +53,8 @@ paper-exact blocker, performance status, or `NOT_MEASURED` fields. See
 
 - M0：已在远端闭环；
 - M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
-- 当前开发主线：M1/M1.1 已完成并冻结；M2.0--M2.15 已形成并完成验收的 C 级 Protocol I
+- 当前开发主线：M1/M1.1 已完成并冻结；M2.0--M2.16 documentation/validation
+  closeout 已形成并完成验收的 C 级 Protocol I
   工程基线；M2 的历史设计门、真实 shuffle、inverse routing 和统一 mask 证据均按
   各阶段记录保留，但不再作为当前 M2 未完成状态；
   M2.8 的项目扩展 `m2_emp_iknp_chosen_ot_conformance` 已在 Ubuntu-24.04 上完成固定
@@ -231,8 +233,9 @@ M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score
 
 ## 3.2 M2：Agarwal Protocol I 精确核心与统一输出（历史目标；当前 C 级基线已收尾）
 
-本节的 `精确` 是 M2 入口时的目标身份，不是当前实现声明。M2.0--M2.15
-已完成当前 C 级模块化工程路径并满足 M2→M3 交接条件；论文精确 3 轮与正式
+本节的 `精确` 是 M2 入口时的目标身份，不是当前实现声明。M2.0--M2.16
+documentation/validation closeout 已完成当前 C 级模块化工程路径并满足 M2→M3
+交接条件；论文精确 3 轮与正式
 `agarwal_protocol_i_exact_mask_output` 仍未完成。
 
 ### 输入
