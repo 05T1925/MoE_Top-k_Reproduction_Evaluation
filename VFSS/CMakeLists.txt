@@ -274,34 +274,103 @@ if(MOE_TOPK_ENABLE_EMP_OT)
     target_link_libraries(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE moe_topk_share_translation_backend sytorch)
 endif()
 
-# Protocol III pre-integration primitive conformance. This validates the
-# existing VFSS DPF implementation and transport without starting M3 routing.
+# Protocol III pre-integration primitive conformance.
+# This validates the existing VFSS DPF implementation and transport
+# without starting M3 routing.
 add_executable(
     moe_topk_dpf_conformance_test
     tests/moe_topk/dpf_conformance_test.cpp
 )
-target_link_libraries(moe_topk_dpf_conformance_test FSS)
+target_link_libraries(
+    moe_topk_dpf_conformance_test
+    PRIVATE FSS
+)
 
 if(BUILD_TESTING)
-    add_test(NAME moe_topk_m1_metrics_test COMMAND moe_topk_m1_metrics_test)
-    add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
-    add_test(NAME moe_topk_m1_oracle_test COMMAND moe_topk_m1_oracle_test)
-    add_test(NAME moe_topk_m1_cmpagg_test COMMAND moe_topk_m1_cmpagg_test)
-    add_test(NAME moe_topk_m2_priority_key_test COMMAND moe_topk_m2_priority_key_test)
-    add_test(NAME moe_topk_m2_priority_dcf_conformance_test COMMAND moe_topk_m2_priority_dcf_conformance_test)
-    add_test(NAME moe_topk_m2_reverse_shuffle_model_test COMMAND moe_topk_m2_reverse_shuffle_model_test)
-    add_test(NAME moe_topk_m2_ucmp_conformance_test COMMAND moe_topk_m2_ucmp_conformance_test)
-    add_test(NAME moe_topk_m2_cmpagg_conformance_test COMMAND moe_topk_m2_cmpagg_conformance_test)
-    add_test(NAME moe_topk_m2_transport_conformance_test COMMAND moe_topk_m2_transport_conformance_test)
-    add_test(NAME moe_topk_m2_cmpagg_process_e2e_test COMMAND moe_topk_m2_cmpagg_process_e2e_test)
-    add_test(NAME moe_topk_m2_score_input_conformance_test COMMAND moe_topk_m2_score_input_conformance_test)
-    add_test(NAME moe_topk_m2_paper_core_alignment_test COMMAND moe_topk_m2_paper_core_alignment_test)
+    add_test(
+        NAME moe_topk_m1_metrics_test
+        COMMAND moe_topk_m1_metrics_test
+    )
+    add_test(
+        NAME moe_topk_m1_dcf_conformance_test
+        COMMAND moe_topk_m1_dcf_conformance_test
+    )
+    add_test(
+        NAME moe_topk_m1_oracle_test
+        COMMAND moe_topk_m1_oracle_test
+    )
+    add_test(
+        NAME moe_topk_m1_cmpagg_test
+        COMMAND moe_topk_m1_cmpagg_test
+    )
+
+    add_test(
+        NAME moe_topk_m2_priority_key_test
+        COMMAND moe_topk_m2_priority_key_test
+    )
+    add_test(
+        NAME moe_topk_m2_priority_dcf_conformance_test
+        COMMAND moe_topk_m2_priority_dcf_conformance_test
+    )
+    add_test(
+        NAME moe_topk_m2_reverse_shuffle_model_test
+        COMMAND moe_topk_m2_reverse_shuffle_model_test
+    )
+    add_test(
+        NAME moe_topk_m2_ucmp_conformance_test
+        COMMAND moe_topk_m2_ucmp_conformance_test
+    )
+    add_test(
+        NAME moe_topk_m2_cmpagg_conformance_test
+        COMMAND moe_topk_m2_cmpagg_conformance_test
+    )
+    add_test(
+        NAME moe_topk_m2_transport_conformance_test
+        COMMAND moe_topk_m2_transport_conformance_test
+    )
+    add_test(
+        NAME moe_topk_m2_cmpagg_process_e2e_test
+        COMMAND moe_topk_m2_cmpagg_process_e2e_test
+    )
+    add_test(
+        NAME moe_topk_m2_score_input_conformance_test
+        COMMAND moe_topk_m2_score_input_conformance_test
+    )
+    add_test(
+        NAME moe_topk_m2_paper_core_alignment_test
+        COMMAND moe_topk_m2_paper_core_alignment_test
+    )
+
+    # M3.1 DPF primitive conformance.
+    add_test(
+        NAME moe_topk_dpf_conformance_test
+        COMMAND moe_topk_dpf_conformance_test
+    )
+
     if(MOE_TOPK_ENABLE_EMP_OT)
-        add_test(NAME moe_topk_m2_chosen_ot_conformance_test COMMAND moe_topk_m2_chosen_ot_conformance_test)
-        add_test(NAME moe_topk_m2_opv_conformance_test COMMAND moe_topk_m2_opv_conformance_test)
-        add_test(NAME moe_topk_m2_share_translation_conformance_test COMMAND moe_topk_m2_share_translation_conformance_test)
-        add_test(NAME moe_topk_m2_permute_share_conformance_test COMMAND moe_topk_m2_permute_share_conformance_test)
-        add_test(NAME moe_topk_m2_secret_shared_shuffle_conformance_test COMMAND moe_topk_m2_secret_shared_shuffle_conformance_test)
-        add_test(NAME moe_topk_m2_protocol_i_modular_e2e_test COMMAND moe_topk_m2_protocol_i_modular_e2e_test)
+        add_test(
+            NAME moe_topk_m2_chosen_ot_conformance_test
+            COMMAND moe_topk_m2_chosen_ot_conformance_test
+        )
+        add_test(
+            NAME moe_topk_m2_opv_conformance_test
+            COMMAND moe_topk_m2_opv_conformance_test
+        )
+        add_test(
+            NAME moe_topk_m2_share_translation_conformance_test
+            COMMAND moe_topk_m2_share_translation_conformance_test
+        )
+        add_test(
+            NAME moe_topk_m2_permute_share_conformance_test
+            COMMAND moe_topk_m2_permute_share_conformance_test
+        )
+        add_test(
+            NAME moe_topk_m2_secret_shared_shuffle_conformance_test
+            COMMAND moe_topk_m2_secret_shared_shuffle_conformance_test
+        )
+        add_test(
+            NAME moe_topk_m2_protocol_i_modular_e2e_test
+            COMMAND moe_topk_m2_protocol_i_modular_e2e_test
+        )
     endif()
 endif()
