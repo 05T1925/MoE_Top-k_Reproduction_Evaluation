@@ -41,7 +41,8 @@ PRIVATE
     src/moe_topk/protocol_i_transport.cpp
     src/moe_topk/protocol_i_party_package.cpp
     src/moe_topk/protocol_i_score_input.cpp
-    src/moe_topk/protocol_iii_grank.cpp          # <--- 新增源文件
+    src/moe_topk/protocol_iii_grank.cpp
+    src/moe_topk/protocol_iii_dpf_routing.cpp          # <--- 新增源文件
     # src/softmax.cpp
 )
 
@@ -301,9 +302,28 @@ target_link_libraries(
     ${PROJECT_NAME}
 )
 
+# ===== 新增 M3 dpf_routing 测试可执行文件 =====
+add_executable(
+    moe_topk_m3_dpf_routing_test
+    tests/moe_topk/protocol_iii_dpf_routing_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_dpf_routing_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(
+    moe_topk_m3_dpf_routing_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
-    # ===== 新增 M3 grank 测试命令（放在开头附近） =====
+    # ===== 新增 M3 grank 和 dpf_routing 测试命令 =====
     add_test(NAME moe_topk_m3_grank_test COMMAND moe_topk_m3_grank_test)
+    add_test(NAME moe_topk_m3_dpf_routing_test COMMAND moe_topk_m3_dpf_routing_test)
 
     add_test(NAME moe_topk_m1_metrics_test COMMAND moe_topk_m1_metrics_test)
     add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
