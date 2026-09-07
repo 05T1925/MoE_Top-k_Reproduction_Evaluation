@@ -52,7 +52,7 @@
 - [本地参考资料边界](docs/REFERENCE_MANIFEST.md)
 - [项目实现约束](AGENTS.md)
 - [协议复现工作流](.agents/skills/protocol-reproduction/SKILL.md)
-
+- [M3 及后续双人分工计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
 ## 目录说明
 
 ```text
