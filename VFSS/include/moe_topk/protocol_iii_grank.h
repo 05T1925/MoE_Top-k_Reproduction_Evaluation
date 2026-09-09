@@ -12,6 +12,9 @@ struct ProtocolIIIGrankConfig {
   std::uint64_t session = 0;
   std::uint64_t fingerprint = 0;
 
+  // GRank node masks, comparison edges and online vectors are sized by
+  // logical_n. padded_n remains the public priority-key input layout and
+  // determines the priority-key comparison width.
   std::uint32_t logical_n = 0;
   std::uint32_t padded_n = 0;
   std::uint32_t k = 0;
@@ -54,9 +57,13 @@ struct ProtocolIIIGrankOutput {
 //              v
 // priority-rank additive shares
 //
+// priority_key_shares retains the padded_n layout produced by the secure
+// raw-score adapter. GRank consumes only its first logical_n positions; padded
+// positions do not receive node masks or comparison-edge material.
+//
 // The runtime validates all public/package bindings, performs one masked
-// CmpAgg exchange, and returns additive priority-rank shares. It never
-// reconstructs priority keys or ranks.
+// CmpAgg exchange over the logical graph, and returns additive priority-rank
+// shares. It never reconstructs priority keys or ranks.
 [[nodiscard]] ProtocolIIIGrankOutput protocol_iii_grank_party(
     const ProtocolIIIGrankConfig& config,
     ProtocolIPartyPackage& package,

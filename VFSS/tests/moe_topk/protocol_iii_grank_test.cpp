@@ -228,21 +228,21 @@ make_grank_packages(
     package->fingerprint = config.fingerprint;
     package->comparison_bits =
         config.comparison_bits;
-    package->n = config.padded_n;
+    package->n = config.logical_n;
     package->k = config.k;
   }
 
   party0.party = 0;
   party1.party = 1;
 
-  party0.node_mask_shares.resize(config.padded_n);
-  party1.node_mask_shares.resize(config.padded_n);
+  party0.node_mask_shares.resize(config.logical_n);
+  party1.node_mask_shares.resize(config.logical_n);
 
   std::vector<std::uint64_t> full_masks(
-      config.padded_n);
+      config.logical_n);
 
   for (std::uint32_t index = 0;
-       index < config.padded_n;
+       index < config.logical_n;
        ++index) {
     full_masks[index] = generator() & mask;
 
@@ -256,10 +256,10 @@ make_grank_packages(
   }
 
   for (std::uint32_t left = 0;
-       left < config.padded_n;
+       left < config.logical_n;
        ++left) {
     for (std::uint32_t right = left + 1U;
-         right < config.padded_n;
+         right < config.logical_n;
          ++right) {
       ProtocolIUcmpMaterial material(
           config.comparison_bits,
@@ -295,7 +295,7 @@ void verify_metrics(
     const ProtocolIIIGrankOutput& output0,
     const ProtocolIIIGrankOutput& output1) {
   const auto expected_edges =
-      edge_count(config.padded_n);
+      edge_count(config.logical_n);
 
   for (const auto* output : {&output0, &output1}) {
     require(

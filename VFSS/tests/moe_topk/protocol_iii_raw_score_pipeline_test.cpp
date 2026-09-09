@@ -239,7 +239,7 @@ make_materials(
     grank_package.session = config.grank.session;
     grank_package.fingerprint =
         config.grank.fingerprint;
-    grank_package.n = config.grank.padded_n;
+    grank_package.n = config.grank.logical_n;
     grank_package.k = config.grank.k;
     grank_package.comparison_bits =
         config.grank.comparison_bits;
@@ -335,16 +335,16 @@ make_materials(
 
   // GRank node masks and complete comparison graph.
   party0.grank_package.node_mask_shares.resize(
-      config.grank.padded_n);
+      config.grank.logical_n);
 
   party1.grank_package.node_mask_shares.resize(
-      config.grank.padded_n);
+      config.grank.logical_n);
 
   std::vector<std::uint64_t> full_node_masks(
-      config.grank.padded_n);
+      config.grank.logical_n);
 
   for (std::uint32_t index = 0;
-       index < config.grank.padded_n;
+       index < config.grank.logical_n;
        ++index) {
     full_node_masks[index] =
         generator() & comparison_ring;
@@ -359,10 +359,10 @@ make_materials(
   }
 
   for (std::uint32_t left = 0;
-       left < config.grank.padded_n;
+       left < config.grank.logical_n;
        ++left) {
     for (std::uint32_t right = left + 1U;
-         right < config.grank.padded_n;
+         right < config.grank.logical_n;
          ++right) {
       ProtocolIUcmpMaterial generated(
           config.grank.comparison_bits,
@@ -592,6 +592,12 @@ void run_case(const TestCase& test) {
       selected == test.k,
       "raw-score pipeline selected-count mismatch");
 
+  const auto expected_grank_edges =
+      static_cast<std::uint64_t>(config0.grank.logical_n) *
+      static_cast<std::uint64_t>(
+          config0.grank.logical_n - 1U) /
+      2U;
+
   for (const auto* output : {&output0, &output1}) {
     require(
         output->metrics.input_adapter_rounds == 2U,
@@ -614,6 +620,21 @@ void run_case(const TestCase& test) {
         output->metrics.score_input.raw_dcf_calls ==
             4U * config0.score_input.padded_n,
         "raw-score DCF calls");
+
+    require(
+        output->metrics.grank.comparison_edges ==
+            expected_grank_edges,
+        "raw-score GRank logical edge count");
+
+    require(
+        output->metrics.grank.ucmp_calls ==
+            expected_grank_edges,
+        "raw-score GRank logical uCMP calls");
+
+    require(
+        output->metrics.grank.raw_dcf_calls ==
+            expected_grank_edges * 2U,
+        "raw-score GRank logical DCF calls");
 
     require(
         output->metrics.sent_bytes > 0U &&
