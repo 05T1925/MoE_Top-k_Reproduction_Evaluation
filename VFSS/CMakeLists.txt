@@ -221,6 +221,23 @@ add_executable(
 )
 target_link_libraries(moe_topk_m1_cmpagg_test ${PROJECT_NAME})
 
+add_executable(
+    moe_topk_m3_protocol_iii_three_process_e2e_test
+    tests/moe_topk/protocol_iii_three_process_e2e_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_protocol_iii_three_process_e2e_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_m3_protocol_iii_three_process_e2e_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
 # M2.4 C/B conformance only: no Protocol I runtime or secure shuffle.
 add_executable(moe_topk_m2_priority_key_test tests/moe_topk/protocol_i_priority_key_test.cpp)
 target_link_libraries(moe_topk_m2_priority_key_test ${PROJECT_NAME})
@@ -359,6 +376,10 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m3_dpf_routing_test COMMAND moe_topk_m3_dpf_routing_test)
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
+    add_test(
+        NAME moe_topk_m3_protocol_iii_three_process_e2e_test
+        COMMAND moe_topk_m3_protocol_iii_three_process_e2e_test
+    )
 
     # 已有测试
     add_test(NAME moe_topk_m1_metrics_test COMMAND moe_topk_m1_metrics_test)
