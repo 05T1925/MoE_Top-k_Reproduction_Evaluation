@@ -41,13 +41,20 @@ PRIVATE
     src/moe_topk/protocol_i_transport.cpp
     src/moe_topk/protocol_i_party_package.cpp
     src/moe_topk/protocol_i_score_input.cpp
+    src/moe_topk/protocol_iii_grank.cpp
+    src/moe_topk/protocol_iii_dpf_routing.cpp
+    src/moe_topk/masked_mul_adapter.cpp
+    src/moe_topk/protocol_iii_secure_combine.cpp
     # src/softmax.cpp
 )
 
+# 修改：添加 ext/FSS 和 ext/FSS/include 到公共包含路径
 target_include_directories(${PROJECT_NAME}
 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS>
 )
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
@@ -214,6 +221,23 @@ add_executable(
 )
 target_link_libraries(moe_topk_m1_cmpagg_test ${PROJECT_NAME})
 
+add_executable(
+    moe_topk_m3_protocol_iii_three_process_e2e_test
+    tests/moe_topk/protocol_iii_three_process_e2e_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_protocol_iii_three_process_e2e_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_m3_protocol_iii_three_process_e2e_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
 # M2.4 C/B conformance only: no Protocol I runtime or secure shuffle.
 add_executable(moe_topk_m2_priority_key_test tests/moe_topk/protocol_i_priority_key_test.cpp)
 target_link_libraries(moe_topk_m2_priority_key_test ${PROJECT_NAME})
@@ -282,7 +306,82 @@ add_executable(
 )
 target_link_libraries(moe_topk_dpf_conformance_test FSS)
 
+# ===== M3 grank 测试 =====
+add_executable(
+    moe_topk_m3_grank_test
+    tests/moe_topk/protocol_iii_grank_test.cpp
+)
+target_include_directories(
+    moe_topk_m3_grank_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(
+    moe_topk_m3_grank_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# ===== M3 dpf_routing 测试 =====
+add_executable(
+    moe_topk_m3_dpf_routing_test
+    tests/moe_topk/protocol_iii_dpf_routing_test.cpp
+)
+target_include_directories(
+    moe_topk_m3_dpf_routing_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(
+    moe_topk_m3_dpf_routing_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# ===== masked_mul_adapter 测试 =====
+add_executable(
+    moe_topk_masked_mul_adapter_test
+    tests/moe_topk/masked_mul_adapter_test.cpp
+)
+target_include_directories(
+    moe_topk_masked_mul_adapter_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(
+    moe_topk_masked_mul_adapter_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# ===== secure_combine 测试 =====
+add_executable(
+    moe_topk_m3_secure_combine_test
+    tests/moe_topk/protocol_iii_secure_combine_test.cpp
+)
+target_include_directories(
+    moe_topk_m3_secure_combine_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(
+    moe_topk_m3_secure_combine_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
+    # M3 测试
+    add_test(NAME moe_topk_m3_grank_test COMMAND moe_topk_m3_grank_test)
+    add_test(NAME moe_topk_m3_dpf_routing_test COMMAND moe_topk_m3_dpf_routing_test)
+    add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
+    add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
+    add_test(
+        NAME moe_topk_m3_protocol_iii_three_process_e2e_test
+        COMMAND moe_topk_m3_protocol_iii_three_process_e2e_test
+    )
+
+    # 已有测试
     add_test(NAME moe_topk_m1_metrics_test COMMAND moe_topk_m1_metrics_test)
     add_test(NAME moe_topk_m1_dcf_conformance_test COMMAND moe_topk_m1_dcf_conformance_test)
     add_test(NAME moe_topk_m1_oracle_test COMMAND moe_topk_m1_oracle_test)
