@@ -679,7 +679,7 @@ generate_offline_bundles(const TestCase& test) {
         test.fingerprint;
     bundle->grank_package.comparison_bits =
         grank.comparison_bits;
-    bundle->grank_package.n = grank.padded_n;
+    bundle->grank_package.n = grank.logical_n;
     bundle->grank_package.k = test.k;
 
     bundle->routing_material.session = test.session;
@@ -710,16 +710,16 @@ generate_offline_bundles(const TestCase& test) {
   party1.combine_material.party = 1;
 
   party0.grank_package.node_mask_shares.resize(
-      grank.padded_n);
+      grank.logical_n);
 
   party1.grank_package.node_mask_shares.resize(
-      grank.padded_n);
+      grank.logical_n);
 
   std::vector<std::uint64_t> full_node_masks(
-      grank.padded_n);
+      grank.logical_n);
 
   for (std::uint32_t index = 0;
-       index < grank.padded_n;
+       index < grank.logical_n;
        ++index) {
     full_node_masks[index] =
         generator() & comparison_ring;
@@ -734,10 +734,10 @@ generate_offline_bundles(const TestCase& test) {
   }
 
   for (std::uint32_t left = 0;
-       left < grank.padded_n;
+       left < grank.logical_n;
        ++left) {
     for (std::uint32_t right = left + 1U;
-         right < grank.padded_n;
+         right < grank.logical_n;
          ++right) {
       ProtocolIUcmpMaterial material(
           grank.comparison_bits,
@@ -1557,8 +1557,6 @@ void verify_reports(
   const auto logical_n =
       static_cast<std::uint32_t>(test.scores.size());
 
-  const auto padded_n = padded_size(logical_n);
-
   const auto expected_mask =
       top_k_mask(test.scores, test.k);
 
@@ -1594,8 +1592,8 @@ void verify_reports(
       "Protocol III E2E did not select exactly K");
 
   const auto expected_edges =
-      static_cast<std::uint64_t>(padded_n) *
-      static_cast<std::uint64_t>(padded_n - 1U) /
+      static_cast<std::uint64_t>(logical_n) *
+      static_cast<std::uint64_t>(logical_n - 1U) /
       2U;
 
   const auto expected_cells =

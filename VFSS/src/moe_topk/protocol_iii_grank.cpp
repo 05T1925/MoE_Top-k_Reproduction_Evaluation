@@ -114,9 +114,9 @@ std::vector<std::uint64_t> decode_words(
   return words;
 }
 
-std::uint64_t expected_edge_count(std::uint32_t padded_n) {
-  return static_cast<std::uint64_t>(padded_n) *
-         static_cast<std::uint64_t>(padded_n - 1U) / 2U;
+std::uint64_t expected_edge_count(std::uint32_t logical_n) {
+  return static_cast<std::uint64_t>(logical_n) *
+         static_cast<std::uint64_t>(logical_n - 1U) / 2U;
 }
 
 void validate_config(const ProtocolIIIGrankConfig& config) {
@@ -181,28 +181,28 @@ void validate_package(
       "Protocol III GRank package party binding");
 
   require(
-      package.n == config.padded_n &&
+      package.n == config.logical_n &&
           package.k == config.k &&
           package.comparison_bits ==
               static_cast<int>(config.comparison_bits),
       "Protocol III GRank package parameter binding");
 
   require(
-      package.node_mask_shares.size() == config.padded_n,
+      package.node_mask_shares.size() == config.logical_n,
       "Protocol III GRank node-mask count");
 
   require(
       package.edge_materials.size() ==
-          expected_edge_count(config.padded_n),
+          expected_edge_count(config.logical_n),
       "Protocol III GRank edge-material count");
 
   std::size_t edge_index = 0;
 
   for (std::uint32_t left = 0;
-       left < config.padded_n;
+       left < config.logical_n;
        ++left) {
     for (std::uint32_t right = left + 1U;
-         right < config.padded_n;
+         right < config.logical_n;
          ++right) {
       const auto& edge = package.edge_materials[edge_index++];
 
@@ -263,7 +263,7 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
       low_bit_mask(config.rank_bits);
 
   // Locally add the one-shot node-mask share to each priority-key share.
-  std::vector<std::uint64_t> local_masked_keys(config.padded_n);
+  std::vector<std::uint64_t> local_masked_keys(config.logical_n);
 
   for (std::size_t index = 0;
        index < local_masked_keys.size();
@@ -278,7 +278,7 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
   ProtocolIFrameConfig frame_config{
       config.session,
       config.fingerprint,
-      config.padded_n,
+      config.logical_n,
       config.k,
       config.comparison_bits,
       config.party,
@@ -306,10 +306,10 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
   }
 
   const auto peer_masked_keys =
-      decode_words(peer_payload, config.padded_n);
+      decode_words(peer_payload, config.logical_n);
 
   std::vector<std::uint64_t> opened_masked_keys(
-      config.padded_n);
+      config.logical_n);
 
   for (std::size_t index = 0;
        index < opened_masked_keys.size();
@@ -333,7 +333,7 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
   package.node_mask_shares.clear();
   package.edge_materials.clear();
 
-  const auto padded_rank_shares =
+  const auto logical_rank_shares =
       protocol_i_cmpagg_eval_party(
           config.party,
           config.comparison_bits,
@@ -341,29 +341,27 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
           edge_materials);
 
   require(
-      padded_rank_shares.size() == config.padded_n,
+      logical_rank_shares.size() == config.logical_n,
       "Protocol III GRank CmpAgg output size");
 
   ProtocolIIIGrankOutput output;
   output.rank_additive_shares.resize(config.logical_n);
 
-  // Padding priority keys are required to rank below every logical key.
-  // Therefore the logical positions retain ranks in 0..logical_n-1. Reducing
-// Reducing each local additive share into Z_(2^rank_bits) preserves
-// additive-share correctness without opening any rank value.
-  // without opening any rank.
+  // CmpAgg now evaluates only the logical comparison graph. Reducing each
+  // local additive share into Z_(2^rank_bits) preserves additive-share
+  // correctness without opening any rank value.
   for (std::size_t index = 0;
        index < output.rank_additive_shares.size();
        ++index) {
     output.rank_additive_shares[index] =
-        padded_rank_shares[index] & rank_ring_mask;
+        logical_rank_shares[index] & rank_ring_mask;
   }
 
   output.metrics.sent_bytes = channel.sent_bytes();
   output.metrics.received_bytes = channel.received_bytes();
 
   output.metrics.comparison_edges =
-      expected_edge_count(config.padded_n);
+      expected_edge_count(config.logical_n);
 
   output.metrics.ucmp_calls =
       output.metrics.comparison_edges;
