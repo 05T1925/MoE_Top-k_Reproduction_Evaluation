@@ -37,7 +37,9 @@
 #include <vector>
 
 #include <sys/socket.h>
+#if defined(__linux__)
 #include <sys/sysinfo.h>
+#endif
 #include <sys/utsname.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -175,6 +177,7 @@ std::string detect_operating_system() {
 
 Measurement<std::uint64_t>
 detect_system_memory_bytes() {
+#if defined(__linux__)
   struct sysinfo information {};
 
   if (::sysinfo(&information) != 0) {
@@ -198,6 +201,9 @@ detect_system_memory_bytes() {
 
   return Measurement<std::uint64_t>::measured(
       static_cast<std::uint64_t>(total * unit));
+#else
+  return Measurement<std::uint64_t>::not_measured();
+#endif
 }
 
 std::string compiler_description() {
@@ -234,7 +240,7 @@ make_metrics_environment() {
       MOE_TOPK_GIT_REVISION;
 
   environment.runtime =
-      "native Linux fork+exec";
+      "native POSIX fork+exec";
 
   environment.party_topology =
       "one offline Dealer and two online Parties";
@@ -279,7 +285,7 @@ make_metrics_environment() {
 
   environment.network_environment =
       Measurement<std::string>::measured(
-          "local AF_UNIX socketpair on one Ubuntu VM");
+          "local AF_UNIX socketpair");
 
   environment.network_bandwidth_mbps =
       Measurement<double>::not_measured();
