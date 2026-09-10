@@ -452,6 +452,54 @@ target_compile_definitions(
     MOE_TOPK_PROTOCOL_III_EXECUTABLE="$<TARGET_FILE:agarwal_protocol_iii_modular_3round>"
 )
 
+# ===== Formal raw-score Protocol III modular five-round executable =====
+add_executable(
+    moe_topk_protocol_iii_raw_score_modular_5round
+    src/apps/moe_topk_protocol_iii_raw_score_modular_5round.cpp
+)
+
+target_include_directories(
+    moe_topk_protocol_iii_raw_score_modular_5round
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_protocol_iii_raw_score_modular_5round
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+add_executable(
+    moe_topk_m3_raw_score_secure_executable_test
+    tests/moe_topk/protocol_iii_raw_score_secure_executable_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_raw_score_secure_executable_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_m3_raw_score_secure_executable_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+add_dependencies(
+    moe_topk_m3_raw_score_secure_executable_test
+    moe_topk_protocol_iii_raw_score_modular_5round
+)
+
+target_compile_definitions(
+    moe_topk_m3_raw_score_secure_executable_test
+    PRIVATE
+    MOE_TOPK_PROTOCOL_III_RAW_SCORE_EXECUTABLE="$<TARGET_FILE:moe_topk_protocol_iii_raw_score_modular_5round>"
+)
+
 if(BUILD_TESTING)
     # Protocol III primitive and runtime tests.
     add_test(
@@ -476,10 +524,16 @@ if(BUILD_TESTING)
         COMMAND moe_topk_m3_raw_score_three_process_e2e_test
     )
 
-    # ===== 新增：formal Protocol III executable validation =====
+    # ===== formal Protocol III executable validation =====
     add_test(
         NAME moe_topk_m3_secure_executable_test
         COMMAND moe_topk_m3_secure_executable_test
+    )
+
+    # ===== formal raw-score Protocol III executable validation =====
+    add_test(
+        NAME moe_topk_m3_raw_score_secure_executable_test
+        COMMAND moe_topk_m3_raw_score_secure_executable_test
     )
 
     # 已有测试
