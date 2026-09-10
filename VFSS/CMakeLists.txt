@@ -388,7 +388,11 @@ target_link_libraries(
 )
 
 if(BUILD_TESTING)
-    # M3 测试
+    # Protocol III primitive and runtime tests.
+    add_test(
+        NAME moe_topk_dpf_conformance_test
+        COMMAND moe_topk_dpf_conformance_test
+    )
     add_test(NAME moe_topk_m3_grank_test COMMAND moe_topk_m3_grank_test)
     add_test(NAME moe_topk_m3_dpf_routing_test COMMAND moe_topk_m3_dpf_routing_test)
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
