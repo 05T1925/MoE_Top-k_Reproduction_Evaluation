@@ -45,6 +45,7 @@ PRIVATE
     src/moe_topk/protocol_iii_dpf_routing.cpp
     src/moe_topk/masked_mul_adapter.cpp
     src/moe_topk/protocol_iii_secure_combine.cpp
+    src/moe_topk/protocol_iii_raw_score_pipeline.cpp          # <--- 新增源文件
     # src/softmax.cpp
 )
 
@@ -370,6 +371,22 @@ target_link_libraries(
     ${PROJECT_NAME}
 )
 
+# ===== 新增 raw_score_pipeline 测试 =====
+add_executable(
+    moe_topk_m3_raw_score_pipeline_test
+    tests/moe_topk/protocol_iii_raw_score_pipeline_test.cpp
+)
+target_include_directories(
+    moe_topk_m3_raw_score_pipeline_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(
+    moe_topk_m3_raw_score_pipeline_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
     # M3 测试
     add_test(NAME moe_topk_m3_grank_test COMMAND moe_topk_m3_grank_test)
@@ -379,6 +396,10 @@ if(BUILD_TESTING)
     add_test(
         NAME moe_topk_m3_protocol_iii_three_process_e2e_test
         COMMAND moe_topk_m3_protocol_iii_three_process_e2e_test
+    )
+    add_test(                                                             # <--- 新增
+        NAME moe_topk_m3_raw_score_pipeline_test
+        COMMAND moe_topk_m3_raw_score_pipeline_test
     )
 
     # 已有测试
