@@ -1,24 +1,8 @@
-新的分工应把 M3 当前进度写实，并让搭档负责 M6 的“M2 复用与自适应预处理门”，但不能把 M2 完整图 CmpAgg 当成已经解决 AAV86 自适应预处理。
-
-建议提交到：
-
-```text
-docs/M3_ONWARD_TEAM_WORK_PLAN.md
-```
-
-不要混入当前有未提交修改的 `m3-grank-runtime`。完成并提交 GRank 后，再从最新 `main` 创建独立文档分支：
-
-```text
-docs/m3-onward-team-work-plan
-```
-
-以下是完整文档内容：
-
-```markdown
 # M3 及后续双人分工计划
 
-状态：执行中  
-更新日期：2026-09-07  
+状态：M3 已关闭，后续里程碑执行中
+
+更新日期：2026-09-10
 主线验收顺序：M3 → M4 → M5 → M6 → M7
 
 ## 1. 当前基线
@@ -64,10 +48,10 @@ M2 已提供以下可复用组件：
 | 成员 | 当前主任务 | 后续主任务 |
 | --- | --- | --- |
 | 角色 A（搭档） | M4 CipherGPT 原生基线 | M6 的 M2 复用审计、自适应预处理设计和安全门 |
-| 角色 B（你） | M3 Protocol III 模块化 3 轮 | M5 Protocol III 精确 2 轮、M6 实验 runtime 与统一输出 |
+| 角色 B（你） | M5 Protocol III 精确 2 轮设计门 | M6 实验 runtime 与统一输出 |
 | 双方共同 | 交叉评审、公共语义复核 | M6 安全模型评审、M7 统一实验和论文报告 |
 
-两人可以并行研究和开发，但正式基线验收顺序保持：
+正式基线验收顺序保持如下，其中 M3 已完成：
 
 ```text
 M3 → M4 → M5 → M6 → M7
@@ -80,7 +64,7 @@ M3 → M4 → M5 → M6 → M7
 - 不用后续协议修改 M1/M2 已冻结语义；
 - 不在一个 PR 中混合两个里程碑。
 
-## 3. 角色 B：M3 Protocol III 模块化 3 轮
+## 3. 角色 B：M3 Protocol III 模块化 3 轮完成记录
 
 ### 3.1 固定目标
 
@@ -100,28 +84,22 @@ R3：share-preserving masked multiplication/combine
 
 M3 是模块化 3 轮工程基线，不是论文 Theorem 4.2 的精确 2 轮实现。
 
-### 3.2 当前进度
+### 3.2 最终进度
 
 | 子阶段 | 内容 | 当前状态 |
 | --- | --- | --- |
 | M3.0 | Ubuntu 环境与构建基线 | 已完成 |
-| M3.1a | `keyGenDPF`、`evalDPF_Payload` conformance | 已完成于独立分支，待按 PR 状态集成 |
-| M3.1b | DPF key 经 Peer 传输后求值不变 | 已完成于独立分支，待按 PR 状态集成 |
-| M3.1c | share-preserving multiplication adapter | 已实现并验证于独立分支，待按 PR 状态集成 |
-| M3.2 | Protocol III GRank runtime | 执行中 |
-| M3.3 | masked-rank DPF routing | 未开始 |
-| M3.4 | secure combine 与原顺序 mask | 未开始 |
-| M3.5 | 三方独立进程完整 E2E | 未开始 |
+| M3.1a | `keyGenDPF`、`evalDPF_Payload` conformance | 已合入 `main` 并通过复检 |
+| M3.1b | DPF key 经 Peer 传输后求值不变 | 已合入 `main` 并通过复检 |
+| M3.1c | share-preserving multiplication adapter | 已合入 `main` 并通过复检 |
+| M3.2 | Protocol III GRank runtime | 已完成并通过复检 |
+| M3.3 | masked-rank DPF routing | 已完成并通过复检 |
+| M3.4 | secure combine 与原顺序 mask | 已完成并通过复检 |
+| M3.5 | 三方独立进程完整 E2E | 已完成并通过复检|
 
-分支上的实现和测试只有合并到 `main` 后，才能记为主线已完成。
+上述 M3 实现和测试均已合入 `main@bb0d0e8`。
 
 ### 3.3 M3.2：一轮 GRank
-
-当前分支：
-
-```text
-m3-grank-runtime
-```
 
 输入：
 
@@ -167,7 +145,7 @@ M3.2 退出条件：
 
 ### 3.4 M3.3：DPF routing 第一轮
 
-M3.2 合并后开始。
+M3.3 已完成并合入 `main`；以下内容保留为冻结契约。
 
 输入：
 
@@ -271,9 +249,32 @@ M3 最终交付物：
 - 泄露与输出边界记录；
 - Ubuntu 可复现记录。
 
+## M3 当前冻结状态（2026-09-10）
+
+M3 模块化三轮工程基线及其 raw-score 五轮扩展已经完成复检整改。
+
+已完成：
+
+- 安全 raw-score 输入适配；
+- Dealer/Party fork+exec 角色隔离；
+- logical-n GRank 图；
+- DPF conformance CTest 注册；
+- raw-score 独立进程 E2E；
+- 三轮正式 Party-role executable；
+- 五轮 raw-score 正式 Party-role executable；
+- TEST_ONLY E2E 控制器汇总两方 report 后生成结构化 MetricsRecord；
+- Ubuntu 全新构建验证。
+
+冻结实现：
+
+```text
+agarwal_protocol_iii_modular_3round
+moe_topk_protocol_iii_raw_score_modular_5round
+```
+
 ## 4. 角色 A：M4 CipherGPT 原生基线
 
-角色 A 可与 M3 并行开发 M4，但保持独立分支。
+M3 已关闭；角色 A 可在独立分支继续推进 M4。
 
 负责内容：
 
@@ -545,9 +546,9 @@ docs/TEAM_WORK_PLAN.md
 - AAV86 与 Direct Top-K 是否使用独立标签；
 - 比较量下降是否包含额外预处理和通信成本。
 
-## 10. 分支建议
+## 10. 分支记录与建议
 
-### 角色 B：M3
+### 角色 B：M3 历史分支（均已合入）
 
 ```text
 m3-grank-runtime
@@ -586,30 +587,23 @@ m6-direct-topk-experimental
 
 ## 11. 合并顺序
 
-1. 合并 M3 DPF conformance；
-2. 合并 M3 share-preserving multiplication adapter；
-3. 合并 M3 GRank runtime；
-4. 合并 M3 DPF routing；
-5. 合并 M3 secure combine；
-6. 合并 M3 三方 E2E、审计和复现记录；
-7. 确认 M3 达到退出条件；
-8. 合并 M4 CipherGPT native baseline；
-9. M3/M4 稳定后实现并合并 M5；
-10. 角色 A 可提前合并不改变 runtime 的 M6 复用与预处理审计；
-11. M5 完成且 M6 设计门通过后合并 M6 runtime；
-12. 双方共同执行 M7。
+M3 的 DPF conformance、乘法适配、GRank、DPF routing、secure combine、独立进程
+E2E、审计和复现记录均已按依赖顺序合入并在 `main@bb0d0e8` 关闭。后续顺序为：
+
+1. 合并 M4 CipherGPT native baseline；
+2. M3/M4 稳定后实现并合并 M5；
+3. 角色 A 可提前合并不改变 runtime 的 M6 复用与预处理审计；
+4. M5 完成且 M6 设计门通过后合并 M6 runtime；
+5. 双方共同执行 M7。
 
 ## 12. 当前立即任务
 
 ### 角色 B
 
-1. 修复并通过 `moe_topk_m3_grank_test`；
-2. 运行 GRank oracle differential；
-3. 运行相关 M1/M2/M3 回归；
-4. 提交并创建 `m3-grank-runtime` PR；
-5. 审阅并集成 DPF conformance 与 multiplication adapter；
-6. 从最新 `main` 开始 M3 DPF routing；
-7. 暂不实现 Protocol III 两轮压缩。
+1. 准备 M5 的域与编码契约；
+2. 明确非零 payload、零值和逆元失败语义；
+3. 审计两轮消息依赖、泄露和统一 mask adapter 成本；
+4. 设计门通过前不实现或宣称 Protocol III 精确两轮复现。
 
 ### 角色 A
 
@@ -635,52 +629,3 @@ m6-direct-topk-experimental
 - 不把构建物、论文、密钥、日志或本地参考仓库提交到 Git；
 - 每项结论都有 commit、测试和复现命令；
 - 主线状态始终可审计。
-```
-
-手动提交流程：
-
-```bash
-# 先完成并提交当前 m3-grank-runtime 的代码，不要带着未提交修改切分支
-git status
-
-git switch main
-git pull --ff-only origin main
-git switch -c docs/m3-onward-team-work-plan
-```
-
-创建：
-
-```text
-docs/M3_ONWARD_TEAM_WORK_PLAN.md
-```
-
-建议在 `README.md` 的文档入口增加：
-
-```markdown
-- [M3 及后续双人分工计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
-```
-
-检查并提交：
-
-```bash
-git diff --check
-git status --short
-git diff --name-only
-
-git add docs/M3_ONWARD_TEAM_WORK_PLAN.md README.md
-git commit -m "docs: update team plan for M3 and later milestones"
-git push -u origin docs/m3-onward-team-work-plan
-```
-
-PR 标题：
-
-```text
-docs: update team plan for M3 and later milestones
-```
-
-PR 目标为 `main`，差异最好只包含：
-
-```text
-README.md
-docs/M3_ONWARD_TEAM_WORK_PLAN.md
-```

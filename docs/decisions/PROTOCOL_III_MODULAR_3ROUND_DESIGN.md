@@ -1,6 +1,6 @@
 # Protocol III 模块化 3 轮设计
 
-状态：**M3 实现规范；代码实现等待 M2 阶段门**。
+状态：**M3 实现规范；实现已在 `main@bb0d0e8` 冻结**。
 
 实现标签固定为 `agarwal_protocol_iii_modular_3round`。本文描述的是 Agarwal
 Protocol III 的模块化 3 轮中间基线，不是论文 Theorem 4.2 的精确 2 轮实现。
@@ -84,7 +84,7 @@ DPF keys 和乘法材料必须通过 VFSS `Peer`/Dealer 通道传输；不得自
 
 | 在线轮次 | 输入 | 通信与公开值 | 本地计算 | 输出 |
 | --- | --- | --- | --- | --- |
-| R1：GRank | score arithmetic shares | 使用 M2 冻结的 CmpAgg/FSS 消息；只打开该原语规定的随机掩码值 | 全对全稳定比较并聚合 | priority-rank additive shares `[y_i]` |
+| R1：GRank | `padded_n` 个 priority-key additive shares；比较图仅使用前 `logical_n` 项 | 使用 M2 冻结的 CmpAgg/FSS 消息；只打开该原语规定的随机掩码值 | 全对全稳定比较并聚合 | priority-rank additive shares `[y_i]` |
 | R2：DPF 路由第一轮 | `[y_i]`、`[r_i]`、DPF keys | 两方交换 `[y_i]+[r_i]` 并公开 `hat_y_i=(y_i+r_i) mod 2^rank_bits` | 对每个 `k in [0,K)` 计算 `I_i,k = DPF_i(hat_y_i-k)` 的 additive shares | 每个原位置和目标 rank 的 indicator shares |
 | R3：DPF 路由第二轮 | `[I_i,k]`、`[u_i=1]`、独立乘法材料 | 打开 `I_i,k+a_i,k` 与 `u_i+b_i,k`，不打开乘积 | 每方调用 `MultEval`，再减去自己的 `[c_i,k]`，得到 `[P_i,k]=[I_i,k*u_i]`；按位置求和并转为 XOR bit share | 原顺序 Top-K mask share |
 
@@ -134,8 +134,8 @@ stable rank 是 `0..n-1` 的排列，所以每个位置最多命中一个目标 
 - 通信：只使用 VFSS socket/`Peer` 通道，不使用文件轮询、共享目录或固定 sleep；
 - 模式隔离：仅测试二进制可重构输出；secure runtime 不编译或调用测试重构路径。
 
-M2 必须在交接时提供 rank share 的环、party 编号、通信计数和错误语义。M3 可以
-增加薄适配器，但不得复制第二套 score、rank、mask 或 metrics 语义。
+M3 复用了 M2 已冻结的 rank share 环、party 编号、通信计数和错误语义，只增加
+必要的薄适配器，没有复制第二套 score、rank、mask 或 metrics 语义。
 
 ## 7. 公开值、泄露与错误
 
@@ -160,10 +160,9 @@ mask 或任意调试 oracle。随机性复用、key/triple 数量不足、party 
 4. 乘法 adapter 覆盖 0、1、最大 ring word 和随机值，输出只以 shares 存在；
 5. 验证加法 bit share 的最低位转换为 XOR bit share。
 
-截至 2026-09-04，前 3 项中的标准 DPF 本地重构和 key 传输已按
-`docs/reproduction/DPF_CONFORMANCE_UBUNTU_2026-09-04.md` 完成首轮验证。传输验证
-使用 VFSS `Peer`/Dealer 的内存通道，覆盖与 socket 通道相同的 DPF key
-序列化函数；独立进程 socket E2E 仍保留在 8.3 节，不视为已经完成。
+标准 DPF 本地重构及 Peer/Dealer transport conformance 已正式注册进 CTest，
+共覆盖 44 组；独立进程 E2E 也已在 M3 关闭矩阵中完成。首轮验证记录见
+`docs/reproduction/DPF_CONFORMANCE_UBUNTU_2026-09-04.md`。
 
 第 4 项的无重构乘法 adapter 接口、一次性材料状态、传输边界和测试计划见
 `docs/decisions/PROTOCOL_III_MASKED_MUL_ADAPTER.md`。该前置工作停在 M2
@@ -192,7 +191,7 @@ rank/runtime 接口之前，不提前建立第二套 party、通信或 metrics �
 轮次、PRG calls 和 `n(n-1)/2` comparison edges。尚未接通的字段写
 `NOT_MEASURED`，不得从论文公式或旧日志估算。
 
-开始 M3 代码前必须满足：
+M3 实现门如下，均已在 `main@bb0d0e8` 满足：
 
 1. M1.1 的 CTest 和 metrics provenance 已合并；
 2. M2 的真实 shuffle、统一 mask 和独立进程 E2E 已通过；
@@ -208,3 +207,38 @@ rank/runtime 接口之前，不提前建立第二套 party、通信或 metrics �
 - 不使用 AAV86 图代替全对全 CmpAgg；
 - 不在 M3 中加入域逆元、非零 payload 编码或跨阶段压缩；
 - 不使用 `agarwal_protocol_iii_exact_2round` 或论文 Theorem 4.2 复现标签。
+
+## 复检后的实现映射
+
+本设计在仓库中的正式三轮实现为：
+
+```text
+agarwal_protocol_iii_modular_3round
+```
+
+其安全入口是：
+
+```text
+padded_n 个 priority-key additive shares
+```
+
+因此三轮只统计：
+
+```text
+GRank → DPF routing → secure combine
+```
+
+raw-score 安全输入通过独立扩展提供：
+
+```text
+moe_topk_protocol_iii_raw_score_modular_5round
+```
+
+该扩展增加 carry 和 sign 两轮输入适配，总在线轮数为 5，不能作为
+论文原生三轮实现进行报告。
+
+GRank 图规模按 logical_n 构建；priority-key 输入仍保持
+padded_n 形状；DPF 域保持 2^rank_bits。
+
+最终复检关闭证据见：
+[`../reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`](../reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
