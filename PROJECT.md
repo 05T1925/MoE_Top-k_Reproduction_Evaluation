@@ -458,7 +458,34 @@ CTest 在显式 soft `RLIMIT_NOFILE=1024` 下发现 19 项并通过 19/19；EMP-
 
 因此 M3 实现分支可从本次更新后的 `main` 建立，并必须保留冻结的输入、rank、
 mask、role、transport、metrics 与 secure/test 边界。
+## M3 复检关闭状态
 
+M3 已在 `main@bb0d0e8` 完成代码整改并进入文档关闭阶段。
+
+正式实现：
+
+- `agarwal_protocol_iii_modular_3round`
+  - padded priority-key shares；
+  - 3 online rounds。
+
+- `moe_topk_protocol_iii_raw_score_modular_5round`
+  - Q20.12 raw-score shares；
+  - 5 online rounds。
+
+最终能力包括：
+
+- independent Dealer/P0/P1 fork+exec roles；
+- logical-n GRank；
+- DPF routing；
+- secure combine；
+- raw-score secure entry；
+- formal role executables；
+- MetricsRecord JSON；
+- 11-test M3 validation matrix。
+
+详细证据：
+
+[`docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`](docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
 ## 11. 后续需要团队明确的输入
 
 M0、M1 和 M1.1 已完成；以下问题影响后续里程碑：

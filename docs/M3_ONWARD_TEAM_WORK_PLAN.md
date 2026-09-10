@@ -108,10 +108,10 @@ M3 是模块化 3 轮工程基线，不是论文 Theorem 4.2 的精确 2 轮实�
 | M3.1a | `keyGenDPF`、`evalDPF_Payload` conformance | 已完成于独立分支，待按 PR 状态集成 |
 | M3.1b | DPF key 经 Peer 传输后求值不变 | 已完成于独立分支，待按 PR 状态集成 |
 | M3.1c | share-preserving multiplication adapter | 已实现并验证于独立分支，待按 PR 状态集成 |
-| M3.2 | Protocol III GRank runtime | 执行中 |
-| M3.3 | masked-rank DPF routing | 未开始 |
-| M3.4 | secure combine 与原顺序 mask | 未开始 |
-| M3.5 | 三方独立进程完整 E2E | 未开始 |
+| M3.2 | Protocol III GRank runtime |已完成并通过复检|
+| M3.3 | masked-rank DPF routing | 已完成并通过复检|
+| M3.4 | secure combine 与原顺序 mask |已完成并通过复检 |
+| M3.5 | 三方独立进程完整 E2E | 已完成并通过复检|
 
 分支上的实现和测试只有合并到 `main` 后，才能记为主线已完成。
 
@@ -270,7 +270,27 @@ M3 最终交付物：
 - 三轮因果关系审计；
 - 泄露与输出边界记录；
 - Ubuntu 可复现记录。
+## M3 当前冻结状态（2026-09-10）
 
+M3 模块化三轮工程基线及其 raw-score 五轮扩展已经完成复检整改。
+
+已完成：
+
+- 安全 raw-score 输入适配；
+- Dealer/Party fork+exec 角色隔离；
+- logical-n GRank 图；
+- DPF conformance CTest 注册；
+- raw-score 独立进程 E2E；
+- 三轮正式 executable；
+- 五轮 raw-score 正式 executable；
+- 结构化 MetricsRecord；
+- Ubuntu 全新构建验证。
+
+冻结实现：
+
+```text
+agarwal_protocol_iii_modular_3round
+moe_topk_protocol_iii_raw_score_modular_5round
 ## 4. 角色 A：M4 CipherGPT 原生基线
 
 角色 A 可与 M3 并行开发 M4，但保持独立分支。

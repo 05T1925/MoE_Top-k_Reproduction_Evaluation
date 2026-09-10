@@ -208,3 +208,21 @@ rank/runtime 接口之前，不提前建立第二套 party、通信或 metrics �
 - 不使用 AAV86 图代替全对全 CmpAgg；
 - 不在 M3 中加入域逆元、非零 payload 编码或跨阶段压缩；
 - 不使用 `agarwal_protocol_iii_exact_2round` 或论文 Theorem 4.2 复现标签。
+## 复检后的实现映射
+
+本设计在仓库中的正式三轮实现为：
+
+```text
+agarwal_protocol_iii_modular_3round
+其安全入口是：
+padded_n 个 priority-key additive shares
+因此三轮只统计：
+GRank → DPF routing → secure combine
+raw-score 安全输入通过独立扩展提供：
+moe_topk_protocol_iii_raw_score_modular_5round
+该扩展增加 carry 和 sign 两轮输入适配，总在线轮数为 5，不能作为
+论文原生三轮实现进行报告。
+GRank 图规模按 logical_n 构建；priority-key 输入仍保持
+padded_n 形状；DPF 域保持 2^rank_bits。
+最终复检关闭证据见：
+[`../reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`](../reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)

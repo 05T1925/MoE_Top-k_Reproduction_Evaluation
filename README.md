@@ -55,6 +55,9 @@
 - [项目实现约束](AGENTS.md)
 - [协议复现工作流](.agents/skills/protocol-reproduction/SKILL.md)
 - [M3 及后续双人分工计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
+- [M3 复检整改关闭记录](docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
+- [M3 Ubuntu 环境基线](docs/reproduction/M3_ENV_BASELINE_UBUNTU_2026-09-07.md)
+- [Protocol III 模块化三轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 ## 目录说明
 
 ```text
