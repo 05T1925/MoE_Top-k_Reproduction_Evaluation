@@ -45,7 +45,8 @@ PRIVATE
     src/moe_topk/protocol_iii_dpf_routing.cpp
     src/moe_topk/masked_mul_adapter.cpp
     src/moe_topk/protocol_iii_secure_combine.cpp
-    src/moe_topk/protocol_iii_raw_score_pipeline.cpp          # <--- 新增源文件
+    src/moe_topk/protocol_iii_raw_score_pipeline.cpp
+    src/moe_topk/protocol_iii_secure_core.cpp
     # src/softmax.cpp
 )
 
@@ -371,7 +372,7 @@ target_link_libraries(
     ${PROJECT_NAME}
 )
 
-# ===== 新增 raw_score_pipeline 测试 =====
+# ===== raw_score_pipeline 测试 =====
 add_executable(
     moe_topk_m3_raw_score_pipeline_test
     tests/moe_topk/protocol_iii_raw_score_pipeline_test.cpp
@@ -385,6 +386,70 @@ target_link_libraries(
     moe_topk_m3_raw_score_pipeline_test
     PRIVATE
     ${PROJECT_NAME}
+)
+
+add_executable(
+    moe_topk_m3_raw_score_three_process_e2e_test
+    tests/moe_topk/protocol_iii_raw_score_three_process_e2e_test.cpp
+)
+target_include_directories(
+    moe_topk_m3_raw_score_three_process_e2e_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+target_link_libraries(
+    moe_topk_m3_raw_score_three_process_e2e_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# ===== Protocol III formal modular three-round executable =====
+add_executable(
+    agarwal_protocol_iii_modular_3round
+    src/apps/agarwal_protocol_iii_modular_3round.cpp
+)
+
+target_include_directories(
+    agarwal_protocol_iii_modular_3round
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(
+    agarwal_protocol_iii_modular_3round
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# ===== Validation for the formal Protocol III executable =====
+add_executable(
+    moe_topk_m3_secure_executable_test
+    tests/moe_topk/protocol_iii_secure_executable_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_secure_executable_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_m3_secure_executable_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+add_dependencies(
+    moe_topk_m3_secure_executable_test
+    agarwal_protocol_iii_modular_3round
+)
+
+target_compile_definitions(
+    moe_topk_m3_secure_executable_test
+    PRIVATE
+    MOE_TOPK_PROTOCOL_III_EXECUTABLE="$<TARGET_FILE:agarwal_protocol_iii_modular_3round>"
 )
 
 if(BUILD_TESTING)
@@ -401,9 +466,20 @@ if(BUILD_TESTING)
         NAME moe_topk_m3_protocol_iii_three_process_e2e_test
         COMMAND moe_topk_m3_protocol_iii_three_process_e2e_test
     )
-    add_test(                                                             # <--- 新增
+    add_test(
         NAME moe_topk_m3_raw_score_pipeline_test
         COMMAND moe_topk_m3_raw_score_pipeline_test
+    )
+
+    add_test(
+        NAME moe_topk_m3_raw_score_three_process_e2e_test
+        COMMAND moe_topk_m3_raw_score_three_process_e2e_test
+    )
+
+    # ===== 新增：formal Protocol III executable validation =====
+    add_test(
+        NAME moe_topk_m3_secure_executable_test
+        COMMAND moe_topk_m3_secure_executable_test
     )
 
     # 已有测试
