@@ -47,6 +47,7 @@ PRIVATE
     src/moe_topk/protocol_iii_secure_combine.cpp
     src/moe_topk/protocol_iii_raw_score_pipeline.cpp
     src/moe_topk/protocol_iii_secure_core.cpp
+    src/moe_topk/protocol_iii_metrics_record.cpp
     # src/softmax.cpp
 )
 
@@ -404,6 +405,57 @@ target_link_libraries(
     ${PROJECT_NAME}
 )
 
+# ===== metrics_record 测试 =====
+add_executable(
+    moe_topk_m3_metrics_record_test
+    tests/moe_topk/protocol_iii_metrics_record_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_metrics_record_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(
+    moe_topk_m3_metrics_record_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# ===== Git revision / build type detection for metrics records =====
+find_package(Git QUIET)
+
+set(MOE_TOPK_GIT_REVISION "unknown")
+
+if(Git_FOUND)
+    execute_process(
+        COMMAND
+            ${GIT_EXECUTABLE}
+            rev-parse
+            --verify
+            HEAD
+        WORKING_DIRECTORY
+            ${CMAKE_CURRENT_SOURCE_DIR}/..
+        OUTPUT_VARIABLE
+            MOE_TOPK_GIT_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
+if(NOT MOE_TOPK_GIT_REVISION)
+    set(MOE_TOPK_GIT_REVISION "unknown")
+endif()
+
+if(CMAKE_BUILD_TYPE)
+    set(MOE_TOPK_RECORDED_BUILD_TYPE
+        "${CMAKE_BUILD_TYPE}")
+else()
+    set(MOE_TOPK_RECORDED_BUILD_TYPE
+        "unknown")
+endif()
+
 # ===== Protocol III formal modular three-round executable =====
 add_executable(
     agarwal_protocol_iii_modular_3round
@@ -450,6 +502,58 @@ target_compile_definitions(
     moe_topk_m3_secure_executable_test
     PRIVATE
     MOE_TOPK_PROTOCOL_III_EXECUTABLE="$<TARGET_FILE:agarwal_protocol_iii_modular_3round>"
+    MOE_TOPK_GIT_REVISION="${MOE_TOPK_GIT_REVISION}"
+    MOE_TOPK_BUILD_TYPE="${MOE_TOPK_RECORDED_BUILD_TYPE}"
+)
+
+# ===== Formal raw-score Protocol III modular five-round executable =====
+add_executable(
+    moe_topk_protocol_iii_raw_score_modular_5round
+    src/apps/moe_topk_protocol_iii_raw_score_modular_5round.cpp
+)
+
+target_include_directories(
+    moe_topk_protocol_iii_raw_score_modular_5round
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_protocol_iii_raw_score_modular_5round
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+add_executable(
+    moe_topk_m3_raw_score_secure_executable_test
+    tests/moe_topk/protocol_iii_raw_score_secure_executable_test.cpp
+)
+
+target_include_directories(
+    moe_topk_m3_raw_score_secure_executable_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+
+target_link_libraries(
+    moe_topk_m3_raw_score_secure_executable_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+add_dependencies(
+    moe_topk_m3_raw_score_secure_executable_test
+    moe_topk_protocol_iii_raw_score_modular_5round
+)
+
+target_compile_definitions(
+    moe_topk_m3_raw_score_secure_executable_test
+    PRIVATE
+    MOE_TOPK_PROTOCOL_III_RAW_SCORE_EXECUTABLE="$<TARGET_FILE:moe_topk_protocol_iii_raw_score_modular_5round>"
+    MOE_TOPK_GIT_REVISION="${MOE_TOPK_GIT_REVISION}"
+    MOE_TOPK_BUILD_TYPE="${MOE_TOPK_RECORDED_BUILD_TYPE}"
 )
 
 if(BUILD_TESTING)
@@ -476,10 +580,22 @@ if(BUILD_TESTING)
         COMMAND moe_topk_m3_raw_score_three_process_e2e_test
     )
 
-    # ===== 新增：formal Protocol III executable validation =====
+    # ===== formal Protocol III executable validation =====
     add_test(
         NAME moe_topk_m3_secure_executable_test
         COMMAND moe_topk_m3_secure_executable_test
+    )
+
+    # ===== formal raw-score Protocol III executable validation =====
+    add_test(
+        NAME moe_topk_m3_raw_score_secure_executable_test
+        COMMAND moe_topk_m3_raw_score_secure_executable_test
+    )
+
+    # ===== metrics_record test =====
+    add_test(
+        NAME moe_topk_m3_metrics_record_test
+        COMMAND moe_topk_m3_metrics_record_test
     )
 
     # 已有测试
