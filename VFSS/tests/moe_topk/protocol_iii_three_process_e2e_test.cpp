@@ -27,6 +27,7 @@
 #include <poll.h>
 #include <random>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -1335,7 +1336,146 @@ int party_main(
   }
 }
 
+std::uint32_t parse_u32(
+    const char* value,
+    const char* message) {
+  require(value != nullptr, message);
+
+  const auto parsed = std::stoull(value);
+
+  require(
+      parsed <=
+          std::numeric_limits<std::uint32_t>::max(),
+      message);
+
+  return static_cast<std::uint32_t>(parsed);
+}
+
+std::uint64_t parse_u64(
+    const char* value,
+    const char* message) {
+  require(value != nullptr, message);
+  return std::stoull(value);
+}
+
+int parse_fd(
+    const char* value,
+    const char* message) {
+  require(value != nullptr, message);
+
+  const auto parsed = std::stoll(value);
+
+  require(
+      parsed >= 0 &&
+          parsed <= std::numeric_limits<int>::max(),
+      message);
+
+  return static_cast<int>(parsed);
+}
+
+TestCase make_public_test_case(
+    std::uint32_t logical_n,
+    std::uint32_t k,
+    std::uint64_t session,
+    std::uint64_t fingerprint,
+    std::uint64_t seed) {
+  require(
+      logical_n >= 1U &&
+          k >= 1U &&
+          k <= logical_n &&
+          session != 0U &&
+          fingerprint != 0U,
+      "invalid public M3 role configuration");
+
+  // Role processes need only the public logical length. The values are
+  // deliberately zero-filled because Dealer and Party code must never use
+  // controller plaintext scores.
+  return {
+      std::vector<std::uint32_t>(logical_n, 0U),
+      k,
+      session,
+      fingerprint,
+      seed};
+}
+
+TestCase parse_public_test_case(
+    int argc,
+    char** argv,
+    int start) {
+  require(
+      start >= 0 &&
+          argc >= start + 5,
+      "truncated public M3 role configuration");
+
+  return make_public_test_case(
+      parse_u32(argv[start], "invalid logical_n"),
+      parse_u32(argv[start + 1], "invalid k"),
+      parse_u64(argv[start + 2], "invalid session"),
+      parse_u64(argv[start + 3], "invalid fingerprint"),
+      parse_u64(argv[start + 4], "invalid seed"));
+}
+
+std::string current_executable(
+    const char* fallback) {
+  std::array<char, 4096> path{};
+
+  const auto length =
+      ::readlink(
+          "/proc/self/exe",
+          path.data(),
+          path.size() - 1U);
+
+  if (length > 0) {
+    return std::string(
+        path.data(),
+        static_cast<std::size_t>(length));
+  }
+
+  require(
+      fallback != nullptr &&
+          fallback[0] != '\0',
+      "M3 executable path");
+
+  return fallback;
+}
+
+pid_t launch_exec_role(
+    const std::string& executable,
+    const std::vector<std::string>& arguments,
+    FdPool& descriptors,
+    ChildSet& children,
+    const std::vector<int>& keep) {
+  const auto child = ::fork();
+
+  require(child >= 0, "fork M3 role failed");
+
+  if (child == 0) {
+    descriptors.close_except(keep);
+
+    std::vector<char*> argv;
+    argv.reserve(arguments.size() + 2U);
+
+    argv.push_back(
+        const_cast<char*>(executable.c_str()));
+
+    for (const auto& argument : arguments) {
+      argv.push_back(
+          const_cast<char*>(argument.c_str()));
+    }
+
+    argv.push_back(nullptr);
+
+    ::execv(executable.c_str(), argv.data());
+
+    ::_exit(127);
+  }
+
+  children.add(child);
+  return child;
+}
+
 pid_t launch_party(
+    const char* self,
     const TestCase& test,
     int party,
     FdPool& descriptors,
@@ -1346,62 +1486,68 @@ pid_t launch_party(
     int routing_fd,
     int combine_fd,
     int result_fd) {
-  const auto child = ::fork();
+  require(
+      self != nullptr &&
+          (party == 0 || party == 1),
+      "invalid M3 party launch");
 
-  require(child >= 0, "fork party failed");
+  const std::vector<std::string> arguments{
+      "m3-party",
+      std::to_string(party),
+      std::to_string(offline_fd),
+      std::to_string(input_fd),
+      std::to_string(grank_fd),
+      std::to_string(routing_fd),
+      std::to_string(combine_fd),
+      std::to_string(result_fd),
+      std::to_string(test.scores.size()),
+      std::to_string(test.k),
+      std::to_string(test.session),
+      std::to_string(test.fingerprint),
+      std::to_string(test.seed),
+  };
 
-  if (child == 0) {
-    descriptors.close_except(
-        {offline_fd,
-         input_fd,
-         grank_fd,
-         routing_fd,
-         combine_fd,
-         result_fd});
-
-    const int status =
-        party_main(
-            test,
-            party,
-            offline_fd,
-            input_fd,
-            grank_fd,
-            routing_fd,
-            combine_fd,
-            result_fd);
-
-    ::_exit(status);
-  }
-
-  children.add(child);
-  return child;
+  return launch_exec_role(
+      current_executable(self),
+      arguments,
+      descriptors,
+      children,
+      {offline_fd,
+       input_fd,
+       grank_fd,
+       routing_fd,
+       combine_fd,
+       result_fd});
 }
 
 pid_t launch_dealer(
+    const char* self,
     const TestCase& test,
     FdPool& descriptors,
     ChildSet& children,
     int party0_fd,
     int party1_fd) {
-  const auto child = ::fork();
+  require(
+      self != nullptr,
+      "invalid M3 Dealer launch");
 
-  require(child >= 0, "fork dealer failed");
+  const std::vector<std::string> arguments{
+      "m3-dealer",
+      std::to_string(party0_fd),
+      std::to_string(party1_fd),
+      std::to_string(test.scores.size()),
+      std::to_string(test.k),
+      std::to_string(test.session),
+      std::to_string(test.fingerprint),
+      std::to_string(test.seed),
+  };
 
-  if (child == 0) {
-    descriptors.close_except(
-        {party0_fd, party1_fd});
-
-    const int status =
-        dealer_main(
-            test,
-            party0_fd,
-            party1_fd);
-
-    ::_exit(status);
-  }
-
-  children.add(child);
-  return child;
+  return launch_exec_role(
+      current_executable(self),
+      arguments,
+      descriptors,
+      children,
+      {party0_fd, party1_fd});
 }
 
 void verify_reports(
@@ -1538,7 +1684,9 @@ TestCase make_generated_case(
       seed};
 }
 
-void run_case(const TestCase& test) {
+void run_case(
+    const char* self,
+    const TestCase& test) {
   require(
       !test.scores.empty() &&
           test.k >= 1U &&
@@ -1571,11 +1719,9 @@ void run_case(const TestCase& test) {
     descriptors.make_pair(*pair);
   }
 
-  const auto input_shares =
-      make_priority_key_shares(test);
-
   const auto party0 =
       launch_party(
+          self,
           test,
           0,
           descriptors,
@@ -1589,6 +1735,7 @@ void run_case(const TestCase& test) {
 
   const auto party1 =
       launch_party(
+          self,
           test,
           1,
           descriptors,
@@ -1602,6 +1749,7 @@ void run_case(const TestCase& test) {
 
   const auto dealer =
       launch_dealer(
+          self,
           test,
           descriptors,
           children,
@@ -1624,6 +1772,12 @@ void run_case(const TestCase& test) {
   // block on input_fd before GRank. Online secret shares are not released
   // until Dealer has completed preprocessing and exited successfully.
   children.wait_ok(dealer);
+
+  // The Dealer has now exited. Only the controller creates the TEST_ONLY
+  // priority-key shares, so neither the exec-isolated Dealer nor either
+  // exec-isolated Party inherited plaintext scores or both input shares.
+  const auto input_shares =
+      make_priority_key_shares(test);
 
   send_message(
       input_party0[0],
@@ -1661,9 +1815,59 @@ void run_case(const TestCase& test) {
 
 }  // namespace
 
-int main() {
+int main(int argc, char** argv) {
   try {
     std::signal(SIGPIPE, SIG_IGN);
+
+    if (argc > 1 &&
+        std::string(argv[1]) == "m3-dealer") {
+      require(
+          argc == 9,
+          "invalid M3 Dealer argument count");
+
+      const auto test =
+          parse_public_test_case(argc, argv, 4);
+
+      return dealer_main(
+          test,
+          parse_fd(argv[2], "invalid Dealer P0 fd"),
+          parse_fd(argv[3], "invalid Dealer P1 fd"));
+    }
+
+    if (argc > 1 &&
+        std::string(argv[1]) == "m3-party") {
+      require(
+          argc == 14,
+          "invalid M3 Party argument count");
+
+      const auto party =
+          static_cast<int>(
+              parse_u32(argv[2], "invalid Party id"));
+
+      require(
+          party == 0 || party == 1,
+          "invalid M3 Party id");
+
+      const auto test =
+          parse_public_test_case(argc, argv, 9);
+
+      return party_main(
+          test,
+          party,
+          parse_fd(argv[3], "invalid Party offline fd"),
+          parse_fd(argv[4], "invalid Party input fd"),
+          parse_fd(argv[5], "invalid Party GRank fd"),
+          parse_fd(argv[6], "invalid Party routing fd"),
+          parse_fd(argv[7], "invalid Party combine fd"),
+          parse_fd(argv[8], "invalid Party result fd"));
+    }
+
+    require(
+        argc == 1,
+        "unknown M3 E2E role");
+
+    const auto self =
+        current_executable(argv[0]);
 
     std::vector<TestCase> cases{
         {{7U},
@@ -1769,7 +1973,7 @@ int main() {
           << " start\n"
           << std::flush;
 
-      run_case(test);
+      run_case(self.c_str(), test);
 
       std::cout
           << "protocol="
