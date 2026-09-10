@@ -7,6 +7,7 @@
 #include <moe_topk/protocol_i_ucmp.h>
 #include <moe_topk/protocol_iii_dpf_routing.h>
 #include <moe_topk/protocol_iii_grank.h>
+#include <moe_topk/protocol_iii_metrics_record.h>
 #include <moe_topk/protocol_iii_secure_combine.h>
 #include <moe_topk/topk_oracle.h>
 
@@ -17,26 +18,41 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <csignal>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <exception>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <poll.h>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <sys/socket.h>
+#include <sys/sysinfo.h>
+#include <sys/utsname.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #ifndef MOE_TOPK_PROTOCOL_III_EXECUTABLE
 #error "MOE_TOPK_PROTOCOL_III_EXECUTABLE is not defined"
 #endif
+
+#ifndef MOE_TOPK_GIT_REVISION
+#define MOE_TOPK_GIT_REVISION "unknown"
+#endif
+
+#ifndef MOE_TOPK_BUILD_TYPE
+#define MOE_TOPK_BUILD_TYPE "unknown"
+#endif
+
 namespace {
 
 using namespace moe_topk;
@@ -86,6 +102,209 @@ void require(bool condition, const char* message) {
   if (!condition) {
     throw std::runtime_error(message);
   }
+}
+
+using MetricsClock = std::chrono::steady_clock;
+
+double elapsed_milliseconds(
+    MetricsClock::time_point begin,
+    MetricsClock::time_point end) {
+  return std::chrono::duration<double, std::milli>(
+             end - begin)
+      .count();
+}
+
+std::string trim_copy(std::string value) {
+  const auto first =
+      value.find_first_not_of(" \t\r\n");
+
+  if (first == std::string::npos) {
+    return {};
+  }
+
+  const auto last =
+      value.find_last_not_of(" \t\r\n");
+
+  return value.substr(first, last - first + 1U);
+}
+
+std::string detect_cpu_model() {
+  std::ifstream input("/proc/cpuinfo");
+  std::string line;
+
+  while (std::getline(input, line)) {
+    const auto separator = line.find(':');
+
+    if (separator == std::string::npos) {
+      continue;
+    }
+
+    const auto name =
+        trim_copy(line.substr(0U, separator));
+
+    if (name == "model name" ||
+        name == "Hardware" ||
+        name == "Processor") {
+      return trim_copy(line.substr(separator + 1U));
+    }
+  }
+
+  return {};
+}
+
+std::string detect_operating_system() {
+  struct utsname information {};
+
+  if (::uname(&information) != 0) {
+    return {};
+  }
+
+  std::ostringstream output;
+
+  output
+      << information.sysname
+      << ' '
+      << information.release
+      << ' '
+      << information.machine;
+
+  return output.str();
+}
+
+Measurement<std::uint64_t>
+detect_system_memory_bytes() {
+  struct sysinfo information {};
+
+  if (::sysinfo(&information) != 0) {
+    return Measurement<std::uint64_t>::not_measured();
+  }
+
+  const auto total =
+      static_cast<unsigned long long>(
+          information.totalram);
+
+  const auto unit =
+      static_cast<unsigned long long>(
+          information.mem_unit);
+
+  if (unit != 0U &&
+      total >
+          std::numeric_limits<std::uint64_t>::max() /
+              unit) {
+    return Measurement<std::uint64_t>::not_measured();
+  }
+
+  return Measurement<std::uint64_t>::measured(
+      static_cast<std::uint64_t>(total * unit));
+}
+
+std::string compiler_description() {
+  std::ostringstream output;
+
+#if defined(__clang__)
+  output
+      << "Clang "
+      << __clang_major__
+      << '.'
+      << __clang_minor__
+      << '.'
+      << __clang_patchlevel__;
+#elif defined(__GNUC__)
+  output
+      << "GNU "
+      << __GNUC__
+      << '.'
+      << __GNUC_MINOR__
+      << '.'
+      << __GNUC_PATCHLEVEL__;
+#else
+  output << "unknown compiler";
+#endif
+
+  return output.str();
+}
+
+ProtocolIIIMetricsEnvironment
+make_metrics_environment() {
+  ProtocolIIIMetricsEnvironment environment;
+
+  environment.git_revision =
+      MOE_TOPK_GIT_REVISION;
+
+  environment.runtime =
+      "native Linux fork+exec";
+
+  environment.party_topology =
+      "one offline Dealer and two online Parties";
+
+  environment.compiler =
+      Measurement<std::string>::measured(
+          compiler_description());
+
+  // Exact command-line flags are not currently exported by CMake.
+  environment.compiler_flags =
+      Measurement<std::string>::not_measured();
+
+  const std::string build_type =
+      MOE_TOPK_BUILD_TYPE;
+
+  if (!build_type.empty() &&
+      build_type != "unknown") {
+    environment.build_type =
+        Measurement<std::string>::measured(
+            build_type);
+  }
+
+  const auto cpu_model = detect_cpu_model();
+
+  if (!cpu_model.empty()) {
+    environment.cpu_model =
+        Measurement<std::string>::measured(
+            cpu_model);
+  }
+
+  environment.system_memory_bytes =
+      detect_system_memory_bytes();
+
+  const auto operating_system =
+      detect_operating_system();
+
+  if (!operating_system.empty()) {
+    environment.operating_system =
+        Measurement<std::string>::measured(
+            operating_system);
+  }
+
+  environment.network_environment =
+      Measurement<std::string>::measured(
+          "local AF_UNIX socketpair on one Ubuntu VM");
+
+  environment.network_bandwidth_mbps =
+      Measurement<double>::not_measured();
+
+  environment.network_rtt_ms =
+      Measurement<double>::not_measured();
+
+  environment.thread_count = 1U;
+
+  return environment;
+}
+
+std::uint64_t checked_metric_sum(
+    std::initializer_list<std::uint64_t> values) {
+  std::uint64_t total = 0U;
+
+  for (const auto value : values) {
+    require(
+        value <=
+            std::numeric_limits<std::uint64_t>::max() -
+                total,
+        "metrics byte counter overflow");
+
+    total += value;
+  }
+
+  return total;
 }
 
 std::uint8_t bit_width(std::uint32_t value) {
@@ -1639,6 +1858,111 @@ void verify_reports(
       "combine communication mismatch");
 }
 
+void emit_three_round_metrics_record(
+    const TestCase& test,
+    const PartyReport& party0,
+    const PartyReport& party1,
+    double offline_time_ms,
+    double online_time_ms) {
+  require(
+      party0.metrics[3] == party1.metrics[3],
+      "metrics comparison-edge mismatch");
+
+  require(
+      party0.metrics[13] == 3U &&
+          party1.metrics[13] == 3U,
+      "metrics three-round mismatch");
+
+  ProtocolIIIMetricsObservation observation;
+
+  observation.n =
+      static_cast<std::uint64_t>(
+          test.scores.size());
+
+  observation.k = test.k;
+
+  observation.input_seed =
+      Measurement<std::uint64_t>::measured(
+          test.seed);
+
+  observation.input_distribution =
+      Measurement<std::string>::measured(
+          "deterministic regression vectors with "
+          "boundary and stable-tie coverage");
+
+  observation.warmup_runs =
+      Measurement<std::uint64_t>::measured(0U);
+
+  observation.repetitions =
+      Measurement<std::uint64_t>::measured(1U);
+
+  observation.offline_time_ms =
+      Measurement<double>::measured(
+          offline_time_ms);
+
+  observation.offline_material_total_bytes =
+      Measurement<std::uint64_t>::measured(
+          checked_metric_sum({
+              party0.metrics[0],
+              party1.metrics[0],
+          }));
+
+  observation.online_time_ms =
+      Measurement<double>::measured(
+          online_time_ms);
+
+  // The present primitive interfaces do not expose a complete
+  // online PRG-call counter.
+  observation.online_prg_calls_total =
+      Measurement<std::uint64_t>::not_measured();
+
+  observation.comparison_edges_total =
+      Measurement<std::uint64_t>::measured(
+          party0.metrics[3]);
+
+  observation.parties = {
+      {
+          "P0",
+          checked_metric_sum({
+              party0.metrics[1],
+              party0.metrics[5],
+              party0.metrics[9],
+          }),
+          checked_metric_sum({
+              party0.metrics[2],
+              party0.metrics[6],
+              party0.metrics[10],
+          }),
+      },
+      {
+          "P1",
+          checked_metric_sum({
+              party1.metrics[1],
+              party1.metrics[5],
+              party1.metrics[9],
+          }),
+          checked_metric_sum({
+              party1.metrics[2],
+              party1.metrics[6],
+              party1.metrics[10],
+          }),
+      },
+  };
+
+  observation.correctness_status =
+      CorrectnessStatus::PASSED;
+
+  const auto record =
+      make_protocol_iii_modular_3round_metrics_record(
+          make_metrics_environment(),
+          observation);
+
+  std::cout
+      << protocol_iii_metrics_record_json(record)
+      << '\n'
+      << std::flush;
+}
+
 TestCase make_generated_case(
     std::uint32_t logical_n,
     std::uint32_t k,
@@ -1749,6 +2073,9 @@ void run_case(
           combine[1],
           result_party1[1]);
 
+  const auto offline_start =
+      MetricsClock::now();
+
   const auto dealer =
       launch_dealer(
           self,
@@ -1775,11 +2102,17 @@ void run_case(
   // until Dealer has completed preprocessing and exited successfully.
   children.wait_ok(dealer);
 
+  const auto offline_end =
+      MetricsClock::now();
+
   // The Dealer has now exited. Only the controller creates the TEST_ONLY
   // priority-key shares, so neither the exec-isolated Dealer nor either
   // exec-isolated Party inherited plaintext scores or both input shares.
   const auto input_shares =
       make_priority_key_shares(test);
+
+  const auto online_start =
+      MetricsClock::now();
 
   send_message(
       input_party0[0],
@@ -1807,7 +2140,21 @@ void run_case(
           static_cast<std::uint32_t>(
               test.scores.size()));
 
+  const auto online_end =
+      MetricsClock::now();
+
    verify_reports(test, report0, report1);
+
+  emit_three_round_metrics_record(
+      test,
+      report0,
+      report1,
+      elapsed_milliseconds(
+          offline_start,
+          offline_end),
+      elapsed_milliseconds(
+          online_start,
+          online_end));
 
   // Both formal Party executables have now completed the measured
   // three-round core and delivered their reports. Release their
