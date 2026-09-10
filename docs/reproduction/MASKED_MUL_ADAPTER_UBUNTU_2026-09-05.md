@@ -36,10 +36,12 @@ cmake --build VFSS/build-mul-adapter \
 ./VFSS/build-mul-adapter/moe_topk_m1_cmpagg_test
 ./VFSS/build-mul-adapter/moe_topk_dpf_conformance_test
 ./VFSS/build-mul-adapter/moe_topk_masked_mul_adapter_test
+ctest --test-dir VFSS/build-mul-adapter --output-on-failure
 ```
 
-当前 `main` 尚未完成 M1.1 的 CTest 注册，因此本记录按目标逐个执行；adapter 目标
-留待 M1.1 合并后的统一 CTest 入口注册，不在本分支修改角色 A 的工作范围。
+开发期间先从 `fa380cc` 按目标逐个回归；创建 PR 前发现 M1.1 已以 `078fcb2`
+合并到 `main`，随后合入该基线并把 adapter 注册到现有 CTest 入口。没有改写 M1.1
+的四个测试或 metrics 语义。
 
 ## 4. 覆盖
 
