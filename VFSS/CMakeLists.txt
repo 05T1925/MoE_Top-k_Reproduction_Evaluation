@@ -387,6 +387,22 @@ target_link_libraries(
     ${PROJECT_NAME}
 )
 
+add_executable(
+    moe_topk_m3_raw_score_three_process_e2e_test
+    tests/moe_topk/protocol_iii_raw_score_three_process_e2e_test.cpp
+)
+target_include_directories(
+    moe_topk_m3_raw_score_three_process_e2e_test
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS
+)
+target_link_libraries(
+    moe_topk_m3_raw_score_three_process_e2e_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
     # Protocol III primitive and runtime tests.
     add_test(
@@ -404,6 +420,11 @@ if(BUILD_TESTING)
     add_test(                                                             # <--- 新增
         NAME moe_topk_m3_raw_score_pipeline_test
         COMMAND moe_topk_m3_raw_score_pipeline_test
+    )
+
+    add_test(
+        NAME moe_topk_m3_raw_score_three_process_e2e_test
+        COMMAND moe_topk_m3_raw_score_three_process_e2e_test
     )
 
     # 已有测试
