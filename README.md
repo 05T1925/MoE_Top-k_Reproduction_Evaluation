@@ -29,7 +29,9 @@
 - M2 验证可靠性修复已合入：Ubuntu 24.04.4 的 fresh EMP-ON CTest 在显式 soft
   `RLIMIT_NOFILE=1024` 下发现 19 项并通过 19/19；EMP-OFF 通过 13/13。此结果恢复
   C 级基线的默认资源限制可复现性，不改变协议标签或 paper-exact 状态；
-- M3 Protocol III 模块化 3 轮是当前实现主线，可从本次更新后的 `main` 开始；
+- M3 已在 `main@bb0d0e8` 完成整改并冻结：正式三轮入口接收 padded
+  priority-key shares；raw-score 扩展为 2 轮输入适配加 3 轮安全核心，共 5 轮；
+  当前后续主线为 M4 CipherGPT 原生基线；
 - 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
 - 论文和大型参考工程不进入普通远端 Git 历史，需要队友在本地自行补齐。
 
@@ -57,7 +59,7 @@
 - [M3 及后续双人分工计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
 - [M3 复检整改关闭记录](docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
 - [M3 Ubuntu 环境基线](docs/reproduction/M3_ENV_BASELINE_UBUNTU_2026-09-07.md)
-- [Protocol III 模块化三轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
+
 ## 目录说明
 
 ```text

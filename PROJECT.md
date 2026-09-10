@@ -431,8 +431,10 @@ CryptoMoE 保留为 M7 之后的工作负载接入：先冻结 eligibility、dum
 M1/M1.1 已完成并冻结。M2.0--M2.16 documentation/validation closeout 已完成当前
 C 级模块化 Protocol I 基线，
 实现标签为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，core 为
-4 轮、总路径为 8 轮，且已合入 `main`。M2→M3 交接条件满足，当前实现主线为
-`agarwal_protocol_iii_modular_3round`。Agarwal paper-exact 3-round core、7-round
+4 轮、总路径为 8 轮，且已合入 `main`。M3 也已在 `main@bb0d0e8` 完成整改并
+冻结：`agarwal_protocol_iii_modular_3round` 是 padded priority-key shares 输入的
+模块化三轮基线，raw-score 入口是另行标记的五轮项目扩展。Agarwal paper-exact
+3-round core、7-round
 total candidate、paper-compatible public masked-list primitive 和 formal leakage
 proof 尚未完成，作为后续独立研究目标保留；不得把 M2 C 级基线写成论文精确复现。
 
@@ -456,11 +458,12 @@ CTest 在显式 soft `RLIMIT_NOFILE=1024` 下发现 19 项并通过 19/19；EMP-
 `docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md` 与
 `docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md`。
 
-因此 M3 实现分支可从本次更新后的 `main` 建立，并必须保留冻结的输入、rank、
-mask、role、transport、metrics 与 secure/test 边界。
+M3 后续维护必须保留已冻结的输入、rank、mask、role、transport、metrics 与
+secure/test 边界；下一实现主线为 M4。
+
 ## M3 复检关闭状态
 
-M3 已在 `main@bb0d0e8` 完成代码整改并进入文档关闭阶段。
+M3 已在 `main@bb0d0e8` 完成代码整改；本节记录最终关闭口径。
 
 正式实现：
 
@@ -474,18 +477,19 @@ M3 已在 `main@bb0d0e8` 完成代码整改并进入文档关闭阶段。
 
 最终能力包括：
 
-- independent Dealer/P0/P1 fork+exec roles；
+- TEST_ONLY E2E 控制器通过 fork+exec 隔离 Dealer、Party 0 和 Party 1；
 - logical-n GRank；
 - DPF routing；
 - secure combine；
 - raw-score secure entry；
-- formal role executables；
-- MetricsRecord JSON；
+- 两个正式 Party-role executable；
+- TEST_ONLY E2E 控制器汇总两方正式 report 后生成 MetricsRecord JSON；
 - 11-test M3 validation matrix。
 
 详细证据：
 
 [`docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`](docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
+
 ## 11. 后续需要团队明确的输入
 
 M0、M1 和 M1.1 已完成；以下问题影响后续里程碑：
