@@ -36,8 +36,9 @@ M2 的 forward/reverse shuffle、controlled rank reveal 和独立 masked-key ope
 
 ### 2.3 帧、材料和失败语义
 
-- 每个 framed message 绑定 `session`、输入 `fingerprint`、`phase`、`sequence`、`role`、`slot/type`、`width` 和 `count`；接收方必须逐字段校验。
-- one-shot material 用过即清理；phase、role、slot、size、sequence 和输入绑定不匹配时 fail closed。
+- frame/header 级绑定为 `session`、输入 `fingerprint`、`n`、`K`、`bits/width`、`sender`、`receiver`、`phase`、`type` 和 `sequence`；分片消息另绑定 `payload length` 与有序 `chunk offset`。接收方必须逐字段校验。
+- material record 级绑定为 `party`、`slot`、`stage`、`edge endpoints`、`material count` 和 one-shot consumption；`slot` 不被笼统视为每个 frame header 字段。
+- one-shot material 用过即清理；phase、role、slot、size、sequence、edge 或输入绑定不匹配时 fail closed。
 - replay、duplicate、EOF、truncation、trailing bytes、错误 role、错误 size 和超时均不得产生 partial output、明文 fallback、静默吞错或自动降级。
 - 禁止 file polling、sleep 同步、无依据 retry、在线 Dealer 依赖，以及用零值替代未测或缺失材料。
 
@@ -46,7 +47,9 @@ M2 的 forward/reverse shuffle、controlled rank reveal 和独立 masked-key ope
 | 能力 | M2 当前路径 | M3 当前路径 | 冻结判断 |
 | --- | --- | --- | --- |
 | Q20.12、signed score、stable tie、oracle | 使用 | 使用 | 共享语义，可兼容 |
-| priority-key、uCMP、CMpAgg、DPF/transport 基础设施 | 使用 | 使用对应组件 | 共享组件，但阶段和 frame binding 仍须校验 |
+| priority-key、uCMP/CmpAgg | 使用 | 使用对应组件 | 共享比较能力，但阶段、域宽和 binding 仍须独立校验 |
+| 部分 material/package 类型与 framed transport | 使用 | 复用部分类型/传输能力 | 类型可复用不等于 package 实例可直接互操作 |
+| DPF routing、DPF key/material、secure combine | 不使用 | M3 专有 | 不得写成 M2 能力 |
 | raw-score carry/sign adapter | M2 raw 入口使用 | M3 raw extension 调用同一入口语义 | 共享 2-round adapter；总轮数不可混写 |
 | M2 forward/reverse secret-shared shuffle | 使用 | 不调用 | 不属于 M3 依赖 |
 | M2 shuffled-rank reconstruction/rank reveal | 使用/审计为 M2 泄露边界 | 不调用 | 不得带入 M3 |
@@ -66,9 +69,9 @@ M3 secure core 的固定链为 `GRank -> DPF routing -> secure combine`；priori
 
 ## 5. 兼容规则与变更门槛
 
-1. M2 priority-key package 只有在 session、fingerprint、phase、role、width、count、one-shot slot 和 output semantics 全部相同，并且明确属于 priority-key 入口时，才可与 M3 priority-key core 对接。
+1. M2 和 M3 可以复用 `ProtocolIPartyPackage` 类型及部分 material 类型作为记录表示，但现有 M2 package 实例不得直接交给 M3。M2 当前 comparison graph/material 可能按 `padded_n` 生成；M3 GRank graph 按 `logical_n` 生成，node masks、edge materials、count 和序列化内容必须按各自 config 独立生成并验证。
 2. M2 raw-score adapter 与 M3 raw extension 的兼容只覆盖冻结的 2-round Q20.12 输入转换；不能把 M3 raw 的 5 轮重新标为 M3 三轮，也不能把 M2 的 8 轮缩写成论文轮数。
-3. M2 shuffle、reverse shuffle、shuffled-rank、reverse carrier 和 M2 pipeline 的 material/package 不得直接接入 M3。
+3. M2 shuffle、reverse shuffle、shuffled-rank、reverse carrier 和 M2 pipeline 的 material/package 不得直接接入 M3；未来 M2 exact package 也不得向 M3 强制引入 shuffle/public-list 专有字段。
 4. 改变输入含义、输出顺序、角色、轮数、泄露、padding、预处理时机、frame schema、指标边界或错误处理时，必须先新增/更新决策文档，再同时更新实施计划、conformance、oracle differential、独立进程 E2E 和指标 provenance。
 5. 任何不匹配均 fail closed；禁止兼容层吞掉字段、自动猜测阶段、静默降级到明文或旧 shuffle 路径。
 
@@ -80,6 +83,6 @@ M3 secure core 的固定链为 `GRank -> DPF routing -> secure combine`；priori
 
 ## 7. 未决项
 
-- 请求中指定的 `docs/decisions/M3_RAW_SCORE_SECURE_ENTRY.md` 在当前 checkout 不存在；本次不伪造该文档，也不把本冻结记录冒充为它的替代品。
+- 上一阶段任务输入误写了 `docs/decisions/M3_RAW_SCORE_SECURE_ENTRY.md`；它不是仓库缺失交付物。本仓库 M3 raw-score 口径实际由 [`PROTOCOL_III_MODULAR_3ROUND_DESIGN.md`](PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)、[`M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`](../reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)、`VFSS/src/moe_topk/protocol_iii_raw_score_pipeline.cpp`、正式 raw executable 和对应测试源码共同提供。
 - M2 exact 3-round paper alignment、严格泄露审计和 EMP-ON 当前环境仍不是本次治理任务的完成项。
 - 本次只冻结契约和验证基线；没有实现 M2 三轮修复，也没有修改历史复现记录中的旧 revision 或旧结论。

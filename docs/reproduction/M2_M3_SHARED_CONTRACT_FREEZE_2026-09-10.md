@@ -11,7 +11,8 @@
 | --- | --- |
 | repository root | `/Users/wentao.liu/Desktop/moe_plan` |
 | branch | `codex/m2-m3-contract-freeze` |
-| HEAD | `2a83b19dead1230a416fa093c8ca2983cdec0f8e` |
+| validation/base revision | `2a83b19dead1230a416fa093c8ca2983cdec0f8e` |
+| documentation commit | `f5450cd45fdb32afe1201863b6f38898463f738e` |
 | origin/main | `2a83b19dead1230a416fa093c8ca2983cdec0f8e` |
 | remote | `git@github.com:05T1925/MoE_Top-k_Reproduction_Evaluation.git` |
 | 初始 worktree/index | clean；`VFSS-baseline/` 无差异 |
@@ -21,14 +22,14 @@
 
 ## 2. 文档输入审计
 
-已读取项目约束、项目说明、实施计划、团队工作计划、M2 决策文档、Protocol III modular design 和当前 M3 closeout。请求列出的 `docs/decisions/M3_RAW_SCORE_SECURE_ENTRY.md` 不存在，已作为未决输入记录，未自行补写论文含义。
+已读取项目约束、项目说明、实施计划、团队工作计划、M2 决策文档、Protocol III modular design 和当前 M3 closeout。上一阶段任务输入误写了 `docs/decisions/M3_RAW_SCORE_SECURE_ENTRY.md`；它不是仓库缺失交付物。M3 raw-score 的实际依据是 `docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md`、`docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`、`VFSS/src/moe_topk/protocol_iii_raw_score_pipeline.cpp`、formal raw executable 和对应测试源码。
 
 相关当前记录：
 
 - [M2/M3 共享契约决策](../decisions/M2_M3_SHARED_CONTRACT_FREEZE.md)
 - [当前 M3 Ubuntu closeout](M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
 
-历史 M2/M3 复现记录只作为历史证据，不替代本次 fresh macOS baseline，也不被本次文档批量改写。
+历史 M2/M3 复现记录只作为历史证据，不替代本次 fresh macOS baseline，也不被本次文档批量改写。阶段一的 `24/24`、EMP-ON `NOT_MEASURED` 和依赖错误事实保持不变。
 
 ## 3. 环境与依赖
 
@@ -167,7 +168,8 @@ M3 production source 中未发现 `true_rank`、`sleep`、明文重构调用或 
 
 ## 7. 共享契约验证结论
 
-- 已冻结 signed Q20.12、modulo-`2^32` raw additive shares、stable tie、`logical_n`/`padded_n`、原始顺序 XOR bit-mask、P0/P1/P2 角色和 frame binding。
+- 已冻结 signed Q20.12、modulo-`2^32` raw additive shares、stable tie、`logical_n`/`padded_n`、原始顺序 XOR bit-mask、P0/P1/P2 角色和 frame/material binding；frame/header 与 material record 的字段边界见决策文档。
+- `ProtocolIPartyPackage` 类型和部分 material 类型可以作为共享记录表示，但 M2 的 padded comparison graph/package 实例不得直接交给按 logical graph 构造的 M3；两者的 node masks、edge materials、count 和序列化内容必须独立生成。
 - 已确认 M3 不依赖 M2 shuffle、reverse carrier、shuffled-rank reconstruction/rank reveal 或 M2 pipeline。
 - M2 当前 C-level 的 `2 + 4 + 2 = 8` 与 M2 predecessor 的 `4 + 2 = 6` 历史标签继续保留；不被 M3 的 `3`/`5` 标签覆盖。
 - M3 有自己的 `protocol_iii_metrics_record.*` factory；当前测试证明 schema/record 行为，不能扩写为 EMP-ON 或生产性能证明。
