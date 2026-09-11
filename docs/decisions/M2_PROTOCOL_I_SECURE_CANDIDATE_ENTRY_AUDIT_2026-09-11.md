@@ -1,8 +1,8 @@
 # M2 Protocol I isolated secure candidate entry audit
 
-状态：**ENTRY_BLOCKED**。
+状态：**ENTRY_BLOCKED（旧安全模型的历史审计）**。
 
-日期：2026-09-11。基准为阶段三A提交 `8f11a4d0aa53ca75dd06536ebc55b0f847750837`。本记录是阶段三B的入口审计，不是 secure candidate 实现记录。
+日期：2026-09-11。基准为阶段三A提交 `8f11a4d0aa53ca75dd06536ebc55b0f847750837`。本记录审计的是“P2 不得知道完整 `r`”的旧安全模型，不是当前 Dealer-preprocessed candidate 的最终状态。当前候选的显式模型和实现门见 `M2_PROTOCOL_I_DEALER_PREPROCESSED_3ROUND_CANDIDATE.md`；该候选仍不改变论文 Gate C 的 BLOCKED 结论。
 
 ## 1. 审计范围和证据等级
 

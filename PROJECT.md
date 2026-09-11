@@ -448,6 +448,14 @@ C 级标签或 M3 主线；详见
 M2.16 的审计文档已随 `f800f96` 合入 `main`。该 Git 集成不改变上述协议
 决定：paper-exact primitive 仍被阻塞，M3 继续复用冻结的 C 级契约。
 
+后续独立分支可以实现
+`m2_protocol_i_dealer_preprocessed_3round_rank_share_candidate` 项目候选：在明确
+的 Dealer-preprocessed、最多单角色腐化且不串谋模型下，由 P2 offline 生成相关
+material，P0/P1 执行三轮 rank-share core。该项目扩展不改变当前 8-round M2 基线、
+M3 主线或论文 exact/leakage gate；详见对应 decision record。当前实现已在该隔离
+分支落地，但因本机 EMP-ON 依赖缺失尚未达到 `SECURE_CANDIDATE_GO`；详见对应
+reproduction record。
+
 随后合入的验证可靠性修复解决了两个与协议语义无关的问题：chosen-OT adapter
 会在 `POLLIN|POLLHUP` 时先排空合法缓冲数据；modular E2E harness 会在每个 case
 关闭其 20 个 socketpair 的端点并回收 P0/P1/P2。Ubuntu 24.04.4 的 fresh EMP-ON

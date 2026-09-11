@@ -37,6 +37,16 @@ and M3 implementation mainline remain unchanged. See
 The M2.16 documentation was integrated into `main` by `f800f96`. It records a
 blocked paper-exact research target, not an exact implementation.
 
+阶段三B另行实现的
+`m2_protocol_i_dealer_preprocessed_3round_rank_share_candidate` 是一个明确的项目
+扩展：P2 在 offline 阶段可以短暂知道完整 `r`，生成 edge DCF/uCMP material，随后
+在 online role 启动前退出。该 candidate 不修改当前 M2 8-round 主路径、M3 主线或
+论文 Gate C；功能、三轮 causal trace、独立进程和泄露边界以
+`docs/decisions/M2_PROTOCOL_I_DEALER_PREPROCESSED_3ROUND_CANDIDATE.md` 为准，
+未测环境和 EMP-ON 结果继续记录为 `NOT_MEASURED`。本次实现已加入独立 package/core/
+executable/controller，但当前验收状态为 `IMPLEMENTATION_BLOCKED`，因为本机无法
+配置 emp-tool/emp-ot；执行证据见对应 reproduction record。
+
 ### M2 validation reliability status (2026-09-06)
 
 The chosen-OT readable-hangup repair and modular E2E FD-lifecycle repair are

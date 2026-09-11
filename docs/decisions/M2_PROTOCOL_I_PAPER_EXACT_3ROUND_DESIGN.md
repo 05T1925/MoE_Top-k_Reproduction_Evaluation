@@ -265,4 +265,9 @@ frame/header binding 与 material record binding 也必须分开：
 
 本门结论是 **BLOCKED**。原因是论文必需的 public masked-list、同一 hidden permutation、correlated r/GRank material 和三轮完整 causal transcript 尚未在当前 VFSS 或本地可用论文证据中闭合。这个结论只阻止 M2 paper-exact 实现和 exact label，不阻止已冻结 M2 C 级基线或 M3 独立实现继续验证。
 
+允许另行审查明确标注为 project candidate 的 Dealer-preprocessed 路径，但 P2
+offline 知道完整 `r` 属于项目扩展安全模型，不是本门对 Agarwal exact Dealer view
+或论文泄露等价性的批准。该路径必须独立满足自己的 candidate conformance、
+differential、独立进程和 leakage gate。
+
 下一次只有在形成独立的 paper-compatible primitive 设计、逐消息 transcript、材料/视图证明、15 项 gate 的 conformance/differential/E2E 证据并复核 M3 regression 后，才重新审查 GO。未经这些证据，不得以代码改名、补一个字段、增加测试 oracle 或借用 M3 三轮结果解锁。

@@ -126,4 +126,8 @@ m2_protocol_i_raw_score_input_modular_8round_mask_output 保持原样。
 
 当前 M2 C 级 secure path 没有新增可接受泄露，但也没有实现论文所要求的 public masked-list。设计门结论为 **BLOCKED**：不批准 M2 paper-exact 实现、不批准 exact label、不批准以 M3 结果或参考 oracle 替代缺失证明。
 
+本门不覆盖另行命名的 Dealer-preprocessed project candidate。该候选若允许 P2
+offline 知道完整 `r`，必须把这一点作为独立安全模型和独立泄露边界记录，不能把其
+结果回写为论文 exact leakage evidence。
+
 重新审查至少需要：独立 primitive、same-permutation algebra、correlated-r material/party view、完整三轮 transcript、六类视图审计、shuffle conformance、negative cases、oracle differential、独立进程 E2E 和 M3 regression。

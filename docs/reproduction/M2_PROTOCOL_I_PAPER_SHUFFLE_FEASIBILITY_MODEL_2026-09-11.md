@@ -1,7 +1,7 @@
 # M2 Protocol I paper-compatible shuffle feasibility model reproduction
 
 日期：2026-09-11
-阶段三A复核结论：**algebraic ideal-function model = PASS**；阶段三B Entry Audit：**ENTRY_BLOCKED**。
+阶段三A复核结论：**algebraic ideal-function model = PASS**；阶段三B旧安全模型 Entry Audit：**ENTRY_BLOCKED**。Dealer-preprocessed project candidate 的当前状态见 `docs/decisions/M2_PROTOCOL_I_DEALER_PREPROCESSED_3ROUND_CANDIDATE.md`。
 
 ## 1. 基准、工作区和范围
 

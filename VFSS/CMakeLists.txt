@@ -298,6 +298,35 @@ if(MOE_TOPK_ENABLE_EMP_OT)
         src/moe_topk/protocol_i_pipeline.cpp)
     target_include_directories(moe_topk_share_translation_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include)
     target_link_libraries(moe_topk_share_translation_backend PRIVATE moe_topk_emp_ot_backend FSS)
+    add_library(moe_topk_m2_dealer_preprocessed_3round_candidate_core STATIC
+        src/moe_topk/protocol_i_dealer_candidate_package.cpp
+        src/moe_topk/protocol_i_dealer_candidate_core.cpp)
+    target_include_directories(moe_topk_m2_dealer_preprocessed_3round_candidate_core
+        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_compile_features(moe_topk_m2_dealer_preprocessed_3round_candidate_core PRIVATE cxx_std_17)
+    set_target_properties(moe_topk_m2_dealer_preprocessed_3round_candidate_core PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(moe_topk_m2_dealer_preprocessed_3round_candidate_core
+        PUBLIC moe_topk_share_translation_backend ${PROJECT_NAME} OpenSSL::Crypto)
+    add_executable(moe_topk_m2_dealer_preprocessed_3round_candidate
+        src/apps/m2_protocol_i_dealer_preprocessed_3round_candidate.cpp)
+    target_include_directories(moe_topk_m2_dealer_preprocessed_3round_candidate
+        PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_compile_features(moe_topk_m2_dealer_preprocessed_3round_candidate PRIVATE cxx_std_17)
+    set_target_properties(moe_topk_m2_dealer_preprocessed_3round_candidate PROPERTIES CXX_EXTENSIONS OFF)
+    target_link_libraries(moe_topk_m2_dealer_preprocessed_3round_candidate
+        PRIVATE moe_topk_m2_dealer_preprocessed_3round_candidate_core)
+    if(BUILD_TESTING)
+        add_executable(moe_topk_m2_dealer_preprocessed_3round_candidate_test
+            tests/moe_topk/protocol_i_dealer_candidate_test.cpp)
+        target_include_directories(moe_topk_m2_dealer_preprocessed_3round_candidate_test
+            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_compile_features(moe_topk_m2_dealer_preprocessed_3round_candidate_test PRIVATE cxx_std_17)
+        set_target_properties(moe_topk_m2_dealer_preprocessed_3round_candidate_test PROPERTIES CXX_EXTENSIONS OFF)
+        target_compile_definitions(moe_topk_m2_dealer_preprocessed_3round_candidate_test PRIVATE
+            MOE_TOPK_M2_DEALER_CANDIDATE_EXECUTABLE="$<TARGET_FILE:moe_topk_m2_dealer_preprocessed_3round_candidate>")
+        target_link_libraries(moe_topk_m2_dealer_preprocessed_3round_candidate_test
+            PRIVATE moe_topk_m2_dealer_preprocessed_3round_candidate_core)
+    endif()
     add_executable(moe_topk_m2_opv_conformance_test tests/moe_topk/protocol_i_opv_conformance_test.cpp)
     target_include_directories(moe_topk_m2_opv_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(moe_topk_m2_opv_conformance_test PRIVATE moe_topk_emp_ot_backend)
@@ -637,5 +666,7 @@ if(BUILD_TESTING)
         add_test(NAME moe_topk_m2_permute_share_conformance_test COMMAND moe_topk_m2_permute_share_conformance_test)
         add_test(NAME moe_topk_m2_secret_shared_shuffle_conformance_test COMMAND moe_topk_m2_secret_shared_shuffle_conformance_test)
         add_test(NAME moe_topk_m2_protocol_i_modular_e2e_test COMMAND moe_topk_m2_protocol_i_modular_e2e_test)
+        add_test(NAME moe_topk_m2_dealer_preprocessed_3round_candidate_test
+                 COMMAND moe_topk_m2_dealer_preprocessed_3round_candidate_test)
     endif()
 endif()
