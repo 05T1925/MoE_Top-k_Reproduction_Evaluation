@@ -456,6 +456,13 @@ M3 主线或论文 exact/leakage gate；详见对应 decision record。当前实
 分支落地，但因本机 EMP-ON 依赖缺失尚未达到 `SECURE_CANDIDATE_GO`；详见对应
 reproduction record。
 
+阶段三C在当前执行面停止于环境门：状态为 `ENVIRONMENT_BLOCKED` /
+`CORE_RUNTIME_BLOCKED`。该 candidate 的输出仍是 shuffled-domain rank shares，
+没有形成可供两轮 reverse/output adapter 使用的 secure selection carrier shares，
+因此入口状态为 `ADAPTER_ENTRY_BLOCKED`。本阶段不新增 adapter 源码、不接入 TEST_ONLY
+carrier，也不改变正式 M2 8-round 路径或 M3 主线；后续复核命令和证据要求见
+`docs/decisions/M2_PROTOCOL_I_CANDIDATE_OUTPUT_ADAPTER_GATE_2026-09-11.md`。
+
 随后合入的验证可靠性修复解决了两个与协议语义无关的问题：chosen-OT adapter
 会在 `POLLIN|POLLHUP` 时先排空合法缓冲数据；modular E2E harness 会在每个 case
 关闭其 20 个 socketpair 的端点并回收 P0/P1/P2。Ubuntu 24.04.4 的 fresh EMP-ON

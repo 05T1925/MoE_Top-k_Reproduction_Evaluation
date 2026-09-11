@@ -162,3 +162,9 @@ Permute+Share、候选 executable、候选 CTest 和 independent-process E2E 均
 CTest 回归通过，但不覆盖本候选。故本阶段结论为 `IMPLEMENTATION_BLOCKED`，不是
 `SECURE_CANDIDATE_GO`。完整命令和输出边界见
 `docs/reproduction/M2_PROTOCOL_I_DEALER_PREPROCESSED_3ROUND_CANDIDATE_2026-09-11.md`。
+
+阶段三C进一步确认：上述状态只能表述为 candidate source authored；real dependency
+compilation/link/runtime、candidate conformance、oracle differential、fork+exec
+E2E 和 three-round trace 均为 `NOT_MEASURED`。阶段三C的 core runtime 门为
+`CORE_RUNTIME_BLOCKED`，output adapter 入口门为 `ADAPTER_ENTRY_BLOCKED`；详见
+`docs/decisions/M2_PROTOCOL_I_CANDIDATE_OUTPUT_ADAPTER_GATE_2026-09-11.md`。

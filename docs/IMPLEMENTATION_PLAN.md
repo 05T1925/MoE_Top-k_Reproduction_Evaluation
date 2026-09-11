@@ -47,6 +47,15 @@ blocked paper-exact research target, not an exact implementation.
 executable/controller，但当前验收状态为 `IMPLEMENTATION_BLOCKED`，因为本机无法
 配置 emp-tool/emp-ot；执行证据见对应 reproduction record。
 
+阶段三C进一步闭合候选验证和 output-adapter 入口门：当前环境状态为
+`ENVIRONMENT_BLOCKED`，因此三轮 candidate 的真实 EMP-ON 编译、链接、运行、
+conformance、oracle differential、fork+exec 和 causal trace 均为
+`NOT_MEASURED`，core 状态为 `CORE_RUNTIME_BLOCKED`。candidate 当前只输出
+shuffled-domain rank shares，不是 `selection_bit_share` carrier shares，故
+`ADAPTER_ENTRY_BLOCKED`；本阶段没有新增 adapter 源码，也不改变 M2 8-round 主路径、
+M3 主线或论文 exact/leakage gate。详见
+`docs/decisions/M2_PROTOCOL_I_CANDIDATE_OUTPUT_ADAPTER_GATE_2026-09-11.md`。
+
 ### M2 validation reliability status (2026-09-06)
 
 The chosen-OT readable-hangup repair and modular E2E FD-lifecycle repair are

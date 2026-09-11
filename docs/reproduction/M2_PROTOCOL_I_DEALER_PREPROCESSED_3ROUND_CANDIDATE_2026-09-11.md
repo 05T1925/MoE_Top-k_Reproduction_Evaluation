@@ -8,6 +8,12 @@ package，因此无法执行需要 EMP-ON 的真实 shuffle/DCF/OT 和 fork+exec
 将以下结果写成 `SECURE_CANDIDATE_GO`、paper-exact 或 Protocol I reproduction
 complete。
 
+阶段三C验证将该状态进一步拆分为 `candidate source authored: PASS`、real dependency
+compile/link/runtime: `NOT_MEASURED`、`CORE_RUNTIME_BLOCKED`；由于输出仍是
+shuffled-domain rank shares 而不是 selection carrier shares，adapter 入口为
+`ADAPTER_ENTRY_BLOCKED`。阶段三C没有新增 adapter 源码，详见对应 adapter gate
+decision record。
+
 ## 1. Revision and scope
 
 - 基准提交：`b88da43eb256a6c609331ca8f68a90a2e638cff4`。
