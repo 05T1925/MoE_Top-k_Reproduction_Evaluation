@@ -261,16 +261,19 @@ target_link_libraries(moe_topk_m2_score_input_conformance_test ${PROJECT_NAME})
 add_executable(moe_topk_m2_paper_core_alignment_test tests/moe_topk/protocol_i_paper_core_alignment_test.cpp)
 target_link_libraries(moe_topk_m2_paper_core_alignment_test ${PROJECT_NAME})
 
-# TEST_ONLY: isolated paper-compatible algebra/view model.  It intentionally
-# has no production-library or formal M2 executable link.
-add_executable(
-    moe_topk_m2_paper_shuffle_candidate_model_test
-    tests/moe_topk/protocol_i_paper_shuffle_candidate_model_test.cpp
-)
-set_target_properties(
-    moe_topk_m2_paper_shuffle_candidate_model_test
-    PROPERTIES CXX_EXTENSIONS OFF
-)
+# TEST_ONLY: isolated paper-compatible algebra/view model. It intentionally
+# has no production-library or formal M2 executable link, and must not enter a
+# production BUILD_TESTING=OFF build.
+if(BUILD_TESTING)
+    add_executable(
+        moe_topk_m2_paper_shuffle_candidate_model_test
+        tests/moe_topk/protocol_i_paper_shuffle_candidate_model_test.cpp
+    )
+    set_target_properties(
+        moe_topk_m2_paper_shuffle_candidate_model_test
+        PROPERTIES CXX_EXTENSIONS OFF
+    )
+endif()
 
 if(MOE_TOPK_ENABLE_EMP_OT)
     find_package(emp-tool 1.0 CONFIG REQUIRED)

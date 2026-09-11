@@ -1,7 +1,7 @@
 # M2 Protocol I paper-compatible shuffle feasibility model reproduction
 
 日期：2026-09-11
-结论：**FEASIBILITY_GO（仅 Gate A；不代表 secure candidate 或论文精确实现）**
+阶段三A复核结论：**algebraic ideal-function model = PASS**；阶段三B Entry Audit：**ENTRY_BLOCKED**。
 
 ## 1. 基准、工作区和范围
 
@@ -13,7 +13,7 @@
 - 阶段二输入中提到的 `docs/decisions/M2_M3_SHARED_CONTRACT.md` 不存在；实际冻结文件为 `docs/decisions/M2_M3_SHARED_CONTRACT_FREEZE.md`，本阶段按实际 canonical 文件复核。
 - 阶段二输入中提到的 `Papers/PAPERS.sha256` 不存在；实际 manifest 为 `docs/PAPERS.sha256`。本次重新执行 `shasum -a 256 -c docs/PAPERS.sha256`，manifest 中 9/9 项均为 `OK`。相关 Agarwal PDF hash 为 `18faf63eaa7923eef715a6eb9d5d526fe04dcb69700b133c3e94de935f68c01c`，Chase shuffle PDF hash 为 `6112f7116ec3d3b100fbb5ca10f058a6a0e3f19f165c5c6a071a48b10c0c48ab`。
 
-本阶段只增加隔离的 `TEST_ONLY` algebra/view model、最小 CTest 注册、设计门文档和本记录。没有修改 M2 现有 8-round secure runtime、M3/M4/M5、共享输入输出契约、基线或本地参考工程。
+本阶段只增加隔离的 `TEST_ONLY` algebra/view model、最小 CTest 注册、设计门文档和本记录。没有修改 M2 现有 8-round secure runtime、M3/M4/M5、共享输入输出契约、基线或本地参考工程。阶段三B复核没有因为模型测试通过而新增 secure candidate。
 
 ## 2. 设计和证据边界
 
@@ -24,24 +24,26 @@
 - C：项目冻结的 Q20.12、stable tie、logical/padded、原顺序 mask 等工程契约；
 - D：本阶段候选模型的代数、三方视图和 causal transcript，不能反写成论文或安全结论。
 
-阶段二的三个 BLOCKED 根因在本模型层面闭合：
+阶段二的三个 BLOCKED 根因在本模型的理想代数层面成立，但没有闭合真实 secure 入口：
 
-1. 使用 `Perm(p, v)[slot] = v[p[slot]]` 固定方向，并验证先 `p0`、后 `p1` 等价于 `pi[slot] = p0[p1[slot]]`；public masked list、secret payload 和 GRank mask 使用同一 slot 对齐。
-2. `r = r0 + r1 mod 2^w`，P0/P1 只持有自己的 share，GRank share 直接绑定同一 `r0/r1`；P2 只得到 shape/handle metadata 并在 online 前退出。
-3. transcript 明确为 O0 offline package shape、R1 forward local-share bundle、R2 final public-mask/payload shares、R3 rank-share bundle。候选 shuffle 为 2 个 online barriers，和 rank 一轮组合为 3 个 core barriers，没有隐藏第四轮。
+1. `same-permutation algebra`：PASS（仅理想函数和测试 oracle）；当前 PS API 没有 public-list/r/GRank binding 输出。
+2. `correlated r/GRank relation`：PASS（仅理想等式）；当前 `ProtocolIUcmpMaterial` 需要完整 `mask_left/mask_right`，没有合格的分布式 offline 生成。
+3. `causal transcript`：候选设计成立，但 executable transcript BLOCKED；当前代码仍有独立 masked-key exchange 与 rank reveal，3 barrier 不能从候选表格直接推出。
 
 ## 3. TEST_ONLY 模型
 
 文件：[`protocol_i_paper_shuffle_candidate_model_test.cpp`](../../VFSS/tests/moe_topk/protocol_i_paper_shuffle_candidate_model_test.cpp)。
 
-模型使用标准 C++ 独立编译，不链接生产库；CTest target 也没有 `target_link_libraries`，因此没有进入正式 M2 executable、secure library 或 M3 runtime。模型只在测试目标内允许 oracle reconstruction，并明确执行以下信号：
+模型使用标准 C++ 独立编译，不链接生产库；CTest target 也没有 `target_link_libraries`，因此没有进入正式 M2 executable、secure library 或 M3 runtime。模型只在测试目标内允许 oracle reconstruction，并明确执行以下信号。这些是 algebraic ideal-function evidence，不是 secure candidate evidence：
 
 - public masked list 与 secret shuffled payload 的复合 permutation 一致；
 - public list 中的 `r` 与 GRank local material 逐槽一致；
-- P0/P1 不持有完整 `r` 或完整复合 permutation，P2 不接触 input、score、key、rank 或完整对象；
+- 模型对象中的 P0/P1 不持有完整 `r` 或完整复合 permutation，P2 不接触 input、score、key、rank 或完整对象；这不是实际进程视图证明；
 - permutation 方向、logical/padded 边界、非二次幂输入、duplicate score 的 stable priority-key；
 - 错 permutation、错 r correlation、错 slot metadata、错 shape 和 material reuse 必须失败；
-- priority core 计数为 `shuffle 2 + rank 1 = 3`，raw-score candidate path 计数为 `carry 1 + sign 1 + core 3 + reverse/output 2 = 7`。
+- 候选设计目标计数为 `shuffle 2 + rank 1 = 3`，raw-score candidate path 计数为 `carry 1 + sign 1 + core 3 + reverse/output 2 = 7`；没有实际 transport trace 支撑该候选轮数。
+
+此外，模型的 `padded_n` 对 `logical_n=1` 使用 1，而当前 `protocol_i_make_input_layout` 从 `padded_n=2` 开始；模型的 `key_bits` 也不能直接代替当前项目的 `comparison_bits = 32 + index_bits + 1`。项目级 width/layout conformance 尚未完成。
 
 当前仓库未发现 `VFSS/tests/moe_topk/public_masked_shuffle.py`；已有 reverse-shuffle 测试不包含本阶段的 public-list/GRank correlation/P2 view/causal round 集合，因此本模型提供独立信号，而不是复制已有 functional adapter。
 
@@ -123,23 +125,21 @@ ctest --test-dir /tmp/moe-stage3a-build.3QRsti --output-on-failure
 - `VFSS-baseline/`、`Papers/`、`Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/` 没有进入差异；构建目录、日志和密钥没有进入版本控制。
 - 现有 8-round M2 路径、M3 正式实现、共享契约和 MetricsRecord 统计口径没有修改。
 
-## 7. Gate 结论
+## 7. 阶段三A复核与阶段三B入口结论
 
-| Gate A 条件 | 结果 | 证据 |
+| 条件 | 结果 | 证据 |
 | --- | --- | --- |
-| 代数、ring/width、padding、score/key | PASS | 设计文档第 2 节、候选模型 54 cases |
-| same-permutation proof obligation | PASS | 设计文档第 4 节、staged/direct permutation assertions |
-| correlated r/GRank material | PASS | 设计文档第 2.4/3 节、correlation assertions |
-| P0/P1/P2 三方视图 | PASS | 设计文档第 3 节、view-shape assertions |
-| input-independent offline/P2 boundary | PASS | P2 view 与构造顺序检查 |
-| complete causal transcript | PASS | 设计文档第 5 节、O0/R1/R2/R3 表 |
-| 无隐藏额外 online barrier | PASS | shuffle 2 + rank 1 的轮次检查 |
-| TEST_ONLY 关键不变量 | PASS | direct compile、定向 CTest、完整回归 |
+| algebraic ideal-function model | PASS | 设计文档第 2/4 节、candidate model 54 cases |
+| distributed secure construction | BLOCKED | 当前 PS 没有 public-list/r/GRank 真实输出契约 |
+| executable causal transcript | BLOCKED | 当前 pipeline 仍有 masked-key exchange 和 rank reveal |
+| GRank/FSS correlation generation | BLOCKED | uCMP 构造需要完整 mask pair，无分布式生成原语 |
+| project width/layout conformance | BLOCKED | `logical_n=1` 的 padding 和 comparison width 与模型不同 |
+| TEST_ONLY 关键不变量 | PASS | direct compile、定向 CTest、历史全量 CTest |
 
-因此本阶段结论为 **FEASIBILITY_GO**，只表示可以进入下一阶段的隔离 secure candidate 实现门（Gate B）。Gate B 尚未执行；Gate C 尚未执行。
+因此阶段三B Entry Audit 结论为 **ENTRY_BLOCKED**，不创建 secure candidate 空壳或虚假 executable。阶段三A的 25/25 只作为模型自身的历史证据，不作为本阶段修改后的 secure 通过证据。
 
 不得由本记录推出以下结论：已经实现 Agarwal Protocol I、已经完成论文精确三轮核心、已经完成 secure 三轮协议、已经完成 Protocol I reproduction、已经证明论文泄露完全一致，或已经通过 exact label gate。
 
 ## 8. 未决项和后续入口
 
-下一阶段只能另行实现隔离 secure candidate，并至少补齐独立进程 P2/P0/P1、真实 offline/online boundary、primitive conformance、oracle differential、independent-process E2E、secure path 无明文重构、无在线 Dealer 和无文件同步。当前 8-round 工程路径及其标签继续保留，不因本阶段的 FEASIBILITY_GO 改名或替换。
+如需重新进入 Gate B，最小前置项是：给出不掌握完整 `r` 的真实 correlated uCMP/FSS material 生成；为 R1/R2 给出基于实际 PS/OT/Share Translation 的逐槽消息代数；实现可审计的 public list、secret payload 与 GRank 同槽绑定；按实际 send/receive trace 证明最多三个 online barriers；并完成项目 width/layout conformance。当前 8-round 工程路径及其标签继续保留，不因阶段三A模型通过而改名或替换。
