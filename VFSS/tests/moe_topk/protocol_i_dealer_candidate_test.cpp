@@ -4,6 +4,8 @@
 #include <moe_topk/protocol_i_pipeline.h>
 #include <moe_topk/protocol_i_priority_key.h>
 #include <moe_topk/protocol_i_transport.h>
+#include <FSS/config.h>
+#include <cryptoTools/Common/Defines.h>
 
 #include <algorithm>
 #include <array>
@@ -460,6 +462,10 @@ void run_case(std::uint32_t logical_n, std::uint32_t k, unsigned style, unsigned
 
 int main() {
   try {
+    for (int index = 0; index < 256; ++index) {
+      FSSConfig::prngs[index].SetSeed(osuCrypto::toBlock(0x4d3243414e444944ULL,
+                                                         static_cast<std::uint64_t>(index)));
+    }
     package_conformance();
     transport_negative();
     std::uint64_t serial = 1;
