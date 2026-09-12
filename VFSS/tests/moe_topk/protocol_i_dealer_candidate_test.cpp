@@ -176,7 +176,7 @@ std::pair<std::vector<std::uint64_t>, std::vector<std::uint64_t>> split_keys(
 std::vector<std::uint64_t> expected_ranks(const std::vector<std::uint64_t>& shuffled_keys) {
   std::vector<std::uint64_t> ranks(shuffled_keys.size());
   for (std::size_t index = 0; index < shuffled_keys.size(); ++index) {
-    for (const auto other : shuffled_keys) ranks[index] += other < shuffled_keys[index] ? 1U : 0U;
+    for (const auto other : shuffled_keys) ranks[index] += other > shuffled_keys[index] ? 1U : 0U;
   }
   return ranks;
 }

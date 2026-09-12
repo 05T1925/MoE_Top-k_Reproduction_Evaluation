@@ -341,9 +341,9 @@ ProtocolIDealerCandidateOutput protocol_i_dealer_candidate_core_party(
   output.metrics.online_rounds = output.metrics.forward_online_rounds + output.metrics.masked_open_rounds;
   output.metrics.rank_bits = config.rank_bits;
   output.trace = {
-      {1, 1, 1, 1, 0, 1, 0, first.online_sent_bytes, first.online_received_bytes},
-      {2, 2, 1, 0, 1, 1, 0, second.online_sent_bytes, second.online_received_bytes},
-      {3, 3, 1, config.party, static_cast<std::uint8_t>(1U - config.party), 0, 1, r3_sent, r3_received}};
+      {1, 1, 1, 1, 0, 1, first.online_sent_bytes, first.online_received_bytes, 1},
+      {2, 2, 1, 0, 1, 1, second.online_sent_bytes, second.online_received_bytes, 1},
+      {3, 3, 1, config.party, static_cast<std::uint8_t>(1U - config.party), 1, r3_sent, r3_received, 1}};
   validate_output(config, output);
   return output;
 }

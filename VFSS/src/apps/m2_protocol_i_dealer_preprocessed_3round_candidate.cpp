@@ -4,6 +4,9 @@
 #include <moe_topk/protocol_i_pipeline.h>
 #include <moe_topk/protocol_i_transport.h>
 
+#include <FSS/config.h>
+#include <cryptoTools/Common/Defines.h>
+
 #include <algorithm>
 #include <array>
 #include <cerrno>
@@ -95,6 +98,16 @@ std::uint64_t random_value() {
     fail("candidate permutation randomness");
   }
   return value;
+}
+
+void initialize_fss_prngs() {
+  for (int index = 0; index < 256; ++index) {
+    std::array<std::uint64_t, 2> seed{};
+    if (RAND_bytes(reinterpret_cast<unsigned char*>(seed.data()), sizeof(seed)) != 1) {
+      fail("candidate FSS randomness");
+    }
+    FSSConfig::prngs[index].SetSeed(osuCrypto::toBlock(seed[0], seed[1]));
+  }
 }
 
 ProtocolIPermutation local_permutation(std::uint32_t n, unsigned mode, std::uint64_t seed) {
@@ -250,6 +263,7 @@ int party_main(const Arguments& arguments, int party) {
 
 int main(int argc, char** argv) {
   try {
+    initialize_fss_prngs();
     const Arguments arguments(argc, argv);
     const auto role = arguments.required("--role");
     if (role == "dealer") return dealer_main(arguments);
