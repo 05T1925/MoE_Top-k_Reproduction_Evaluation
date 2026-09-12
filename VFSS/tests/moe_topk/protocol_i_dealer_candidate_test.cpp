@@ -176,7 +176,12 @@ std::pair<std::vector<std::uint64_t>, std::vector<std::uint64_t>> split_keys(
 std::vector<std::uint64_t> expected_ranks(const std::vector<std::uint64_t>& shuffled_keys) {
   std::vector<std::uint64_t> ranks(shuffled_keys.size());
   for (std::size_t index = 0; index < shuffled_keys.size(); ++index) {
-    for (const auto other : shuffled_keys) ranks[index] += other > shuffled_keys[index] ? 1U : 0U;
+    // CmpAgg assigns equal keys in descending slot order; real priority keys
+    // are unique, while padded dummy keys intentionally share one value.
+    for (std::size_t other = 0; other < shuffled_keys.size(); ++other) {
+      ranks[index] += shuffled_keys[other] < shuffled_keys[index] ||
+                      (shuffled_keys[other] == shuffled_keys[index] && other > index) ? 1U : 0U;
+    }
   }
   return ranks;
 }
@@ -454,7 +459,22 @@ void run_case(std::uint32_t logical_n, std::uint32_t k, unsigned style, unsigned
   for (std::size_t index = 0; index < layout.padded_n; ++index) {
     require((output0.public_masked_list[index] & ~ring) == 0, "candidate public y ring");
     const auto rank = (output0.shuffled_rank_share[index] + output1.shuffled_rank_share[index]) & ring;
-    require(rank == expected[index], "candidate rank differential");
+    if (rank != expected[index]) {
+      std::string detail = "TEST_ONLY_DIAGNOSTIC candidate rank differential index=" +
+                           std::to_string(index) + " got=" + std::to_string(rank) +
+                           " expected=" + std::to_string(expected[index]) +
+                           " shuffled_key=" + std::to_string(shuffled_keys[index]) +
+                           " public_y=" + std::to_string(output0.public_masked_list[index]) +
+                           " rank0=" + std::to_string(output0.shuffled_rank_share[index]) +
+                           " rank1=" + std::to_string(output1.shuffled_rank_share[index]);
+      detail += " expected_all=";
+      for (const auto value : expected) detail += std::to_string(value) + ",";
+      detail += " actual_all=";
+      for (std::size_t j = 0; j < layout.padded_n; ++j) {
+        detail += std::to_string((output0.shuffled_rank_share[j] + output1.shuffled_rank_share[j]) & ring) + ",";
+      }
+      throw std::runtime_error(detail);
+    }
   }
 }
 
