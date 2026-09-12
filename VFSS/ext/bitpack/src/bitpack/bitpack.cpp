@@ -2,7 +2,7 @@
 
 namespace bitpack {
     
-    inline uint64_t mod(uint64_t x, int bw)
+    uint64_t mod(uint64_t x, int bw)
     {
         return x & ((1LL << bw) - 1);
     }

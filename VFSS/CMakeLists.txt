@@ -62,6 +62,7 @@ PUBLIC
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
 
+if(BUILD_TESTING)
 
 # === Benchmarks ===
 # DCF，GROTTO，GTDCF 比较
@@ -275,6 +276,8 @@ if(BUILD_TESTING)
     )
 endif()
 
+endif() # BUILD_TESTING: core tests/benchmarks before EMP backend
+
 if(MOE_TOPK_ENABLE_EMP_OT)
     find_package(emp-tool 1.0 CONFIG REQUIRED)
     find_package(emp-ot 1.0 CONFIG REQUIRED)
@@ -286,9 +289,11 @@ if(MOE_TOPK_ENABLE_EMP_OT)
     target_compile_features(moe_topk_emp_ot_backend PRIVATE cxx_std_20)
     set_target_properties(moe_topk_emp_ot_backend PROPERTIES CXX_EXTENSIONS OFF)
     target_link_libraries(moe_topk_emp_ot_backend PRIVATE emp-ot::emp-ot emp-tool::emp-tool OpenSSL::Crypto Threads::Threads)
-    add_executable(moe_topk_m2_chosen_ot_conformance_test tests/moe_topk/protocol_i_chosen_ot_conformance_test.cpp)
-    target_include_directories(moe_topk_m2_chosen_ot_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(moe_topk_m2_chosen_ot_conformance_test PRIVATE moe_topk_emp_ot_backend)
+    if(BUILD_TESTING)
+        add_executable(moe_topk_m2_chosen_ot_conformance_test tests/moe_topk/protocol_i_chosen_ot_conformance_test.cpp)
+        target_include_directories(moe_topk_m2_chosen_ot_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_link_libraries(moe_topk_m2_chosen_ot_conformance_test PRIVATE moe_topk_emp_ot_backend)
+    endif()
     add_library(moe_topk_share_translation_backend STATIC
         src/moe_topk/protocol_i_share_translation.cpp
         src/moe_topk/protocol_i_permutation.cpp
@@ -324,25 +329,31 @@ if(MOE_TOPK_ENABLE_EMP_OT)
         set_target_properties(moe_topk_m2_dealer_preprocessed_3round_candidate_test PROPERTIES CXX_EXTENSIONS OFF)
         target_compile_definitions(moe_topk_m2_dealer_preprocessed_3round_candidate_test PRIVATE
             MOE_TOPK_M2_DEALER_CANDIDATE_EXECUTABLE="$<TARGET_FILE:moe_topk_m2_dealer_preprocessed_3round_candidate>")
+        add_dependencies(moe_topk_m2_dealer_preprocessed_3round_candidate_test
+            moe_topk_m2_dealer_preprocessed_3round_candidate)
         target_link_libraries(moe_topk_m2_dealer_preprocessed_3round_candidate_test
             PRIVATE moe_topk_m2_dealer_preprocessed_3round_candidate_core)
     endif()
-    add_executable(moe_topk_m2_opv_conformance_test tests/moe_topk/protocol_i_opv_conformance_test.cpp)
-    target_include_directories(moe_topk_m2_opv_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(moe_topk_m2_opv_conformance_test PRIVATE moe_topk_emp_ot_backend)
-    add_executable(moe_topk_m2_share_translation_conformance_test tests/moe_topk/protocol_i_share_translation_conformance_test.cpp)
-    target_include_directories(moe_topk_m2_share_translation_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(moe_topk_m2_share_translation_conformance_test PRIVATE moe_topk_share_translation_backend)
-    add_executable(moe_topk_m2_permute_share_conformance_test tests/moe_topk/protocol_i_permute_share_conformance_test.cpp)
-    target_include_directories(moe_topk_m2_permute_share_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(moe_topk_m2_permute_share_conformance_test PRIVATE moe_topk_share_translation_backend)
-    add_executable(moe_topk_m2_secret_shared_shuffle_conformance_test tests/moe_topk/protocol_i_secret_shared_shuffle_conformance_test.cpp)
-    target_include_directories(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE moe_topk_share_translation_backend)
-    add_executable(moe_topk_m2_protocol_i_modular_e2e_test tests/moe_topk/protocol_i_small_e2e_test.cpp)
-    target_include_directories(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/cryptoTools)
-    target_link_libraries(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE moe_topk_share_translation_backend sytorch)
+    if(BUILD_TESTING)
+        add_executable(moe_topk_m2_opv_conformance_test tests/moe_topk/protocol_i_opv_conformance_test.cpp)
+        target_include_directories(moe_topk_m2_opv_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_link_libraries(moe_topk_m2_opv_conformance_test PRIVATE moe_topk_emp_ot_backend)
+        add_executable(moe_topk_m2_share_translation_conformance_test tests/moe_topk/protocol_i_share_translation_conformance_test.cpp)
+        target_include_directories(moe_topk_m2_share_translation_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_link_libraries(moe_topk_m2_share_translation_conformance_test PRIVATE moe_topk_share_translation_backend)
+        add_executable(moe_topk_m2_permute_share_conformance_test tests/moe_topk/protocol_i_permute_share_conformance_test.cpp)
+        target_include_directories(moe_topk_m2_permute_share_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_link_libraries(moe_topk_m2_permute_share_conformance_test PRIVATE moe_topk_share_translation_backend)
+        add_executable(moe_topk_m2_secret_shared_shuffle_conformance_test tests/moe_topk/protocol_i_secret_shared_shuffle_conformance_test.cpp)
+        target_include_directories(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+        target_link_libraries(moe_topk_m2_secret_shared_shuffle_conformance_test PRIVATE moe_topk_share_translation_backend)
+        add_executable(moe_topk_m2_protocol_i_modular_e2e_test tests/moe_topk/protocol_i_small_e2e_test.cpp)
+        target_include_directories(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/cryptoTools)
+        target_link_libraries(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE moe_topk_share_translation_backend sytorch)
+    endif()
 endif()
+
+if(BUILD_TESTING)
 
 # Protocol III pre-integration primitive conformance. This validates the
 # existing VFSS DPF implementation and transport without starting M3 routing.
@@ -669,4 +680,6 @@ if(BUILD_TESTING)
         add_test(NAME moe_topk_m2_dealer_preprocessed_3round_candidate_test
                  COMMAND moe_topk_m2_dealer_preprocessed_3round_candidate_test)
     endif()
-endif()
+endif() # BUILD_TESTING: remaining tests/benchmarks
+
+endif() # BUILD_TESTING
