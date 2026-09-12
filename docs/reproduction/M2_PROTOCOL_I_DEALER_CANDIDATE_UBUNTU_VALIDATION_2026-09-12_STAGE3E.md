@@ -11,9 +11,10 @@
 - `CORE_RUNTIME_BLOCKED`
 - `ADAPTER_ENTRY_BLOCKED`
 
-本轮无法获得 candidate runtime 证据。当前执行主机是 Windows 11，不是要求的 Ubuntu
-24.04；且没有可执行的 CMake/CTest、Eigen3 CMake 配置、`emp-tool` 或 `emp-ot` 包。
-没有安装或修改任何依赖，也没有使用 EMP-OFF、历史结果、声明桩或 fake header 绕过门槛。
+本轮已显式切换到已安装的 WSL `Ubuntu-24.04`。Ubuntu 24.04、CMake/CTest、Eigen3 3.4.0
+和 OpenSSL 3.0.13 均已确认；真实 EMP-ON configure 推进到第一处依赖检查，但因
+`emp-tool` CMake package 缺失而停止。仍未获得 candidate runtime 证据。没有安装或修改
+任何依赖，也没有使用 EMP-OFF、历史结果、声明桩或 fake header 绕过门槛。
 
 ## Git identity and revision
 
@@ -43,29 +44,28 @@ Get-ChildItem C:\ -Recurse -Include Eigen3Config.cmake,emp-toolConfig.cmake,emp-
 
 Observed:
 
-- OS: Windows 11 Home 10.0.26200, x64; Ubuntu 24.04 unavailable
+- OS: WSL2 Ubuntu 24.04.4 LTS, x86_64（Windows 仅作为启动器）
 - CPU: Intel Core i9-13980HX, 24 cores / 32 logical processors
-- compiler: MinGW-w64 `g++` 8.1.0
-- CMake: `NOT_FOUND`
-- CTest: `NOT_FOUND`
-- Ninja: found under the Python installation, but unusable without CMake and not a substitute
-- Eigen3: `Eigen3Config.cmake` not found
+- compiler: GNU g++ 13.3.0
+- CMake/CTest: 3.28.3
+- Ninja: 1.11.1
+- Eigen3: 3.4.0, `/usr/share/eigen3/cmake/Eigen3Config.cmake`
 - emp-tool: `emp-toolConfig.cmake` / `emp-tool-config.cmake` not found
 - emp-ot: `emp-otConfig.cmake` / `emp-ot-config.cmake` not found
-- OpenSSL: Git MinGW OpenSSL 3.5.7 executable and MinGW OpenSSL headers/libs exist
-- WSL: probe did not provide a usable Ubuntu distribution
+- OpenSSL: 3.0.13, `/usr/include/openssl/{crypto.h,rand.h}`, `libcrypto.so.3`
+- WSL: `Ubuntu-24.04` explicitly selected and usable
 - dependency installation/modification: none
 
 ## Dependency matrix
 
 | Dependency | Required | Current evidence | Status |
 | --- | --- | --- | --- |
-| Ubuntu 24.04 x86_64 | yes | Windows host | `BLOCKED` |
-| CMake / CTest | yes | executables absent | `BLOCKED` |
-| Eigen3 CMake package | yes | config absent | `BLOCKED` |
+| Ubuntu 24.04 x86_64 | yes | WSL2 Ubuntu 24.04.4 | `PASS` |
+| CMake / CTest | yes | 3.28.3 | `PASS` |
+| Eigen3 CMake package | yes | 3.4.0 config present | `PASS` |
 | emp-tool 1.0 CONFIG | yes | config absent | `BLOCKED` |
 | emp-ot 1.0 CONFIG | yes | config absent | `BLOCKED` |
-| OpenSSL development files | yes | headers/libs present, CMake path unavailable | `PARTIAL` |
+| OpenSSL development files | yes | headers/libs and pkg-config 3.0.13 | `PASS` |
 
 ## CMake configure result
 
@@ -81,14 +81,15 @@ Command:
 cmake -S VFSS -B C:\Users\28641\Desktop\MoE_Top-k_Reproduction_Evaluation\.tmp-stage3e-build-20260912 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_EMP_OT=ON
 ```
 
-Result: `FAIL / ENVIRONMENT_BLOCKED` before CMake execution:
+Result: `FAIL / ENVIRONMENT_BLOCKED` during dependency discovery:
 
 ```text
 The term 'cmake' is not recognized as a name of a cmdlet, function, script file, or executable program.
 ```
 
-The repository's next required checks (`find_package(emp-tool 1.0 CONFIG REQUIRED)` and
-`find_package(emp-ot 1.0 CONFIG REQUIRED)`) could not be reached. No build graph was generated.
+The repository reached `find_package(emp-tool 1.0 CONFIG REQUIRED)` and failed because no
+`emp-toolConfig.cmake` or `emp-tool-config.cmake` exists in the configured prefix. `emp-ot` was
+not reached. No build graph was generated.
 
 ## Compile and link result
 
@@ -172,4 +173,3 @@ git status --short --branch
 在具备全部 pinned Ubuntu/EMP 依赖的环境中重新执行阶段三E；保存 configure/build/test 原始
 输出、实际 child 生命周期、R1/R2/R3 counters 和失败矩阵后，再重新审查 `CORE_RUNTIME_GO`。
 在此之前不得实现 output adapter 或修改七轮、paper-exact、最终 mask 结论。
-
