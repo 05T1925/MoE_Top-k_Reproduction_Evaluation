@@ -1,5 +1,8 @@
 #include <moe_topk/protocol_i_dealer_candidate_core.h>
 #include <moe_topk/protocol_i_dealer_candidate_package.h>
+#include <moe_topk/protocol_i_dealer_candidate_route_a.h>
+#include <moe_topk/protocol_i_raw_score_route_a.h>
+#include <moe_topk/protocol_i_score_input.h>
 #include <moe_topk/protocol_i_permutation.h>
 #include <moe_topk/protocol_i_pipeline.h>
 #include <moe_topk/protocol_i_transport.h>
@@ -134,6 +137,55 @@ std::vector<std::uint64_t> decode_words(const std::vector<std::uint8_t>& bytes,
   return words;
 }
 
+std::vector<std::uint8_t> encode_route_result(
+    const ProtocolIDealerCandidatePublicConfig& config,
+    const ProtocolIDealerCandidateRouteAOutput& output) {
+  std::vector<std::uint8_t> bytes;
+  bytes.insert(bytes.end(), {'R', 'A', '6', 'M', 1});
+  auto put = [&bytes](std::uint64_t value) {
+    for (int shift = 56; shift >= 0; shift -= 8)
+      bytes.push_back(static_cast<std::uint8_t>(value >> shift));
+  };
+  put(config.material_id);
+  put(output.xor_mask_share.size());
+  put(output.rank_reveal_sent_bytes);
+  put(output.rank_reveal_received_bytes);
+  put(output.reverse_sent_bytes);
+  put(output.reverse_received_bytes);
+  put(output.online_rounds);
+  bytes.insert(bytes.end(), output.xor_mask_share.begin(), output.xor_mask_share.end());
+  return bytes;
+}
+
+std::vector<std::uint8_t> encode_raw_route_result(
+    const ProtocolIDealerCandidatePublicConfig& config,
+    const ProtocolIPriorityPipelineOutput& output,
+    const ProtocolIScoreInputMetrics& score_metrics) {
+  std::vector<std::uint8_t> bytes;
+  bytes.insert(bytes.end(), {'R', 'A', '8', 'M', 1});
+  auto put = [&bytes](std::uint64_t value) {
+    for (int shift = 56; shift >= 0; shift -= 8)
+      bytes.push_back(static_cast<std::uint8_t>(value >> shift));
+  };
+  put(config.material_id);
+  put(output.xor_mask_share.size());
+  put(score_metrics.carry_sent_bytes);
+  put(score_metrics.carry_received_bytes);
+  put(score_metrics.sign_sent_bytes);
+  put(score_metrics.sign_received_bytes);
+  put(output.metrics.forward_sent_bytes);
+  put(output.metrics.forward_received_bytes);
+  put(output.metrics.cmpagg_sent_bytes);
+  put(output.metrics.cmpagg_received_bytes);
+  put(output.metrics.rank_reveal_sent_bytes);
+  put(output.metrics.rank_reveal_received_bytes);
+  put(output.metrics.reverse_sent_bytes);
+  put(output.metrics.reverse_received_bytes);
+  put(score_metrics.rounds + output.metrics.online_rounds);
+  bytes.insert(bytes.end(), output.xor_mask_share.begin(), output.xor_mask_share.end());
+  return bytes;
+}
+
 ProtocolIDealerCandidatePublicConfig public_config(const Arguments& arguments) {
   const auto logical_n = dimension(arguments, "--logical-n");
   const auto k = dimension(arguments, "--k");
@@ -158,6 +210,21 @@ int dealer_main(const Arguments& arguments) {
   const int package0_fd = descriptor(arguments, "--package0-fd");
   const int package1_fd = descriptor(arguments, "--package1-fd");
   close_except({package0_fd, package1_fd});
+  const bool raw_route = arguments.optional("--raw-score-route-a", "0") == "1";
+  if (raw_route) {
+    auto packages = protocol_i_raw_score_route_a_preprocess(config);
+    const auto package0 = serialize_party_package(packages.party0);
+    const auto package1 = serialize_party_package(packages.party1);
+    ProtocolIFramedChannel channel0(
+        package0_fd, {config.session, config.fingerprint, config.padded_n, config.k,
+                      config.comparison_bits, 2, 0, 1, 1}, timeout_ms(arguments));
+    ProtocolIFramedChannel channel1(
+        package1_fd, {config.session, config.fingerprint, config.padded_n, config.k,
+                      config.comparison_bits, 2, 1, 1, 1}, timeout_ms(arguments));
+    protocol_i_send_framed_chunks(channel0, package0);
+    protocol_i_send_framed_chunks(channel1, package1);
+    return 0;
+  }
   auto packages = protocol_i_dealer_candidate_preprocess(config);
   const auto package0 = serialize_dealer_candidate_package(packages.party0);
   const auto package1 = serialize_dealer_candidate_package(packages.party1);
@@ -186,9 +253,20 @@ int party_main(const Arguments& arguments, int party) {
   const int masked_open_fd = descriptor(arguments, "--masked-open-fd");
   const int result_fd = descriptor(arguments, "--result-fd");
   const int ready_fd = descriptor(arguments, "--ready-fd");
+  const bool route_a = arguments.optional("--route-a", "0") == "1";
+  const bool raw_route = arguments.optional("--raw-score-route-a", "0") == "1";
+  if (raw_route && !route_a) fail("raw Route A requires route mode");
+  const int rank_reveal_fd = route_a ? descriptor(arguments, "--rank-reveal-fd") : -1;
+  const int route_result_fd = route_a ? descriptor(arguments, "--route-result-fd") : -1;
+  const std::array<int, 2> score_fds{
+      raw_route ? descriptor(arguments, "--score-fd-0") : -1,
+      raw_route ? descriptor(arguments, "--score-fd-1") : -1};
   std::array<int, 4> offline_fds{};
   std::array<int, 2> forward_fds{};
+  std::array<int, 2> reverse_fds{};
   std::vector<int> keep{package_fd, input_fd, masked_open_fd, result_fd, ready_fd};
+  if (route_a) { keep.push_back(rank_reveal_fd); keep.push_back(route_result_fd); }
+  if (raw_route) { keep.push_back(score_fds[0]); keep.push_back(score_fds[1]); }
   for (unsigned index = 0; index < offline_fds.size(); ++index) {
     offline_fds[index] = descriptor(arguments, ("--offline-fd-" + std::to_string(index)).c_str());
     keep.push_back(offline_fds[index]);
@@ -197,17 +275,23 @@ int party_main(const Arguments& arguments, int party) {
     forward_fds[index] = descriptor(arguments, ("--forward-fd-" + std::to_string(index)).c_str());
     keep.push_back(forward_fds[index]);
   }
+  if (route_a) {
+    for (unsigned index = 0; index < reverse_fds.size(); ++index) {
+      reverse_fds[index] = descriptor(arguments, ("--reverse-fd-" + std::to_string(index)).c_str());
+      keep.push_back(reverse_fds[index]);
+    }
+  }
   close_except(keep);
 
-  ProtocolIDealerCandidatePackage package;
+  const auto package_config = ProtocolIFrameConfig{
+      config.session, config.fingerprint, config.padded_n, config.k,
+      config.comparison_bits, static_cast<std::uint8_t>(party), 2, 1, 1};
+  std::vector<std::uint8_t> encoded_package;
+  std::uint64_t package_bytes = 0;
   {
-    ProtocolIFramedChannel channel(
-        package_fd, {config.session, config.fingerprint, config.padded_n, config.k,
-                     config.comparison_bits, static_cast<std::uint8_t>(party), 2, 1, 1},
-        timeout_ms(arguments));
-    const auto encoded_package = protocol_i_receive_framed_chunks(channel, 64U * 1024U * 1024U);
-    package = deserialize_dealer_candidate_package(encoded_package, party);
-    package.serialized_bytes = channel.received_bytes();
+    ProtocolIFramedChannel channel(package_fd, package_config, timeout_ms(arguments));
+    encoded_package = protocol_i_receive_framed_chunks(channel, 64U * 1024U * 1024U);
+    package_bytes = channel.received_bytes();
   }
 
   const auto mode = number(arguments, "--permutation-mode");
@@ -240,12 +324,51 @@ int party_main(const Arguments& arguments, int party) {
         input_fd, {config.session, config.fingerprint, config.padded_n, config.k,
                    config.comparison_bits, static_cast<std::uint8_t>(party), 2, 4, 1},
         timeout_ms(arguments));
-    priority_key_share = decode_words(input.receive(), config.padded_n);
+    priority_key_share = decode_words(input.receive(), raw_route ? config.logical_n : config.padded_n);
   }
 
   ProtocolIDealerCandidateCoreConfig core_config;
   static_cast<ProtocolIDealerCandidateConfig&>(core_config) = config;
   core_config.timeout_ms = timeout_ms(arguments);
+  if (raw_route) {
+    auto package = deserialize_party_package(encoded_package, party);
+    std::vector<std::uint32_t> raw_score_shares;
+    raw_score_shares.reserve(priority_key_share.size());
+    for (const auto share : priority_key_share) {
+      if (share > UINT32_MAX) fail("raw score share width");
+      raw_score_shares.push_back(static_cast<std::uint32_t>(share));
+    }
+    ProtocolIScoreInputMetrics score_metrics;
+    const auto keys = protocol_i_raw_score_input_party(
+        {config.session, config.fingerprint, config.logical_n, config.padded_n, config.k,
+         config.rank_bits, config.comparison_bits, static_cast<std::uint8_t>(party),
+         core_config.timeout_ms}, package, raw_score_shares, score_fds, &score_metrics);
+    const auto route_output = protocol_i_dealer_candidate_route_a_priority_party(
+        {config.session, config.fingerprint, config.logical_n, config.padded_n, config.k,
+         config.comparison_bits, static_cast<std::uint8_t>(party), core_config.timeout_ms},
+        std::move(package), shuffle_material, keys, forward_fds, masked_open_fd,
+        rank_reveal_fd, reverse_fds);
+    ProtocolIFramedChannel result(
+        route_result_fd, {config.session, config.fingerprint, config.padded_n, config.k,
+                          config.comparison_bits, static_cast<std::uint8_t>(party), 2, 8, 1},
+        timeout_ms(arguments));
+    result.send(encode_raw_route_result(config, route_output, score_metrics));
+    return 0;
+  }
+  ProtocolIDealerCandidatePackage package =
+      deserialize_dealer_candidate_package(encoded_package, party);
+  package.serialized_bytes = package_bytes;
+  if (route_a) {
+    auto route_output = protocol_i_dealer_candidate_route_a_party(
+        core_config, std::move(package), shuffle_material,
+        priority_key_share, forward_fds, masked_open_fd, rank_reveal_fd, reverse_fds);
+    ProtocolIFramedChannel result(
+        route_result_fd, {config.session, config.fingerprint, config.padded_n, config.k,
+                          config.comparison_bits, static_cast<std::uint8_t>(party), 2, 7, 1},
+        timeout_ms(arguments));
+    result.send(encode_route_result(config, route_output));
+    return 0;
+  }
   const auto output = protocol_i_dealer_candidate_core_party(
       core_config, std::move(package), shuffle_material, priority_key_share,
       forward_fds, masked_open_fd);

@@ -1,4 +1,6 @@
 #include <moe_topk/protocol_i_pipeline.h>
+#include <moe_topk/protocol_i_dealer_candidate_route_a.h>
+#define protocol_i_priority_pipeline_party protocol_i_dealer_candidate_route_a_priority_party
 #include <moe_topk/protocol_i_priority_key.h>
 #include <moe_topk/protocol_i_score_input.h>
 #include <moe_topk/protocol_i_transport.h>

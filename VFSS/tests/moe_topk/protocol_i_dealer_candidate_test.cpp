@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <cerrno>
 #include <fcntl.h>
 #include <iostream>
 #include <random>
@@ -53,8 +54,10 @@ void make_socket_pair(FdPair& pair) {
   require(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds) == 0, "candidate socketpair");
   for (const auto fd : fds) {
     const auto flags = ::fcntl(fd, F_GETFD);
-    require(flags >= 0 && ::fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == 0,
-            "candidate socket fd flags");
+    if (flags < 0 || ::fcntl(fd, F_SETFD, flags | FD_CLOEXEC) != 0) {
+      std::cerr << "candidate socket fd flags fd=" << fd << " errno=" << errno << '\n';
+      fail("candidate socket fd flags");
+    }
   }
   pair = {fds[0], fds[1]};
 }
@@ -69,8 +72,10 @@ void prepare_child(const std::vector<int>& all_fds, const std::vector<int>& keep
   }
   for (const auto fd : keep) {
     const auto flags = ::fcntl(fd, F_GETFD);
-    require(flags >= 0 && ::fcntl(fd, F_SETFD, flags & ~FD_CLOEXEC) == 0,
-            "candidate child fd inheritance");
+    if (flags < 0 || ::fcntl(fd, F_SETFD, flags & ~FD_CLOEXEC) != 0) {
+      std::cerr << "candidate child fd inheritance fd=" << fd << " errno=" << errno << '\n';
+      fail("candidate child fd inheritance");
+    }
   }
 }
 
@@ -273,7 +278,9 @@ void transport_negative() {
 struct CaseChannels {
   std::array<FdPair, 4> offline{};
   std::array<FdPair, 2> forward{};
-  FdPair package0{}, package1{}, ready0{}, ready1{}, input0{}, input1{}, masked{}, result0{}, result1{};
+  std::array<FdPair, 2> reverse{};
+  FdPair package0{}, package1{}, ready0{}, ready1{}, input0{}, input1{}, masked{}, rank_reveal{},
+      result0{}, result1{}, route_result0{}, route_result1{};
 };
 
 std::vector<int> all_fds(const CaseChannels& channels) {
@@ -284,9 +291,11 @@ std::vector<int> all_fds(const CaseChannels& channels) {
   };
   for (const auto& pair : channels.offline) add(pair);
   for (const auto& pair : channels.forward) add(pair);
+  for (const auto& pair : channels.reverse) add(pair);
   for (const auto* pair : {&channels.package0, &channels.package1, &channels.ready0, &channels.ready1,
-                           &channels.input0, &channels.input1, &channels.masked, &channels.result0,
-                           &channels.result1}) add(*pair);
+                           &channels.input0, &channels.input1, &channels.masked, &channels.rank_reveal,
+                           &channels.result0, &channels.result1, &channels.route_result0,
+                           &channels.route_result1}) add(*pair);
   return values;
 }
 
@@ -294,9 +303,10 @@ void close_all(CaseChannels& channels) {
   auto close = [](FdPair& pair) { close_fd(pair.first); close_fd(pair.second); };
   for (auto& pair : channels.offline) close(pair);
   for (auto& pair : channels.forward) close(pair);
+  for (auto& pair : channels.reverse) close(pair);
   close(channels.package0); close(channels.package1); close(channels.ready0); close(channels.ready1);
-  close(channels.input0); close(channels.input1); close(channels.masked);
-  close(channels.result0); close(channels.result1);
+  close(channels.input0); close(channels.input1); close(channels.masked); close(channels.rank_reveal);
+  close(channels.result0); close(channels.result1); close(channels.route_result0); close(channels.route_result1);
 }
 
 std::vector<std::string> dealer_args(const ProtocolIDealerCandidatePublicConfig& config,
@@ -316,7 +326,8 @@ std::vector<std::string> dealer_args(const ProtocolIDealerCandidatePublicConfig&
 
 std::vector<std::string> party_args(const ProtocolIDealerCandidatePublicConfig& config,
                                     const CaseChannels& channels, int party,
-                                    unsigned permutation_mode, std::uint64_t permutation_seed) {
+                                    unsigned permutation_mode, std::uint64_t permutation_seed,
+                                    bool route_a = false) {
   const auto& package = party == 0 ? channels.package0 : channels.package1;
   const auto& ready = party == 0 ? channels.ready0 : channels.ready1;
   const auto& input = party == 0 ? channels.input0 : channels.input1;
@@ -327,6 +338,13 @@ std::vector<std::string> party_args(const ProtocolIDealerCandidatePublicConfig& 
   add_arg(args, "--input-fd", input.first);
   add_arg(args, "--masked-open-fd", party == 0 ? channels.masked.first : channels.masked.second);
   add_arg(args, "--result-fd", result.first);
+  if (route_a) {
+    add_arg(args, "--route-a", 1);
+    add_arg(args, "--rank-reveal-fd",
+            party == 0 ? channels.rank_reveal.first : channels.rank_reveal.second);
+    add_arg(args, "--route-result-fd",
+            party == 0 ? channels.route_result0.first : channels.route_result1.first);
+  }
   for (unsigned index = 0; index < channels.offline.size(); ++index) {
     add_arg(args, ("--offline-fd-" + std::to_string(index)).c_str(),
             party == 0 ? channels.offline[index].first : channels.offline[index].second);
@@ -334,6 +352,12 @@ std::vector<std::string> party_args(const ProtocolIDealerCandidatePublicConfig& 
   for (unsigned index = 0; index < channels.forward.size(); ++index) {
     add_arg(args, ("--forward-fd-" + std::to_string(index)).c_str(),
             party == 0 ? channels.forward[index].first : channels.forward[index].second);
+  }
+  if (route_a) {
+    for (unsigned index = 0; index < channels.reverse.size(); ++index) {
+      add_arg(args, ("--reverse-fd-" + std::to_string(index)).c_str(),
+              party == 0 ? channels.reverse[index].first : channels.reverse[index].second);
+    }
   }
   add_arg(args, "--logical-n", config.logical_n);
   add_arg(args, "--k", config.k);
@@ -478,6 +502,137 @@ void run_case(std::uint32_t logical_n, std::uint32_t k, unsigned style, unsigned
   }
 }
 
+std::vector<std::uint8_t> parse_route_result(const std::vector<std::uint8_t>& bytes,
+                                             std::uint32_t logical_n,
+                                             std::uint64_t material_id) {
+  require(bytes.size() == 5U + 7U * sizeof(std::uint64_t) + logical_n,
+          "route result length");
+  const std::array<std::uint8_t, 5> identity{'R', 'A', '6', 'M', 1};
+  require(std::equal(identity.begin(), identity.end(), bytes.begin()),
+          "route result identity");
+  std::size_t offset = 5;
+  auto get = [&]() {
+    std::uint64_t value = 0;
+    for (unsigned index = 0; index < 8; ++index) value = (value << 8U) | bytes[offset++];
+    return value;
+  };
+  require(get() == material_id, "route result material identity");
+  const auto count = get();
+  const auto rank_sent = get(); const auto rank_received = get();
+  const auto reverse_sent = get(); const auto reverse_received = get();
+  const auto rounds = get();
+  require(count == logical_n && rounds == 6 && rank_sent > 0 && rank_received > 0 &&
+              reverse_sent > 0 && reverse_received > 0, "route result metrics");
+  return std::vector<std::uint8_t>(bytes.begin() + static_cast<std::ptrdiff_t>(offset), bytes.end());
+}
+
+void route_result_negative() {
+  bool rejected = false;
+  try { (void)parse_route_result({}, 1, 1); } catch (...) { rejected = true; }
+  require(rejected, "route result truncation negative");
+  std::vector<std::uint8_t> wrong(5U + 7U * sizeof(std::uint64_t) + 1U, 0);
+  wrong[0] = 'R'; wrong[1] = 'A'; wrong[2] = 'X'; wrong[3] = 'M'; wrong[4] = 1;
+  rejected = false;
+  try { (void)parse_route_result(wrong, 1, 1); } catch (...) { rejected = true; }
+  require(rejected, "route result identity negative");
+}
+
+void run_route_case(std::uint32_t logical_n, std::uint32_t k, unsigned style,
+                    unsigned permutation_mode, std::uint64_t serial) {
+  const auto layout = protocol_i_make_input_layout(logical_n, k);
+  const ProtocolIDealerCandidatePublicConfig config{
+      0x910000 + serial, 0x920000 + serial, 0x930000 + serial, logical_n,
+      layout.padded_n, k, layout.minimum_comparison_bits, layout.index_bits};
+  const auto scores = scores_for(logical_n, style, 0x940000 + serial);
+  const auto keys = priority_keys(scores, logical_n, layout.padded_n);
+  const auto shares = split_keys(keys, config.comparison_bits, 0xa40000 + serial);
+  CaseChannels channels;
+  for (auto& pair : channels.offline) make_socket_pair(pair);
+  for (auto& pair : channels.forward) make_socket_pair(pair);
+  for (auto& pair : channels.reverse) make_socket_pair(pair);
+  make_socket_pair(channels.package0); make_socket_pair(channels.package1);
+  make_socket_pair(channels.ready0); make_socket_pair(channels.ready1);
+  make_socket_pair(channels.input0); make_socket_pair(channels.input1);
+  make_socket_pair(channels.masked); make_socket_pair(channels.rank_reveal);
+  make_socket_pair(channels.result0); make_socket_pair(channels.result1);
+  make_socket_pair(channels.route_result0); make_socket_pair(channels.route_result1);
+  const auto all = all_fds(channels);
+  const std::string executable = MOE_TOPK_M2_DEALER_CANDIDATE_EXECUTABLE;
+  const auto dealer = spawn_role(executable, dealer_args(config, channels), all,
+                                 {channels.package0.first, channels.package1.first});
+  close_fd(channels.package0.first); close_fd(channels.package1.first);
+  wait_ok(dealer, "route dealer process");
+  const auto p0 = spawn_role(executable, party_args(config, channels, 0, permutation_mode,
+                                                    0xb40000 + serial, true), all,
+    [&] { std::vector<int> keep{channels.package0.second, channels.ready0.first,
+      channels.input0.first, channels.masked.first, channels.result0.first,
+      channels.rank_reveal.first,
+      channels.route_result0.first}; for (const auto& p : channels.offline) keep.push_back(p.first);
+      for (const auto& p : channels.forward) keep.push_back(p.first);
+      for (const auto& p : channels.reverse) keep.push_back(p.first); return keep; }());
+  const auto p1 = spawn_role(executable, party_args(config, channels, 1, permutation_mode,
+                                                    0xc40000 + serial, true), all,
+    [&] { std::vector<int> keep{channels.package1.second, channels.ready1.first,
+      channels.input1.first, channels.masked.second, channels.result1.first,
+      channels.rank_reveal.second,
+      channels.route_result1.first}; for (const auto& p : channels.offline) keep.push_back(p.second);
+      for (const auto& p : channels.forward) keep.push_back(p.second);
+      for (const auto& p : channels.reverse) keep.push_back(p.second); return keep; }());
+  close_fd(channels.package0.second); close_fd(channels.package1.second);
+  close_fd(channels.ready0.first); close_fd(channels.ready1.first);
+  close_fd(channels.input0.first); close_fd(channels.input1.first);
+  close_fd(channels.result0.first); close_fd(channels.result1.first);
+  for (auto& p : channels.offline) { close_fd(p.first); close_fd(p.second); }
+  for (auto& p : channels.forward) { close_fd(p.first); close_fd(p.second); }
+  close_fd(channels.masked.first); close_fd(channels.masked.second);
+  close_fd(channels.rank_reveal.first); close_fd(channels.rank_reveal.second);
+  for (auto& p : channels.reverse) { close_fd(p.first); close_fd(p.second); }
+  const auto receive = [&](int party, int phase) {
+    return ProtocolIFrameConfig{config.session, config.fingerprint, config.padded_n, config.k,
+      config.comparison_bits, 2, static_cast<std::uint8_t>(party),
+      static_cast<std::uint8_t>(phase), 1};
+  };
+  { ProtocolIFramedChannel r0(take_fd(channels.ready0.second), receive(0, 2), kTimeoutMs);
+    ProtocolIFramedChannel r1(take_fd(channels.ready1.second), receive(1, 2), kTimeoutMs);
+    require(r0.receive() == std::vector<std::uint8_t>{1} && r1.receive() == std::vector<std::uint8_t>{1},
+            "route readiness"); }
+  { ProtocolIFramedChannel i0(take_fd(channels.input0.second), receive(0, 4), kTimeoutMs);
+    ProtocolIFramedChannel i1(take_fd(channels.input1.second), receive(1, 4), kTimeoutMs);
+    i0.send(encode_words(shares.first)); i1.send(encode_words(shares.second)); }
+  ProtocolIFramedChannel r0(take_fd(channels.route_result0.second), receive(0, 7), kTimeoutMs);
+  ProtocolIFramedChannel r1(take_fd(channels.route_result1.second), receive(1, 7), kTimeoutMs);
+  const auto mask0 = parse_route_result(r0.receive(), logical_n, config.material_id);
+  const auto mask1 = parse_route_result(r1.receive(), logical_n, config.material_id);
+  wait_ok(p0, "route party 0 process"); wait_ok(p1, "route party 1 process");
+  close_all(channels);
+  std::vector<std::size_t> order(logical_n);
+  for (std::size_t i = 0; i < order.size(); ++i) order[i] = i;
+  std::stable_sort(order.begin(), order.end(), [&](std::size_t a, std::size_t b) {
+    return static_cast<std::int32_t>(scores[a]) > static_cast<std::int32_t>(scores[b]);
+  });
+  std::vector<std::uint8_t> expected(logical_n);
+  for (std::size_t i = 0; i < k; ++i) expected[order[i]] = 1;
+  require(mask0.size() == logical_n && mask1.size() == logical_n, "route mask shape");
+  std::size_t selected = 0;
+  for (std::size_t i = 0; i < logical_n; ++i) {
+    const auto bit = static_cast<std::uint8_t>((mask0[i] ^ mask1[i]) & 1U);
+    if (bit != expected[i]) {
+      std::string detail = "route original-order oracle index=" + std::to_string(i) +
+                           " got=" + std::to_string(bit) + " expected=" +
+                           std::to_string(expected[i]) + " n=" + std::to_string(logical_n) +
+                           " k=" + std::to_string(k) + " style=" + std::to_string(style) +
+                           " perm=" + std::to_string(permutation_mode) + " mask0=";
+      for (const auto value : mask0) detail += std::to_string(value) + ",";
+      detail += " mask1=";
+      for (const auto value : mask1) detail += std::to_string(value) + ",";
+      throw std::runtime_error(detail);
+    }
+    selected += bit;
+  }
+  require(selected == k && r0.received_bytes() > 0 && r1.received_bytes() > 0,
+          "route result accounting");
+}
+
 }  // namespace
 
 int main() {
@@ -488,6 +643,7 @@ int main() {
     }
     package_conformance();
     transport_negative();
+    route_result_negative();
     std::uint64_t serial = 1;
     for (const auto logical_n : {1U, 2U, 3U, 5U, 7U, 8U}) {
       const std::vector<std::uint32_t> ks{1U, (logical_n + 1U) / 2U, logical_n};
@@ -495,6 +651,13 @@ int main() {
         const auto case_serial = serial++;
         run_case(logical_n, k, static_cast<unsigned>(case_serial % 5U),
                  static_cast<unsigned>(case_serial % 3U), case_serial);
+      }
+    }
+    std::uint64_t route_serial = 1;
+    for (const auto logical_n : {1U, 3U, 5U, 7U, 8U, 11U}) {
+      for (const auto k : {1U, (logical_n + 1U) / 2U, logical_n}) {
+        run_route_case(logical_n, k, static_cast<unsigned>(route_serial % 5U),
+                       static_cast<unsigned>(route_serial % 3U), route_serial++);
       }
     }
     return 0;
