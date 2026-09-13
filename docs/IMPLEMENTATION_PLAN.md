@@ -1,488 +1,851 @@
 # MoE Top-K 详细实施计划
 
-本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界和长期统一
-指标；本文把工作拆成可分配、可验收的里程碑。若两者冲突，以更新后的
-`PROJECT.md` 和团队明确决定为准，并同步修正文档，禁止仅在代码中形成隐含规则。
+更新日期：2026-09-13
 
-## 1. 当前结论
+本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
-### M2.0–M2.16 documentation/validation closeout status (2026-09-07)
+若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
 
-M2 Protocol I is closed as the project's C-level modular baseline after the
-M2.16 documentation and validation closeout.
-The validated implementation label is
-`m2_protocol_i_raw_score_input_modular_8round_mask_output`; EMP-OFF and EMP-ON
-full suites, raw-score independent-process E2E, and the explicit `(128,2/8)` and
-`(256,2/8)` smokes have passed. M2.15 did not achieve the paper's 3-round core:
-the current VFSS two-pass PS API cannot emit the paper-compatible public masked
-shuffled list under the same hidden permutation. The measured current graph is
-8 rounds (2 raw adapter + 4 current core + 2 reverse mask adapter). This is an
-engineering closeout and M2-to-M3 handoff, not a paper-exact claim.
+本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B BB90+DCF。
 
-### M2.16 status (2026-09-06)
+## 1. 当前结论与执行主线
 
-M2.16 completed a paper-exact feasibility and leakage audit without changing the
-runtime. Agarwal §2.4/§4.1 requires a shuffle output `pi(x)+r` under the same
-hidden permutation as the secret payload, where `r` is unknown to either single
-party and is the subsequent FSS-gate secret parameter. The current VFSS
-Permute+Share/P2 material contract has no auditable public-list output,
-same-permutation binding, or correlated `r`/GRank material. No primitive, round
-label, or leakage approval was upgraded: the 3-round core and 7-round unified
-candidate remain blocked, while the C-level 4-round core / 8-round total baseline
-and M3 implementation mainline remain unchanged. See
-`docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md`,
-`docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`, and
-`docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md`.
+### 1.1 已完成基础
 
-The M2.16 documentation was integrated into `main` by `f800f96`. It records a
-blocked paper-exact research target, not an exact implementation.
+| 里程碑 | 当前状态 | 保留边界 |
+| --- | --- | --- |
+| M0 | 仓库、来源和冻结基线已建立 | `VFSS-baseline/` 不修改 |
+| M1/M1.1 | 统一语义、oracle、基础适配、metrics 和测试入口已完成 | 不重新定义 score、tie rule 和输出 |
+| M2 工程基线 | C 级模块化实现已完成并合入 main | 四轮核心、raw-score 到 mask 共八轮，不是论文精确实现 |
+| M3 | 三轮模块化核心及 raw-score 五轮扩展已完成并冻结 | 作为 M5 的基础和对照 |
 
-### M2 validation reliability status (2026-09-06)
+当前 M2 工程实现标签为：
 
-The chosen-OT readable-hangup repair and modular E2E FD-lifecycle repair are
-integrated without changing the M2 protocol graph. In Ubuntu 24.04.4, a fresh
-combined EMP-ON build with explicit soft `RLIMIT_NOFILE=1024` discovered 19
-CTests and passed 19/19; the independently configured EMP-OFF suite passed
-13/13. The direct `(128,2/8)` and `(256,2/8)` modular E2E cases and repeated
-full matrix also passed at 1024, with the full matrix additionally passing at
-4096. This closes the observed harness/resource blocker for the C-level
-baseline in that recorded environment. It does not change the 8-round label,
-paper-exact blocker, performance status, or `NOT_MEASURED` fields. See
-`docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md` and
-`docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md`.
+```text
+m2_protocol_i_raw_score_input_modular_8round_mask_output
+```
 
-- M0：已在远端闭环；
-- M1：核心已完成并同步远端，四项测试在 macOS 与 Ubuntu 24.04 通过；
-- 当前开发主线：M1/M1.1 已完成并冻结；M2.0--M2.16 documentation/validation
-  closeout 已形成并完成验收的 C 级 Protocol I
-  工程基线；M2 的历史设计门、真实 shuffle、inverse routing 和统一 mask 证据均按
-  各阶段记录保留，但不再作为当前 M2 未完成状态；
-  M2.8 的项目扩展 `m2_emp_iknp_chosen_ot_conformance` 已在 Ubuntu-24.04 上完成固定
-  EMP 依赖构建、upstream base-OT/IKNP smoke、C++20 隔离的 connected-fd adapter 和
-  sender/receiver 独立进程 conformance；M2.9 项目扩展
-  `m2_emp_opv_share_translation_conformance` 已在其上完成真实 GGM OPV 与 Share
-  Translation 的独立进程 conformance；M2.10 项目扩展
-  `m2_emp_single_pass_permute_share_conformance` 完成单遍 Permute+Share
-  conformance；M2.11 项目扩展
-  `m2_emp_two_pass_shuffle_roundtrip_conformance` 随后在独立 P0/P1 exec 进程中完成
-  两遍前向/逆向 carrier roundtrip conformance。它仍不是完整 Protocol I，状态与
-  M2.12 项目 E2E `m2_protocol_i_priority_key_input_small_e2e` 已将 priority-key
-  additive shares、两遍 shuffle、CmpAgg、受控 shuffled rank 泄露和 reverse carrier
-  串联为原顺序 XOR mask shares；M2.13 的 C 级候选
-  `m2_protocol_i_modular_6round_mask_output` 闭合 P2 包先收后预处理的离线屏障、
-  有界分片帧、逻辑/填充布局、全 rank-permutation 审计和 6 轮模块化 mask 输出；M2.14
-  `m2_protocol_i_raw_score_input_modular_8round_mask_output` 已将 raw Q20.12 算术 shares
-  经 two-stage carry/lift/sign adapter 接入该路径，实际因果总数为 8 轮；
-  它仍不是 Agarwal paper-exact 基线，状态与
-  可复现命令见
-  `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md` 和
-  `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`、
-  `docs/decisions/M2_PERMUTE_SHARE.md`、
-  `docs/decisions/M2_SECRET_SHARED_SHUFFLE.md`、
-  `docs/decisions/M2_PROTOCOL_I_SMALL_E2E.md`、
-  `docs/reproduction/M2_PERMUTE_SHARE_UBUNTU_2026-09-06.md` 和
-  `docs/reproduction/M2_PROTOCOL_I_SMALL_E2E_UBUNTU_2026-09-06.md`、
-  `docs/reproduction/M2_SECRET_SHARED_SHUFFLE_UBUNTU_2026-09-06.md`；
-  M2.15 已完成 paper-core alignment audit：Agarwal §4.1 的 public masked
-  shuffled list 不能由当前 VFSS 两遍 PS API 表达，故保留当前 4-round core、8-round
-  total baseline，并将 3-round/7-round candidate 保留为 D 级未实现目标；见
-  `docs/decisions/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md` 和
-  `docs/reproduction/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT_UBUNTU_2026-09-06.md`；
-  M2 已收尾并合入 `main`；M3 Protocol III 模块化 3 轮及 raw-score 5 轮扩展已在
-  `main@bb0d0e8` 完成整改并冻结；当前后续主线为 M4 CipherGPT → M5 Protocol III
-  2 轮 → M6 AAV86；
-- 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
-- CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
-- 任何 AAV86/Direct Top-K 原型在解决自适应预处理前不得标为论文定理实现。
+当前 M3 两个入口为：
+
+```text
+agarwal_protocol_iii_modular_3round
+moe_topk_protocol_iii_raw_score_modular_5round
+```
+
+M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核心。M3 已在 `main@bb0d0e8` 完成整改；不得继续将 M3 写成尚待开始。
+
+### 1.2 当前待完成目标
+
+- Protocol I 论文精确三轮核心及通信核验。
+- Protocol III 论文精确两轮核心及通信核验。
+- Protocol I、Protocol III 各自的 AAV86 升级及完整性能验收。
+- Protocol I、Protocol III 各自的 BB90+DCF 升级及完整性能验收。
+- 六种目标方案的统一横向报告。
+
+轮数口径固定为：
+
+- Protocol I：Theorem 4.1 的三轮核心。
+- Protocol III：Theorem 4.2 的两轮核心。
+- raw-score 输入适配和原顺序 mask 输出适配另列，并计入端到端主结果。
+
+不得将 Protocol I 目标写成“论文两轮”，也不得将核心轮数直接用作统一输入输出路径的总轮数。
+
+### 1.3 新执行顺序
+
+```text
+M2 精确核心实现完成
+  → Protocol I 通信测量及差异解释
+  → M2 公共接口交接
+  → M5 精确核心实现完成
+  → Protocol III 通信测量及差异解释
+  → 基础协议接口与计量结果交接
+  → M6A 两种 AAV86 升级实现
+  → M6A 完整性能验收
+  → M6B 两种 BB90+DCF 升级实现
+  → M6B 完整性能验收
+  → M7 六种方案统一报告
+```
+
+M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消，不再作为 M5 的前置条件。
+
+资料研究、设计、失败用例整理可以提前进行；依赖未冻结接口的实现和正式验收必须遵循上述顺序。
+
+### 1.4 最终六种方案
+
+1. Protocol I。
+2. Protocol III。
+3. Protocol I + AAV86。
+4. Protocol III + AAV86。
+5. Protocol I + BB90+DCF。
+6. Protocol III + BB90+DCF。
+
+已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
+
+历史 `Direct Top-K` 原型不直接改名为 BB90+DCF。CipherGPT native、CipherGPT-style adapter 和 CryptoMoE 接入不属于本轮六种方案的交付范围。
+
+### 1.5 文档同步边界
+
+本次路线替代旧 `docs/decisions/ROADMAP_PRIORITY_2026-09-04.md` 中冲突的顺序与阶段门。
+
+以下文档应同步：
+
+- `PROJECT.md`
+- `docs/IMPLEMENTATION_PLAN.md`
+- `docs/TEAM_WORK_PLAN.md`
+- `docs/M3_ONWARD_TEAM_WORK_PLAN.md`
+- `README.md`
+- 路线决策及配套计量规范
+
+旧计划中的 M4→M5 前置关系不再执行。历史实现和实验记录保留，不将新目标反写为旧阶段已完成能力。
 
 ## 2. 全程不变的统一契约
 
 ### 2.1 输入和输出
 
-- 输入：`m` 个 32 位 score 的算术共享 `[x_j]^A` 和公开 Top-K 数量 `K`；
-- 顺序：选择最大的 `K` 个 score，同分按原始下标打破；
-- 输出：原始输入顺序下 `m` 个布尔共享 `[z_j]^B`；
-- 正确性：每个 `z_j` 是 0/1，`Σz_j=K`，掩码为 1 的位置精确对应 Top-K；
-- 不要求 Top-K 集合内部排序；
-- selected values/payload 只能是附加诊断，不能代替 bit-mask。
+- 单次调用包含 n 个 32 位二补码 signed fixed-point score 算术共享。
+- 小数位数为 12，数值解释为量化整数除以 `2^12`。
+- 两方 raw shares 满足 `raw = (x0+x1) mod 2^32`。
+- 公开参数包含 n、K、位宽、payload 形状、party 拓扑和模式。
+- 选择 score 最大的 K 个元素，同分按 original index 升序。
+- 最高优先级 rank 为 0，有效范围为 `0..n-1`。
+- 输出为原始输入顺序下长度 n 的秘密共享 Top-K bit-mask。
+- 每位为 0/1，且恰好 K 位为 1。
+- 不要求 Top-K 集合内部排序。
+- selected payload 不能代替统一 mask。
 
-若原生论文接口不是 bit-mask，必须增加明确的 `mask_output` 适配层。元素与原始
-索引绑定、shuffle、逆映射、共享转换和 mask 生成都属于被测协议路径，时间和通信
-不得从主结果中扣除。
+统一接口：
 
-### 2.2 测试矩阵
+```text
+([z_1]^B, ..., [z_n]^B)
+    <- TopK(([x_1]^A, ..., [x_n]^A), K)
+```
 
-| `n` | `K` | AAV86 迭代 `r` |
+元素与原始位置绑定、输入编码、shuffle、路由、逆映射、共享转换和 mask 生成均属于实际执行路径。主结果不能将这些步骤作为免费后处理扣除。
+
+六种方案复用同一份输入语义、oracle 和输出契约。
+
+### 2.2 安全与测试边界
+
+- P2 为输入无关的离线材料提供方，完成分发后退出在线路径。
+- secure runtime 不通过测试辅助逻辑重构 raw score、priority key、原顺序 rank、比较位、selected index 或最终 mask。
+- 原始输入和中间值不得交给 Dealer 计算正确答案。
+- 具体协议允许公开的 shuffled rank 或局部 rank 必须有单独的泄露说明，不能扩大为任意 rank 公开。
+- oracle 重构只在隔离的 TEST_ONLY 路径发生。
+- 材料必须绑定 session、party、参数和协议阶段，并按规定一次性消费。
+- 不使用文件轮询、固定 sleep、模拟 shuffle 或在线补发材料隐瞒协议依赖。
+
+新适配器按以下顺序验证：
+
+```text
+conformance
+  → oracle differential
+  → 独立进程 E2E
+  → 消息、泄露和计量审计
+```
+
+### 2.3 测试矩阵
+
+| n | K | AAV86 迭代 r |
 | --- | --- | --- |
 | 128、256 | 2、8 | 2、3、4、5 |
 | `10^3`、`10^4`、`10^5`、`10^6` | 80 | 2、3、4、5 |
 
-同一比较组必须使用相同输入文件/种子、位宽、score 解释、网络环境和 oracle。
-无法运行的大规模点标记 `NOT_MEASURED` 并保存失败原因，禁止外推填表。
+执行规则：
 
-### 2.3 必须输出的指标
+- 六种方案沿用同一 `(n,K)` 矩阵。
+- AAV86 两种路线均覆盖 `r=2..5`。
+- BB90 的迭代参数根据采用版本单独定义，不复用 AAV86 字段冒充已确定配置。
+- 同一比较组使用同一输入、输入种子、score 解释、网络和 oracle。
+- 输入种子与算法随机种子分别记录。
+- 保留基础随机量化整数均匀范围 `[-32*2^12, 32*2^12]`，端点包含；其他分布单独标注。
+- 正确性测试另覆盖重复值、全相等、负数、正负边界、`K=1`、`K=n`、非二次幂 n 和非法输入。
+- 正式性能实验分别覆盖 LAN/WAN。
+- 每个配置预热 1 次、正式运行 5 次，保留逐次结果并报告 median/min/max。
+- 随机图每次运行的种子、边数、节点复杂度和性能结果关联保存。
+- 无法运行的配置保留失败阶段、资源限制和原因，不缩小参数后冒充原配置。
 
-- `offline_time_ms`；
-- `offline_material_total_bits`；
-- `online_time_ms`；
-- `online_comm_total_bits`；
-- `online_comm_per_party_bits`，作为主表通信字段；
+基础协议的两次通信核验先覆盖小规模边界及 `(128,2/8)`、`(256,2/8)`，并使用可行规模检查增长趋势。它们不要求在进入后续阶段前强行完成全对全 `n=10^6` 实验。
+
+完整长期矩阵及无法完成配置的记录在正式性能阶段处理。
+
+### 2.4 必须输出的指标
+
+| 字段 | 含义 |
+| --- | --- |
+| `offline_time_ms` | 全部预处理耗时，明确生成、序列化和分发边界 |
+| `offline_material_total_bits` | 在线所需全部离线材料之和 |
+| `online_time_ms` | 输入就绪至统一 mask 完成的在线耗时 |
+| `online_comm_total_bits` | 在线各方实际发送字节折算后的总和 |
+| `online_comm_per_party_bits` | total 除以在线方数量，主表通信字段 |
+| `online_rounds` | 因果依赖决定的在线轮数 |
+| `online_prg_calls_total` | 所有在线方长度倍增 PRG 调用总数 |
+| `comparison_edges_total` | 实际执行的无序比较边总数 |
+| `total_time_ms` | offline 与 online 时间之和 |
+
+同时保留：
+
 - 每方 `sent_bits`、`received_bits`；
-- `online_rounds`；
-- `online_prg_calls_total`；
-- `comparison_edges_total`；
-- `total_time_ms = offline_time_ms + online_time_ms`；
-- 运行时、拓扑、`n/K/r`、位宽、线程、网络、revision 和 correctness status。
+- revision、实现标签、runtime、party topology；
+- n、K、算法迭代参数；
+- score、comparison、rank、payload 位宽与表示；
+- logical/padded layout；
+- 输入分布、输入种子、算法种子；
+- CPU、内存、OS、编译器、flags、build type、线程数；
+- 网络配置、带宽、RTT；
+- 命令、预热次数、重复次数；
+- correctness status、失败原因和原始结果定位信息。
 
-每个配置预热 1 次、正式运行 5 次，保存原始运行记录并报告 median/min/max。
+total 只累加发送量，received 用于核验，不再次加入总量。
 
-## 3.0 M0：仓库与规范基线
+同一条比较边由两方分别计算，不因此记为两条边；同一位置对在不同步骤实际重复比较时，按实际次数计数。比较边数、DCF 调用数和 PRG 调用数分别记录。
 
-### 目标
+未知指标使用 `NOT_MEASURED`，不能用零、估算或历史数字填充。完整性能阶段必须补齐适用计数；仅有字段而没有可信观测不算测量完成。
 
-建立可以安全上传和协作的最小远端仓库，不混入大型参考工程、论文和生成物。
+### 2.5 分阶段计量
 
-### 已完成
+每种方案至少区分：
 
-- 冻结 `VFSS-baseline/`；
-- 建立提交 `993696e` 和标签 `vfss-baseline-2026-09-03`；
-- 确认 `VFSS/` 与冻结树的 131 个源文件一致；
-- 中文化项目总纲；
-- 固定协议命名、证据层级、bit-mask 输出、测试矩阵和性能字段；
-- 忽略论文、参考工程、构建产物、密钥、日志和临时输出；
-- 建立根 README、来源清单和本实施计划。
-- 配置 SSH 远端并推送 `main` 与冻结标签；
-- 在 GitHub 核验公开仓库与文档入口。
+1. raw-score 输入适配；
+2. 论文核心或明确标记的组合核心；
+3. 原顺序 mask 输出适配；
+4. 测试控制、报告传输和 oracle 验证等辅助工作。
 
-### 尚未决定
+主比较使用完整安全路径；论文核验使用功能、参数和边界一致的核心数据。
 
-- 项目级 LICENSE 尚未添加；
-- 论文和大型参考工程的公开再分发未获逐项确认，因此继续保持本地；
-- 队友按 `docs/LOCAL_REFERENCES_SETUP.md` 自行准备获准使用的副本。
+阶段通信应能与总通信对账。并行或合并执行时按实际消息依赖计算总轮数，不机械相加，不把有依赖的两轮消息仅因放入同一函数而称为一轮。
 
-### 退出条件
+历史计时边界保持原样。若旧记录包含 Dealer 启动、输入分发或报告收集，应继续注明；不能静默改写为纯核心时间。
 
-以 `docs/M0_REVIEW.md` 第 6 节为准。
+## 3. 阶段门与验收规则
 
-## 3.1 M1：统一 oracle、数据和计量底座
+### 3.1 基础协议统一阶段门
 
-### 当前状态
+M2 精确核心和 M5 精确核心均按以下顺序推进：
 
-核心已完成（2026-09-04）。团队已冻结 32-bit 二补码 fixed-point（scale=12）、测试量化整数均匀范围
-`[-32*2^12, 32*2^12]`（端点包含）、数值降序及同分 original_index 升序。Oracle、
-全对全 CmpAgg、测试向量、统一比较适配和计量记录均以此语义实现。现有 VFSS CMake
-目标已实际构建并运行 `moe_topk_m1_oracle_test`、`moe_topk_m1_cmpagg_test`、
-`moe_topk_m1_metrics_test` 与 `moe_topk_m1_dcf_conformance_test`；四者在 macOS 与
-Ubuntu 24.04 均通过。
+```text
+G1：实现与正确性完成
+  → G2：通信实测及差异解释完成
+  → G3：接口和证据交接完成
+```
 
-### M1.1 当前状态
+| 阶段门 | 必须提供的证据 | 通过后的状态 |
+| --- | --- | --- |
+| G1 实现门 | conformance、oracle differential、独立进程 E2E、消息与泄露审计 | 可进入正式通信核验的候选 |
+| G2 通信门 | 论文公式、实现消息推导、实际分方计数及差异解释 | 成本对应关系已核验 |
+| G3 交接门 | 冻结 revision、接口契约、最小调用示例、材料及计量说明、接收方复跑记录 | 可作为下一阶段依赖 |
 
-已在 Ubuntu 24.04.4 LTS（WSL2、x86_64）的新 `/tmp` Debug 构建目录验收测试代码 revision
-`a2efe5e3d2d22bb3c031fb24dc3246c37d442fad`：`ctest -N` 恰发现四项，
-`ctest --output-on-failure` 为 4/4 通过。正式 metrics 已补齐输入 seed/分布、
-编译器/flags、构建类型、CPU/内存/OS、网络、warmup 和 repetitions provenance；未测网络
-和性能字段仍是 `NOT_MEASURED`。完整环境、命令、警告检查和 baseline 复检见
-`docs/M1_1_UBUNTU_HANDOFF.md`。本验收只闭合 M1.1，不授权开始 M2，也不将 DPF
-conformance 前置原语测试写成完整 M3 实现证据。
+代码可以按依赖拆成多个可验证 PR 合并，但“代码已合并”不等于 G2/G3 已通过。
 
-### 输入
+论文精确身份还要求全部相关论文前提成立；不能只凭 oracle 通过或轮数相同升级标签。
 
-- `PROJECT.md` 第 5 节契约；
-- VFSS 现有 GroupElement、DCF、通信和统计接口；
-- Protocol I 本地测试向量与论文稳定 rank 定义。
+### 3.2 通信核验方法
 
-### 任务
+每次核验形成三层对照：
 
-1. 明确 32 位 score 是 unsigned、signed two's complement 还是定点数，并记录
-   scale；未决定前不写比较适配代码。
-2. 实现最小明文 oracle：稳定 Top-K → 原始位置 bit-mask。
-3. 建立固定测试数据格式和种子记录；覆盖随机、重复、全相等、负值、`K=1`、
-   `K=n`、非 2 次幂 `n` 和位宽边界。
-4. 为 Protocol I 需要的 VFSS DCF 比较语义建立 conformance test。
-5. 定义统一运行记录，字段严格对应第 2.3 节；不先抽象尚未出现的协议能力。
-6. 建立计时边界和通信计数验证，确认 total 与 per-party 能从同一原始记录得到。
-7. 实现明文全对全 CmpAgg rank，并与 oracle 差分。
+```text
+论文成本公式
+  ↔ 实际参数和消息定义下的实现成本
+  ↔ 独立进程执行得到的实际发送量
+```
 
-### 交付物
+必须检查：
 
-- oracle 源码和单元测试；
-- 统一输入向量及生成说明；
-- DCF conformance test；
-- 指标记录结构和一个明文示例结果；
-- score 编码与 tie rule 决策记录。
+1. 比较功能是否一致：sorting、单个 order statistic、Top-K mask 不混用。
+2. n、logical/padded 规模、输入域、rank 域和 payload 是否一致。
+3. 使用了哪一条定理、脚注和优化。
+4. total/per-party、bits/bytes、KB/KiB 是否一致。
+5. 核心、输入适配、输出适配和封装是否分离。
+6. 是否存在额外位宽、字节对齐、帧头、重复发送或不同材料表示。
+7. 发送量与对端接收量是否能在同一统计边界下对应。
+8. 随 n、K 增长的趋势是否符合实现消息结构。
+9. 是否因遗漏必要步骤或改变泄露而得到较低通信量。
 
-### 退出条件
+Protocol I 主要对照 Theorem 4.1。Protocol III 主要对照 Theorem 4.2，并注明是否采用其中脚注描述的共用掩码优化。
 
-- 所有边界向量得到长度为 `m`、二值、和为 `K` 的正确 mask；
-- DCF 测试覆盖等于阈值和位宽边界；
-- 同一原始通信记录可复算 total/per-party；
-- 没有测试专用明文值进入 secure 接口。
+Table 2、Table 3 的估算参数和归一化方式需单独核对，不能把论文估算值写成本项目实测目标值。
 
-### M1.1 收尾门（已满足）
+### 3.3 通信门退出条件
 
-进入 M2 实现前完成：
+- 原始分方和分阶段计数可复算。
+- 论文公式与当前实现的对应关系明确。
+- 核心及适配、封装成本分别说明。
+- 关键差异已经定位并解释。
+- 正确性、轮数和安全条件仍然成立。
+- 接收方可按命令复跑核验配置。
+- 未解决项有明确记录，不被“数量级接近”覆盖。
 
-1. 为四个 M1 可执行测试注册 CTest，确保 `ctest --output-on-failure` 是统一入口；
-2. 给正式 metrics 记录补齐 seed、输入分布、编译器/flags、CPU/内存/OS、网络环境、
-   warmup 和 repetitions；
-3. 保留 raw per-party sent/received 计数，并验证派生 total/per-party 字段；
-4. 在 Ubuntu 24.04 上执行干净 configure/build/ctest，并把命令和结果写入复现记录；
-5. 再次确认 `VFSS-baseline/` 与冻结标签无差异。
+不要求 wire bytes 与理论 bit 数逐位相等，也不以任意误差百分比代替原因分析。
 
-M1.1 只闭合测试入口和复现元数据，不重新讨论已冻结的 score/tie/output 契约。该门已
-满足；M2 代码仍受 `docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md` 的四项批准决策约束。
+通信核验通过只支持成本一致性。数量级不符时，先定位实现或计量差异；不能直接判定论文错误。数量级相符时，也不能据此证明功能或安全性正确。
 
-## 3.2 M2：Agarwal Protocol I 精确核心与统一输出（历史目标；当前 C 级基线已收尾）
+### 3.4 图升级阶段门
 
-本节的 `精确` 是 M2 入口时的目标身份，不是当前实现声明。M2.0--M2.16
-documentation/validation closeout 已完成当前 C 级模块化工程路径并满足 M2→M3
-交接条件；论文精确 3 轮与正式
-`agarwal_protocol_i_exact_mask_output` 仍未完成。
+M6A、M6B 各自执行：
 
-### 输入
+```text
+算法与安全设计
+  → 两种路线实现
+  → 正确性、消息与材料审计
+  → 计量能力验收
+  → 完整矩阵性能实验
+  → 报告与接口交接
+```
 
-- M1 oracle、测试数据和计量；
-- Chase secret-shared shuffle 论文；
-- `Agarwal_TopK/protocol1/` B0 功能参考和 `protocol1_ca/` B1 shuffle 材料；
-- VFSS DCF 与通信接口。
+M6A 完成两种路线的性能验收后，再进入 M6B 依赖实现及正式实验。
 
-### 任务
+资料核对、明文算法 oracle 和不依赖未冻结接口的设计可以提前开展。
 
-1. 先画清 Dealer、Party 0、Party 1 的离线材料和三轮在线消息，不照搬旧文件协议。
-2. 迁移最小 B1 两次 Permute+Share shuffle；每个元素绑定 score、original index
-   和必要 payload。
-3. 接入全对全 CmpAgg，计算稳定 rank。
-4. 生成原始顺序下的布尔共享 Top-K mask；单独记录 paper core 和 mask adapter
-   开销，主结果使用两者总和。
-5. 删除对 B0 置换矩阵、`MockShuffle`、文件轮询和明文 rank 的运行依赖。
-6. 用独立进程运行 Dealer + 两个在线方。
+### 3.5 性能状态与失败配置
 
-### 测试顺序
+每个配置区分：
 
-1. shuffle permutation/payload 对齐；
-2. 两方各自置换角色和随机性；
-3. CmpAgg stable rank；
-4. mask adapter；
-5. 小规模完整 E2E；
-6. `(128,2/8)`、`(256,2/8)` 正式基线。
+- 成功完成并取得全部适用指标；
+- 正确性失败；
+- 执行失败或超时；
+- 资源不足；
+- 指标未测或计数能力缺失；
+- 参数不适用，并附算法依据。
 
-### 交付物
+资源无法承受的大规模点可按项目总纲记录原因和未测字段，阶段报告必须披露覆盖范围。此类记录不等于该点成功完成。
 
-- `agarwal_protocol_i_exact_mask_output` 可执行目标；
-- secure/test 两种明确模式；
-- 独立进程 runner；
-- 原始指标记录和测试报告；
-- 阶段/消息/公开值审计文档。
+对于已经成功运行的配置，若 PRG、材料或通信等必需指标缺失，不能标为“全部指标完成”。平台性计量缺口应在正式性能验收前补齐。
 
-### 退出条件
+不得静默丢弃失败随机种子、只保留最快结果或用重试掩盖正确性问题。
 
-- 与 oracle 全部差分通过；
-- secure 模式不重构 rank、comparison bits 或 selected indices；
-- 角色为 2+1，在线轮数和额外 mask 适配轮数分别可解释；
-- 所有统一指标来自实际计数，不使用模拟 shuffle 成本。
+## 4. 里程碑任务与退出条件
 
-### M2.7 CmpAgg 三进程运行基础（已完成）
+### 4.1 M0：仓库与规范基线
 
-实现标签固定为 `m2_priority_cmpagg_three_process_e2e`，属于项目扩展（C），不等同于
-`agarwal_protocol_i_exact_mask_output`。P2 在离线阶段为公开 canonical comparison
-graph 生成 node-mask shares 和 party-separated VFSS uCMP/DCF edge material，分别发送
-给 P0/P1 后退出；controller 仅在该 barrier 后发送 TEST_ONLY priority-key shares；
-P0/P1 通过一个有界 framed masked-key exchange 计算 additive rank shares，controller
-才在测试层重构并与 oracle 比较。
+状态：已完成。
 
-M2.7 的十个独立进程用例覆盖 `n=1,2,5,7,11`、`K=1`、`K=n`、`K=2 (n=11)`、非二次幂、
-随机/重复/全相等值及 `INT32_MIN/MAX`，并通过 package/transport 错误矩阵。Ubuntu
-24.04.4 全新 Debug 构建中 CTest 发现 11 项且全量 11/11 通过；实际命令、字节计数、
-退出码和未测字段见
-`docs/reproduction/M2_CMPAGG_PROCESS_E2E_UBUNTU_2026-09-05.md`。
+保留交付物：
 
-该记录保留 M2.7 当时只闭合 CmpAgg process foundation 的历史边界；后续 M2.10--M2.15
-已补齐项目级 shuffle、inverse routing、raw-score adapter 和原始顺序 bit-mask 的
-C 级工程路径。它仍不是 Protocol I paper-exact 证据，论文轮数/泄露证明与网络性能
-仍按各 reproduction record 标为 `NOT_MEASURED` 或未解决。
+- 冻结提交 `993696e` 与标签 `vfss-baseline-2026-09-03`；
+- 来源、论文版本、目录和忽略规则；
+- 统一输出、测试矩阵、指标和证据层级；
+- 远端仓库与文档入口。
 
-## 3.3 M3：Protocol III 模块化 3 轮基线
+历史验收以 `docs/M0_REVIEW.md` 为准。M0 时记录的 LICENSE 和参考资料分发事项保持其证据边界，不作为本次已解决事项。
 
-阶段、消息、表示、泄露、统一 mask 适配和实现门以
-`docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md` 为准。
+不重新执行已完成的仓库初始化，不因本次改计划修改冻结树。
 
-### 输入
+### 4.2 M1/M1.1：统一 oracle、数据和基础计量
 
-- M1 全对全 CmpAgg、oracle、测试输入与指标；
-- M2 已冻结的运行、通信和统一 mask 边界；
-- Agarwal Protocol III 论文定义；
-- ADSMPC 旧原型仅作调用次序和失败模式参考。
+状态：已完成并冻结。
 
-### 任务
+保留：
 
-1. 画清 GRank 1 轮与标准 DPF 路由 2 轮的角色、预处理和消息依赖。
-2. 复用 M1 CmpAgg，以 VFSS DPF + 秘密共享乘法实现模块化路由。
-3. 删除明文 `true_rank` Dealer、文件轮询、固定 `sleep` 和调试重构依赖。
-4. 把 payload 恢复到原始输入位置，输出统一秘密共享 Top-K bit-mask。
-5. 分离 `test`/`secure` 模式并接入统一 metrics。
-6. 使用独立进程完成 Dealer、Party 0、Party 1 的小规模 E2E。
+- Q20.12 signed score 语义；
+- 数值降序、同分 original index 升序；
+- 基础输入分布与边界向量；
+- 明文 stable-rank/Top-K oracle；
+- DCF、CmpAgg conformance；
+- 基础 MetricsRecord、provenance 和 CTest 入口。
 
-### 交付物
+历史验证包括：
 
-- `agarwal_protocol_iii_modular_3round` 可执行目标；
-- GRank/DPF routing conformance 与 oracle differential 测试；
-- 阶段、消息、打开值、泄露和 3 轮因果关系审计；
-- 小规模原始运行记录。
+```text
+moe_topk_m1_oracle_test
+moe_topk_m1_cmpagg_test
+moe_topk_m1_metrics_test
+moe_topk_m1_dcf_conformance_test
+```
 
-### 退出条件
+M1.1 在 Ubuntu 24.04.4、WSL2、x86_64 干净 Debug 构建中验证 revision：
 
-- 重复值、全相等、负值、`K=1/K=n` 和非 2 次幂输入均与 oracle 一致；
-- secure 模式不重构 rank、DPF index 或 selected indices；
-- 在线因果轮数可复算为 3，额外 mask adapter 轮数单独记录；
-- 不使用 `agarwal_protocol_iii_exact_2round` 名称或相关性能声明。
+```text
+a2efe5e3d2d22bb3c031fb24dc3246c37d442fad
+```
 
-## 3.4 M4：CipherGPT 原生基线
+CTest 为 4/4 通过，详见：
 
-### 输入
+`docs/M1_1_UBUNTU_HANDOFF.md`
 
-- M1 统一契约、输入和指标；
-- CipherGPT 论文及原生仓库；
-- `Top_K_paper`、`Top_K_paper_test` 和原生 shuffle。
+后续只按实际需要补充计量和适配能力，不重新讨论已冻结语义，不把历史 `NOT_MEASURED` 改成已测。
 
-### 任务
+### 4.3 M2：Protocol I 精确核心、通信核验与交接
 
-1. 先确认原始代码来源、revision、许可证和 source-only 可审查边界。
-2. 修正输入错误传播，禁止只打印错误后返回不完整结果。
-3. 建立对所有输入都会收缩的 QuickSelect 不变量；解决全相等和重复值，不用轮数
-   上限掩盖不终止。
-4. 与项目统一 tie rule 对齐，并说明它是输出语义适配还是论文原生行为。
-5. shuffle 时绑定 original index，最终输出秘密共享 bit-mask。
-6. 将验证模式重构与 secure 输出分离，保留原生两方密码学栈。
+状态：C 级工程基线已关闭；精确三轮核心是当前推进目标。
 
-### 交付物与退出条件
+主责：角色 A。角色 B 交叉评审并接收接口。
 
-- `ciphergpt_native_mask_output` 基线；
-- 重复值、全相等、错误输入和 `K` 边界回归测试；
-- 小规模原始运行记录及明确的 runtime/topology 字段；
-- 不依赖启发式轮数上限也能终止并返回恰好 `K` 个位置；
-- 统一 mask 与 oracle 一致，计时覆盖索引恢复和 mask 生成。
+#### 输入
 
-## 3.5 M5：Protocol III 精确 2 轮压缩
+- M1 语义、oracle、测试输入与 metrics；
+- 已完成的 M2 shuffle、CmpAgg、transport、package 和输入输出适配；
+- Agarwal §2.4、§4.1、Theorem 4.1；
+- Chase secret-shared shuffle；
+- M2.15/M2.16 对 public masked-list 和泄露的审计记录。
 
-### 前置条件
+#### M2 实现阶段
 
-M3 的 3 轮实现通过差分、独立进程 E2E、消息流和泄露审计。
+1. 明确当前 PS API 与论文功能之间的差异。
+2. 设计并实现同时输出秘密共享 `pi(x)` 与公开 `pi(x)+r` 的所需功能。
+3. 保证两种输出使用同一隐藏置换，r 与后续 GRank 材料关联且对任一单方未知。
+4. 验证预处理输入无关、Dealer 在线静默和材料一次性使用。
+5. 接入全对全 CmpAgg、稳定 rank 和 payload 路由。
+6. 保留 raw-score 输入与原顺序 XOR mask 输出。
+7. 按实际消息依赖实现并审计三轮论文核心。
+8. 运行 conformance、差分、独立进程 E2E 和异常输入/传输测试。
+9. 保留当前四轮核心工程实现作为回归对照。
 
-### 任务
+不能通过额外的事后 masked-list 交换、公开置换或测试端构造公开列表冒充论文所需的 shuffle 功能。
 
-1. 选择并记录满足论文要求的域表示，不能继续把 `Z_(2^b)` 当作域。
-2. 定义非零 payload 编码、零值处理和逆元失败语义。
-3. 实现 GRank 与 DPF 路由的跨阶段压缩，证明并实测在线因果轮数为 2。
-4. 分别计量 paper core 和统一 mask adapter，主结果报告两者总和。
-5. 与 M3 使用同一输入和 oracle 做逐项差分，并运行独立进程 E2E。
+当前历史七轮候选是：
 
-### 交付物与退出条件
+```text
+2 轮 raw-score adapter
++ 3 轮论文核心
++ 2 轮 reverse mask adapter
+= 7 轮候选总路径
+```
 
-- `agarwal_protocol_iii_exact_2round` 可执行目标；
-- 域、非零 payload、消息流、泄露和轮数决策记录；
-- M3/M5 正确性与开销对照；
-- 只有论文前置条件和 2 轮审计均通过后，才能标为 Theorem 4.2 复现。
+它不是既成实现；若最终适配改变，应重新审计，不固定填写总轮数。
 
-## 3.6 M6：AAV86 / Direct Top-K 实验
+#### M2 通信阶段
 
-### 首要研究问题
+G1 通过后：
 
-后续比较图由已公开局部 rank 决定，而 uCMP/DCF 密钥绑定具体 mask difference。
-必须先给出输入无关、Dealer 在线静默的自适应预处理算法。在线 Dealer 原型只能
-作为不同安全模型的实验，不得标为 Theorem 5.1 实现。
+1. 冻结被测 candidate revision 和实现标签。
+2. 运行小规模边界与 `(128,2/8)`、`(256,2/8)` 核验。
+3. 选择可行增长点检查通信趋势。
+4. 对照 Theorem 4.1 及实际输入、payload 和 rank 表示。
+5. 分别记录 raw adapter、shuffle/core、rank reveal、reverse mask 和封装成本。
+6. 输出论文公式、实现推导和实际计数对照。
+7. 定位并解释差异，必要时修正实现后重跑受影响配置。
 
-### 任务
+#### M2 交接阶段
 
-1. 写明每轮公开值、bucket 状态、比较图生成时机和 Dealer 行为。
-2. 解决一般性的 exact-edge 自适应预处理，不采用固定完整图预留等局部补丁。
+G2 通过后向角色 B 提供：
+
+- 可复跑的 revision 与构建配置；
+- 公共接口、输入输出和 layout；
+- score/rank 域及 payload 表示；
+- 预处理材料格式、绑定和消费规则；
+- transport/session/fingerprint 契约；
+- 最小调用示例与错误语义；
+- 分阶段计数说明；
+- 正确性、轮数、泄露和通信核验报告；
+- 与现有 M3 的兼容范围及不能直接复用的部分。
+
+交接不要求 M5 使用 Protocol I 专用 shuffle。应区分可复用的公共部件和仅属于 Protocol I 的实现。
+
+角色 B 在接收 revision 上复跑最小示例及代表性核验，记录接收结果。
+
+#### 交付物
+
+- Protocol I 精确三轮核心候选与统一 mask 路径；
+- 独立进程运行入口；
+- 测试和阶段审计；
+- 通信核验报告；
+- 公共接口交接记录。
+
+`agarwal_protocol_i_exact_mask_output` 为目标身份，不表示当前已有可执行目标。只有精确条件与 G1/G2/G3 均通过后才更新完成状态。
+
+#### 退出条件
+
+- 论文功能、同置换和材料条件成立；
+- 核心三轮可由消息依赖复算；
+- 原始输入顺序的 mask 与 oracle 一致；
+- 没有新增未声明泄露或在线 Dealer；
+- 通信计数可信且关键差异已解释；
+- 交接方成功复跑并确认接口；
+- 原工程基线和冻结语义未被覆盖。
+
+### 4.4 M3：Protocol III 模块化三轮基线
+
+状态：已完成，保留回归与维护。
+
+实现规范见：
+
+`docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md`
+
+保留的三轮路径：
+
+```text
+GRank
+  → masked-rank DPF routing
+  → secure combine
+```
+
+保留的 raw-score 五轮扩展：
+
+```text
+carry
+  → sign
+  → GRank
+  → DPF routing
+  → secure combine
+```
+
+已完成交付物：
+
+- 两个不同输入边界的正式 Party executable；
+- DPF、GRank、combine 与 raw-score 测试；
+- 原顺序 XOR Top-K mask；
+- 独立 Dealer/P0/P1 测试角色；
+- 结构化 MetricsRecord 汇总；
+- 三轮/五轮因果关系和 secure/test 边界记录。
+
+后续维护要求：
+
+- priority-key 三轮入口不能写成 raw-score 三轮入口；
+- 不通过改名将 M3 升级为论文两轮；
+- 新计量字段不得静默改变旧记录；
+- M5 与 M3 使用同一 oracle 做差分；
+- 单位 payload 的 mask 特化不能覆盖一般路由基线身份。
+
+关闭证据见：
+
+`docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`
+
+### 4.5 M4：CipherGPT 原生基线
+
+状态：取消。
+
+本轮不安排：
+
+- CipherGPT 原生修复；
+- original-index 或 mask 适配；
+- CipherGPT-style VFSS adapter；
+- CipherGPT 性能测试；
+- CipherGPT 与六种方案的正式比较。
+
+保留编号、历史资料与忽略规则。删除其作为 M5 前置条件的执行要求，不删除历史实验来源。
+
+### 4.6 M5：Protocol III 精确两轮、通信核验与交接
+
+主责：角色 B。角色 A 交叉评审。
+
+#### 前置条件
+
+- M3 已完成并保持稳定；
+- M2 精确核心的 G1/G2/G3 通过；
+- M5 所需公共接口及其代数适用范围明确。
+
+在前置条件完成前，角色 B 可开展论文核对、域与编码设计、消息表和失败用例准备；不把依赖未冻结接口的实现写成已验收结果。
+
+#### M5 实现阶段
+
+1. 固定满足论文要求的域及表示。
+2. 定义非零 payload、零值编码、乘法掩码和逆元失败语义。
+3. 核对 VFSS DPF 输出与该表示的兼容性，不能把 `Z_(2^b)` 直接视为域。
+4. 划分可复用的 M2 公共接口与必须新增的 M5 适配。
+5. 实现 GRank 与 DPF routing 的跨阶段压缩。
+6. 验证两轮论文核心，不遗漏输入或 mask 适配。
+7. 与 M3 对同一输入、K 和种子进行差分。
+8. 运行 conformance、独立进程 E2E、材料复用拒绝和传输异常测试。
+9. 审计允许公开值、Dealer 行为和消息依赖。
+
+仅因单位 payload 可简化计算而删掉 combine 轮，不能直接作为 Theorem 4.2 精确复现证据。
+
+#### M5 通信阶段
+
+G1 通过后：
+
+1. 冻结 candidate revision 与标签。
+2. 运行与 M2 核验功能可比的小规模及正式基线点。
+3. 对照 Theorem 4.2，注明共用掩码优化是否采用。
+4. 分解 GRank、压缩路由、表示转换和 mask 输出成本。
+5. 比较 M3 与 M5 的通信、轮数及代数适配开销。
+6. 核验单个 order statistic 与项目 Top-K mask 的区别。
+7. 输出三层通信对照、差异解释与未解决项。
+
+#### M5 交接阶段
+
+G2 通过后，为 M6A 提供：
+
+- 冻结的基线 revision；
+- M2/M5 公共部件复用矩阵；
+- 域、payload、DPF 与输入输出适配契约；
+- 材料生成和一次性消费规则；
+- 核心及端到端阶段计量；
+- 正确性和通信核验报告；
+- 图升级必须重新解决的假设；
+- 最小调用示例与复跑结果。
+
+不得将全对全材料生成器直接描述为已支持自适应比较图。
+
+#### 交付物
+
+- `agarwal_protocol_iii_exact_2round` 目标核心及统一 mask 路径；
+- 域、非零编码、消息和泄露决策；
+- M3/M5 差分及开销对照；
+- 通信核验报告；
+- M6A 接口交接记录。
+
+#### 退出条件
+
+- 论文代数条件满足；
+- 两轮核心经消息审计和独立进程执行验证；
+- 输出与冻结 oracle 一致；
+- 输入、输出及表示转换成本完整记录；
+- 通信差异已解释；
+- 两条基础路线的交接可复跑；
+- 只有上述条件通过后才更新精确身份。
+
+### 4.7 M6A：AAV86 两种升级与完整性能验收
+
+#### 前置条件
+
+- M2、M5 精确核心与两次通信核验完成；
+- 基础接口交接完成；
+- M3 工程对照仍可运行。
+
+#### 设计阶段
+
+1. 固定 AAV86 算法及 CA 转换来源。
+2. 明确图生成、pivot、bucket、局部 rank 和稳定同分语义。
+3. 定义输入种子与算法随机种子。
+4. 写明每轮公开值、图生成时机、材料和 Dealer 行为。
+5. 解决输入无关、Dealer 在线静默的自适应 exact-edge 预处理。
+6. 分别给出 Protocol I、Protocol III 组合协议与输出路径。
+7. 审计 Protocol III 组合的代数条件和泄露，不能直接套用 shuffle-based compiler 的证明。
+
+Protocol I+AAV86 对应构造的核心目标为 `2r+1`。Protocol III+AAV86 的 `2r` 是团队组合目标，必须独立推导与验证。
+
+#### 实现阶段
+
+分别交付：
+
+```text
+Protocol I + AAV86
+Protocol III + AAV86
+```
+
+每种方案具有独立标签、入口和计量记录。共享算法部分只保留一份明确契约，不复制另一套 score 或 oracle。
+
+不得使用在线 Dealer 原型、完整图预留或明文图测试冒充目标协议。不同模型的对照必须单独标记并完整计量。
+
+#### 正确性与安全验收
+
+- 明文图算法与稳定 Top-K oracle 一致；
+- 安全图执行与明文算法差分一致；
+- 重复值、全相等和非二次幂输入正确；
+- 输出保持原始顺序且恰有 K 位为 1；
+- 自适应材料生成、边绑定和跨轮消费可审计；
+- 公开 bucket、局部 rank 和位置的泄露有明确说明；
+- 两种组合的轮数独立验证。
+
+#### 计量与性能阶段
+
+1. 补齐可信 PRG 计数、每轮通信、离线材料和时间边界。
+2. 记录每次运行实际 `e_A(n,r)`、`v_A(n,r)`。
 3. 对 `r=2,3,4,5` 运行统一矩阵。
-4. 实测 `e_A(n,r)`、`v_A(n,r)`、PRG 调用和在线轮数。
-5. 在 LAN/WAN 分别比较轮数增加与比较量下降的拐点。
-6. Direct Top-K 使用独立标签和安全说明，不与 AAV86 full-sort 混名。
+4. 分别完成 LAN/WAN 实验。
+5. 每配置预热一次、正式五次，汇总 median/min/max。
+6. 与对应全对全基线比较完整端到端成本。
+7. 将比较量下降与额外轮数、材料、路由及适配成本一起报告。
+8. 保存所有配置状态、失败原因和覆盖范围。
 
-### 交付物与退出条件
+满足 Theorem 5.1 对应构造时，可将实测节点、边及通信与其理论项并列；其他组合使用明确标记的独立推导。
 
-- 预处理与泄露说明；
-- `aav86_ca_experimental` 和必要时 `direct_topk_experimental` 目标；
-- 固定矩阵的原始与汇总结果；
-- 只有 offline-only、安全审查和轮数验证通过后，才升级论文一致性标签。
+#### 交付物
 
-## 3.7 M7：统一性能报告
+- 两种 AAV86 升级实现；
+- 图算法、预处理、泄露和轮数设计；
+- conformance、差分和独立进程 E2E；
+- 完整适用指标与逐次结果；
+- LAN/WAN 性能报告；
+- 未完成配置清单；
+- 供 M6B 复用的接口与计量说明。
 
-### 比较组
+#### 退出条件
 
-1. B0 vs B1：只比较 shuffle backend；
-2. Protocol I vs Protocol III 3 轮：统一 CmpAgg，比较 shuffle 与 DPF routing；
-3. Protocol III 3 轮 vs 2 轮：统一功能，比较压缩前后的轮数与代数代价；
-4. Protocol I/III vs CipherGPT native：统一输入/输出/指标，拓扑与运行时分栏；
-5. Protocol I B1 全对全 vs AAV86 full-sort：比较排名算法；
-6. AAV86 full-sort vs Direct Top-K：相同输入、计划和 transcript 口径；
-7. CipherGPT native vs 未来 VFSS adapter：不同实现身份，不合并结果。
+- 两种路线均完成实现与正确性、安全审计；
+- 计量能力通过核验；
+- 成功运行配置的全部适用指标齐全；
+- 统一矩阵各配置均有成功或明确失败记录；
+- 比较结论与实际覆盖范围一致；
+- 报告经另一方复核；
+- M6A 实现与性能验收完成后，才进入 M6B 依赖实现和正式实验。
 
-### 报告规则
+### 4.8 M6B：BB90+DCF 两种升级与完整性能验收
 
-- 数字只标记为理论值、历史记录、当前实测或 `NOT_MEASURED`；
-- 主通信字段为 per-party，保留 total 和分方原始值；
-- 图表必须能追溯到原始运行文件、revision、环境和命令；
-- 不把不同安全模型、输出功能或计时边界放进同一速度排名。
+#### 前置条件
 
-CryptoMoE 位于 M7 之后：先冻结 eligibility、dummy、容量 `t` 和允许公开的 routing
-transcript，再从已经验收的精确 Top-K 后端开始接入。
+M6A 两种路线的实现、性能验收及交接完成。
 
-## 4. 两人协作方案
+BB90 原文研究和明文算法设计可以提前进行，但不能以此跳过 M6A 的性能阶段。
 
-两人从同一个最新 `main` 建立独立分支，不直接在 `main` 上并行修改。先自行选择
-角色 A/B，选择结果记录在首个 PR 描述中，不在代码里写个人姓名。
+#### 设计阶段
 
-### 4.1 角色 A：公共底座收尾与 Protocol I（M1.1/M2）
+1. 固定 BB90 采用版本、适用范围、迭代参数及概率保证。
+2. 明确从算法顺序统计量到本项目第 K 大稳定优先级的映射。
+3. 明确随机成本界、失败事件与输出正确性条件。
+4. 给出比较图到 CA 的转换。
+5. 定义第 K 大阈值的秘密共享表示。
+6. 设计在线阈值与预生成 DCF 材料的衔接。
+7. 分别设计 Protocol I、Protocol III 路线的完整阶段。
+8. 推导消息依赖和总轮数，不预先套用 AAV86 公式。
 
-负责：
+#### 实现阶段
 
-- 完成 CTest 注册、metrics provenance 和 Ubuntu 干净复现；
-- 依据 M2 顺序梳理 Dealer、Party 0、Party 1 的离线材料和三轮在线消息；
-- 在 `VFSS/` 中实现真实 B1 secret-shared shuffle 的最小路径；
-- 接入全对全 CmpAgg、稳定 rank 和统一 bit-mask 输出；
-- 增加 Protocol I 单元、差分和独立进程 E2E 测试；
-- 记录每个阶段的公开值、轮数、通信和 mask adapter 开销。
-
-主要写入边界：
-
-```text
-VFSS/include/moe_topk/       仅新增 M2 实际需要的接口
-VFSS/src/moe_topk/           Protocol I 与必要运行绑定
-VFSS/tests/moe_topk/         Protocol I 测试
-docs/decisions/              Protocol I 消息流和安全边界
-```
-
-不得修改 `VFSS-baseline/`，不得把 `Agarwal_TopK/` 代码树或旧 FSS ABI 复制进来。
-
-### 4.2 角色 B：Protocol III 设计与实现（M3/M5）
-
-M2 合并前可先做只读设计与测试准备；M2 的公共运行边界冻结后再合并实现：
-
-- 把论文 Protocol III 拆成 GRank、标准 DPF 路由和跨阶段压缩三个可审计阶段；
-- 为 M3 写消息流、3 轮因果关系、打开值/泄露和独立进程 E2E 方案；
-- 复用公共 CmpAgg、oracle 与 metrics，不复制另一套 score/tie/output 语义；
-- 先交付 `agarwal_protocol_iii_modular_3round`，通过后再研究 M5 的域表示、非零
-  payload 和 2 轮压缩；
-- 对 ADSMPC 只做证据映射，不迁移明文 Dealer、文件同步或旧 key layout；
-- CipherGPT 的资料、许可证和失败用例可以提前整理，但实现合并服从 M4 顺序。
-
-主要写入边界：
+分别实现：
 
 ```text
-VFSS/include/moe_topk/       仅新增 M3/M5 实际需要的 DPF/routing 接口
-VFSS/src/moe_topk/           Protocol III 与必要运行绑定
-VFSS/tests/moe_topk/         DPF routing、差分和 E2E 测试
-docs/decisions/              Protocol III 阶段、代数条件、轮数与泄露
+Protocol I + BB90+DCF
+Protocol III + BB90+DCF
 ```
 
-角色 B 不在 M3 中提前实现 2 轮压缩，也不为了推进样例而修改 M1 冻结语义。
+完整功能为：
 
-### 4.3 共享资产与所有权
+```text
+BB90 得到稳定第 K 大阈值
+  → DCF 生成成员指示共享
+  → 必要的路由、逆映射和共享转换
+  → 原顺序 Top-K mask
+```
 
-以下 M1 文件已经冻结，任何一方需要修改都必须先说明对另一条线的影响并由双方
-复核：
+“投票”表示每个位置是否属于 Top-K 的秘密共享成员指示，不增加明文投票公开步骤。
+
+仅以原始 score 与第 K 大 score 做 `>=` 比较无法保证重复值情况下恰选 K 个。必须沿用稳定同分语义，使阈值比较与冻结 oracle 完全一致。
+
+不得将选出阈值本身写成完整 Top-K 协议，也不得将历史 Direct Top-K 原型仅改名后作为 BB90 实现。
+
+#### 正确性与安全验收
+
+- BB90 选择结果与稳定顺序统计量 oracle 一致；
+- DCF 成员选择与完整 Top-K oracle 一致；
+- 覆盖随机、重复值、全相等、边界、非二次幂及 K 边界；
+- 阈值、selected index 和最终 mask 不通过测试路径进入 secure transcript；
+- 在线阈值相关预处理不引入未声明 Dealer 参与；
+- 两种组合各自的材料、公开值和轮数经过审计。
+
+#### 计量与性能阶段
+
+分别计量：
+
+1. BB90 选择；
+2. DCF 成员选择；
+3. 输入、路由、逆映射和 mask 适配；
+4. 完整端到端路径。
+
+记录实际迭代数、节点和边计数、DCF/uCMP/PRG 调用、离线材料、每轮通信和时间。
+
+对统一 `(n,K)` 矩阵及已确定的 BB90 参数进行 LAN/WAN 完整性能实验。遵循预热一次、正式五次及 median/min/max 规则。
+
+与对应全对全和 AAV86 方案比较，不能只报告 BB90 图内部成本而省略最终 DCF 选择。
+
+#### 交付物
+
+- 两种 BB90+DCF 组合实现；
+- 算法版本、阈值表示及预处理设计；
+- 正确性、泄露和消息审计；
+- 全部适用性能指标；
+- 逐次结果、汇总报告和失败配置；
+- 六种方案共同比较所需的接口与数据说明。
+
+#### 退出条件
+
+- 两种路线均完成完整 Top-K mask 路径；
+- 稳定同分和恰好 K 个成员条件通过；
+- 安全模型和概率保证明确；
+- 成功配置全部适用指标齐全；
+- 全矩阵配置状态和限制有记录；
+- 阈值、DCF 和适配成本均计入；
+- 报告经过交叉复核后进入 M7。
+
+### 4.9 M7：六种方案统一性能报告
+
+M7 汇总前述已完成结果，不把 M6A、M6B 的性能验收推迟到此阶段。
+
+#### 主比较组
+
+| 比较 | 目的 |
+| --- | --- |
+| I vs III | 比较全对全精确核心路线 |
+| I vs I+AAV86 | 评估 I 路线的图排序升级 |
+| III vs III+AAV86 | 评估 III 路线的图排序升级 |
+| I vs I+BB90+DCF | 评估 I 路线的选择升级 |
+| III vs III+BB90+DCF | 评估 III 路线的选择升级 |
+| I+AAV86 vs I+BB90+DCF | 相同路线比较两种升级算法 |
+| III+AAV86 vs III+BB90+DCF | 相同路线比较两种升级算法 |
+| I+AAV86 vs III+AAV86 | 相同图算法比较组合路线 |
+| I+BB90+DCF vs III+BB90+DCF | 相同选择算法比较组合路线 |
+
+工程对照另列：
+
+- I 四轮核心与三轮精确核心；
+- III 三轮模块化核心与两轮精确核心；
+- core、raw adapter、mask adapter 和封装成本；
+- 必要且真实执行的 shuffle backend 专项对照。
+
+CipherGPT 不进入本轮报告比较组。
+
+#### 任务
+
+1. 对齐六种方案的 revision、输入、环境、输出和计量边界。
+2. 对实现或环境变化导致不可比的配置补跑。
+3. 汇总全部长期矩阵配置及失败原因。
+4. 展示 offline、online、total、per-party、轮数、PRG、边数和总时间。
+5. 分开呈现理论、历史、当前实测和未测。
+6. 报告性能拐点、资源限制及结论适用范围。
+7. 保留两次基础通信核验的公式与差异解释。
+8. 完成交叉审计和可复跑说明。
+
+#### 退出条件
+
+- 六种方案身份与实际完成情况明确；
+- 比较功能、参数、环境和统计口径可比；
+- 图表与数字可追溯到逐次记录；
+- 不将不同安全模型放入无说明的统一速度排名；
+- 未完成配置和缺失指标完整披露；
+- 不以外推数据填补实测矩阵；
+- 不因已写报告而把未实现或未验收方案标为完成。
+
+CryptoMoE 在 M7 之后另行确定 eligibility、dummy、容量和允许公开的 transcript，不属于本轮退出条件。
+
+## 5. 两人协作与接口所有权
+
+### 5.1 角色 A：搭档
+
+当前主责：
+
+- M2 精确三轮核心；
+- Protocol I 相关测试、通信测量和差异解释；
+- 公共接口交接；
+- M5 的交叉评审。
+
+后续建议分工：
+
+- M6A/M6B 公共比较材料、预处理及 Protocol I 路线；
+- Protocol I 及其两种升级的性能运行；
+- 材料生成、Dealer 和通信边界审计。
+
+不再承担 M4 CipherGPT 任务。
+
+### 5.2 角色 B：你
+
+当前主责：
+
+- 总体计划、实施计划和分工文档修订；
+- M5 域、编码、消息依赖及失败用例准备；
+- 接收并复跑 M2 交接；
+- M5 精确两轮核心、通信核验与交接。
+
+后续建议分工：
+
+- M6A/M6B 的 Protocol III 路线；
+- 统一输出与 Protocol III 适配；
+- Protocol III 及其两种升级的性能运行；
+- 结构化结果与跨协议对照。
+
+M3 已完成，不重新安排为当前实现任务。
+
+### 5.3 双方共同负责
+
+- 公共图算法、oracle 和材料契约评审；
+- 两次通信核验的交叉复跑；
+- M6A/M6B 安全设计和阶段退出评审；
+- 全部指标的计量口径；
+- M7 汇总与结果审计。
+
+图算法实现、公共计量及共享文件在每个阶段指定一名实际写入负责人，另一方评审；不同时维护两份不同实现语义。
+
+详细到文件和 PR 的分工由更新后的 `docs/TEAM_WORK_PLAN.md`、`docs/M3_ONWARD_TEAM_WORK_PLAN.md` 承接。
+
+### 5.4 共享资产
 
 ```text
 VFSS/include/moe_topk/score_semantics.h
@@ -490,44 +853,218 @@ VFSS/include/moe_topk/topk_oracle.h
 VFSS/include/moe_topk/metrics.h
 docs/decisions/M1_SCORE_SEMANTICS.md
 PROJECT.md
+docs/IMPLEMENTATION_PLAN.md
+docs/TEAM_WORK_PLAN.md
+docs/M3_ONWARD_TEAM_WORK_PLAN.md
+README.md
 ```
 
-- 共享输入、种子和 oracle 只保留一份；禁止两条线复制后各自改变 tie rule；
-- 角色 A 不改 Protocol III 路由实现，角色 B 不改 Protocol I shuffle 实现；
-- 两个 PR 不同时修改 `README.md` 或 `IMPLEMENTATION_PLAN.md` 的同一区域；状态汇总由
-  后合并者在代码 PR 通过后单独更新；
-- 原始性能输出留在被忽略目录，进入文档的数字必须带 revision、环境和运行命令；
-- 跨协议共用代码只有第二个真实调用方出现后再提取，不提前建立大而全抽象。
+规则：
 
-### 4.4 合并顺序
+- score、tie rule、oracle 和输出语义保持冻结。
+- 计量能力可按真实需求扩展，但同步说明影响，不静默改变旧字段。
+- 同一共享文件同一区域不同时修改。
+- 两条协议线不复制另一套 rank、输入生成或指标定义。
+- 跨协议公共接口在真实调用需求出现后提取。
+- 角色 A 不顺带修改 III 路由，角色 B 不顺带修改 I shuffle。
+- 必要的公共变更独立成 PR，并运行受影响回归。
+- 不修改 `VFSS-baseline/`。
 
-1. 先合并本次路线、协作边界和 PR 模板；
-2. M1.1 已合并；角色 A 先完成并获批准的 M2 实施前设计门，角色 B 可并行提交不改代码的 M3 消息流设计；
-3. 角色 A 的 M2 实现满足退出条件后合并；
-4. 角色 B 基于冻结的 M2 公共边界合并 M3 模块化 3 轮实现；
-5. M4 CipherGPT 原生基线完成后，再进入 M5 2 轮压缩；
-6. M5 通过后才合并 M6 AAV86/Direct Top-K，实现 PR 不顺带改另一协议。
+### 5.5 交接记录要求
 
-## 5. 每个合并请求的检查项
+每次 G3 交接至少记录：
 
-- 说明对应里程碑和协议阶段；
-- 列出输入、输出、公开值和 party 角色变化；
-- 列出新增/修改测试及实际运行结果；
-- 说明是否影响统一输出、泄露、轮数或指标边界；
-- 不修改 `VFSS-baseline/`；
-- 不加入参考仓库源码、论文、构建产物、密钥或日志；
-- 不吞错误，不加入启发式兜底和仅对当前样例有效的后处理；
-- 文档状态必须与代码实际状态同步。
+| 项目 | 内容 |
+| --- | --- |
+| 基准 | revision、分支、实现标签、构建配置 |
+| 功能 | 输入、输出、公开参数、错误语义 |
+| 表示 | score、rank、payload、logical/padded layout |
+| 材料 | 生成方、时机、绑定、一次性消费 |
+| 通信 | transport、session、阶段及消息顺序 |
+| 计量 | core/adapter、total/per-party、计时边界 |
+| 验证 | conformance、差分、E2E、轮数、通信报告 |
+| 使用 | 最小调用示例与复跑命令 |
+| 限制 | 已知缺口和不可直接复用的假设 |
+| 接收 | 接收方复跑结果与日期 |
 
-## 6. 立即下一步（M2 已收尾，进入 M3）
+交接记录是可运行证据，不以“接口已经写好”的口头说明代替。
 
-1. 从当前 `main` 建立 M3 实现分支，保留当前实现标签和全部 M2.13--M2.16
-   reproduction/decision records，且不得改名为 exact。M2 验证修复已合入 main；
-   当前 C 级基线在记录的 Ubuntu 24.04.4 soft `RLIMIT_NOFILE=1024` 下 EMP-ON
-   19/19、EMP-OFF 13/13 通过。
-2. M3 复用 M1/M2 的 score semantics、oracle、CmpAgg、transport、metrics 和
-   original-order mask 契约，不复制第二套 rank 或输出语义。
-3. M3 先实现 `agarwal_protocol_iii_modular_3round` 的 GRank 1 轮 + 标准 DPF
-   routing 2 轮；Protocol III 的 2 轮压缩和域条件留到 M5。
-4. 在 M3 代码合并前完成 DPF payload/rank conformance、独立 P2/P0/P1 E2E、泄露和
-   causal-round 审计；所有未测量指标继续写 `NOT_MEASURED`。
+## 6. 分支与合并顺序
+
+### 6.1 基本规则
+
+- 从最新 main 建立短生命周期分支。
+- 一个 PR 只处理一个明确实现步骤或治理变更。
+- 不在一个 PR 中混合 Protocol I、Protocol III 和下一种升级算法的无关改动。
+- 文档与设计可以提前合并，依赖 runtime 的验收服从阶段门。
+- 原始密钥、日志、论文、构建产物和参考工程不进入普通 Git 历史。
+- 计划中的目标名称不代表已有 executable 或已完成状态。
+
+### 6.2 当前合并顺序
+
+1. 合并本次范围、路线和分工文档。
+2. 按依赖合并 M2 精确功能及相关测试。
+3. 合并 M2 通信计量、核验报告和必要修正。
+4. 完成 M2 G3 接口交接。
+5. 合并 M5 所需域与适配，再合并精确核心和 E2E。
+6. 合并 M5 通信核验及必要修正。
+7. 完成 M5 G3 基础接口交接。
+8. 合并 M6A 设计、必要公共接口和两种升级实现。
+9. 完成 M6A 计量与完整性能报告。
+10. 合并 M6B 设计、两种组合实现及验证。
+11. 完成 M6B 完整性能报告。
+12. 完成 M7 汇总和必要补跑。
+
+每阶段可以拆多个 PR；前置阶段未通过时，不以“已经合并”绕过验收门。
+
+M4 不再出现在合并顺序中。旧 M2→M3 交接作为已完成历史保留，不与当前 M2 精确核心→M5 交接混淆。
+
+## 7. 每个合并请求的检查项
+
+- 对应哪个里程碑、步骤和阶段门？
+- 实现标签及证据层级是什么？
+- 输入、输出、party 角色和允许公开值是否变化？
+- 是否改变预处理、代数表示、材料绑定或消费方式？
+- 核心与端到端轮数如何计算？
+- 是否包含 raw-score 和 mask 适配成本？
+- 新增或修改了哪些测试，实际命令和结果是什么？
+- 通信是否保留 total、per-party 和分方计数？
+- 适用阶段是否附通信核验或性能矩阵报告？
+- 未测指标与失败配置是否如实记录？
+- 是否影响另一条协议线或公共接口？
+- 文档状态是否与 main/分支实际状态一致？
+- `VFSS-baseline/` 是否保持不变？
+- 是否避免提交参考工程、论文、密钥、日志和构建物？
+- 是否运行相关回归及 `git diff --check`？
+
+文档 PR 不声称重新执行历史测试。新性能结果必须有自己的 revision、输入、环境、命令和原始计数。
+
+## 8. 立即下一步
+
+### 8.1 角色 B 当前任务
+
+1. 完成 `PROJECT.md`、本文及两份分工计划的同步修订。
+2. 更新首页和路线决策，清除仍指向 M4 的现行执行要求。
+3. 保留 M2/M3 历史验收和实现标签。
+4. 整理 M2→M5 交接表及两次通信核验模板。
+5. 准备 M5 域、非零编码、DPF 兼容性和两轮消息设计。
+6. 不修改搭档正在推进的 Protocol I 核心或 shuffle 文件。
+
+### 8.2 角色 A 当前任务
+
+1. 明确当前 M2 精确候选 revision 和实现范围。
+2. 闭合同置换 public masked-list 与 GRank 材料契约。
+3. 完成三轮核心正确性、独立进程 E2E 和消息审计。
+4. 分别测量核心、输入适配、输出适配和封装通信。
+5. 对照论文解释成本差异。
+6. 提交最小调用示例、接口说明和核验报告。
+7. 与角色 B 完成可复跑交接。
+
+### 8.3 双方立即共同确认
+
+- 本轮目标是 I 三轮核心、III 两轮核心。
+- I 四轮工程基线和 III 三轮工程基线继续保留。
+- M2、M5 均执行“实现→通信核验→交接”。
+- AAV86 两种路线完成完整性能验收后再推进 BB90+DCF。
+- 六种方案共用语义和全部指标。
+- CipherGPT 实施和性能任务已取消。
+- 分支进度不能直接写成 main 已完成。
+- 尚未测量的数据继续标记 `NOT_MEASURED`。
+
+## 9. 历史证据索引
+
+本节保留旧计划中的实现基础和验收事实。它们不是本次修改文档重新运行得到的结果，也不构成精确核心已经完成的声明。
+
+### 9.1 M2.7：CmpAgg 三进程基础
+
+实现标签：
+
+```text
+m2_priority_cmpagg_three_process_e2e
+```
+
+P2 为公开 canonical graph 生成 node-mask shares 和分方 uCMP/DCF 材料，发送后退出。测试控制器在离线屏障后提供 priority-key shares；重构与 oracle 检查只在测试层执行。
+
+历史测试覆盖 `n=1,2,5,7,11`、K 边界、重复值、非二次幂、正负边界及 package/transport 错误矩阵。
+
+记录的 Ubuntu 干净 Debug 构建为 11/11 CTest 通过。见：
+
+`docs/reproduction/M2_CMPAGG_PROCESS_E2E_UBUNTU_2026-09-05.md`
+
+### 9.2 M2.8–M2.14：工程组件与端到端路径
+
+| 阶段 | 已有实现或证据 |
+| --- | --- |
+| M2.8 | EMP chosen OT、connected-fd adapter 和独立进程 conformance |
+| M2.9 | GGM OPV 与 Share Translation |
+| M2.10 | 单遍 Permute+Share |
+| M2.11 | 两遍前向/逆向 shuffle roundtrip |
+| M2.12 | priority-key 输入、shuffle、CmpAgg、受控 shuffled rank 与 reverse carrier 的小规模 E2E |
+| M2.13 | 六轮模块化 mask 路径、离线屏障、有界帧、layout 和 rank-permutation 审计 |
+| M2.14 | raw-score carry/lift/sign 适配后的八轮路径 |
+
+主要决策：
+
+- `docs/decisions/M2_CHOSEN_OT_DEPENDENCY.md`
+- `docs/decisions/M2_OPV_SHARE_TRANSLATION.md`
+- `docs/decisions/M2_PERMUTE_SHARE.md`
+- `docs/decisions/M2_SECRET_SHARED_SHUFFLE.md`
+- `docs/decisions/M2_PROTOCOL_I_SMALL_E2E.md`
+
+主要复现记录：
+
+- `docs/reproduction/M2_PERMUTE_SHARE_UBUNTU_2026-09-06.md`
+- `docs/reproduction/M2_SECRET_SHARED_SHUFFLE_UBUNTU_2026-09-06.md`
+- `docs/reproduction/M2_PROTOCOL_I_SMALL_E2E_UBUNTU_2026-09-06.md`
+
+这些组件是后续复用基础，不自动证明精确 shuffle 功能或自适应图预处理已经实现。
+
+### 9.3 M2.15/M2.16：精确核心差距审计
+
+M2.15 确认当时的 PS API 无法表达论文需要的同置换 public masked shuffled list，因此保留四轮核心、八轮总路径。
+
+M2.16 进一步审计 `pi(x)+r`、掩码秘密性和 GRank 关联，未新增精确原语。文档随 `f800f96` 合入 main。
+
+三轮核心、七轮总路径在这些记录中仍为未实现候选。相关文件：
+
+- `docs/decisions/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT.md`
+- `docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md`
+- `docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md`
+- `docs/reproduction/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT_UBUNTU_2026-09-06.md`
+- `docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md`
+
+本次重新推进该目标，不反写这些历史结论。
+
+### 9.4 M2 验证可靠性关闭
+
+chosen-OT readable-hangup 和 modular E2E FD-lifecycle 修复已合入，未改变协议图。
+
+记录的 Ubuntu 24.04.4 fresh 构建在 soft `RLIMIT_NOFILE=1024` 下：
+
+- EMP-ON：19/19；
+- EMP-OFF：13/13；
+- `(128,2/8)`、`(256,2/8)` 及重复矩阵通过；
+- 相关完整矩阵还在 4096 下通过。
+
+这说明对应工程验证不依赖将 FD limit 提高到 4096，不表示论文精确条件或网络性能已验收。
+
+见：
+
+- `docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md`
+- `docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md`
+
+### 9.5 M3 关闭记录
+
+M3 在 `main@bb0d0e8` 完成整改，保留三轮 priority-key 和五轮 raw-score 两个入口。
+
+已完成 logical-n GRank、DPF routing、secure combine、raw-score 安全入口、独立进程测试、两个正式 Party executable 和 MetricsRecord 汇总。
+
+正式 Party 生成各自 report，TEST_ONLY 控制器汇总完整 MetricsRecord；不能写成每个 Party executable 都独立生成全局结果。
+
+完整证据及 11-test 验证口径见：
+
+`docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md`
+
+历史计时包括已披露的 Dealer 生命周期、输入分发和 report 收集边界；网络 bandwidth/RTT 及完整在线 PRG 计数仍按原记录保留未测状态。
+
+后续正式实验新增分阶段计量，不静默替换历史数字或证据来源。
