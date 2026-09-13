@@ -1,93 +1,195 @@
 # MoE Top-K 安全协议统一项目
 
-本仓库以 VFSS 为唯一活动实现框架，目标是建立可复现、可横向比较的安全 Top-K
-基线。长期顺序已经冻结为：公共底座 → Protocol I → Protocol III 模块化 3 轮
-基线 → CipherGPT 原生基线 → Protocol III 精确 2 轮压缩 → AAV86。
+本仓库以 **VFSS** 为唯一活动实现框架，建立统一语义、可复现、可横向比较的安全 Top-K 实验环境。
+
+当前已完成 Protocol I 四轮核心工程基线、Protocol III 三轮模块化核心。下一阶段先完成 Protocol I 论文精确三轮核心及通信核验，再基于交接接口完成 Protocol III 论文精确两轮核心及通信核验，随后依次完成 AAV86、BB90+DCF 两条升级路线及完整性能测试。
+
+M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参考，不作为后续阶段的前置条件。
 
 ## 当前状态
 
-- M2.16 paper-exact feasibility/leakage audit 已随 `f800f96` 合入 `main`；
-  它记录 exact 目标被当前 VFSS 架构阻塞，而非已实现；
-- M0 已在远端闭环，`main` 与冻结标签均已推送；
-- M1 核心已完成：score 语义、oracle、CmpAgg、metrics 和真实 VFSS DCF
-  conformance 测试均通过；
-- M1.1 已在 Ubuntu 24.04.4 的干净 Debug 构建中验收：`ctest -N` 恰发现四项，
-  `ctest --output-on-failure` 为 4/4 通过；验收记录见
-  `docs/M1_1_UBUNTU_HANDOFF.md`；M1/M1.1 的语义、oracle、metrics 和冻结基线
-  已完成并保持不变；
-- `VFSS/` 已产生 M1 的预期改动，`VFSS-baseline/` 仍保持冻结标签内容；
-- M2.0--M2.16 documentation/validation closeout 已完成当前 C 级模块化 Protocol I
-  工程基线，并已合入 `main`；M2.16 仅是 feasibility/leakage audit，不是 exact
-  Protocol I 实现；
-  当前实现标签为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，
-  core 为 4 轮、总路径为 8 轮；
-- M2 未达成 Agarwal paper-exact 3-round core 或 7-round total candidate，这些
-  仍是明确记录的后续研究目标，不得反写成当前实现能力；
-- M2.16 已完成 paper-exact 3-round feasibility/leakage audit：论文要求的同置换
-  public `pi(x)+r` 与当前 VFSS PS/GRank material 绑定仍无可审计实现，因此保留
-  8-round C 级基线；
-- M2 验证可靠性修复已合入：Ubuntu 24.04.4 的 fresh EMP-ON CTest 在显式 soft
-  `RLIMIT_NOFILE=1024` 下发现 19 项并通过 19/19；EMP-OFF 通过 13/13。此结果恢复
-  C 级基线的默认资源限制可复现性，不改变协议标签或 paper-exact 状态；
-- M3 已在 `main@bb0d0e8` 完成整改并冻结：正式三轮入口接收 padded
-  priority-key shares；raw-score 扩展为 2 轮输入适配加 3 轮安全核心，共 5 轮；
-  当前后续主线为 M4 CipherGPT 原生基线；
-- 统一输出固定为原始输入顺序下的秘密共享 Top-K bit-mask；
-- 论文和大型参考工程不进入普通远端 Git 历史，需要队友在本地自行补齐。
+| 里程碑 | 状态 | 实现与验收边界 |
+| --- | --- | --- |
+| M0 | 已完成 | 远端仓库及冻结基线已建立 |
+| M1/M1.1 | 已完成 | score、tie rule、oracle、基础适配、metrics 和 CTest 入口已冻结 |
+| M2 工程基线 | 已完成并合入 main | Protocol I 四轮核心；raw-score 到原顺序 mask 共八轮 |
+| M2 精确核心 | 当前推进目标 | 论文三轮核心、通信核验及公共接口交接尚需完成 |
+| M3 | 已完成并冻结 | priority-key 三轮入口，以及 raw-score 五轮扩展 |
+| M4 | 已取消 | 不实施 CipherGPT，不安排其性能实验 |
+| M5 | 后续目标 | Protocol III 论文两轮核心及通信核验 |
+| M6A | 后续目标 | I+AAV86、III+AAV86 实现及完整性能验收 |
+| M6B | 后续目标 | I+BB90+DCF、III+BB90+DCF 实现及完整性能验收 |
+| M7 | 后续目标 | 六种方案统一汇总与报告 |
+
+已完成的工程实现为：
+
+| 实现标签 | 输入 | 核心轮数 | 完整入口轮数 |
+| --- | --- | --- | --- |
+| `m2_protocol_i_raw_score_input_modular_8round_mask_output` | raw Q20.12 score shares | 4 | 8 |
+| `agarwal_protocol_iii_modular_3round` | padded priority-key shares | 3 | 3，不含 raw-score 适配 |
+| `moe_topk_protocol_iii_raw_score_modular_5round` | raw Q20.12 score shares | 3 | 5 |
+
+需要明确：
+
+- M2.16 可行性与泄露审计已随 `f800f96` 合入 main，但没有实现 paper-exact 原语。
+- 该审计记录的缺口是：论文要求的同置换 public `pi(x)+r`，以及与后续 GRank 材料关联的秘密掩码，在当时 VFSS PS 接口中尚无完整可审计实现。
+- Protocol I 三轮核心、沿用现有适配器时的七轮总路径仍是候选目标，不能反写成既有能力。
+- M3 已在 `main@bb0d0e8` 完成整改，不再是“可开始”的待实现阶段。
+- M3 三轮和五轮入口保留为 M5 的正确性及开销对照，不通过改名升级为论文两轮实现。
+- `VFSS/` 已包含 M1、M2、M3 的活动实现；`VFSS-baseline/` 继续保持冻结。
+- 当前任务安排不等于分支工作已经验收或合入 main，完成状态必须对应代码和证据。
+
+## 后续路线
+
+```text
+M2 Protocol I 精确三轮核心
+  → 通信测量及差异解释
+  → 公共接口交接
+  → M5 Protocol III 精确两轮核心
+  → 通信测量及差异解释
+  → 基础接口交接
+  → M6A AAV86 两种升级实现及完整性能验收
+  → M6B BB90+DCF 两种升级实现及完整性能验收
+  → M7 六种方案统一报告
+```
+
+Protocol I 的论文核心为三轮，Protocol III 为两轮。raw-score 输入适配、表示转换和原顺序 mask 输出适配单独记录，并计入端到端主结果。
+
+两次基础协议验收均执行：
+
+```text
+协议实现与正确性完成
+  → 通信核验及差异解释完成
+  → 接口、示例和证据交接完成
+```
+
+通信核验需要对齐论文公式、实际参数和消息结构、分方实测计数。数量级相符不能单独证明正确性或安全性；数量级不符也不能未经差异分析直接归因于论文错误。
+
+AAV86 和 BB90+DCF 各自包含两种实现及完整性能验收，不把性能测试全部推迟到 M7。资料研究和设计可提前并行，依赖实现和正式验收遵循上述顺序。
+
+## 六种目标方案
+
+| 方案 | 目标 |
+| --- | --- |
+| Protocol I | 全对全 CmpAgg、shuffle-based routing、统一 mask 适配 |
+| Protocol III | 全对全 CmpAgg、压缩 DPF routing、统一 mask 适配 |
+| Protocol I + AAV86 | Protocol I 路线的图算法升级 |
+| Protocol III + AAV86 | Protocol III 路线的图算法组合升级 |
+| Protocol I + BB90+DCF | 第 K 大阈值选择与 DCF 成员判断，接入 Protocol I 路线 |
+| Protocol III + BB90+DCF | 第 K 大阈值选择与 DCF 成员判断，接入 Protocol III 路线 |
+
+上述是目标方案，不表示已经全部实现。
+
+图升级需要单独解决自适应预处理、Dealer 在线静默、材料绑定、泄露和消息依赖。Protocol III 的图算法组合不能直接继承 shuffle-based compiler 的论文结论。
+
+BB90+DCF 必须保持稳定同分规则并恰好选出 K 个位置；历史 Direct Top-K 原型不直接改名为 BB90。
+
+## 统一语义与实验要求
+
+统一输入为 32 位二补码 signed fixed-point score 算术共享，小数位数为 12。选择 score 最大的 K 个元素，同分按 original index 升序，最高优先级 rank 为 0。
+
+统一输出为：
+
+```text
+原始输入顺序下长度 n 的秘密共享 Top-K bit-mask
+每位为 0/1，且恰好 K 位为 1
+```
+
+六种方案复用同一 oracle、输入语义和输出契约。重构与明文校验只在隔离的测试路径发生。
+
+统一测试矩阵：
+
+| n | K | AAV86 迭代 r |
+| --- | --- | --- |
+| 128、256 | 2、8 | 2、3、4、5 |
+| `10^3`、`10^4`、`10^5`、`10^6` | 80 | 2、3、4、5 |
+
+BB90 迭代参数按采用算法单独定义。
+
+正式实验保留全部统一指标：离线时间与材料、在线时间、total/per-party/分方通信、因果轮数、PRG 调用、比较边数和总时间，以及 revision、输入、种子、环境和命令。
+
+每配置预热一次、正式运行五次，报告 median/min/max。AAV86、BB90+DCF 的完整性能阶段分别覆盖 LAN/WAN。无法完成的配置保留失败原因和未测字段，不外推填表。
+
+详细定义以 `PROJECT.md` 和 `docs/IMPLEMENTATION_PLAN.md` 为准。
 
 ## 文档入口
 
-- [项目范围、论文映射与统一指标](PROJECT.md)
-- [详细实施计划](docs/IMPLEMENTATION_PLAN.md)
-- [双人实施分工与交接计划](docs/TEAM_WORK_PLAN.md)
-- [M2 分支阶段映射与重命名记录](docs/BRANCH_MAP.md)
-- [路线优先级决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
-- [Protocol III 模块化 3 轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
+### 当前规范与分工
+
+- [项目范围、六种方案、论文映射与统一指标](PROJECT.md)
+- [详细实施计划与阶段门](docs/IMPLEMENTATION_PLAN.md)
+- [双人职责、公共文件所有权与交接契约](docs/TEAM_WORK_PLAN.md)
+- [M3 冻结契约及后续双人执行计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
+- [项目实现约束](AGENTS.md)
+- [协议复现工作流](.agents/skills/protocol-reproduction/SKILL.md)
 - [M1 统一 score 语义（已冻结）](docs/decisions/M1_SCORE_SEMANTICS.md)
+
+### 已完成基线与验收证据
+
 - [M1.1 Ubuntu 24.04 验收记录](docs/M1_1_UBUNTU_HANDOFF.md)
-- [M2 Protocol I 实施前设计门](docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md)
-- [M2.16 paper-exact 3-round 阻塞规格](docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
+- [M2 分支阶段映射与重命名记录](docs/BRANCH_MAP.md)
+- [M2 Protocol I 历史实施前设计门](docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md)
+- [M2.16 精确三轮候选规格与历史阻塞](docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
 - [M2.16 paper-exact 泄露审计](docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md)
 - [M2.16 Ubuntu 研究记录](docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md)
 - [M2 chosen-OT POLLIN/HUP 修复记录](docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md)
 - [M2 modular E2E FD 生命周期修复记录](docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md)
-- [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
-- [M0/M1 仓库复检](docs/M0_REVIEW.md)
-- [本地参考资料边界](docs/REFERENCE_MANIFEST.md)
-- [项目实现约束](AGENTS.md)
-- [协议复现工作流](.agents/skills/protocol-reproduction/SKILL.md)
-- [M3 及后续双人分工计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
+- [Protocol III 模块化三轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 - [M3 复检整改关闭记录](docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
 - [M3 Ubuntu 环境基线](docs/reproduction/M3_ENV_BASELINE_UBUNTU_2026-09-07.md)
+
+### 历史路线与本地资料
+
+- [2026-09-04 历史路线决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
+- [本地论文与参考仓库配置](docs/LOCAL_REFERENCES_SETUP.md)
+- [本地参考资料边界](docs/REFERENCE_MANIFEST.md)
+- [M0/M1 仓库复检](docs/M0_REVIEW.md)
+
+旧路线中的 CipherGPT 实施和 M4→M5 前置关系已被本次修订替代。当前执行顺序以更新后的项目总纲、实施计划和分工文档为准。
 
 ## 目录说明
 
 ```text
 VFSS/                 唯一活动实现目录
 VFSS-baseline/        冻结恢复与回归基线
-docs/                 计划、决策和来源记录
-.agents/skills/       仓库级 Codex 工作流
+docs/                 计划、决策、来源与验收记录
+.agents/skills/       仓库级协议复现工作流
 ```
 
-本机另有 `Papers/`、`ADSMPC/`、`Agarwal_TopK/` 和 `CipherGPT/` 作为只读参考。
-这些目录被 `.gitignore` 排除；新环境不会自动拥有它们。需要共享时按
-`docs/LOCAL_REFERENCES_SETUP.md` 放到固定位置并校验；需要重新分发时按
-`docs/REFERENCE_MANIFEST.md` 选择经过许可证审查的方式。
+本地可按任务需要准备 `Papers/`、`ADSMPC/`、`Agarwal_TopK/` 和 `CipherGPT/`。这些目录被 `.gitignore` 排除，新环境不会自动拥有它们。
 
-## 协作起点
+`CipherGPT/` 仅保留为历史参考，本轮不要求准备其工作包以推进实施。论文和大型参考工程不进入普通远端 Git 历史。
 
-1. 先阅读 `PROJECT.md`、`AGENTS.md` 和当前里程碑的决策记录；
-2. 按 `docs/LOCAL_REFERENCES_SETUP.md` 准备自己分工所需的本地参考资料；
-3. 确认工作基于最新 `main`，并知道 `vfss-baseline-2026-09-03` 只用于恢复比较；
-4. 新协议代码只修改 `VFSS/`，不得修改 `VFSS-baseline/`；
-5. 每项工作按 `docs/IMPLEMENTATION_PLAN.md` 的输入、交付物和退出条件验收；
-6. PR 使用仓库模板，性能结果使用统一测试矩阵和字段，不提交生成密钥、日志或
-   本地构建产物。
+资料准备与版本校验见 `docs/LOCAL_REFERENCES_SETUP.md`；新增来源和再分发边界见 `docs/REFERENCE_MANIFEST.md`。
 
-## 已验证环境
+## 当前协作起点
 
-- Apple Clang、CMake、Homebrew `libomp` 与 `eigen@3`：M1 四个目标通过；
-- Ubuntu 24.04.4、GCC 13.3、CMake、Eigen 3.4、OpenMP 4.5：M1 四个目标通过；
-- LAN/WAN 性能尚未测量，不能从本机功能测试推导通信或时延结论。
+- **角色 A（搭档）**：推进 Protocol I 精确三轮核心、测试、通信核验及公共接口交接。
+- **角色 B（Protocol III 负责人）**：修订计划与分工，准备 M5 设计；交接完成后推进 Protocol III 精确两轮核心及通信核验。
+- **双方**：交叉复跑、维护公共契约，随后分别推进两条协议路线的 AAV86 和 BB90+DCF 升级。
 
-复现命令见 `docs/decisions/M1_SCORE_SEMANTICS.md`。
+开始工作前：
+
+1. 阅读 `PROJECT.md`、`AGENTS.md` 和当前阶段决策。
+2. 按分工准备必要资料并校验版本。
+3. 从最新 main 建短生命周期分支。
+4. 按 `docs/TEAM_WORK_PLAN.md` 确认共享接口、metrics 和文档的主写负责人。
+5. 新协议实现进入 `VFSS/`，不修改 `VFSS-baseline/`。
+6. 按实施计划的实现、通信核验和交接门验收。
+7. PR 使用仓库模板，结果保留 revision、环境、输入、种子、命令和原始计数。
+8. 不提交生成密钥、日志、论文、参考工程和本地构建产物。
+
+`vfss-baseline-2026-09-03` 只用于恢复与回归比较，不作为新开发起点。
+
+## 已记录的验证与性能边界
+
+- M1 四项测试已在 Apple Clang、CMake、Homebrew `libomp`/`eigen@3` 环境通过。
+- M1/M1.1 已在 Ubuntu 24.04.4 的干净 Debug 构建中通过 4/4 CTest。
+- M2 验证可靠性修复记录：Ubuntu 24.04.4、soft `RLIMIT_NOFILE=1024` 下，EMP-ON 19/19、EMP-OFF 13/13 通过。
+- M3 关闭记录保留三轮/五轮入口及 11-test 验证口径，具体环境、结果来源和限制以原记录为准。
+- 已有工程路径具备部分实际通信、材料和时间记录；这些记录不等于完成论文核心通信核验。
+- 正式 LAN/WAN 性能和完整可信在线 PRG 计数仍需补齐，未测项保持 `NOT_MEASURED`。
+
+历史验证不因修改 README 而成为重新运行的结果，也不能直接推导新精确核心或图升级方案的性能。
+
+复现命令分别见 M1.1、M2 修复和 M3 关闭记录。
