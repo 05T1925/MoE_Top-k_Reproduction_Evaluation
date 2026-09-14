@@ -11,7 +11,6 @@
 
 本契约适用于：
 
-```text
 Protocol III round-compressed payload-selection core
 K-rank repeated selection extension
 selected-record to original-order mask adapter boundary
