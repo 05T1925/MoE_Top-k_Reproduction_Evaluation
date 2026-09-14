@@ -211,7 +211,30 @@ payload field: GF(2^64)
 0..logical_n-1
 padding domain 上的点不能成为合法 selected rank。
 该嵌入是 PROJECT_DECISION，成本报告必须与论文记号 Z_n 区分。
-10. Paper-core 输出身份
+10.1 Paper functionality 与项目 packed-record 映射
+
+论文 `F_select` 的逻辑输出是目标 rank 对应的 key 和关联 payload 的秘密份额。
+
+M5 采用一个非零 field record 编码二者：
+
+```text
+encoded_record =
+    nonzero_tag || project_priority_key
+其中 project priority key 已绑定：
+normalized score
+original index
+stable tie rule
+因此，选出 encoded_record 后可以恢复论文功能所需的 key 以及本项目作为
+payload 使用的 original index。
+该 packed representation 是 PROJECT_DECISION，不是论文规定的数据布局。
+在 secure runtime 中不得重构 encoded record。解码只允许：
+1. 在后续安全 adapter 中对秘密份额操作；或
+2. 在明确隔离的 TEST_ONLY 正确性检查中重构。
+在 ring-to-field 输入适配完成前，M5 测试入口必须显式接收两套一致的输入：
+priority-key ring shares
+encoded-record field shares
+这只证明 paper core，不证明 raw-score 到 field record 的安全转换已经完成。
+10.2 Paper-core 输出身份
 单 target rank 的 paper-core 输出为：
 一个 selected encoded-record field share
 K-rank 项目扩展输出为：
