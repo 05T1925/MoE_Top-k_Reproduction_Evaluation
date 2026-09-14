@@ -36,7 +36,6 @@ f(x) = x^64 + x^4 + x^3 + x + 1
 
 因为：
 
-```text
 degree(f) = 64
 prime divisors of 64 = {2}
 需要验证：
