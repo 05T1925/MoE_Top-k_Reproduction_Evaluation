@@ -1,4 +1,3 @@
-docs/decisions/M5_PROTOCOL_III_PAPER_EVIDENCE.md
 # M5 Protocol III 论文证据记录
 
 状态：**待评审；合并后冻结为 M5 论文证据基线**
