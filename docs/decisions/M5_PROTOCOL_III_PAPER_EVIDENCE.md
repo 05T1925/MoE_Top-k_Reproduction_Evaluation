@@ -237,11 +237,21 @@ selected payload shares。状态：PROJECT_DECISION。
 - 尚未直接产生原顺序 n-bit mask。
 从 K 个 selected payload shares 转换为原顺序 XOR Top-K mask 属于独立
 mask adapter。其时间、通信和在线轮数必须单独记录，并计入端到端主结果。
-在 mask adapter 完成前，只能使用：
-protocol_iii_exact_2round_candidate
-protocol_iii_repeated_k_payload_selection_candidate
-不得使用完整完成态标签：
-agarwal_protocol_iii_exact_2round_mask_output
+在完成身份验收前，候选实现统一使用：
+```text
+m5_protocol_iii_compressed_field_candidate
+只有 paper-core 满足 field、非零 payload、两轮因果关系、安全边界、
+正确性和通信核验后，才能使用仓库冻结的完成态身份：
+agarwal_protocol_iii_exact_2round
+该完成态身份只表示论文核心为两轮，不表示 raw-score 输入适配和原顺序
+Top-K mask 适配也只有两轮。
+端到端实现必须另行记录：
+input_adapter_rounds
+paper_core_rounds
+mask_adapter_rounds
+total_online_rounds
+如果 mask adapter 增加在线轮次，端到端 executable 或结果标签不得包含
+会使人误解为完整路径只有两轮的名称。
 11. 成本核验边界
 Theorem 4.2 对 Compare-Aggregate ranking 的单次 selection 给出：
 online communication:
