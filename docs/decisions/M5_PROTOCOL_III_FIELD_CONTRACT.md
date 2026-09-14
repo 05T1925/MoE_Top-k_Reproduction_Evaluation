@@ -1,4 +1,3 @@
-```markdown
 # M5 Protocol III 有限域、非零 payload 与输出契约
 
 状态：**待评审；合并后冻结 M5 field contract**
