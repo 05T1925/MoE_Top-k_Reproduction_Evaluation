@@ -31,9 +31,25 @@ bit i = x^i 的系数
 f(x) = x^64 + x^4 + x^3 + x + 1
 低 64 位 reduction constant 为：
 0x1B
-该多项式必须在 conformance test 中使用独立的 Rabin irreducibility check
-或等价的可信验证固定下来。实现不得只因为常量可运行就假设其不可约。
-2.1 运算
+2.1 不可约性核验
+
+该多项式已按 Rabin irreducibility criterion 核验。
+
+因为：
+
+```text
+degree(f) = 64
+prime divisors of 64 = {2}
+需要验证：
+gcd(x^(2^32) - x, f(x)) = 1
+x^(2^64) - x = 0 mod f(x)
+本项目的独立位多项式核验结果为：
+gcd result = 1
+final Frobenius equality = true
+因此该多项式在 GF(2) 上不可约，可以定义 GF(2^64)。
+后续 field conformance test 必须保留上述判据作为回归测试，但不可约性不是
+等到 runtime 实现后才决定的未解决事项。
+2.2 运算
 addition(a,b)    = a XOR b
 subtraction(a,b) = a XOR b
 zero             = 0x0000000000000000
@@ -41,7 +57,7 @@ one              = 0x0000000000000001
 multiplication   = carry-less polynomial multiplication mod f(x)
 inverse(a)       = a^(2^64-2), for a != 0
 inverse(0) 必须硬失败。
-2.2 序列化
+2.3 序列化
 每个 field element 使用固定 8 字节 big-endian 编码。
 GF(2^64) 的每个 64 位串都是 canonical field element，因此不存在 prime-field
 式的非 canonical residue。
@@ -54,6 +70,8 @@ byte_order
 field_id = "gf2_64_poly_1b"
 field_version = 1
 byte_order = "big-endian"
+乘法实现使用固定 64 次迭代。左移被乘数前保存 bit 63；若该位为 1，
+左移后 XOR `0x1B`。不得根据秘密 field element 的比特提前终止循环。
 3. 类型隔离
 必须新增独立类型，例如：
 class ProtocolIIIBinaryField64;
@@ -167,7 +185,7 @@ q_0 + q_1 = z_i*s_i
 Round 2 公开：
 z_tilde_i = q_0 + q_1
 每个 triple、s_i 和对应 inverse 只能消费一次。
-8. Field-output DPF 合同
+8.1 Field-output DPF 合同
 M5 的 DPF 为：
 domain:
     rank domain
@@ -198,7 +216,27 @@ key 或外围 material 必须绑定 output group，防止 ring key 与 field key
 最终 leaf 到 field element 的扩展必须产生完整 64 位 field element。不得直接把
 已清除控制位的 tree seed 当作均匀 64 位 field leaf。若增加 domain-separated PRG
 leaf expansion，其 AES/PRG 调用必须进入指标。
-9. Rank domain
+8.2 DPF key 的执行内复用
+
+每个位置的 field DPF key 在同一次协议执行中可以对：
+
+```text
+target_rank = 0..K-1
+分别求值。
+因此 one-shot 的含义是：
+一个 material bundle 只能用于一个 protocol session
+而不是：
+一个 DPF key 只能调用一次 Eval
+状态机必须允许：
+fresh
+  -> evaluating targets 0..K-1
+  -> consumed
+禁止：
+- 在第一个 target rank 后提前销毁 key；
+- 对同一 target rank 意外重复计量；
+- 在另一个 session 中再次使用 key；
+- 在部分失败后把 bundle 恢复为 fresh。
+9.1 Rank domain
 GRank 输出仍位于 rank additive group：
 Z_(2^rank_bits)
 rank_bits = max(1, ceil(log2(logical_n)))
@@ -211,6 +249,25 @@ payload field: GF(2^64)
 0..logical_n-1
 padding domain 上的点不能成为合法 selected rank。
 该嵌入是 PROJECT_DECISION，成本报告必须与论文记号 Z_n 区分。
+9.2 二次幂域嵌入的证明义务
+
+论文 DPF domain 记为 `Z_n`，VFSS 当前 DPF 接口使用
+`Z_(2^rank_bits)`。M5 采用后者属于项目实例化。
+
+使用完成态 exact 身份前必须验证：
+
+1. GRank 的每个合法重构值都位于 `0..logical_n-1`；
+2. `r_i` 和 `hat_rank_i` 按 `2^rank_bits` 取模；
+3. 对每个合法 target rank：
+
+   ```text
+   (hat_rank_i - target_rank) mod 2^rank_bits = r_i
+   iff
+   rank_i = target_rank
+4. padding domain 中的点不会产生额外 selected output；
+5. DPF key size、Eval 成本和通信按实际 rank_bits 报告；
+6. 不把论文 Z_n 的理论成本直接当作 VFSS 二次幂嵌入的实测成本。
+未完成上述证明和测试时，保持 candidate 身份。
 10.1 Paper functionality 与项目 packed-record 映射
 
 论文 `F_select` 的逻辑输出是目标 rank 对应的 key 和关联 payload 的秘密份额。
