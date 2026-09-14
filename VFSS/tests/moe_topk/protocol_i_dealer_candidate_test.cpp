@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <utility>
 #include <vector>
 
 #ifndef MOE_TOPK_M2_DEALER_CANDIDATE_EXECUTABLE
@@ -561,7 +562,6 @@ void run_route_case(std::uint32_t logical_n, std::uint32_t k, unsigned style,
   const auto dealer = spawn_role(executable, dealer_args(config, channels), all,
                                  {channels.package0.first, channels.package1.first});
   close_fd(channels.package0.first); close_fd(channels.package1.first);
-  wait_ok(dealer, "route dealer process");
   const auto p0 = spawn_role(executable, party_args(config, channels, 0, permutation_mode,
                                                     0xb40000 + serial, true), all,
     [&] { std::vector<int> keep{channels.package0.second, channels.ready0.first,
@@ -578,6 +578,7 @@ void run_route_case(std::uint32_t logical_n, std::uint32_t k, unsigned style,
       channels.route_result1.first}; for (const auto& p : channels.offline) keep.push_back(p.second);
       for (const auto& p : channels.forward) keep.push_back(p.second);
       for (const auto& p : channels.reverse) keep.push_back(p.second); return keep; }());
+  wait_ok(dealer, "route dealer process");
   close_fd(channels.package0.second); close_fd(channels.package1.second);
   close_fd(channels.ready0.first); close_fd(channels.ready1.first);
   close_fd(channels.input0.first); close_fd(channels.input1.first);
@@ -659,6 +660,17 @@ int main() {
         run_route_case(logical_n, k, static_cast<unsigned>(route_serial % 5U),
                        static_cast<unsigned>(route_serial % 3U), route_serial++);
       }
+    }
+    // Large-domain route coverage keeps the independent-process harness on the
+    // same padded/non-power-of-two and boundary-K matrix as the raw-score path.
+    for (const auto [logical_n, k] : {std::pair<std::uint32_t, std::uint32_t>{16U, 2U},
+                                      {31U, 8U},
+                                      {127U, 64U},
+                                      {128U, 128U},
+                                      {129U, 1U},
+                                      {256U, 128U}}) {
+      run_route_case(logical_n, k, static_cast<unsigned>(route_serial % 5U),
+                     static_cast<unsigned>(route_serial % 3U), route_serial++);
     }
     return 0;
   } catch (const std::exception& error) {

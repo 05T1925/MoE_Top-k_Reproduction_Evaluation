@@ -11,7 +11,11 @@ candidate, or M3.
 
 - Branch: `codex/m2-candidate-ubuntu-validation`
 - Pre-implementation HEAD: `98be22fe52a251f9a6824b59fd35aa91fc349412`.
-- Final verification revision: `f752a77` (`feat(m2): complete Route A mask output paths`).
+- Final verification revision: `71c161290d6627e8a9521a8733e6061b9afed861` (`feat(m2): complete Route A mask output paths`).
+- Provenance correction: `f752a771e33e8da274e369e9e67695e50cfc676a` is an
+  amend-before-final dangling commit with the same parent (`98be22f`) and the
+  same subject. It is retained only as historical provenance; it is not the
+  final revision for the Stage 3L result.
 - Worktree after commit: clean. The clean-revision results below were rerun
   from `/tmp/moe-stage3l-committed`.
 - Host: Ubuntu 24.04 WSL2, x86_64; CMake; Eigen3 CMake package;
