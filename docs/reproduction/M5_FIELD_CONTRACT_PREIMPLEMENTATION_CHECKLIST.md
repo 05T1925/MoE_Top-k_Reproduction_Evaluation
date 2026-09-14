@@ -1,4 +1,3 @@
-```markdown
 # M5 Field Contract 实现前检查表
 
 状态：**field-contract 分支检查表；不构成 M5 已实现证据**
