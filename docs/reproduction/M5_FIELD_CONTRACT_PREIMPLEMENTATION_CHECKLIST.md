@@ -1,9 +1,8 @@
-# M5 Field Contract 实现前检查表
-
 状态：**field-contract 分支检查表；不构成 M5 已实现证据**
 
 基准分支：
 
+```text
 m5-protocol-iii-field-contract
 基准 revision：
 TO_BE_FILLED_AT_REVIEW
@@ -87,9 +86,3 @@ m5-protocol-iii-field-adapters
 - M2 当前工作文件无重叠修改。
 - git diff --check 无输出。
 - PR 差异中没有 VFSS-baseline/。
-
-这个分支不需要修改 `PROJECT.md`、`IMPLEMENTATION_PLAN.md` 或 `M3_ONWARD_TEAM_WORK_PLAN.md`：最新 `main` 已经包含 M5 路线和分支命名。这样 PR 差异最小，也不会与你搭档正在改的公共文档或 Protocol I 文件冲突。
-
-- :codex-followup[审查三份文档]{prompt="审查这三份 M5 field-contract 文档的论文一致性、数学正确性和仓库命名，并指出合并前必须修改的问题。"}
-- :codex-followup[准备有限域代码]{prompt="为下一分支 m5-protocol-iii-field-adapters 设计 C++ 头文件接口和完整 conformance 测试内容，但先不要修改文件。"}
-- :codex-followup[设计 Field DPF]{prompt="基于当前 VFSS dpf.cpp 设计最小的 GF(2^64) output-group 扩展，列出需要新增或修改的文件及代码内容。"}
