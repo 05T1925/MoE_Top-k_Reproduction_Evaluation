@@ -1,7 +1,7 @@
 # 阶段三M：M2 Route A 最终证据与 M2→M3 交接复检报告
 
-日期：2026-09-14  
-分支：`codex/m2-candidate-ubuntu-validation`  
+日期：2026-09-14
+分支：`codex/m2-candidate-ubuntu-validation`
 证据级别：C 级项目工程扩展、当前 revision fresh Ubuntu/EMP 实测；不提升为论文结论。
 
 ## 1. Executive conclusion
@@ -38,8 +38,10 @@ CTest 均通过。该修复没有改变 secure runtime、协议消息、轮数�
 - 阶段三M开始时工作区：仅有本阶段待提交的测试/文档修改；`VFSS-baseline/` 和参考目录无差异。
 - 基础提交主题：`feat(m2): complete Route A mask output paths`
 
-阶段三M本身的提交在报告生成后创建；报告中的代码证据先绑定到上述
-`71c1612`，再绑定到包含本阶段矩阵修复和报告的最终提交。
+阶段三M代码/证据提交已创建为
+`fc149c2e33df53a272208622da925d0047303121`（`feat(m2): close Route A stage3M evidence`）。
+该提交包含本阶段矩阵修复、阶段三L provenance 修正和本报告初版；随后仅文档的
+closeout commit 只会更新本报告中的提交索引，不改变代码或测试证据。
 
 ### 2.2 阶段三L 的 `f752a77` 修正
 
@@ -367,48 +369,51 @@ result frame 的分阶段 sent/received bytes、rounds、logical output count、
 
 `71c161290d6627e8a9521a8733e6061b9afed861 feat(m2): complete Route A mask output paths`
 
-本阶段不修改前置 Route A 实现文件、M3 secure runtime 或冻结基线。阶段三M提交将在报告
-落盘后创建，提交前再次运行 `git diff --check` 并确认工作区只包含上述三文件。
+本阶段不修改前置 Route A 实现文件、M3 secure runtime 或冻结基线。代码/证据提交为
+`fc149c2e33df53a272208622da925d0047303121`；提交前已运行 `git diff --check`，并确认
+差异只包含上述三文件；随后已创建仅文档的 closeout commit，
+不改变代码或测试证据。
 
 ## 12. A-J 完整回答
 
-**A. 当前最终 revision 的准确 hash 是什么？**  
+**A. 当前最终 revision 的准确 hash 是什么？**
 阶段三M复验所依据的前置最终 revision 是
-`71c161290d6627e8a9521a8733e6061b9afed861`；本阶段矩阵/harness/报告提交会在其上追加，
-提交 hash 以 Git 最终输出为准。
+`71c161290d6627e8a9521a8733e6061b9afed861`；包含本阶段代码/证据的提交是
+`fc149c2e33df53a272208622da925d0047303121`。之后的 closeout 若仅修改本报告，不改变
+该代码 revision 的测试含义。
 
-**B. `f752a77` 与 `71c1612` 的关系是什么？**  
+**B. `f752a77` 与 `71c1612` 的关系是什么？**
 `f752a77` 是同一父提交 `98be22f` 上的 amend 前 dangling commit；`71c1612` 是同主题、
 同作者/时间的最终 amend commit。阶段三L报告已修正，不再把 `f752a77` 写成最终 revision。
 
-**C. M2 formal baseline 是否仍保持原标签和 8 轮？**  
+**C. M2 formal baseline 是否仍保持原标签和 8 轮？**
 是。标签仍为 `m2_protocol_i_raw_score_input_modular_8round_mask_output`，8 轮不变。
 
-**D. 三轮 candidate 是否通过独立进程和 rank differential？**  
+**D. 三轮 candidate 是否通过独立进程和 rank differential？**
 是。当前 revision fresh EMP-ON candidate focused 为 1/1 PASS；测试启动独立 Dealer、P0、P1，
 并在 TEST_ONLY 层对 shuffled rank shares 做 differential。输出仍不是完整 mask。
 
-**E. Priority-key Route A 是否真正通过独立进程，实际是否 6 轮？**  
+**E. Priority-key Route A 是否真正通过独立进程，实际是否 6 轮？**
 是。独立 Dealer/P0/P1 运行，`RA6M` frame 解析确认非零 rank/reverse counters 和 `rounds=6`；
 扩大到 `n=256` 后 focused 仍 1/1 PASS。
 
-**F. Raw-score Route A 是否真正通过独立进程，实际是否 8 轮？**  
+**F. Raw-score Route A 是否真正通过独立进程，实际是否 8 轮？**
 是。独立 Dealer/P0/P1 运行，`RA8M` frame 解析确认 carry/sign/candidate/rank/reverse counters
 和 `rounds=8`；focused 1/1 PASS。
 
-**G. 最终输出是否为 logical_n 原始顺序 XOR Top-K bit-mask？**  
+**G. 最终输出是否为 logical_n 原始顺序 XOR Top-K bit-mask？**
 是。两个 Route A frame 的 mask share 长度等于 logical_n；TEST_ONLY controller 对两方 share
 执行 XOR 后逐位置匹配冻结 signed-score stable oracle，且恰好 K 个 1。
 
-**H. secure 路径是否避免 rank/index/final-mask 重构？**  
+**H. secure 路径是否避免 rank/index/final-mask 重构？**
 是，但 Route A 明确允许并计入 R4 的 shuffled-domain rank reveal；secure path 不重构 selected
 index、original index 或 final mask，最终 mask 重构仅在 TEST_ONLY harness。
 
-**I. M3 是否在当前 revision 上通过无回归复检？**  
+**I. M3 是否在当前 revision 上通过无回归复检？**
 是。fresh EMP-ON M3 focused 11/11 PASS，完整 CTest 34/34 PASS；M3 符号和契约边界未被 M2
 Route A 改动污染。
 
-**J. 当前是否可以宣称论文 Protocol I 三轮精确复现？**  
+**J. 当前是否可以宣称论文 Protocol I 三轮精确复现？**
 不可以。论文 exact label 仍 `BLOCKED / NOT_VERIFIED`；public masked-list 同置换/相关材料、
 完整论文 transcript、精确泄露证明和 3-round mask-output gate 尚未满足。
 
@@ -440,4 +445,3 @@ Route A 改动污染。
 | 论文原生 3-round core | NOT_IMPLEMENTED / BLOCKED |
 | 论文/项目 7-round total path | NOT_IMPLEMENTED / RESEARCH_BLOCKED |
 | formal performance benchmark | NOT_MEASURED |
-
