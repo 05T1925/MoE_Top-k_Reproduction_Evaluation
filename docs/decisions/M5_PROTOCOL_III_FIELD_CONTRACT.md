@@ -1,5 +1,3 @@
-## 2. 新增 `docs/decisions/M5_PROTOCOL_III_FIELD_CONTRACT.md`
-
 ```markdown
 # M5 Protocol III 有限域、非零 payload 与输出契约
 
