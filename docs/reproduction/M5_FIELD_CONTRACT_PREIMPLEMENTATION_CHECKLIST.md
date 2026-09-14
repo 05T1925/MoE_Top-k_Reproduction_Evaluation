@@ -4,7 +4,6 @@
 
 基准分支：
 
-```text
 m5-protocol-iii-field-contract
 基准 revision：
 TO_BE_FILLED_AT_REVIEW
