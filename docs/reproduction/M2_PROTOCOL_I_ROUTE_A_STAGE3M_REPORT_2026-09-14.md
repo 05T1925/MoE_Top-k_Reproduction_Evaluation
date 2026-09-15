@@ -31,17 +31,21 @@ CTest 均通过。该修复没有改变 secure runtime、协议消息、轮数�
 
 ## 2. Git provenance
 
-### 2.1 当前最终 revision
+### 2.1 阶段三M复验基准与当前 HEAD
 
 - Branch：`codex/m2-candidate-ubuntu-validation`
-- 阶段三M开始时 HEAD：`71c161290d6627e8a9521a8733e6061b9afed861`
+- 阶段三M开始时、并用于该阶段代码/测试复验的实现 HEAD：
+  `71c161290d6627e8a9521a8733e6061b9afed861`
 - 阶段三M开始时工作区：仅有本阶段待提交的测试/文档修改；`VFSS-baseline/` 和参考目录无差异。
 - 基础提交主题：`feat(m2): complete Route A mask output paths`
 
 阶段三M代码/证据提交已创建为
 `fc149c2e33df53a272208622da925d0047303121`（`feat(m2): close Route A stage3M evidence`）。
 该提交包含本阶段矩阵修复、阶段三L provenance 修正和本报告初版；随后仅文档的
-closeout commit 只会更新本报告中的提交索引，不改变代码或测试证据。
+closeout commit `5bd879e8c4d053b14aae61f19bbaf53529446025` 已落地，只更新本报告中的
+提交索引，不改变代码或测试证据。该 closeout 是 `fc149c2e33df53a272208622da925d0047303121`
+的直接子提交；因此阶段三M的代码/测试证据仍绑定 `fc149c2`，而当前仓库 HEAD 的完整
+provenance 是其文档-only 子提交 `5bd879e`。
 
 ### 2.2 阶段三L 的 `f752a77` 修正
 
@@ -54,7 +58,8 @@ closeout commit 只会更新本报告中的提交索引，不改变代码或测�
 - 因此 `f752a77` 仅是阶段三L内部验证/历史 amend 前 revision，不是当前最终 revision。
 
 阶段三L报告已将 Final verification revision 改为完整 `71c161290d6627e8a9521a8733e6061b9afed861`，
-并保留上述关系说明；不再同时使用两个无法解释的“最终 revision”。
+并保留上述关系说明；不再同时使用两个无法解释的阶段三L“最终 revision”。当前仓库 HEAD
+则是阶段三M代码/证据提交的文档-only 子提交 `5bd879e8c4d053b14aae61f19bbaf53529446025`。
 
 ### 2.3 历史报告交叉核对
 
@@ -371,16 +376,17 @@ result frame 的分阶段 sent/received bytes、rounds、logical output count、
 
 本阶段不修改前置 Route A 实现文件、M3 secure runtime 或冻结基线。代码/证据提交为
 `fc149c2e33df53a272208622da925d0047303121`；提交前已运行 `git diff --check`，并确认
-差异只包含上述三文件；随后已创建仅文档的 closeout commit，
-不改变代码或测试证据。
+差异只包含上述三文件；随后创建了仅文档的 closeout commit
+`5bd879e8c4d053b14aae61f19bbaf53529446025`，不改变代码或测试证据。
 
 ## 12. A-J 完整回答
 
 **A. 当前最终 revision 的准确 hash 是什么？**
-阶段三M复验所依据的前置最终 revision 是
+阶段三M复验所依据的实现 revision 是
 `71c161290d6627e8a9521a8733e6061b9afed861`；包含本阶段代码/证据的提交是
-`fc149c2e33df53a272208622da925d0047303121`。之后的 closeout 若仅修改本报告，不改变
-该代码 revision 的测试含义。
+`fc149c2e33df53a272208622da925d0047303121`。阶段三M closeout 已由其直接子提交
+`5bd879e8c4d053b14aae61f19bbaf53529446025` 完成；该提交仅更新文档，不改变代码
+revision 的测试含义。若指当前仓库最终 HEAD，应使用 `5bd879e8c4d053b14aae61f19bbaf53529446025`。
 
 **B. `f752a77` 与 `71c1612` 的关系是什么？**
 `f752a77` 是同一父提交 `98be22f` 上的 amend 前 dangling commit；`71c1612` 是同主题、
