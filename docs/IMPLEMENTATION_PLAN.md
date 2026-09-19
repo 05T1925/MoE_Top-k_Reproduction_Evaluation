@@ -109,7 +109,11 @@ paper-exact blocker, performance status, or `NOT_MEASURED` fields. See
   `docs/reproduction/M2_PROTOCOL_I_PAPER_CORE_ALIGNMENT_UBUNTU_2026-09-06.md`；
   M2 已收尾并合入 `main`；M3 Protocol III 模块化 3 轮及 raw-score 5 轮扩展已在
   `main@bb0d0e8` 完成整改并冻结；当前后续主线为 M4 CipherGPT → M5 Protocol III
-  2 轮 → M6 AAV86；
+  2 轮 → M6 AAV86。2026-09-19 的 Protocol I 论文证据复核没有改变这些 C 类工程
+  状态：paper-exact 仍受逐轮 transcript、`π/r` material/party-view 和 full-version
+  缺口阻塞，接手顺序见
+  `docs/decisions/M2_PROTOCOL_I_PAPER_EVIDENCE_SUPPLEMENT_2026-09-19.md` 与
+  `docs/M2_M3_TEAMMATE_HANDOFF_2026-09-19.md`；
 - 双人职责、并行边界和 M2 → M3 交接条件见 `docs/TEAM_WORK_PLAN.md`；
 - CryptoMoE：移到 M7 统一实验之后，作为独立工作负载接入；
 - 任何 AAV86/Direct Top-K 原型在解决自适应预处理前不得标为论文定理实现。
