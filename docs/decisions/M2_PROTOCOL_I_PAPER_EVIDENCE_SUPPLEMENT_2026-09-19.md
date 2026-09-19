@@ -1,4 +1,4 @@
-# M2 Protocol I 论文证据补充与交接门
+# M2 Protocol I 论文证据与实验复现验收标准
 
 日期：2026-09-19
 
@@ -8,7 +8,7 @@
 30df4f09836a4ff38c83e87e04e29048f405022c
 ```
 
-本次只更新文档。最终交接 revision 以本分支提交为准。
+本次只更新证据边界、复现目标和验收标准，不修改现有协议实现。
 
 前置决策：
 
@@ -16,350 +16,584 @@
 docs/decisions/M2_PROTOCOL_I_STAGE3O_DECISION_2026-09-15.md
 ```
 
-本项目当前门状态：
+## 1. 当前目标
+
+M2 的目标调整为：
 
 ```text
-DESIGN_BLOCKED
-IMPLEMENTATION_NO_GO
-M2_PAPER_EXACT_BLOCKED / NOT_VERIFIED
+Protocol I paper-aligned experimental reproduction
 ```
 
-其中 `IMPLEMENTATION_NO_GO` 仅指本项目的 paper-exact 验收门，不表示 Protocol I 在一般意义上
-无法依据会议版的高层 functionality 实现。
+验收重点为：
 
-## 1. 范围与不变项
+1. 功能结果正确；
+2. 核心协议保持三个在线 causal rounds；
+3. Dealer 仅参与输入无关的离线预处理，在线阶段静默；
+4. 在线通信量及其随 `n`、输入位宽和 payload 位宽的增长数量级与 Theorem 4.1 一致；
+5. 项目新增的 raw-score、index、rank-direction 和 mask adapter 单独记录；
+6. 实验环境、revision、输入、随机种子、原始日志和计数可复现。
 
-本补充整理：
+本阶段不再把以下材料作为实验复现的前置阻塞项：
 
-- 已定位的目标论文证据；
-- supporting literature 的限定用途；
-- 当前资料缺口；
-- paper rank 与 project priority-rank 的方向映射；
-- paper-native 输出与项目 adapter 的边界；
-- 下一位执行者的取证及验收顺序。
+- 作者 full version；
+- Theorem 4.1 的完整证明；
+- 作者原始逐消息 frame 格式；
+- secure shuffle 的作者具体代码；
+- 与作者实现逐字节一致的 preprocessing package；
+- 作者内部 benchmark 脚本。
 
-本补充不修改任何 `VFSS/` 源码、既有实现标签、在线轮数、测试记录或泄露结论。它不是实现
-授权，也不将项目扩展重命名为论文原生协议。
+缺少这些材料意味着项目不能宣称：
+
+```text
+author-implementation-exact
+message-level paper-exact
+material-level paper-exact
+```
+
+但不阻止项目完成具有正确功能、相同在线轮数和相同通信数量级的独立实验复现。
 
 ## 2. 证据分类
 
-证据类别保持为：
+继续使用以下证据分类：
 
 - A — `TARGET_PAPER`：Agarwal CCS 2024 目标论文直接定义或明确陈述。
 - B — `LOCAL_REFERENCE`：`Agarwal_TopK/`、`ADSMPC/` 等本地参考工程的实际行为。
 - C — `PROJECT_EXTENSION`：本项目增加的 ABI、adapter、mask 输出、metrics 或工程约定。
-- D — `UNVERIFIED`：目标论文中尚未取得直接证据、尚未完成审计的设想或映射。
+- D — `UNVERIFIED`：尚未得到目标论文直接支持或尚未完成实验验证的假设。
 
-其他论文不并入 A/B/C/D，而是单列：
+其他 FSS 论文单列为：
 
-- `SUPPORTING_LITERATURE`：SIGMA 等用于解释通用模型、原语或背景的正式文献。
+- `SUPPORTING_LITERATURE`：用于解释通用 FSS preprocessing、Gen/Eval 和 masked-value
+  执行模型的正式文献。
 
-“FSS 通常如此”“本地参考实现如此”或“另一篇论文如此”均不能补写为 Agarwal Protocol I 的
-A 类逐轮 transcript。
+SIGMA 是 `SUPPORTING_LITERATURE`，不是 B 类本地参考，也不能替代 Agarwal Protocol I
+的具体 shuffle transcript。
 
-## 3. 本次已核验来源
+## 3. 已核验来源
 
-| 来源 | 身份与核验 | 可用范围 |
+| 来源 | 身份与核验 | 用途 |
 | --- | --- | --- |
 | Agarwal 等，*Secure Sorting and Selection via Function Secret Sharing*，CCS 2024 会议版 | `Papers/Agarwal 等 - 2024 - Secure Sorting and Selection .pdf`；SHA256 `18faf63eaa7923eef715a6eb9d5d526fe04dcb69700b133c3e94de935f68c01c`；15 页，论文页 3023–3037 | Protocol I 的 A 类目标论文来源 |
-| Gupta 等，*SIGMA: Secure GPT Inference with Function Secret Sharing* | SHA256 `3a2989f1da36bda9e2e9b4b6a2d482e33aeff15b223e18a2d1aa5ebcbf1fea0d` | `SUPPORTING_LITERATURE`；通用 FSS preprocessing/Gen/Eval 背景，不是 Protocol I transcript |
-| `Agarwal_TopK/`、`ADSMPC/` 等本地参考 | 仅在固定来源、revision、许可证和入口后记录实际行为 | B 类本地参考；不能反推为目标论文主张 |
+| Gupta 等，*SIGMA: Secure GPT Inference with Function Secret Sharing* | SHA256 `3a2989f1da36bda9e2e9b4b6a2d482e33aeff15b223e18a2d1aa5ebcbf1fea0d` | 通用 FSS preprocessing、Gen/Eval 和 masked-value 模型旁证 |
+| `Agarwal_TopK/`、`ADSMPC/` 等 | 仅记录固定 revision 下的实际行为 | B 类本地参考；不能反推为论文主张 |
 
-Agarwal 文件路径必须与 `docs/PAPERS.sha256` 保持完全一致，包括 `Selection` 与 `.pdf`
-之间的空格：
+Agarwal 文件路径必须与 `docs/PAPERS.sha256` 完全一致：
 
 ```text
 Papers/Agarwal 等 - 2024 - Secure Sorting and Selection .pdf
 ```
 
-## 4. 九项证据矩阵
+## 4. Agarwal 论文已经直接回答的内容
 
-| 编号 | 问题 | 当前结论 | 分类与边界 |
-| ---: | --- | --- | --- |
-| 1 | Protocol I 是否为 `(2+1)`、secure shuffle + CmpAgg、3 online rounds | 会议版明确给出 Protocol I 的高层组合和三轮在线声明；会议版没有给出足以完成 message-level 审计的逐轮 sender/receiver/frame/causal transcript | 高层结构与三轮声明为 A；concrete transcript 为 D |
-| 2 | `π(x)+r` 与 `r` 分别是什么 | secure shuffle 的公开 masked shuffled list 是 `π(x)+r`；`r` 是与 shuffle 关联的私有随机 mask，对任一单方均未知，并作为后续 FSS gate 的秘密参数 | 高层功能为 A；`r` 的具体生成、分发、份额格式和消费点仍为 D |
-| 3 | P0/P1/P2 的角色及 Dealer 是否在线参与 | `P0`、`P1` 是在线双方，`P2` 是 offline party/dealer；Dealer 离线发送 correlated randomness，在线保持静默 | Dealer online silence 是 A 类直接证据 |
-| 4 | key、payload 与 original index 是否使用同一 permutation | 论文功能定义明确要求 key 与 corresponding payload 保持关联；会议版未给出 concrete shuffle material 如何实现该绑定；original index 是项目新增 payload/adapter | key/payload 对应关系为 A；concrete material 为 D；original index 为 C |
-| 5 | 论文原生输出是否为 original-order Top-K mask | Fsort/Fselect 原生输出是 key shares 与对应 payload shares；不是 original-order XOR Top-K mask | 原生输出为 A；项目 mask 为 C |
-| 6 | 论文三轮是否覆盖项目 adapter | Theorem 4.1 的三轮声明不能直接覆盖 raw-score 转换、rank 方向转换、original-index 绑定、reverse routing 和 mask 生成 | 论文核心三轮为 A；adapter 为 C；adapter causal rounds 必须独立审计 |
-| 7 | stable rank 与项目 priority-rank 是否同方向 | 论文 rank 为 minimum `0`、maximum `n-1`；相等元素中原序列更早者 rank 更小。项目语义为 Top-K largest、最高优先级 `0`，同分时 original index 更小者优先 | 论文 rank/stable tie 为 A；方向转换为 C，且必须显式实现和测试 |
-| 8 | preprocessing 与 online Dealer 的边界 | Agarwal 的 `(2+1)` 模型直接支持 Dealer 离线发送 correlated randomness、在线静默；通用的 Gen/Eval 背景可由 SIGMA 辅助解释 | Agarwal online silence 为 A；SIGMA 仅为 supporting literature |
-| 9 | 是否已取得 full version、proof 或逐轮 transcript | 本仓库和本次已记录资料中尚未取得可审计的 full version、proof 或逐轮 transcript；会议版多处将证明指向 full version | `PAPER_SOURCE_INCOMPLETE`；这是检索状态，不表示 full version 不存在 |
+### 4.1 协议角色
 
-## 5. Protocol I 的已确认边界
+Agarwal §1、§1.2 和 §2.1 明确给出 `(2+1)` 模型：
 
-### 5.1 三轮声明与逐轮 transcript
-
-Agarwal §4.1 和 Theorem 4.1 支持 Protocol I 的高层三轮在线声明。该声明不等同于：
-
-- 已知三个具体 frame；
-- 已知每轮 sender 与 receiver；
-- 已知每条消息的字段；
-- 已知每方在每轮的完整 view；
-- 已知 `r` 的 material layout；
-- 已知本项目 adapter 可免费包含在三轮内。
+- `P0`、`P1` 是在线双方；
+- `P2` 是 offline party/dealer；
+- Dealer 在离线阶段发送 correlated randomness；
+- Dealer 在线阶段保持静默；
+- 输入由 `P0`、`P1` 分享；
+- 安全模型为单个静态半诚实腐化。
 
 因此：
 
 ```text
-3 online rounds: A / VERIFIED AT HIGH LEVEL
-message-level transcript: D / NOT VERIFIED
+Dealer online silence = A / VERIFIED
 ```
 
-### 5.2 `r` 与 `π(x)+r`
+这不是仅由 FSS 惯例推出的结论，也不需要依赖 SIGMA 才成立。
 
-正确表述为：
+### 4.2 secure shuffle 的功能接口
+
+Agarwal §2.4 明确给出 secure shuffle 的高层功能：
+
+- 输入是 secret-shared list `x`；
+- 输出包括 secret-shared shuffled list；
+- 在线双方还得到公开的 masked shuffled list `π(x)+r`；
+- `π` 是一个 permutation；
+- `r=(r1,...,rn)` 是随机私有 mask；
+- `r` 对任一单方均未知；
+- 后续 FSS gate 使用 `r` 作为秘密参数；
+- 公开的 `π(x)+r` 可直接作为 FSS gate 输入。
+
+因此，正确表述为：
 
 ```text
-r 是与 secure shuffle 关联的私有随机 mask 向量；
-公开输出之一是 π(x)+r；
-r 本身不是公开输出；
-r 对任一单方均未知；
-r 作为后续 FSS gate 的秘密参数使用。
+r 是与 secure shuffle 关联的随机私有 mask；
+公开值是 π(x)+r；
+r 本身不是公开输出。
 ```
 
-不得写成“`r` 是公开输出”或“公开了 `r`”。
+论文同时明确说明，secure-shuffle functionality 的正式描述和 concrete protocol
+instantiation 位于 full version。因此，会议版没有给出 `r` 的具体 share layout 或消息格式。
 
-仍需取得或确认：
+### 4.3 rank 与 stable tie
 
-- `r` 的生成者；
-- P0/P1 分别取得什么 material；
-- `r` 是以何种份额或 key material 表示；
-- `r` 与 `π` 如何组合；
-- 哪一个后续 gate 在何时消费相应秘密参数。
+Agarwal §3 明确定义：
 
-### 5.3 Dealer online silence
+```text
+Rank(x_i)
+= 小于 x_i 的元素数量
++ 位于 i 之前且等于 x_i 的元素数量
+```
 
-Dealer online silence 是 Agarwal 目标论文的 A 类直接证据。
+因此：
 
-目标论文对 `(2+1)` 模型的描述明确限定 Dealer 在 offline phase 发送 correlated
-randomness，随后在 online phase 保持静默；§2.1 也将 `P0`、`P1` 定义为在线 parties，
-将 `P2` 定义为 offline party/dealer。
+```text
+minimum element rank = 0
+maximum element rank = n - 1
+```
 
-因此，本文不再使用 SIGMA 来“推导”Dealer online silence。SIGMA 仅用于补充说明通用 FSS
-preprocessing `Gen` 与 online `Eval` 的背景结构。
+相等元素中，原序列位置更早者取得更小的论文 rank。
 
-### 5.4 same-permutation 边界
+这是 A 类直接证据。
 
-论文的 Fsort functionality 已经要求：
+### 4.4 key 与 payload 的关联
+
+Figure 1 的 `Fsort` ideal functionality 明确要求：
 
 ```text
 使用 x 作为 keys；
-y 是与 keys 对应的 payloads；
-输出排序后的 key shares 和对应 payload shares。
+使用 y 作为 corresponding payloads；
+对 x、y 保持对应关系地排序；
+输出排序后的 key shares 和 payload shares。
 ```
 
-所以 key 与 payload 的对应关系是 A 类要求，不应标成完全未知。
+Figure 2 的 `Fselect` 则输出 rank-`k` 元素及其 corresponding payload 的 shares。
 
-当前未知的是 concrete secure-shuffle material 如何确保 key 与 payload 使用同一 secret
-permutation。
+§4 进一步说明，ranking 只作用于 keys，payload 在 routing 阶段随对应 key 移动。
 
-Original index 并不是自动获得的目标论文输出。本项目如果把 original index 作为额外 payload
-绑定到 key，属于 C 类 adapter，必须单独定义和审计：
+因此：
 
-- index 的编码；
-- index 与 key/payload 的同一 permutation；
-- padding/dummy index；
-- reverse routing；
-- 泄露；
-- causal communication rounds。
+```text
+key/payload association = A / VERIFIED
+```
 
-### 5.5 paper-native 输出与项目 mask
+会议版没有给出 concrete shuffle material 如何实现该绑定，但实验复现可以选择任一满足
+该 ideal functionality 和安全模型的 secure shuffle 实现。
 
-Agarwal 的 Fsort/Fselect functionality 输出 key shares 与 corresponding payload shares。
-Fselect 返回所选元素及相应 payload 的 shares，而不是整条原始顺序 mask。
+### 4.5 Protocol I 的轮数和通信量
 
-项目目标：
+Table 1、§4.1 和 Theorem 4.1 直接支持：
+
+```text
+Protocol I:
+routing = Shuffle
+ranking = all-pairs Compare-Aggregate
+parties = 2+1
+online rounds = 3
+```
+
+对于 `G = Z_L'`、`L' >= 2L`、`ell' = ceil(log2 L')` 和 `p` bit payload，
+Theorem 4.1 给出的总在线通信量为：
+
+```text
+4n(ell' + p) + 2n ceil(log2 n) bits
+```
+
+在线计算量为：
+
+```text
+2 * C(n,2) * DCF.Eval[G, Z_n]
+```
+
+Dealer 向两个在线方发送的离线通信量为：
+
+```text
+6n(ell' + p)
++ 4n ceil(log2 n)
++ 2 * C(n,2)
+  * (DCF.KeySize[G, Z_n] + ceil(log2 n))
+bits
+```
+
+对于实验复现，核心在线通信数量级应为：
+
+```text
+O(n(ell' + p + log n))
+```
+
+核心在线计算和 DCF preprocessing 主项随全对比较数量增长：
+
+```text
+O(n^2)
+```
+
+实现可以存在序列化、frame header、连接初始化和 metrics 元数据等固定开销，但必须将这些
+工程开销与 protocol payload 分开报告。
+
+## 5. SIGMA 能补充的 FSS 标准模型
+
+SIGMA §2.2–§2.4 给出标准的 2PC-with-preprocessing FSS 示例：
+
+### 离线阶段
+
+- preprocessing 与在线输入独立；
+- Dealer 或其他 preprocessing mechanism 生成 correlated randomness；
+- 为 wire 采样随机 mask；
+- `Gen` 根据 offset function 生成两份 FSS keys；
+- `P0`、`P1` 分别取得自己的 key 和所需 preprocessing material。
+
+### 在线阶段
+
+- `P0`、`P1` 使用 masked input 和各自 FSS key；
+- 两方分别执行 `Eval`；
+- Eval 输出组合为相应函数值的 share 或 masked-output share；
+- 协议需要时重构 masked intermediate；
+- output owner 最终使用相应 mask 得到输出；
+- Dealer 不执行 online Eval。
+
+这可支持本项目采用以下通用结构：
+
+```text
+offline:
+Dealer/Gen → material_0, material_1
+
+online:
+P0/P1 → masked input
+P0/P1 → local Eval
+P0/P1 → reconstruct required masked intermediates
+P0/P1 → output shares
+```
+
+但 SIGMA 不提供 Agarwal secure shuffle 的 `π/r` concrete transcript，不能用于声称复现了
+作者的具体 shuffle 实例化。
+
+## 6. 原十个问题的处理结论
+
+| 原问题 | 处理结论 | 是否阻塞实验复现 |
+| --- | --- | --- |
+| full version、附录和三轮 transcript | 会议版没有完整 transcript；Theorem 4.1 proof 和 shuffle 具体实例化被放到 full version | 否 |
+| `r` 的具体生成和分发 | Agarwal 给出功能边界；具体 material 未给出。可采用符合该功能的独立实现 | 否 |
+| key/payload same permutation | Fsort ideal functionality 已明确要求保持 correspondence；具体 material 可由所选 shuffle 实现负责 | 否 |
+| original index 和逆路由 | Original index 可作为项目 payload 实例化；逆路由和 original-order mask 属于 C 类 adapter | 否 |
+| stable tie 和 priority-rank | 论文 rank 定义已明确；项目必须单独定义 descending Top-K 的方向及 tie 映射 | 否 |
+| padding/dummy | 会议版未定义 Protocol I padding/dummy；如果实现需要，登记为 C 类工程约定 | 否 |
+| key/payload shares 到 mask | 不属于 Fsort/Fselect 原生输出；属于 C 类 adapter | 否 |
+| mask adapter 是否属于论文计数 | 不属于 Theorem 4.1 已证明的原生输出边界；必须单独计量 | 否 |
+| Theorem 4.1 的准确边界 | 覆盖 `Fsort`、3 online rounds、payload 和列出的计算/通信成本；不自动覆盖项目 adapter | 否 |
+| proof、版本和稳定链接 | 会议版 DOI 和公开出版记录可稳定引用；完整 proof 仍指向尚未纳入仓库的 full version | 否 |
+
+因此，原“给作者或导师的十个问题”不再是 M2 实验复现的强制前置条件。
+
+## 7. rank 与 Top-K 项目语义
+
+论文 rank 是升序 rank：
+
+```text
+最小值 → 0
+最大值 → n - 1
+```
+
+如果只考虑互异元素，Top-K largest 对应论文 rank：
+
+```text
+n-K, ..., n-1
+```
+
+但需要特别注意相等元素。
+
+论文 stable rank 对相等值采用：
+
+```text
+原位置更早者 → 更小的论文 rank
+```
+
+如果直接用：
+
+```text
+priority_rank = n - 1 - paper_rank
+```
+
+会同时反转数值顺序和相等元素的先后顺序，不能自动保证项目要求的：
+
+```text
+score 相同 → original index 更小者优先
+```
+
+因此，本项目必须显式冻结 descending Top-K 的 tie 语义。允许的工程方式包括先构造已经编码
+项目优先级的 composite priority key，再调用排序/选择核心；但其编码、位宽和输入转换属于
+C 类 adapter，不属于 Agarwal 原生 rank 定义。
+
+验收测试必须至少覆盖：
+
+- 所有分数互异；
+- Top-K 边界处存在两个相等分数；
+- 多个元素全部同分；
+- `K=1`；
+- `K=n`；
+- 同分时 original index 的确定性选择。
+
+## 8. original index 和 original-order mask
+
+Agarwal 的 `Fsort` 支持 corresponding payload；Theorem 4.1 也明确计入 `p` bit payload。
+
+因此，将 original index 编码为 payload 是与论文接口兼容的项目实例化。不过论文没有直接
+定义以下项目输出：
 
 ```text
 original-order XOR Top-K mask
 ```
 
-属于 C 类 adapter。不得将 mask 输出反写为论文原生功能，也不得把 adapter 隐式计入论文的
-三轮声明。
+下列步骤均为 C 类 adapter：
 
-### 5.6 rank 方向映射
+1. 将 original index 编码为 payload；
+2. 取得排序或选择后的 index shares；
+3. 判断哪些 index 属于 Top-K；
+4. 将结果路由回原始位置；
+5. 产生 original-order mask；
+6. 转换成项目要求的 XOR shares。
 
-论文 rank：
-
-```text
-minimum element → rank 0
-maximum element → rank n - 1
-```
-
-相等元素中，原序列更早者 rank 更小。
-
-项目 priority-rank：
+实验报告必须把这些步骤与 Protocol I paper core 分开：
 
 ```text
-maximum / highest priority → rank 0
-Top-K largest
-score 相同 → original index 更小者优先
+paper core:
+shuffle + ranking + routing
+
+project adapter:
+raw-score conversion
+priority-key construction
+index payload
+rank-direction/tie mapping
+reverse routing
+original-order mask
+XOR-share conversion
 ```
 
-因此两种 rank 的数值方向相反。项目必须定义显式转换，例如由已冻结的输入规模和排名域决定
-方向映射；具体公式应在实现设计中登记并由 oracle 测试确认。
+如果 adapter 增加在线通信或 causal rounds，必须单独报告，不能合并后仍将整个系统称为
+“3-round Protocol I”。
 
-本补充只冻结“必须显式转换”这一边界，不在缺少最终接口设计时新增具体实现公式。
+## 9. padding 和 dummy
 
-## 6. SIGMA 对照的正确用法
+当前 Agarwal 会议版中没有给出 Protocol I 的 padding/dummy 规则。
 
-SIGMA §2.2–§2.4 对通用 FSS 预处理模型的说明可支持以下背景理解：
+Protocol I 的公开参数直接包含元素数量 `n`，Theorem 4.1 的成本也直接以 `n` 表示。因此，
+不能在没有额外来源的情况下宣称论文要求将输入 padding 到二次幂或固定容量。
 
-- correlated material 可以在在线输入处理前生成；
-- `Gen` 生成后续计算使用的 material；
-- online `Eval` 由两方使用各自 material 执行。
+如果本项目的 shuffle、network frame 或 batch implementation 需要 padding/dummy，则应将其
+登记为 C 类工程约定，并记录：
 
-SIGMA 属于 `SUPPORTING_LITERATURE`，不是 B 类 `LOCAL_REFERENCE`，也不是 Agarwal
-Protocol I 的 A 类来源。
+- 真实元素数；
+- padding 后元素数；
+- dummy key 和 payload 的语义；
+- dummy 是否可能进入 Top-K；
+- 过滤 dummy 的位置；
+- padding 对通信量和运行时间的影响；
+- 是否泄露真实 `n`。
 
-SIGMA 不能证明：
+实验通信量应同时报告 logical `n` 和 physical padded `n`，避免把 padding 开销误记为论文
+公式偏差。
 
-- Protocol I 三个 causal round 的具体内容；
-- Protocol I 的 sender/receiver；
-- `π/r` material 的具体格式；
-- Protocol I party view；
-- concrete same-permutation 实例化；
-- inverse routing；
-- original-order mask adapter。
+## 10. 实验复现验收门
 
-## 7. 对现有 M2/M3 的影响
+M2 可在没有 full version 的情况下进入实现和实验。最终验收分为以下五项。
 
-下列标签、实现和历史测试状态均不因本补充改变：
+### 10.1 功能正确性
 
-| 路径 | 固定标签 | 当前身份 |
-| --- | --- | --- |
-| M2 formal baseline | `m2_protocol_i_raw_score_input_modular_8round_mask_output` | C 类工程基线 |
-| M2 candidate | `m2_protocol_i_dealer_preprocessed_3round_rank_share_candidate` | candidate；不是完整 mask |
-| M2 priority/raw Route A | `m2_protocol_i_dealer_preprocessed_rank_reveal_6round_mask_output` / `m2_protocol_i_raw_score_dealer_preprocessed_rank_reveal_8round_mask_output` | C 类扩展；包含额外泄露/adapter |
-| M3 modular/raw | `agarwal_protocol_iii_modular_3round` / `moe_topk_protocol_iii_raw_score_modular_5round` | 与 Route A 隔离的工程基线/扩展 |
-
-阶段三N的 Ubuntu/EMP 测试记录仍是祖先代码的历史证据，详见：
+必须通过：
 
 ```text
-docs/reproduction/M2_M3_STAGE3N_FINAL_CLOSEOUT_2026-09-15.md
+conformance
+→ cleartext oracle differential
+→ independent-process E2E
 ```
 
-本次没有运行 C++、CTest 或性能测试：
+至少检查：
+
+- 排序结果；
+- selection 或 Top-K 结果；
+- payload/index correspondence；
+- stable tie；
+- original-order mask；
+- share reconstruction；
+- 边界输入和重复值。
+
+### 10.2 在线轮数
+
+Protocol I paper core 必须为：
 
 ```text
-runtime verification: NOT_REMEASURED
-performance fields: NOT_MEASURED
+3 causal online rounds
 ```
 
-## 8. 本项目 paper-exact 验收门
+连接建立、握手、日志同步等 transport event 不得伪装成协议轮次，也不得忽略真正存在数据依赖
+的额外通信。
 
-会议版已经给出：
-
-- ideal functionality；
-- secure shuffle 的高层接口；
-- public `π(x)+r`；
-- FSS gates；
-- rank 定义；
-- 三轮总结；
-- 成本公式。
-
-这些内容足以支持高层 functionality 研究，也可能支持独立构造
-Protocol-I-like implementation。
-
-但是，本项目的 paper-exact 验收要求进一步覆盖：
-
-- message-level；
-- material-level；
-- party-view-level；
-- round-exact；
-- paper core 与 project adapter 的可审计分离。
-
-因此：
+项目 adapter 的轮数单独报告：
 
 ```text
-Under this project's paper-exact acceptance criterion,
-implementation remains NO-GO until the missing
-transcript/material evidence is obtained.
+paper_core_online_rounds
+adapter_online_rounds
+total_online_rounds
 ```
 
-`IMPLEMENTATION_NO_GO` 不能被解释为论文证明了 Protocol I 无法实现，也不能被推广为其他
-项目必须采用的门槛。
+### 10.3 Dealer 边界
 
-## 9. 唯一允许的后续顺序
+必须满足：
 
-1. 获取 full version、作者提供的算法或附录，或可校验的一手逐轮 transcript。
-2. 对新增资料记录来源、URL、获取日期、SHA256、页码、算法号或定理号。
-3. 更新 A/B/C/D evidence table，逐轮列出：
-   - sender → receiver；
-   - 消息字段；
-   - causal dependency；
-   - 公开值；
-   - 每方 view；
-   - material producer、recipient 和 consumption；
-   - `π/r` 生命周期；
-   - key/payload concrete same-permutation；
-   - padding/dummy。
-4. 单独设计 paper-native key/payload shares 到项目 original-order mask 的 C 类 adapter。
-5. 显式定义论文 rank 到项目 priority-rank 的方向映射。
-6. 分别审计 paper core 与 adapter 的轮数、通信量和泄露。
-7. 仅在上述内容可审计后，新建独立 package、frame 和 material identity。
-8. 验证顺序固定为：
-   - conformance；
-   - oracle differential；
-   - 独立进程 E2E；
-   - leakage/round audit；
-   - 通信核验；
-   - 接口交接。
+- preprocessing 与在线输入独立；
+- Dealer 只在 offline phase 产生和分发 material；
+- Dealer 不读取在线输入；
+- Dealer 不接收在线消息；
+- Dealer 不参与 online Eval；
+- 在线阶段仅由 `P0`、`P1` 执行。
 
-在此之前，不得使用以下内容填补 paper transcript 空白：
+如果实验使用预生成文件模拟 Dealer，应记录生成命令、随机种子策略、material identity 和每方
+读取的文件。
 
-- `RA6M` 或 `RA8M`；
-- M3 DPF material；
-- 测试层明文重构；
-- 本地参考工程行为；
-- SIGMA 的通用 Gen/Eval 模型；
-- 未经来源核验的 FSS 惯例。
+### 10.4 通信量
 
-## 10. 给作者或导师的最小问题集
-
-请索取或确认：
-
-1. Protocol I 的 full version、附录或逐轮 transcript，包括三轮的 sender 和 receiver。
-2. Secure shuffle 中 `r` 的生成者、P0/P1 各自获得的 material、`r` 与 `π` 的组合及消费点。
-3. Key 和 corresponding payload 如何通过 concrete material 使用同一 secret permutation。
-4. 如果加入 original index，正确的组合与逆路由方式是什么；若论文未定义，应确认它属于项目
-   adapter。
-5. Stable tie 的完整编码，以及论文 rank 到 Top-K-largest priority-rank 的推荐映射。
-6. Padding/dummy 是否由 Protocol I 定义，以及其对正确性、轮数和泄露的影响。
-7. Fsort/Fselect 原生 key/payload 输出转成 original-order Top-K mask 是否属于论文计数。
-8. 如果不属于论文计数，推荐的额外协议、轮数和泄露口径是什么。
-9. Theorem 4.1 三轮声明所覆盖的准确协议边界。
-10. 可公开引用的 proof、算法编号、版本和稳定下载位置。
-
-## 11. 交接门结论
-
-当前结论保持：
+至少分别记录：
 
 ```text
-Protocol I high-level construction: VERIFIED
-3-online-round claim: VERIFIED AT HIGH LEVEL
-Dealer online silence: VERIFIED / A
-public π(x)+r: VERIFIED / A
-r as private shuffle-associated mask: VERIFIED / A
-paper-native key/payload output: VERIFIED / A
-stable rank: VERIFIED / A
-paper-rank → project-priority-rank mapping: REQUIRED / C
-message-level transcript: NOT VERIFIED / D
-concrete r material: NOT VERIFIED / D
-concrete key/payload same-permutation material: NOT VERIFIED / D
-original-index and original-order mask adapter: PROJECT EXTENSION / C
-full version/proof/transcript: PAPER_SOURCE_INCOMPLETE
-project paper-exact implementation gate: IMPLEMENTATION_NO_GO
+offline_bytes_total
+online_bytes_p0_to_p1
+online_bytes_p1_to_p0
+online_bytes_total
+paper_core_online_bytes
+adapter_online_bytes
+transport_overhead_bytes
 ```
 
-该门解除后，执行顺序为：
+Protocol I paper core 的理论目标为：
 
 ```text
-Protocol I paper-exact
-→ Protocol I 通信核验
-→ Protocol I 接口交接
-→ M5 Protocol III paper-exact
+4n(ell' + p) + 2n ceil(log2 n) bits
 ```
 
-不得跳过 Protocol I 通信核验和接口交接，也不得恢复已经取消的 M4 CipherGPT 路线。
+实验不强制逐 bit 完全相等，但必须满足：
+
+1. 将固定 frame/header 开销单列；
+2. 扣除 transport overhead 后，核心通信量与理论公式处于可解释的常数因子内；
+3. 固定 `ell'`、`p` 改变 `n` 时，在线通信呈近线性增长；
+4. 固定 `n` 改变 `ell'` 或 `p` 时，在线通信呈近线性增长；
+5. 不出现无法解释的 `O(n^2)` 在线通信；
+6. `O(n^2)` DCF 成本主要体现在离线 key material 和计算，而不是核心在线通信。
+
+### 10.5 可复现性
+
+每组实验必须保存：
+
+- Git revision；
+- 构建命令；
+- 运行命令；
+- 编译器和依赖版本；
+- 操作系统和硬件；
+- `n`、`K`、`L`、`L'`、`ell'`、`p`；
+- 输入文件或随机生成方式；
+- 随机种子；
+- 重复次数；
+- 原始 stdout/stderr；
+- 原始 metrics；
+- 理论通信量；
+- 实测通信量；
+- paper core 与 adapter 的拆分。
+
+没有实际运行记录的字段继续写：
+
+```text
+NOT_MEASURED
+```
+
+## 11. 允许的命名
+
+通过上述验收后，可以使用：
+
+```text
+Protocol I paper-aligned experimental reproduction
+Agarwal Protocol I functionality-aligned implementation
+Protocol I 3-round paper-core reproduction
+```
+
+在没有作者 full version 和 concrete transcript 的情况下，不使用：
+
+```text
+author-code reproduction
+author-implementation-exact
+message-level paper-exact
+material-level paper-exact
+byte-for-byte reproduction
+```
+
+项目输出为 original-order XOR Top-K mask 时，应在名称或报告中明确：
+
+```text
+paper core + project mask adapter
+```
+
+## 12. 后续执行顺序
+
+1. 冻结 Protocol I paper core 与 C 类 adapter 的接口边界。
+2. 实现或选用满足 §2.4 功能要求的 secure shuffle。
+3. 保证 key 与 payload 经过同一逻辑 permutation。
+4. 实现 all-pairs Compare-Aggregate ranking。
+5. 将 paper core 控制在三个 causal online rounds。
+6. 独立实现并计量 raw-score、index、tie、reverse-routing 和 mask adapter。
+7. 运行 conformance、oracle differential 和独立进程 E2E。
+8. 对多个 `n`、位宽和 payload 位宽采集通信量。
+9. 比较实测通信与 Theorem 4.1 的公式和数量级。
+10. 完成 Protocol I 通信核验与接口交接。
+11. 进入 M5 Protocol III paper-exact/paper-aligned 实验复现。
+
+## 13. 非阻塞的可选作者问题
+
+如果以后能够联系作者，只需补充询问：
+
+1. 是否存在公开 full version 或 Protocol I secure-shuffle 的正式 transcript；
+2. Theorem 4.1 实验使用的 concrete shuffle 实例化、代码 revision 和 benchmark 配置。
+
+这些问题用于提高论文精确度，不阻塞当前实验复现。
+
+## 14. 当前结论
+
+```text
+Protocol I high-level construction:
+VERIFIED / A
+
+Dealer offline-only and online silence:
+VERIFIED / A
+
+public π(x)+r:
+VERIFIED / A
+
+r as private shuffle-associated mask:
+VERIFIED / A
+
+key/payload correspondence:
+VERIFIED AT FUNCTIONALITY LEVEL / A
+
+paper rank and stable rank:
+VERIFIED / A
+
+Protocol I online rounds:
+3 / VERIFIED / A
+
+Protocol I online communication:
+4n(ell' + p) + 2n ceil(log2 n) bits / VERIFIED / A
+
+concrete secure-shuffle transcript:
+NOT AVAILABLE IN CONFERENCE VERSION / NON-BLOCKING
+
+full Theorem 4.1 proof:
+REFERRED TO FULL VERSION / NON-BLOCKING
+
+original-index payload:
+PROJECT INSTANTIATION / C
+
+descending priority and tie mapping:
+PROJECT ADAPTER / C
+
+original-order XOR Top-K mask:
+PROJECT ADAPTER / C
+
+padding/dummy:
+NOT DEFINED BY CONFERENCE VERSION;
+PROJECT EXTENSION IF USED / C
+
+experimental reproduction:
+IMPLEMENTATION_GO
+
+message/material-level paper-exact claim:
+NO-GO UNTIL ADDITIONAL EVIDENCE
+```
