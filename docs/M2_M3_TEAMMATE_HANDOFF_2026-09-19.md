@@ -2,7 +2,7 @@
 
 日期：2026-09-19
 
-交接分支：`codex/m2-paper-evidence-handoff`
+交接分支：`docs/m2-paper-evidence-handoff`
 
 范围：证据与文档收尾；本次没有新增或修改协议实现。
 
@@ -82,3 +82,6 @@ git log --left-right --cherry-pick --oneline HEAD...origin/main
 
 本次交接只新增文档，因此没有重跑 C++/CTest 或性能实验（`NOT_REMEASURED`）。交接提交前应
 复检文档链接、`git diff --check`、工作树、分支基线、冻结目录无差异，以及远端分支推送结果。
+
+全局项目阶段、约 55% 的规划口径和其余里程碑见
+`docs/PROJECT_PROGRESS_2026-09-19.md`。新分支必须使用功能前缀，禁止再使用 `codex/`。

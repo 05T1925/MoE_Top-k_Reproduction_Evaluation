@@ -6,6 +6,13 @@
 
 ## 1. 当前结论
 
+### 全局进度快照（2026-09-19）
+
+按项目里程碑权重，本项目约完成 55%。M0、M1/M1.1、M2 C 类工程基线和 M3 模块化
+接口适配已经完成；M2 paper-exact 的资料/设计收尾仍被逐轮 transcript 与 material 证据
+阻塞，M4--M7 和 CryptoMoE 仍未完成。该规划百分比不代表性能、测试覆盖率或论文一致性。
+权重、阶段状态和唯一推荐顺序见 `docs/PROJECT_PROGRESS_2026-09-19.md`。
+
 ### M2.0–M2.16 documentation/validation closeout status (2026-09-07)
 
 M2 Protocol I is closed as the project's C-level modular baseline after the

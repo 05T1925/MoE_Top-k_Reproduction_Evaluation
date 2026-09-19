@@ -6,6 +6,12 @@
 
 ## 当前状态
 
+截至 2026-09-19，按里程碑权重计算的全局进度约为 **55%**：M0、M1/M1.1、M2 C 类
+工程基线与 M3 模块化接口适配已完成；M2 paper-exact 仍受一手 transcript/material 证据
+阻塞，M4--M7 与 CryptoMoE 尚未完成。该数字是规划状态而非代码覆盖率或论文一致性
+声明；阶段权重、已完成交付物和剩余门见
+[全局进度与后续阶段](docs/PROJECT_PROGRESS_2026-09-19.md)。
+
 - M2.16 paper-exact feasibility/leakage audit 已随 `f800f96` 合入 `main`；
   它记录 exact 目标被当前 VFSS 架构阻塞，而非已实现；
 - M0 已在远端闭环，`main` 与冻结标签均已推送；
@@ -39,6 +45,7 @@
 
 - [项目范围、论文映射与统一指标](PROJECT.md)
 - [详细实施计划](docs/IMPLEMENTATION_PLAN.md)
+- [全局进度与后续阶段](docs/PROJECT_PROGRESS_2026-09-19.md)
 - [双人实施分工与交接计划](docs/TEAM_WORK_PLAN.md)
 - [M2 分支阶段映射与重命名记录](docs/BRANCH_MAP.md)
 - [路线优先级决策](docs/decisions/ROADMAP_PRIORITY_2026-09-04.md)
@@ -48,6 +55,8 @@
 - [M2 Protocol I 实施前设计门](docs/decisions/M2_PROTOCOL_I_DESIGN_GATE.md)
 - [M2.16 paper-exact 3-round 阻塞规格](docs/decisions/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_DESIGN.md)
 - [M2.16 paper-exact 泄露审计](docs/decisions/M2_PROTOCOL_I_EXACT_LEAKAGE_AUDIT.md)
+- [M2 论文证据补充与交接门](docs/decisions/M2_PROTOCOL_I_PAPER_EVIDENCE_SUPPLEMENT_2026-09-19.md)
+- [M2/M3 队友接手说明](docs/M2_M3_TEAMMATE_HANDOFF_2026-09-19.md)
 - [M2.16 Ubuntu 研究记录](docs/reproduction/M2_PROTOCOL_I_PAPER_EXACT_3ROUND_UBUNTU_2026-09-06.md)
 - [M2 chosen-OT POLLIN/HUP 修复记录](docs/reproduction/M2_CHOSEN_OT_POLLHUP_UBUNTU_2026-09-06.md)
 - [M2 modular E2E FD 生命周期修复记录](docs/reproduction/M2_MODULAR_E2E_FD_LIFECYCLE_UBUNTU_2026-09-06.md)

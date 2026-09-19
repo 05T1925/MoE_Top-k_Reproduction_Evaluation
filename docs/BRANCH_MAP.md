@@ -1,6 +1,6 @@
 # M2 分支阶段映射
 
-更新时间：2026-09-07。本文记录 M2 历史分支的阶段归属和新名称，便于从
+更新时间：2026-09-19。本文记录 M2 历史分支的阶段归属和新名称，便于从
 `main` 追溯阶段证据。分支重命名只改变 Git ref，不改变提交内容或论文结论。
 
 | 原名称 | 新名称 | 阶段归属 |
@@ -40,3 +40,21 @@ paper-exact 结论。Ubuntu 24.04.4 的 soft `RLIMIT_NOFILE=1024` 组合验证�
 分支派生。
 
 M1.1、M3 设计和 Protocol III DPF 测试分支不属于本次 M2 重命名范围。
+
+## 2026-09-19：功能前缀迁移
+
+从此日期起不再创建 `codex/` 前缀。分支名称使用仓库既有功能前缀：文档/交接为
+`docs/`，修复为 `fix/`，实现为 `feat/`，测试为 `test/`，设计为 `design/`，性能为
+`perf/`，审计为 `review/`。迁移只移动 ref，不改变提交内容、论文证据等级或 PR 的
+评审结论。
+
+| 旧 ref | 迁移后的 ref | 理由 |
+| --- | --- | --- |
+| `codex/m2-paper-evidence-handoff` | `docs/m2-paper-evidence-handoff` | M2 论文证据与队友交接文档 |
+| `codex/m2-candidate-output-adapter-gate` | `docs/m2-candidate-output-adapter-gate` | 三轮 candidate output-adapter 文档门 |
+| `codex/m2-candidate-ubuntu-validation` | `docs/m2-candidate-ubuntu-validation` | 本地 M2 candidate/Ubuntu 证据线 |
+| `codex/fix-m3-metrics-portability` | `fix/m3-metrics-portability` | M3 metrics POSIX 可移植性修复 |
+
+迁移后队友应运行 `git fetch origin --prune`，切换到新 ref；旧的远端 `codex/` ref 会在
+确认新 ref 指向对应提交后删除。不要从旧 ref 创建新工作，也不要在任何分支名中再次使用
+`codex/`。
