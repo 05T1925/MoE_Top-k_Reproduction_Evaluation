@@ -1,12 +1,12 @@
 # M3 及后续双人分工计划
 
-状态：**M3 已关闭；推进 Protocol I 精确核心、通信核验及后续升级**。
+状态：**M3 已关闭；strict Protocol I G1、官方 G2/G3 和 M5 runtime 为未来 gated 责任**。
 
 更新日期：2026-09-13
 
 本文承接 `PROJECT.md`、`docs/IMPLEMENTATION_PLAN.md` 和 `docs/TEAM_WORK_PLAN.md`，保留 M3 已完成的接口契约与证据，细化当前任务、后续分工、交叉评审、分支建议及合并顺序。
 
-当前主线为：
+以下为未来 gated dependency sequence，不是当前可执行工作：
 
 ```text
 M2 Protocol I 精确三轮核心
@@ -20,6 +20,11 @@ M2 Protocol I 精确三轮核心
 ```
 
 M3 是已完成前置基础，不重新安排实现。M4 CipherGPT 已取消，不再作为 M5 或后续阶段的前置条件。
+
+严格 M2 message/material/party-view/round-exact G1 当前 BLOCKED；M2 G2、G3 和 M5
+runtime 因而保持 BLOCKED。仅 non-exact paper-aligned 实验复现 READY，且不改变这些门。
+唯一当前门记录为
+[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)。
 
 ## 1. 当前基线与复用边界
 
@@ -120,7 +125,7 @@ Protocol I 的论文精确核心为三轮，Protocol III 为两轮。输入适�
 
 | 成员 | 当前主任务 | 后续主任务 |
 | --- | --- | --- |
-| 角色 A（搭档） | M2 精确三轮核心、通信核验、公共接口交接 | 公共比较材料与预处理；Protocol I 两种升级及实验 |
+| 角色 A（搭档） | future gated：strict M2 G1、官方 G2 与 G3（当前不得执行） | 公共比较材料与预处理；Protocol I 两种升级及实验 |
 | 角色 B（Protocol III 负责人） | 计划修订、M5 设计准备、接收 M2 交接 | M5 精确两轮与通信核验；Protocol III 两种升级及实验 |
 | 双方共同 | 交叉评审、通信复跑、契约核对 | 图算法与安全设计、完整性能验收、最终报告 |
 
@@ -382,11 +387,11 @@ Dealer 是既有 TEST_ONLY E2E harness 的独立角色，不应写成第三个�
 
 关闭记录保留其 11-test 验证口径、结果来源和限制，不将本次计划修订写成重新运行测试。
 
-## 4. 当前角色 A：M2 精确核心与通信核验
+## 4. 角色 A future gated：M2 strict G1、官方 G2 与 G3（当前不得执行）
 
 ### 4.1 实现任务
 
-角色 A 负责：
+strict G1 evidence available 后，角色 A 负责：
 
 1. 固定当前 candidate revision 与实现范围。
 2. 闭合同置换的秘密共享 `pi(x)` 和公开 `pi(x)+r` 输出。
@@ -447,7 +452,7 @@ Protocol I 专用 shuffle 不作为 Protocol III 必须调用的部件。
 6. 整理 M3 复用矩阵与失败用例。
 7. 评审角色 A 的接口和通信核验方法。
 
-不修改角色 A 正在推进的 shuffle 或公共材料实现，不基于未冻结接口宣称 M5 已完成。
+不修改任何尚未解锁的 strict shuffle 或公共材料实现，不基于未冻结接口宣称 M5 已完成。
 
 ### 5.2 M5 实现任务
 
@@ -958,12 +963,7 @@ M4 不再是任何阶段的前置条件。
 
 ### 角色 A
 
-1. 明确当前 Protocol I 精确候选 revision。
-2. 推进 public masked-list、同置换和关联材料功能。
-3. 完成三轮核心正确性、消息与安全审计。
-4. 实测通信并解释与论文的差异。
-5. 提供公共接口、示例、报告及交接 revision。
-6. 与 B 完成交接复跑。
+当前仅进行 NON-EXACT paper-aligned 实验复现、证据准备和 canonical gate 允许的 design-only 工作。严格 G1、官方 G2、G3 和 M5 runtime 均为未来 gated sequence。
 
 ### 角色 B
 

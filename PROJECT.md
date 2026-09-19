@@ -53,6 +53,11 @@ M2：Protocol I 论文精确三轮核心
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
+当前严格 M2 证据门见
+[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](docs/decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)：
+message/material/party-view/round-exact Protocol I 目前 BLOCKED；非精确的 paper-aligned
+实验复现不得通过 M2 G1、G2 或 G3，也不得解除 M5 runtime 的依赖门。
+
 Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Protocol III 的论文目标为 **2 个在线轮次**，对应 Theorem 4.2。上述目标针对论文核心，不能直接作为 raw-score 输入到原顺序 Top-K mask 的端到端轮数。
 
 本次修订替代 `docs/decisions/ROADMAP_PRIORITY_2026-09-04.md` 中与本节冲突的路线。`docs/IMPLEMENTATION_PLAN.md`、`docs/TEAM_WORK_PLAN.md` 和 `docs/M3_ONWARD_TEAM_WORK_PLAN.md` 需要同步更新；同步期间以本文和团队本次明确决定为准，旧 M4 前置门不再适用。
@@ -519,9 +524,11 @@ artifacts/                 被忽略的本地产物
 
 ### M2：Protocol I 精确核心与通信核验
 
-状态：C 级工程基线已完成；精确三轮核心继续推进。
+状态：C 级工程基线已完成。严格 M2 G1、官方 G2、G3 和 M5 runtime 均为未来 gated sequence，当前不可执行。
 
-后续任务：
+当前仅允许：明确标为 NON-EXACT 的 paper-aligned 实验复现、证据准备，以及 canonical gate 明确允许的 design-only 工作。严格 G1 仍等待 authoritative transcript/material/party-view/causal-round 证据；G2 仅在严格 G1 后，G3 仅在官方 G2 后，M5 runtime 仅在严格 M2 handoff 后。
+
+严格 G1 解除后，未来任务：
 
 1. 闭合 paper-compatible public masked-list shuffle 契约。
 2. 验证同置换 payload、公开 masked list 与 GRank 材料绑定。
@@ -708,13 +715,13 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 - BB90+DCF 两种组合尚不能视为已有完整实现。
 - M4 CipherGPT 已从本轮实施与性能范围取消。
 
-团队当前工作安排为：
+团队未来 gated 责任归属（当前不得执行 strict G1、官方 G2、G3 或 M5 runtime）为：
 
-- 角色 A（搭档）：推进 Protocol I 精确三轮核心、相关测试、通信核验与接口交接。
-- 角色 B（你）：先完成总体计划和分工修订，准备 M5 设计；在交接完成后推进 Protocol III 精确两轮核心及通信核验。
+- 角色 A（搭档）：未来 gated 负责 strict Protocol I G1、官方 G2 与 G3；当前仅可进行 NON-EXACT 实验、证据准备和允许的 design-only 工作。
+- 角色 B（你）：当前负责计划修订和 M5 design-only 准备；M5 runtime 是 strict M2 G3 后的 future gated 责任。
 - 双方：交叉评审公共接口、语义、轮数与成本证据；后续分工按更新后的详细计划执行。
 
-上述安排表示当前任务，不表示搭档分支上的工作已经完成或合入 main。主线状态只随代码、测试和验收证据更新。
+上述安排仅保留责任归属，不表示 strict 工作已解锁或当前可执行。主线状态只随代码、测试和验收证据更新。
 
 ## 10. 历史实现与验收记录
 

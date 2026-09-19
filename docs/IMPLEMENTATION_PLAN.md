@@ -6,6 +6,11 @@
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
 
+当前严格 M2 门以
+[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)
+为准：message/material/party-view/round-exact G1 为 BLOCKED；只有明确的 NON-EXACT
+paper-aligned experimental reproduction READY，且不能进入 G2、G3 或解除 M5 runtime 前置条件。
+
 本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B BB90+DCF。
 
 ## 1. 当前结论与执行主线
@@ -365,7 +370,7 @@ CTest 为 4/4 通过，详见：
 
 ### 4.3 M2：Protocol I 精确核心、通信核验与交接
 
-状态：C 级工程基线已关闭；精确三轮核心是当前推进目标。
+状态：C 级工程基线已关闭。严格 M2 G1、官方 G2、G3 和 M5 runtime 是未来 gated sequence，当前不可执行；当前仅允许 NON-EXACT paper-aligned 实验复现、证据准备和 canonical gate 允许的 design-only 工作。
 
 主责：角色 A。角色 B 交叉评审并接收接口。
 
@@ -800,7 +805,7 @@ CryptoMoE 在 M7 之后另行确定 eligibility、dummy、容量和允许公开�
 
 ### 5.1 角色 A：搭档
 
-当前主责：
+未来 gated 主责（当前不得执行 strict G1、官方 G2、G3 或 M5 runtime）：
 
 - M2 精确三轮核心；
 - Protocol I 相关测试、通信测量和差异解释；
@@ -817,7 +822,7 @@ CryptoMoE 在 M7 之后另行确定 eligibility、dummy、容量和允许公开�
 
 ### 5.2 角色 B：你
 
-当前主责：
+未来 gated 主责（当前不得执行 strict G1、官方 G2、G3 或 M5 runtime）：
 
 - 总体计划、实施计划和分工文档修订；
 - M5 域、编码、消息依赖及失败用例准备；
@@ -948,17 +953,11 @@ M4 不再出现在合并顺序中。旧 M2→M3 交接作为已完成历史保�
 3. 保留 M2/M3 历史验收和实现标签。
 4. 整理 M2→M5 交接表及两次通信核验模板。
 5. 准备 M5 域、非零编码、DPF 兼容性和两轮消息设计。
-6. 不修改搭档正在推进的 Protocol I 核心或 shuffle 文件。
+6. 不修改任何尚未解锁的 strict Protocol I 核心或 shuffle 工作。
 
-### 8.2 角色 A 当前任务
+### 8.2 角色 A future gated 任务（当前不得执行）
 
-1. 明确当前 M2 精确候选 revision 和实现范围。
-2. 闭合同置换 public masked-list 与 GRank 材料契约。
-3. 完成三轮核心正确性、独立进程 E2E 和消息审计。
-4. 分别测量核心、输入适配、输出适配和封装通信。
-5. 对照论文解释成本差异。
-6. 提交最小调用示例、接口说明和核验报告。
-7. 与角色 B 完成可复跑交接。
+strict G1、官方 G2、G3 与 M5 runtime 保持未来 gated 责任；当前仅允许 NON-EXACT 实验、证据准备和 canonical gate 允许的 design-only 工作。
 
 ### 8.3 双方立即共同确认
 

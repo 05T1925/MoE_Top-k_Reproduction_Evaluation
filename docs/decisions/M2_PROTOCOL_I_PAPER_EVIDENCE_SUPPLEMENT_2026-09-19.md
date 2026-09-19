@@ -10,18 +10,23 @@
 
 本次只更新证据边界、复现目标和验收标准，不修改现有协议实现。
 
-前置决策：
+当前严格门：
 
 ```text
-docs/decisions/M2_PROTOCOL_I_STAGE3O_DECISION_2026-09-15.md
+docs/decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md
 ```
+
+本记录所述 paper-aligned experimental reproduction 只能使用 NON-EXACT 身份；
+它不得通过严格 M2 G1、G2 或 G3，也不得解除 M5 runtime 门。SIGMA、本地参考行为、
+当前 VFSS 代码和项目扩展均不能补推缺失的目标论文 transcript、material、party-view
+或 round-exact 事实。
 
 ## 1. 当前目标
 
 M2 的目标调整为：
 
 ```text
-Protocol I paper-aligned experimental reproduction
+Protocol I paper-aligned experimental reproduction (NON-EXACT ONLY)
 ```
 
 验收重点为：
@@ -501,9 +506,9 @@ NOT_MEASURED
 通过上述验收后，可以使用：
 
 ```text
-Protocol I paper-aligned experimental reproduction
-Agarwal Protocol I functionality-aligned implementation
-Protocol I 3-round paper-core reproduction
+Protocol I paper-aligned experimental reproduction (NON-EXACT ONLY)
+Agarwal Protocol I functionality-aligned implementation (NON-EXACT ONLY)
+Protocol I 3-round paper-core reproduction (NON-EXACT ONLY)
 ```
 
 在没有作者 full version 和 concrete transcript 的情况下，不使用：
@@ -523,6 +528,9 @@ paper core + project mask adapter
 ```
 
 ## 12. 后续执行顺序
+
+本节原有操作步骤仅在严格 G1 被 authoritative evidence 解除后适用；它们是未来 gated sequence。当前 NON-EXACT 路径不得流入官方 G2、G3 或 M5 runtime。其通信测量仅为实验工程证据，不能满足 strict G1、官方 G2 或 G3，也不能解除 M5 runtime 门；仅可在未来 exact evidence 到位后作为比较材料。
+
 
 1. 冻结 Protocol I paper core 与 C 类 adapter 的接口边界。
 2. 实现或选用满足 §2.4 功能要求的 secure shuffle。
@@ -592,8 +600,8 @@ NOT DEFINED BY CONFERENCE VERSION;
 PROJECT EXTENSION IF USED / C
 
 experimental reproduction:
-IMPLEMENTATION_GO
+NON_EXACT_IMPLEMENTATION_GO
 
-message/material-level paper-exact claim:
-NO-GO UNTIL ADDITIONAL EVIDENCE
+message/material/party-view/round-exact claim:
+BLOCKED UNTIL TARGET-PAPER EVIDENCE
 ```
