@@ -4,6 +4,11 @@
 
 状态：规划与审计口径；不是代码覆盖率、性能结果或严格论文一致性声明。
 
+当前严格 M2 状态以
+[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)
+为准：message/material/party-view/round-exact Protocol I 为 BLOCKED；仅 NON-EXACT
+paper-aligned experimental reproduction READY，且不能通过 M2 G1/G2/G3 或解除 M5 runtime 门。
+
 ## 总体结论
 
 当前项目已经完成公共正确性底座、Protocol I 的 C 类工程基线，以及与 Protocol III
@@ -13,7 +18,7 @@
 secure-shuffle 实例化作为进入实现的强制前置条件。M2 当前允许进入：
 
 ```text
-Protocol I paper-aligned experimental reproduction
+Protocol I paper-aligned experimental reproduction (NON-EXACT ONLY)
 ```
 
 该阶段的验收重点是：
@@ -29,10 +34,10 @@ Protocol I paper-aligned experimental reproduction
 单一完成百分比。后续进度以各阶段可审计的退出条件为准，不以提交数、代码行数或未经重新
 定义的加权百分比衡量。
 
-当前冻结执行路线为：
+以下是未来 gated dependency sequence，不是当前可执行工作：
 
 ```text
-M2 Protocol I 论文对齐实验复现
+M2 strict exact Protocol I
 → Protocol I 通信核验
 → Protocol I 接口交接
 → M5 Protocol III 论文对齐实验复现
@@ -52,11 +57,11 @@ M4 CipherGPT 已取消，不属于当前执行路线，也不应重新计入项�
 | M0：证据、命名与冻结基线 | 完成 | 引用边界、PDF/参考资料清单、`VFSS-baseline` 冻结 | 无；后续仅做维护性复检 |
 | M1/M1.1：公共正确性底座 | 完成 | Q20.12 语义、stable tie、oracle、CmpAgg、metrics、DCF conformance、Ubuntu 验收 | 性能和 LAN/WAN 结果不属于该阶段的已测结论 |
 | M2：Protocol I C 类工程基线 | 完成 | 8-round raw-score mask baseline、shuffle/transport/material、独立进程与 Ubuntu/EMP 记录 | 不得将其重新命名为论文原生 3-round 实现 |
-| M2-reproduction：Protocol I 论文对齐实验复现 | `IMPLEMENTATION_GO` | 会议版的高层协议结构、Dealer 模型、stable rank、`π(x)+r`、原生输出、3-round 声明和通信公式已经核验 | 实现 3-round paper core；完成正确性、轮数、Dealer 边界和通信数量级验收 |
-| Protocol I 通信核验 | 待 M2-reproduction 实现后执行 | 已冻结 Theorem 4.1 理论公式和项目 metrics 要求 | 分别记录 paper core、adapter 和 transport overhead；完成多组参数的增长趋势核验 |
-| Protocol I 接口交接 | 未开始 | 已知项目目标输出为 original-order XOR Top-K mask | 冻结输入、输出、rank/tie 映射、index/payload 绑定、adapter、泄露和错误语义 |
+| M2-reproduction：Protocol I NON-EXACT 论文对齐实验复现 | `NON_EXACT_IMPLEMENTATION_GO` | 会议版的高层协议结构、Dealer 模型、stable rank、`π(x)+r`、原生输出、3-round 声明和通信公式已经核验 | 实现 3-round paper core；完成正确性、轮数、Dealer 边界和通信数量级验收 |
+| Protocol I 通信核验 | 未来 gated：strict G1 后才可执行 | 已冻结 Theorem 4.1 理论公式和项目 metrics 要求 | 分别记录 paper core、adapter 和 transport overhead；完成多组参数的增长趋势核验 |
+| Protocol I 接口交接 | 未来 gated：官方 G2 后才可执行 | 已知项目目标输出为 original-order XOR Top-K mask | 冻结输入、输出、rank/tie 映射、index/payload 绑定、adapter、泄露和错误语义 |
 | M3：Protocol III 模块化工程基线 | 完成 | 3-round priority-key 路径、5-round raw-score 路径、DPF routing、secure combine、三方 E2E | 这些实现不等于论文声明的 2-round Protocol III |
-| M5：Protocol III 论文对齐实验复现 | 设计准备 | paper evidence、field contract 和预实现检查清单 | 满足域与非零 payload 前置条件；实现 2-round paper core；完成正确性、轮数、通信和 E2E 验收 |
+| M5：Protocol III 论文对齐实验复现 | runtime future-gated；仅设计准备 | paper evidence、field contract 和预实现检查清单 | 满足域与非零 payload 前置条件；实现 2-round paper core；完成正确性、轮数、通信和 E2E 验收 |
 | Protocol III 通信核验 | 未开始 | 可复用公共 metrics 和测试框架 | paper core 与 raw-score/index/mask adapter 分项计量 |
 | Protocol III 接口交接 | 未开始 | 已有模块化接口经验 | 冻结可供 M6A、M6B 与统一报告使用的语义和测量接口 |
 | M6A：AAV86 | 未开始 | 已识别自适应 exact-edge 预处理门 | 一手算法依据、offline-only 预处理、安全模型、runtime、差分测试和 E2E |
@@ -90,9 +95,9 @@ M4 CipherGPT 已取消，不属于当前执行路线，也不应重新计入项�
 允许使用的名称包括：
 
 ```text
-Protocol I paper-aligned experimental reproduction
-Agarwal Protocol I functionality-aligned implementation
-Protocol I 3-round paper-core reproduction
+Protocol I paper-aligned experimental reproduction (NON-EXACT ONLY)
+Agarwal Protocol I functionality-aligned implementation (NON-EXACT ONLY)
+Protocol I 3-round paper-core reproduction (NON-EXACT ONLY)
 ```
 
 ### 3. message/material-level paper-exact
@@ -106,7 +111,7 @@ material-level paper-exact
 byte-for-byte reproduction
 ```
 
-缺少这些资料只限制上述严格命名，不再阻塞论文对齐实验复现。
+缺少这些资料阻塞严格 M2 G1；仅允许明确标为 NON-EXACT 的实验复现，其测量仅为实验工程证据，不是官方 G2，不能满足 G1/G3 或解除 M5 runtime 门。
 
 ## Protocol I 已核验依据
 
@@ -255,7 +260,7 @@ O(n^2)
 M2-reproduction 当前状态为：
 
 ```text
-IMPLEMENTATION_GO
+IMPLEMENTATION_GO (NON-EXACT EXPERIMENTAL REPRODUCTION ONLY)
 ```
 
 最终退出条件如下。
@@ -338,7 +343,7 @@ NOT_MEASURED
 
 ## 后续执行顺序
 
-### 1. M2 Protocol I 论文对齐实验复现
+### 1. M2 strict exact Protocol I
 
 1. 冻结 paper core 与项目 adapter 的接口。
 2. 实现或选用符合论文 §2.4 高层功能的 secure shuffle。

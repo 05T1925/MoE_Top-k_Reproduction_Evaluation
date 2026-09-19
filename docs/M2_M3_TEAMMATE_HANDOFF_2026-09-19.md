@@ -36,12 +36,10 @@ M4 CipherGPT 已取消，不属于当前路线。
 按以下顺序阅读，避免把工程适配或 supporting literature 写成目标论文结论：
 
 1. `PROJECT.md` 与 `docs/IMPLEMENTATION_PLAN.md`：总边界和计量规则。
-2. `docs/decisions/M2_M3_FINAL_HANDOFF_2026-09-15.md`：既有标签、输入输出、角色与隔离。
-3. `docs/decisions/M2_PROTOCOL_I_STAGE3O_DECISION_2026-09-15.md`：本项目的 paper-exact gate。
-4. `docs/decisions/M2_PROTOCOL_I_PAPER_EVIDENCE_SUPPLEMENT_2026-09-19.md`：本次证据矩阵。
-5. `docs/reproduction/M2_M3_STAGE3N_FINAL_CLOSEOUT_2026-09-15.md`：最后一次 Ubuntu/EMP 实测记录。
-6. `docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md`：M3 独立路径。
-7. `docs/PROJECT_PROGRESS_2026-09-19.md`：当前全局路线和阶段边界。
+2. `docs/decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md`：当前 strict gate、非精确身份与下游依赖。
+3. `docs/decisions/M2_PROTOCOL_I_PAPER_EVIDENCE_SUPPLEMENT_2026-09-19.md`：本次证据矩阵。
+4. `docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md`：M3 独立路径。
+5. `docs/PROJECT_PROGRESS_2026-09-19.md`：当前全局路线和阶段边界。
 
 ## 证据分类
 

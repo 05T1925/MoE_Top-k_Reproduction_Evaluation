@@ -6,7 +6,10 @@
 
 本次修订保留已完成的 M1/M1.1、M2 工程基线和 M3 模块化基线，不改变冻结的 score、tie-break、rank 和原顺序 Top-K mask 语义。
 
-当前交接主线是 **M2 精确核心与通信核验 → M5 精确核心**。过去的 **M2 工程基线 → M3 模块化实现**属于已完成历史，单独保留，不重新安排执行。
+当前交接主线是 **严格 M2 精确核心与通信核验 → M5 精确核心**。过去的 **M2 工程基线 → M3 模块化实现**属于已完成历史，单独保留，不重新安排执行。严格 M2
+message/material/party-view/round-exact 门当前 BLOCKED；仅 NON-EXACT 的 paper-aligned
+实验复现 READY，详见
+[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)。
 
 ## 1. 当前分工与执行顺序
 
@@ -14,7 +17,7 @@
 
 | 角色 | 当前主责 | 后续主责 |
 | --- | --- | --- |
-| 角色 A（搭档） | Protocol I 精确三轮核心、测试、通信核验和接口交接 | Protocol I 路线的升级实现与性能测试；公共比较材料和预处理 |
+| 角色 A（搭档） | future gated：strict M2 G1、官方 G2 与 G3（当前不得执行） | Protocol I 路线的升级实现与性能测试；公共比较材料和预处理 |
 | 角色 B（Protocol III 负责人） | 总体计划、实施计划和分工修订；M5 设计准备 | 基于交接接口推进 Protocol III 精确两轮核心、通信核验及对应升级 |
 | 双方共同 | 交叉评审、交接复跑、公共契约核对 | 图算法设计、计量审计、阶段验收和最终报告 |
 
@@ -41,7 +44,7 @@ Protocol I 的论文核心目标为三轮，Protocol III 为两轮。输入适�
 ### 1.3 里程碑边界
 
 - M1/M1.1：已完成，保持冻结。
-- M2：工程基线已完成，继续推进精确三轮核心与通信核验。
+- M2：工程基线已完成；严格精确三轮核心 BLOCKED，非精确实验复现不通过 G1/G2/G3。
 - M3：三轮模块化核心及 raw-score 五轮扩展已完成。
 - M4：取消，不再作为任何后续阶段的前置条件。
 - M5：Protocol III 精确两轮核心与通信核验。
@@ -53,9 +56,9 @@ Protocol I 的论文核心目标为三轮，Protocol III 为两轮。输入适�
 
 ## 2. 角色 A：Protocol I 精确核心与通信核验
 
-### 2.1 当前实现职责
+### 2.1 future gated strict 实现责任（当前不得执行）
 
-角色 A 负责：
+角色 A 在 strict G1 evidence available 后负责：
 
 1. 固定当前开发 revision、候选标签和实际实现范围。
 2. 基于 M2.15/M2.16 审计，闭合 paper-compatible public masked-list shuffle 功能。
@@ -128,7 +131,7 @@ docs/reproduction/          Protocol I 测试和通信核验记录
 7. 准备边界向量、失败用例和验收方案。
 8. 评审角色 A 的接口、消息表及通信核验方法。
 
-这些工作不要求等待 Protocol I 全部完成，但不能修改角色 A 正在推进的 shuffle 或公共材料实现，也不能基于未冻结接口宣称 M5 已完成。
+这些工作不要求等待 Protocol I 全部完成，但不能修改任何尚未解锁的 strict shuffle 或公共材料实现，也不能基于未冻结接口宣称 M5 已完成。
 
 ### 3.2 接收 M2 交接
 
@@ -206,6 +209,9 @@ G1：协议实现与正确性完成
 代码可以分批合并，但“已合并”“能运行”“通信已打印”不分别等于 G1、G2、G3 已通过。
 
 M5 完成后沿用同样三阶段结构，由角色 B 主责交付、角色 A 交叉核验，再进入 M6A。
+
+当前严格 M2 G1 未通过，因此 M2 G2 通信核验、G3 交接和 M5 runtime 均为 BLOCKED；
+不得以 non-exact 复现或已合并代码绕过此顺序。
 
 ### 4.2 输入、rank 和输出
 
@@ -651,11 +657,7 @@ M3 继续作为 M5 的正确性和开销对照。原始测试来源、计时边�
 
 ### 角色 A
 
-1. 推进 Protocol I 精确三轮核心。
-2. 完成正确性、消息和材料审计。
-3. 实测通信并解释与论文的差异。
-4. 提供接口、最小示例、报告和交接 revision。
-5. 与角色 B 完成交接复跑。
+当前仅进行 NON-EXACT paper-aligned 实验复现、证据准备和 canonical gate 允许的 design-only 工作。严格 G1、官方 G2、G3 和 M5 runtime 均为未来 gated sequence。
 
 ### 角色 B
 
