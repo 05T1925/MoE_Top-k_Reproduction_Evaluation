@@ -1,61 +1,211 @@
 # 项目全局进度与后续阶段
 
 日期：2026-09-19
-状态：规划口径；不是代码覆盖率、性能结果或论文一致性声明。
+
+状态：规划与审计口径；不是代码覆盖率、性能结果或论文一致性声明。
 
 ## 总体结论
 
-按下表的里程碑权重，本项目当前约为 **55%** 完成。这个数字衡量的是“统一安全 Top-K
-项目”从基础设施到可比较实验/工作负载接入的全流程，不把已有提交数或代码行数当作
-进度。它包含已完成的 M0、M1、M2 C 类工程基线和 M3 模块化基线，也显式扣除了未完成的
-M2 paper-exact、M4--M7 与 CryptoMoE。
+当前项目已经完成公共正确性底座、Protocol I 的 C 类工程基线，以及与 Protocol III
+相关的模块化工程基线。尚未完成的核心工作是 Protocol I 与 Protocol III 的
+paper-exact 实现、相应通信核验、AAV86、BB90+DCF，以及最终六方案统一报告。
 
-该估计的可复算值为 `20 + 15 + 3 + 15 + 1.5 = 54.5`，四舍五入为 55%。其中 M2
-paper-exact 的 3 分和 M5 的 1.5 分只代表已完成的资料/设计工作，**不代表可执行的
-论文精确实现**。
+本文不再给出单一“完成百分比”。旧的约 55% 估计依赖已经取消的 CipherGPT
+里程碑及其权重，无法与当前路线自洽。后续进度以各阶段的可审计退出条件为准，不以提交数、
+代码行数或未经重新定义的加权百分比衡量。
+
+当前冻结执行路线为：
+
+```text
+M2 Protocol I paper-exact
+→ Protocol I 通信核验
+→ Protocol I 接口交接
+→ M5 Protocol III paper-exact
+→ Protocol III 通信核验
+→ Protocol III 接口交接
+→ M6A AAV86
+→ M6B BB90+DCF
+→ M7 六方案统一报告
+```
+
+M4 CipherGPT 已取消，不属于当前执行路线，也不应重新计入项目进度或后续优先级。
 
 ## 阶段总览
 
-| 阶段 | 权重 | 状态 | 已完成的可审计交付物 | 未完成的退出条件 |
-|---|---:|---|---|---|
-| M0：证据、命名与冻结基线 | 5 | 完成 | 引用边界、PDF/参考资料清单、`VFSS-baseline` 冻结 | 无；后续只做维护性复检 |
-| M1/M1.1：公共正确性底座 | 15 | 完成 | Q20.12 语义、stable tie、oracle、CmpAgg、metrics、DCF conformance、Ubuntu 验收 | 性能/LAN/WAN 仍不属于该阶段的已测结论 |
-| M2：Protocol I C 类工程基线 | 15 | 完成 | 8-round raw-score mask baseline、shuffle/transport/material、独立进程与 Ubuntu/EMP 记录 | 不升级为论文 exact |
-| M2-exact：Protocol I 论文校准 | 15 | 阻塞中的研究收尾（20%） | 会议版的原生输出、Dealer 模型、stable tie、`π(x)+r` 高层证据已定位 | 逐轮 transcript、party view、`r` material、same-permutation、padding/dummy、full version/proof |
-| M3：Protocol III 模块化接口适配 | 15 | 完成 | 3-round priority-key 与 5-round raw-score路径、DPF routing、secure combine、三方 E2E | 2-round 压缩不属于 M3，转入 M5 |
-| M4：CipherGPT 原生基线 | 10 | 未开始 | 已有范围、风险和验收计划 | source/revision/license 审计、终止/错误语义、index 绑定、mask adapter、差分/E2E |
-| M5：Protocol III 论文精确 2-round | 10 | 设计准备（15%） | paper-evidence、field contract 与预实现检查清单 | 域与非零 payload 前置条件、2-round transcript、实现、泄露/轮数审计、E2E |
-| M6：AAV86 / Direct Top-K | 7.5 | 未开始 | 已识别自适应 exact-edge 预处理门 | offline-only 预处理、安全模型、runtime、差分/E2E |
-| M7：统一性能报告 | 5 | 未开始 | 指标口径和比较矩阵已定义 | 在同一环境实际采样、原始记录、可比较报告 |
-| CryptoMoE 工作负载接入 | 2.5 | 未开始 | 已定义为 M7 之后的独立层 | eligibility/dummy/capacity/leakage 契约与已验收后端 |
+| 阶段 | 状态 | 已完成的可审计交付物 | 未完成的退出条件 |
+| --- | --- | --- | --- |
+| M0：证据、命名与冻结基线 | 完成 | 引用边界、PDF/参考资料清单、`VFSS-baseline` 冻结 | 无；后续仅做维护性复检 |
+| M1/M1.1：公共正确性底座 | 完成 | Q20.12 语义、stable tie、oracle、CmpAgg、metrics、DCF conformance、Ubuntu 验收 | 性能、LAN/WAN 结果不属于该阶段的已测结论 |
+| M2：Protocol I C 类工程基线 | 完成 | 8-round raw-score mask baseline、shuffle/transport/material、独立进程与 Ubuntu/EMP 记录 | 不得升级命名为 paper-exact |
+| M2-exact：Protocol I 论文精确核心 | 证据阻塞 | 会议版的高层协议结构、原生输出、Dealer 模型、stable rank、`π(x)+r` 等证据已经定位 | 逐轮 transcript、party view、`r` material、concrete same-permutation、padding/dummy、full version/proof 等仍需审计 |
+| Protocol I 通信核验 | 未开始 | 已有 metrics 和计量规则可复用 | paper core 与项目 adapter 的轮数、通信量、公开值和泄露必须分别核验 |
+| Protocol I 接口交接 | 未开始 | 已知项目目标输出为 original-order XOR Top-K mask | 冻结输入、输出、rank 方向、index/payload 绑定、adapter 和错误语义 |
+| M3：Protocol III 模块化工程基线 | 完成 | 3-round priority-key 路径、5-round raw-score 路径、DPF routing、secure combine、三方 E2E | 这些实现不等于论文精确 2-round Protocol III |
+| M5：Protocol III paper-exact | 设计准备 | paper evidence、field contract 和预实现检查清单 | 域与非零 payload 前置条件、2-round transcript、实现、泄露/轮数审计、E2E |
+| Protocol III 通信核验 | 未开始 | 可复用公共 metrics 与测试框架 | paper core 与 raw-score/index/mask adapter 分项计量 |
+| Protocol III 接口交接 | 未开始 | 已有模块化接口经验 | 冻结可供 M6A/M6B 和统一报告使用的语义与测量接口 |
+| M6A：AAV86 | 未开始 | 已识别自适应 exact-edge 预处理门 | 一手算法依据、offline-only 预处理、安全模型、runtime、差分测试和 E2E |
+| M6B：BB90+DCF | 资料准备 | 已确定为 AAV86 之后的独立阶段 | 原始算法依据、目标顺序统计量、DCF 衔接、实现来源、差分测试和 E2E |
+| M7：六方案统一报告 | 未开始 | 指标口径和比较矩阵已有基础 | 同一环境实际采样、原始记录、版本固定和可比较报告 |
 
 ## 已完成与未完成的边界
 
-已完成不等于论文精确复现：M2、M3 当前均是名称和轮数已冻结的工程基线/扩展；其中
-M2 的论文精确 Protocol I 被资料与 material/transcript 证据阻塞，M3 的论文精确
-2-round 压缩是独立的 M5。所有性能字段若未来自已保存的实际运行，仍为
-`NOT_MEASURED`。
+“工程基线完成”不等于“论文精确复现完成”。
 
-M2 的证据收尾详见
-`docs/decisions/M2_PROTOCOL_I_PAPER_EVIDENCE_SUPPLEMENT_2026-09-19.md`；M2/M3
-代码与测试交接详见 `docs/M2_M3_TEAMMATE_HANDOFF_2026-09-19.md` 和
-`docs/reproduction/M2_M3_STAGE3N_FINAL_CLOSEOUT_2026-09-15.md`。
+M2 当前完成的是名称、语义和测试记录可追溯的 C 类工程基线。Protocol I 的论文精确核心
+仍受 material、逐轮 transcript 和 party-view 证据不足的限制。
 
-## 建议执行顺序
+M3 当前完成的是与 Route A 隔离的模块化工程基线。论文声称的 Protocol III 2-round
+核心属于 M5，不能用现有 3-round 或 5-round 工程路径代替。
 
-1. **M2-exact 只取证，不补猜代码。** 向作者/导师取得 full version 或逐轮算法；先完成
-   sender/receiver、字段、公开值、party view、`π/r` 生命周期和 adapter 计量表。
-2. **M4 启动 CipherGPT native baseline。** 先解决 license/source、错误传播、终止性和
-   stable/index/mask 语义，再做差分和独立进程测试。
-3. **M5 仅在 field contract 可满足后进入实现。** 不将 `Z_(2^b)` 当 field，不为零
-   payload 或逆元失败增加隐式降级路径。
-4. **M6 先解决自适应预处理。** 禁止 online Dealer 或以完整图预分配冒充 AAV86 的
-   exact-edge 节省。
-5. **M7 最后采集统一性能。** 保留 revision、命令、环境、输入/种子、重复次数和原始
-   计数；CryptoMoE 只在此后接入。
+论文中的 rank 方向和项目统一的 priority-rank 方向不同：
+
+```text
+论文 rank：
+minimum = 0
+maximum = n - 1
+相等元素中，原序列更早者 rank 更小
+
+项目 priority-rank：
+最高优先级 = 0
+Top-K largest
+score 相同时，original index 更小者优先
+```
+
+因此，从论文 rank 到项目 priority-rank 必须存在显式的方向映射。不能仅凭两者都具有
+stable tie，就宣称 rank 编码完全相同。
+
+所有没有来自已保存实际运行记录的性能字段均为 `NOT_MEASURED`。仅有历史测试记录、
+设计表或论文成本公式时，不得改写为本项目已经测得的性能结果。
+
+M2 的证据收尾详见：
+
+```text
+docs/decisions/M2_PROTOCOL_I_PAPER_EVIDENCE_SUPPLEMENT_2026-09-19.md
+```
+
+M2/M3 的实现身份与交接边界详见：
+
+```text
+docs/M2_M3_TEAMMATE_HANDOFF_2026-09-19.md
+docs/reproduction/M2_M3_STAGE3N_FINAL_CLOSEOUT_2026-09-15.md
+```
+
+## 后续执行顺序
+
+### 1. M2 Protocol I paper-exact
+
+在本项目的 paper-exact 验收标准下，先取得或确认能够审计以下内容的一手资料：
+
+- 三个在线轮次的 sender、receiver、字段及 causal dependency；
+- 各方在每个阶段可见的公开值和私有 material；
+- shuffle 关联的私有随机 mask `r` 的生成、分发和消费；
+- `π`、`r` 与公开值 `π(x)+r` 的生命周期；
+- key 与 corresponding payload 的同一 permutation 绑定；
+- original index 作为项目新增 payload/adapter 时的绑定方式；
+- padding 和 dummy 语义；
+- paper-native key/payload shares 到项目 original-order mask 的适配边界。
+
+缺少上述证据时，不补猜 message-level 或 material-level 实现，也不把已有 Route A、
+M3 material 或测试层明文重构重新命名为 paper-exact。
+
+### 2. Protocol I 通信核验
+
+paper core 和项目 adapter 必须分别计量。Theorem 4.1 的 3-round 声明不能直接覆盖：
+
+- Q20.12 raw-score 输入转换；
+- rank 方向映射；
+- original-index 绑定；
+- reverse routing；
+- original-order XOR Top-K mask 生成。
+
+上述 adapter 是否产生额外 causal communication round，必须依据实际设计审计，不能未经
+分析直接记为零，也不能预先断言一定增加轮数。
+
+### 3. Protocol I 接口交接
+
+只有在 paper core、通信计量和 adapter 边界冻结后，才进行 Protocol I 接口交接。交接至少
+包括：
+
+- 输入域和定点数语义；
+- Top-K largest 与 stable tie 语义；
+- paper rank 到 project priority-rank 的方向映射；
+- key、payload 与 original index 的绑定；
+- paper-native 输出与项目 mask 输出的边界；
+- 公开值、泄露面和错误语义；
+- offline/online material 身份和消费点；
+- 可复现命令、测试和 metrics 输出。
+
+### 4. M5 Protocol III paper-exact
+
+仅在 field contract 和非零 payload 等前置条件得到明确满足后进入实现。不将
+`Z_(2^b)` 自动当作 field，也不为零 payload 或逆元失败添加未记录的隐式降级路径。
+
+Protocol III 的 2-round paper core 与 raw-score、index、mask adapter 必须分别审计。
+
+### 5. Protocol III 通信核验与接口交接
+
+按照与 Protocol I 相同的证据纪律，冻结：
+
+- 两轮 causal transcript；
+- DPF/DCF material；
+- 每方 view 和公开值；
+- paper-native 输入输出；
+- 项目新增 adapter；
+- 通信量、轮数和泄露；
+- 可供 M6A、M6B 与统一报告使用的稳定接口。
+
+### 6. M6A AAV86
+
+先解决一手算法依据与自适应预处理问题。不得引入 online Dealer，也不得用完整图预分配
+冒充 AAV86 的 exact-edge 节省。
+
+完成来源登记、安全模型、runtime、oracle differential 和独立进程 E2E 后，才进入 M6B。
+
+### 7. M6B BB90+DCF
+
+BB90+DCF 是 AAV86 之后的独立阶段。必须登记算法来源、固定版本、目标顺序统计量、随机性、
+概率成本、正确性条件以及与 DCF 预处理的连接方式。
+
+AAV86、QuickSelect、Direct Top-K 或 pivot-pruning 原型不能仅因能够选择第 K 大而登记为
+BB90。
+
+### 8. M7 六方案统一报告
+
+统一报告最后执行。所有方案必须在同一可复现环境下采样，并保存：
+
+- 精确 revision；
+- 构建和运行命令；
+- 编译器、依赖与机器环境；
+- 输入规模、K、种子和重复次数；
+- 原始日志和原始计数；
+- offline/online、paper core/adapter 的拆分；
+- 正确性、轮数、通信量与泄露口径。
+
+未经实际运行的字段继续写 `NOT_MEASURED`。
+
+## M4 CipherGPT 的治理状态
+
+M4 CipherGPT 已取消。CipherGPT 不再是当前路线中的独立实现阶段，也不占用任何里程碑权重。
+
+如果未来需要把 CipherGPT 作为外部对照重新引入，必须通过新的治理决定单独定义范围、
+证据来源、许可证、验收条件和报告位置；不能通过修改本文中的阶段名称使其隐式恢复。
 
 ## 分支命名规则
 
-新分支使用功能前缀：`docs/`、`design/`、`feat/`、`fix/`、`test/`、`perf/`、`review/`。
-不再创建 `codex/` 前缀分支；历史同类 ref 的迁移见 `docs/BRANCH_MAP.md`。一个分支只承载
-一个里程碑或明确治理变更，所有实现分支从最新 `origin/main` 开始。
+新分支使用功能前缀：
+
+```text
+docs/
+design/
+feat/
+fix/
+test/
+perf/
+review/
+```
+
+不再创建 `codex/` 前缀分支。历史同类 ref 的迁移见 `docs/BRANCH_MAP.md`。
+
+一个分支只承载一个里程碑或一项明确的治理变更。所有实现分支从最新
+`origin/main` 开始，并在合并前重新核对基线、测试记录和冻结目录。
