@@ -10,7 +10,7 @@ engineering baseline is
 + 4 core + 2 reverse-mask rounds.
 
 Candidate identity: **Agarwal Protocol I functionality-aligned 3-round
-experimental candidate (NON-EXACT) — paper-aligned core + project adapters**.
+experimental candidate (NON-EXACT), using an independent Dealer-DPF shuffle construction**. Its concrete C-INSTANTIATION remediation contract is [the 2026-09-20 contract](M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md), not author behavior.
 Machine label:
 `agarwal_protocol_i_functionality_aligned_3round_NON_EXACT_experimental`.
 
@@ -24,7 +24,7 @@ Explanatory sublabels map back to those classes: **A-DIRECT** and
 | A | Target-paper evidence. **A-DIRECT:** P0/P1 are online in the (2+1) setting; P2 supplies correlated randomness offline and is silent online; preprocessing is input-independent; shuffle outputs secret-shared shuffled data and public `y=π(x)+r` to online parties; `r` is private random masks unknown to a single online party; the public array is directly usable as FSS input without added communication; FSS/GRank uses `r` as secret parameter; Fsort preserves key/payload correspondence; stable ranks are revealed after shuffle for local routing; Fsort has three online rounds; Theorem 4.1 gives aggregate `4N(ell'+p)+2N ceil(log2 N)` online bits. **A-DERIVED (not verbatim transcript facts):** two shuffle rounds yield public `y` plus secret shuffled shares, then local GRank, one shuffled-rank opening, and local routing; no extra GRank masked-input opening follows shuffle; key/payload follow one hidden permutation; `r` in `y` is the slot-mask vector encoded by corresponding GRank/FSS material; an added post-shuffle `y` round makes the core at least four rounds; shuffled ranks remain unlinkable to original positions while the hidden permutation remains secret. |
 | B | Observed local-reference/current-code behavior only; never a paper conclusion. |
 | C | Project extensions, including **C-INSTANTIATION**: concrete messages/material layout, Q20.12 adaptation, composite priority key, padding, original-index payload, inverse routing, XOR mask, framing, counters, identifiers, replay protection, and the RANK_OPEN frame/layout/validation/logging/failure handling. |
-| D | **D-UNRESOLVED:** author transcript/material/party views, concrete two-round bound-shuffle construction, exact wire layout, exact shuffle R1/R2 sender/receiver messages, exact π/r representation and ownership, concrete joint generation/distribution of shuffle and GRank material, complete P0/P1/P2 simulation views, Theorem 4.1's per-round shuffle split, and proof/security of the proposed C-level backend. |
+| D | **D-UNRESOLVED:** author-exact transcript/material/party views, exact wire layout, author-specific π/r representation/ownership, author-specific joint material construction, complete author simulation views, and Theorem 4.1's per-round shuffle split. **PRE-REMEDIATION STATUS / HISTORICAL T2 STATUS:** this row formerly also listed the concrete two-round backend and its project security review as unresolved. For Dealer-DPF Candidate B only, that project-level issue is superseded by the later C-INSTANTIATION remediation contract; this does not resolve author-exact evidence. |
 
 **SUPPORTING_FSS (supporting literature, not A/B/C/D):** SIGMA / standard FSS
 preprocessing supports generic input-independent mask generation, trusted-dealer
@@ -57,11 +57,13 @@ contains the following.
 
 1. A public session manifest: protocol/version, session, fingerprint,
    material-set ID, logical/padded sizes, K, widths, roles, phases, and counts.
-2. **D-UNRESOLVED:** exact `π/r` ownership and representation. A project backend
-   may choose a dealer-held ephemeral master witness, never serialized whole and
-   erased before P2 exits, only as a **C-INSTANTIATION** after its security model
-   and the paper's private-mask requirement are reconciled and reviewed; this is
-   not asserted as author behavior.
+2. **PRE-REMEDIATION STATUS / HISTORICAL T2 STATUS:** exact `π/r` ownership and
+   representation were D-UNRESOLVED at the original T2 design point. For the
+   later Dealer-DPF Candidate B C-INSTANTIATION, the project-level ownership,
+   atomic construction, and security contract are superseded by
+   [the remediation contract](M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md): backend VALID, remediation COMPLETE,
+   implementation NOT PRESENT, tests NOT RUN, measurements NOT_MEASURED. This
+   does not assert author behavior or resolve author-exact ownership evidence.
 3. Per-party `BoundPublicMaskShuffle` R1/R2 material for complete key/payload
    records.
 4. Per-party public-list/GRank linkage tokens ensuring the R2 list uses the
@@ -82,9 +84,14 @@ low-entropy secret permutations or masks into public identifiers.
 
 ## BoundPublicMaskShuffle: required contract and blocker
 
-No current VFSS primitive implements this contract. Runtime implementation
-remains blocked until a concrete construction and security review exist; this
-document does not invent a cryptographic backend.
+**PRE-REMEDIATION STATUS / HISTORICAL T2 STATUS:** no current VFSS primitive
+implemented this contract, and runtime was blocked pending a concrete backend and
+security review. For the later Dealer-DPF Candidate B C-INSTANTIATION, that
+project-level backend/security-contract issue is superseded by
+[the remediation contract](M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md): VALID design and COMPLETE remediation,
+with NOT PRESENT implementation, NOT RUN testing, and NOT_MEASURED results. This
+does not resolve author-exact transcript/material/party-view evidence or strict
+G1, official G2/G3, and M5 runtime BLOCKED status.
 
 `BoundPublicMaskShuffle` must shuffle the entire key/payload record under one
 hidden permutation; output each party's secret shares of `π(key,payload)`; and
@@ -116,15 +123,18 @@ public inputs `(y_i,y_j)`. It must preserve:
 Thus the GRank/DCF offset convention preserves the exact `r_i-r_j`
 sign/orientation for edge `(i,j)`. A package using `r_j-r_i`, or evaluating the
 same key on `(y_j,y_i)`, is not equivalent and must fail correctness/validation.
-The comparison meaning remains `uCMP(key_i,key_j) = 1` iff `key_i > key_j`,
+The comparison meaning remains `uCMP(A_i,A_j) = 1` iff `A_i < A_j`,
 subject to the comparison-domain promise.
 
-**A-DIRECT (canonical A):** the paper's offset-gate/uCMP/GenCmpAgg ordering
-facts. **A-DERIVED (canonical A):** the equality above connecting public
-`y=key+r` to the required edge offset. Concrete key serialization/layout remains
-**D-UNRESOLVED (canonical D)**. Edge IDs/orientation metadata that enforces this
-relation is **C-INSTANTIATION (canonical C)**. No internal DCF key encoding is
-specified here.
+**A-DIRECT (canonical A):** the target paper's native uCMP/GenCmpAgg semantics
+and ordering facts; these are not silently rewritten as repository adapter
+semantics. **A-DERIVED (canonical A):** the equality above connecting public
+`y=key+r` to the required edge offset. The current repository strict-less adapter
+`L_ij=[A_i<A_j]` and its CmpAgg integration are **C-INSTANTIATION/current
+implementation semantics**, not an A-level transcription of the paper's native
+uCMP convention. Concrete author key serialization/layout remains
+**D-UNRESOLVED**. Edge IDs/orientation metadata enforcing the Candidate-B
+relation are C-INSTANTIATION; no internal DCF key encoding is specified here.
 
 ## Abstract A-DERIVED causal transcript
 
@@ -226,12 +236,17 @@ distribution. Record logical `n`, padded `N`, K, `w`, `ell'`, `p`, `b`, `E`,
 per-party DCF/FSS evaluations `E`, total evaluations across P0/P1 `2E`, actual
 PRG calls, and per-primitive offline material.
 
-Total is the sum of party sends only; received counts are cross-checks. Compare
-future core observations using padded `N` against
-`4N(ell'+p)+2N ceil(log2 N)`; logical `n` is only a labeled reference. Classify
-differences as padding, width, payload, extra C-level fields, serialization,
-framing, control, or unresolved. All T2 empirical fields are `NOT_MEASURED`;
-NON-EXACT measurements cannot satisfy official G2.
+Total is the sum of party sends only; received counts are cross-checks.
+**PRE-REMEDIATION STATUS / HISTORICAL T2 STATUS:** the original T2 discussion
+used Agarwal Theorem 4.1, `4N(ell'+p)+2Nb`, as target-paper A evidence. For the
+later Dealer-DPF Candidate B C-INSTANTIATION, frozen logical payload is R1
+`2N(ell'+p)`, R2 `2Nell'`, RANK_OPEN `2Nb`, total `4Nell'+2Np+2Nb`. The `2Np`
+difference is a resolved structural difference of the independent construction,
+not missing accounting. Future Candidate-B measurements first check that formula,
+then may compare separately with Theorem 4.1 as paper-vs-project structure;
+Candidate B is not paper-native communication. Logical `n` remains a labeled
+reference. All T2 empirical fields remain NOT_MEASURED; NON-EXACT measurements
+cannot satisfy official G2.
 
 ## Leakage, failures, and safety
 
@@ -274,12 +289,12 @@ polling, or online material request.
    has no online descriptor; only TEST_ONLY controller reconstructs.
 10. Counter self-tests reconciling sends/receives/stages/totals and distinguishing
     edges, FSS calls, PRG calls, payload, and framing.
-11. DCF orientation/sign differential: choose known `key_i`, `key_j`, `r_i`, and
-    `r_j`; form `y_i=key_i+r_i` and `y_j=key_j+r_j`; reconstruct the comparison
-    output and verify `[key_i > key_j]` for both `key_i > key_j` and `key_i <
-    key_j`. Swap the mask-difference orientation or public-input order in a
-    negative case and require validation failure or oracle-detected incorrect
-    output.
+11. Candidate-B uCMP orientation differential: for canonical `e=(i,j), i<j`,
+    form `alpha=r_A[i]-r_A[j]`, evaluate `(y_i,y_j)`, and reconstruct
+    `L_ij=[A_i<A_j]`; verify CmpAgg `rank_i+=1-L_ij; rank_j+=L_ij`. Include
+    positive strict-less and strict-not-less cases. Negative oracle cases must
+    fail for reversed `r_A[j]-r_A[i]`, swapped `(y_j,y_i)`, or replacement of
+    strict-less with obsolete strict-greater; no inversion or argument swap.
 12. INT32_MIN cross-boundary padding: use non-power-of-two `logical_n`, every
     real score and dummy score `INT32_MIN`, real indices `0..logical_n-1`, and
     dummy indices `logical_n..N-1`; run `K=1` and `K=logical_n`. Verify every
@@ -288,16 +303,26 @@ polling, or online material request.
 
 ## Open risks and T2 acceptance
 
-Unchanged risks are: the missing concrete two-round backend is the principal
-runtime blocker; a backend may reveal a fourth causal round; binding metadata is
-not malicious security; exact wire/material sizes are unknown; exact π/r
-ownership, representation, joint material distribution, P0/P1/P2 simulation
-views, and author-specific serialization/replay/erasure/lifecycle behavior remain
-D-UNRESOLVED; P2 ephemeral-secret lifecycle needs review; padding affects cost;
-and generic payload widths may require a new packed representation.
+**PRE-REMEDIATION STATUS / HISTORICAL T2 STATUS:** at the original T2 design
+point, the missing concrete two-round backend, its project π/r ownership, joint
+material construction, and security review were runtime blockers. For later
+Dealer-DPF Candidate B, those project-level issues are superseded/resolved by
+[the remediation contract](M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md): VALID design and COMPLETE remediation,
+but NOT PRESENT implementation, NOT RUN testing, and NOT_MEASURED results.
+This does not resolve author-exact transcript/material layout/party views,
+strict G1, official G2/G3, or M5 runtime; those remain D-UNRESOLVED/BLOCKED.
+Other T2 risks retain their historical status.
 
-T2 acceptance requires one documentation file, this exact NON-EXACT identity,
-A/B/C/D labels, the complete contracts above, explicit tie-reversal rejection,
-three rounds conditioned on the unresolved backend, paper-native versus adapter
-separation, `NOT_MEASURED` metrics, unchanged gates/baselines, and no
-implementation or benchmark claim.
+**HISTORICAL T2 STATUS:** when this design was originally written, acceptance
+of this NON-EXACT direction was conditioned on resolving a concrete two-round
+BoundPublicMaskShuffle backend. **CURRENT CANDIDATE-B STATUS:** for the
+Dealer-DPF C-INSTANTIATION, that project-level condition is superseded by
+[the remediation contract](M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md), which records VALID backend design and COMPLETE
+security-contract remediation. This does not mean implementation exists or is
+authorized: it remains NOT PRESENT and authorization remains NO pending the
+separate post-merge implementation-authorization gate. It also does not resolve
+author-exact evidence: strict G1, official G2, official G3, and M5 runtime
+remain BLOCKED. Historical T2 acceptance otherwise required this exact NON-EXACT
+identity, A/B/C/D labels, the contracts above, tie-reversal rejection,
+paper-native versus adapter separation, NOT_MEASURED metrics, unchanged gates,
+and no implementation or benchmark claim.
