@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-13
+更新日期：2026-09-21
 
 ## 1. 项目目标与当前边界
 
@@ -57,6 +57,12 @@ M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M
 [M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](docs/decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)：
 message/material/party-view/round-exact Protocol I 目前 BLOCKED；非精确的 paper-aligned
 实验复现不得通过 M2 G1、G2 或 G3，也不得解除 M5 runtime 的依赖门。
+
+Protocol I 的独立 Dealer-DPF Candidate-B 路线已经停止；`M2CBKDF1` 和
+BoundPublicMaskShuffle 仅作为历史设计保留，不再是 active contract。当前路线沿
+Agarwal §2.4 引用的 Chase、Ghosh、Poburinnaya Secret-Shared Shuffle 栈迁移，
+见 [2026-09-21 redesign](docs/decisions/M2_PROTOCOL_I_CHASE_SECRET_SHARED_SHUFFLE_REDESIGN_2026-09-21.md)。
+该迁移是 paper-aligned C-INSTANTIATION；strict exact M2、G2/G3 仍 BLOCKED。
 
 Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Protocol III 的论文目标为 **2 个在线轮次**，对应 Theorem 4.2。上述目标针对论文核心，不能直接作为 raw-score 输入到原顺序 Top-K mask 的端到端轮数。
 
@@ -120,9 +126,11 @@ AAV86 和 BB90 的原始文献用于补充算法来源。引用时必须区分�
 
 ### 4.2 Protocol I 与安全 shuffle
 
-Protocol I 依赖 Chase、Ghosh、Poburinnaya 的两方静态半诚实 secret-shared shuffle。`协议1shuffle.pdf` 是当前直接基础资料。
+Protocol I 依赖 Chase、Ghosh、Poburinnaya 的两方静态半诚实
+secret-shared shuffle。当前实际论文为 `Papers/Secret-Shared Shuffle.pdf`。
 
-`Agarwal_TopK/protocol1/` 的 B0 是置换矩阵功能参考；`protocol1_ca/` 中的 B1 提供两次 Permute+Share、OPV、Share Translation 和 Benes 方向的参考材料。
+本 checkout 未安装 `Agarwal_TopK/`、`ADSMPC/` 或 `CipherGPT/`。本次结论只引用
+本地论文和 tracked VFSS 实现，不引用缺失参考树的行为。
 
 VFSS 已有通过验收的 C 级两遍 secret-shared shuffle，但当前冻结实现尚未满足论文所需的完整 public masked-list 契约。
 
@@ -133,7 +141,18 @@ VFSS 已有通过验收的 C 级两遍 secret-shared shuffle，但当前冻结�
 公开的 y = pi(x) + r
 ```
 
-其中，两类输出必须使用同一隐藏置换；`r` 对任一单方未知，并与后续 GRank/DCF gate 的秘密参数一致。利用该公开 masked list，后续 ranking gate 不需要再单独交换输入 masked list。
+其中，两类输出必须使用同一隐藏置换；`r` 对任一单方未知，并与后续 GRank/DCF
+gate 的秘密参数一致。“任一单方”包括 `(2+1)` 模型中可能被单独半诚实腐化的
+P2，不能改写成“任一在线方”。
+
+CHASE-DIRECT 中 P0/P1 分别选择并保留 `pi0/pi1`，没有 P2 同时知道两者。任何
+把 permutation-dependent correlation 编译给 P2、使 P2 知道两方 permutation
+的方案都是 C-INSTANTIATION，而不是 Chase 原始 party view。
+
+当前 P2 先采样完整 `r` 再分发 shares 的四轮路径只保留为 functional
+C-INSTANTIATION baseline：它没有被证明满足 Agarwal any-single-party secrecy，
+不能解除 strict G1。更保守的候选让 P0/P1 独立贡献 `r0/r1`，但在 P2 不得知
+完整 `r` 时生成 r-bound GRank/FSS keys 仍缺 distributed/blind KeyGen 机制。
 
 M2 精确核心需要验证：
 
@@ -524,7 +543,9 @@ artifacts/                 被忽略的本地产物
 
 ### M2：Protocol I 精确核心与通信核验
 
-状态：C 级工程基线已完成。严格 M2 G1、官方 G2、G3 和 M5 runtime 均为未来 gated sequence，当前不可执行。
+状态：C 级工程基线已完成；Dealer-DPF 路线已停止；Chase-based R0
+documentation/cleanup 已形成待评审 patch。严格 M2 G1、G2/G3 和 M5 runtime
+仍为 gated sequence。
 
 当前仅允许：明确标为 NON-EXACT 的 paper-aligned 实验复现、证据准备，以及 canonical gate 明确允许的 design-only 工作。严格 G1 仍等待 authoritative transcript/material/party-view/causal-round 证据；G2 仅在严格 G1 后，G3 仅在官方 G2 后，M5 runtime 仅在严格 M2 handoff 后。
 
