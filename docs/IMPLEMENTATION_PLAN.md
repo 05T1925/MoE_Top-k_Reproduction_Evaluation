@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-13
+更新日期：2026-09-21
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -10,6 +10,12 @@
 [M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)
 为准：message/material/party-view/round-exact G1 为 BLOCKED；只有明确的 NON-EXACT
 paper-aligned experimental reproduction READY，且不能进入 G2、G3 或解除 M5 runtime 前置条件。
+
+Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
+OPV -> Share Translation -> Beneš -> Permute+Share -> two-pass
+SecretSharedShuffle，并把具体 P2 preprocessing 与 Agarwal public-mask adapter
+保持为准确标记的 C-INSTANTIATION。详见
+[M2 Protocol I Chase redesign](decisions/M2_PROTOCOL_I_CHASE_SECRET_SHARED_SHUFFLE_REDESIGN_2026-09-21.md)。
 
 本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B BB90+DCF。
 
@@ -370,7 +376,8 @@ CTest 为 4/4 通过，详见：
 
 ### 4.3 M2：Protocol I 精确核心、通信核验与交接
 
-状态：C 级工程基线已关闭。严格 M2 G1、官方 G2、G3 和 M5 runtime 是未来 gated sequence，当前不可执行；当前仅允许 NON-EXACT paper-aligned 实验复现、证据准备和 canonical gate 允许的 design-only 工作。
+状态：C 级工程基线已关闭；Dealer-DPF 已停止；Chase-based R0 patch 待评审。
+严格 M2 G1、G2/G3 和 M5 runtime 仍是 gated sequence。
 
 主责：角色 A。角色 B 交叉评审并接收接口。
 
@@ -382,30 +389,47 @@ CTest 为 4/4 通过，详见：
 - Chase secret-shared shuffle；
 - M2.15/M2.16 对 public masked-list 和泄露的审计记录。
 
-#### M2 实现阶段
+#### M2 Chase 迁移阶段
 
-1. 明确当前 PS API 与论文功能之间的差异。
-2. 设计并实现同时输出秘密共享 `pi(x)` 与公开 `pi(x)+r` 的所需功能。
-3. 保证两种输出使用同一隐藏置换，r 与后续 GRank 材料关联且对任一单方未知。
-4. 验证预处理输入无关、Dealer 在线静默和材料一次性使用。
-5. 接入全对全 CmpAgg、稳定 rank 和 payload 路由。
-6. 保留 raw-score 输入与原顺序 XOR mask 输出。
-7. 按实际消息依赖实现并审计三轮论文核心。
-8. 运行 conformance、差分、独立进程 E2E 和异常输入/传输测试。
-9. 保留当前四轮核心工程实现作为回归对照。
+1. **R0 migration/cleanup**：清理 Candidate-B-only 资产；冻结证据、group 与
+   P0/P1/P2 knowledge contracts。
+2. **R1 OPV conformance**：扩展 shape、position/value、freshness 和 process tests。
+3. **R2 Share Translation**：验证 `Delta=b-pi(a)` 与 hiding boundary。
+4. **R3 Beneš `(T,d)`**：验证 composition、disjointness 与 shape policy。
+5. **R4 Permute+Share**：建立 clear oracle；区分 CHASE-DIRECT P0/P1
+   preprocessing 与只提供 permutation-independent correlation 的 P2-assisted
+   candidate。P2 同时知道 `pi0/pi1` 的 compiler 仅是 C-INSTANTIATION。
+6. **R5 SecretSharedShuffle**：验证 two-pass forward shuffle，以及 P0/P1
+   分别选择并保留 `pi0/pi1`、无单方获得 composed permutation 的 Chase view。
+7. **R6 Agarwal adapter**：产生 same-`pi` secret shares 与 public
+   `pi(key)+r`。完整 `r` 必须对 P0/P1/P2 任一单方未知。P2-full-`r` 四轮路径
+   仅是 functional C-baseline；knowledge-preserving 路径仍缺 distributed/blind
+   r-bound GRank KeyGen。
+8. **R7 integration**：接回 uCMP/DCF、CmpAgg、rank open 和 local routing；
+   Protocol I shuffle 禁止 DPF routing。
+9. **R8 E2E**：frozen-oracle differential 和独立 P2/P0/P1 process E2E。
+10. **R9 accounting**：记录 causal rounds、online/offline bytes、OT/PRG/DCF
+    和 wall-clock；未知值保持 `NOT_MEASURED`。
 
-不能通过额外的事后 masked-list 交换、公开置换或测试端构造公开列表冒充论文所需的 shuffle 功能。
+CHASE-DIRECT 中 P0/P1 分别选择 permutation，P2 不在其 party view 中。把
+input-independent work 移入 P2 是项目 preprocessing C-INSTANTIATION；
+input independence 本身不授权 P2 知道两方 permutation 或完整 `r`。
 
-当前历史七轮候选是：
+当前严格 causal transcript 为：
 
 ```text
-2 轮 raw-score adapter
-+ 3 轮论文核心
-+ 2 轮 reverse mask adapter
-= 7 轮候选总路径
+offline direct: P0/P1 retain pi0/pi1 and run permutation-dependent OPV/ST
+offline conservative candidate: P2 supplies only permutation-independent bases
+offline r-private candidate: P0/P1 contribute r0/r1; blind GRank KeyGen BLOCKED
+R1: P1(data owner) -> P0(pi0 owner), first PS message
+R2: P0(data owner) -> P1(pi1 owner), depends on R1
+R3: exchange q_b=z_b+r_b, reconstruct public y=pi(key)+r
+R4: open shuffled rank shares; routing is local
 ```
 
-它不是既成实现；若最终适配改变，应重新审计，不固定填写总轮数。
+因此保守路径是四个核心因果轮次。三轮目标保持 **BLOCKED**，直到获得
+Agarwal full-version transcript 或严格证明 fused adapter。P2-full-`r` 路径即使
+功能正确，也不能解除 strict G1。
 
 #### M2 通信阶段
 
@@ -946,18 +970,21 @@ M4 不再出现在合并顺序中。旧 M2→M3 交接作为已完成历史保�
 
 ## 8. 立即下一步
 
-### 8.1 角色 B 当前任务
+### 8.1 当前 Chase migration 任务
 
-1. 完成 `PROJECT.md`、本文及两份分工计划的同步修订。
-2. 更新首页和路线决策，清除仍指向 M4 的现行执行要求。
-3. 保留 M2/M3 历史验收和实现标签。
-4. 整理 M2→M5 交接表及两次通信核验模板。
-5. 准备 M5 域、非零编码、DPF 兼容性和两轮消息设计。
-6. 不修改任何尚未解锁的 strict Protocol I 核心或 shuffle 工作。
+1. 评审 R0 redesign、cleanup 和 party-knowledge diff。
+2. R1--R3 复用现有 OPV/ST/Beneš，不重写第二套。
+3. R4/R5 建 clear oracle 和 standalone forward-shuffle tests。
+4. P2-assisted preprocessing 先证明与 direct Chase views 的 distribution
+   equivalence；P2-knows-both-permutations 路径保持 C-INSTANTIATION。
+5. R6 保留 P2-full-`r` 四轮路径时，只能作为 functional C-baseline；另行
+   评估 distributed `r` 与 blind/distributed GRank KeyGen，不假定可行。
+6. 保留 legacy M2/M3、`VFSS-baseline/` 和 Protocol III DPF。
 
-### 8.2 角色 A future gated 任务（当前不得执行）
+### 8.2 Future strict gate
 
-strict G1、官方 G2、G3 与 M5 runtime 保持未来 gated 责任；当前仅允许 NON-EXACT 实验、证据准备和 canonical gate 允许的 design-only 工作。
+允许准确标记的 NON-EXACT Chase migration。strict G1、官方 G2/G3 和 M5
+runtime 保持 gated；任何 C-baseline 都不能解除这些门。
 
 ### 8.3 双方立即共同确认
 
