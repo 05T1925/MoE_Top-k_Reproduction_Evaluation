@@ -58,8 +58,6 @@ M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M
 message/material/party-view/round-exact Protocol I 目前 BLOCKED；非精确的 paper-aligned
 实验复现不得通过 M2 G1、G2 或 G3，也不得解除 M5 runtime 的依赖门。
 
-The independent Dealer-DPF BoundPublicMaskShuffle NON-EXACT design is decision-complete at the C-INSTANTIATION security-contract level, but implementation has not started. Strict exact M2 remains blocked; the frozen four-core/eight-E2E baseline remains valid; no official G2/G3 claim is authorized. See [the contract](docs/decisions/M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md).
-
 Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Protocol III 的论文目标为 **2 个在线轮次**，对应 Theorem 4.2。上述目标针对论文核心，不能直接作为 raw-score 输入到原顺序 Top-K mask 的端到端轮数。
 
 本次修订替代 `docs/decisions/ROADMAP_PRIORITY_2026-09-04.md` 中与本节冲突的路线。`docs/IMPLEMENTATION_PLAN.md`、`docs/TEAM_WORK_PLAN.md` 和 `docs/M3_ONWARD_TEAM_WORK_PLAN.md` 需要同步更新；同步期间以本文和团队本次明确决定为准，旧 M4 前置门不再适用。

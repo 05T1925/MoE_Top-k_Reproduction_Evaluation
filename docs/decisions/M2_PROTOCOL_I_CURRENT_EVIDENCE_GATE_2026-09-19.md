@@ -15,7 +15,6 @@ historical implementation, test, performance, or decision records.
 | M2 G2 communication verification | **BLOCKED** | Strict M2 G1 has not passed. |
 | M2 G3 interface/evidence handoff | **BLOCKED** | Strict M2 G1 and G2 have not passed. |
 | M5 runtime implementation | **BLOCKED** | The required M2 G3 handoff has not passed. Design and evidence preparation remain separate, non-runtime work. |
-| Dealer-DPF BoundPublicMaskShuffle | **VALID design; NON-EXACT C-INSTANTIATION** | Security-contract remediation complete; implementation absent; tests/benchmarks not run; measurements NOT_MEASURED. |
 
 Strict M2 G1 requires a target-paper-supported, auditable Protocol I
 transcript that is exact at the message, material, party-view, and causal-round
