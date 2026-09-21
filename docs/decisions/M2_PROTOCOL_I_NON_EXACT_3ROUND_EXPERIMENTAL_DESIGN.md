@@ -14,8 +14,6 @@ experimental candidate (NON-EXACT), using an independent Dealer-DPF shuffle cons
 Machine label:
 `agarwal_protocol_i_functionality_aligned_3round_NON_EXACT_experimental`.
 
-Its normative byte-level entropy derivation is [M2CBKDF1](M2_PROTOCOL_I_DEALER_DPF_ENTROPY_DERIVATION_CONTRACT_2026-09-21.md), also a C-INSTANTIATION rather than author behavior.
-
 This document preserves four canonical, non-interchangeable evidence classes.
 Explanatory sublabels map back to those classes: **A-DIRECT** and
 **A-DERIVED** are A, **C-INSTANTIATION** is C, and **D-UNRESOLVED** is D.

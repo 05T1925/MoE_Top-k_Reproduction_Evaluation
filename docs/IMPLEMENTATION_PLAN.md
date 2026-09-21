@@ -30,7 +30,7 @@ paper-aligned experimental reproduction READY，且不能进入 G2、G3 或解�
 m2_protocol_i_raw_score_input_modular_8round_mask_output
 ```
 
-Approved NON-EXACT Candidate-B sequence: 1) documentation remediation decision; 2) independent documentation review; 3) explicit implementation authorization; 4) DPF/uCMP conformance slice; 5) Dealer preprocessing/material factory; 6) BoundPublicMaskShuffle core; 7) Protocol I integration; 8) independent-process E2E/failure tests; 9) communication/complexity instrumentation; 10) final implementation/security review. The entropy-derivation ambiguity is decision-complete at documentation level through [M2CBKDF1](decisions/M2_PROTOCOL_I_DEALER_DPF_ENTROPY_DERIVATION_CONTRACT_2026-09-21.md); implementation authorization must be re-run after documentation review and merge. Implementation remains NOT PRESENT, tests remain NOT RUN, and measurements remain NOT_MEASURED. No Slice 1 is authorized; strict G1/official G2/G3/M5 do not change. See [the contract](decisions/M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md).
+Approved NON-EXACT Candidate-B sequence: 1) documentation remediation decision; 2) independent documentation review; 3) explicit implementation authorization; 4) DPF/uCMP conformance slice; 5) Dealer preprocessing/material factory; 6) BoundPublicMaskShuffle core; 7) Protocol I integration; 8) independent-process E2E/failure tests; 9) communication/complexity instrumentation; 10) final implementation/security review. No implementation stage is complete; strict G1/official G2/G3/M5 do not change. See [the contract](decisions/M2_PROTOCOL_I_DEALER_DPF_BOUND_PUBLIC_MASK_SHUFFLE_REMEDIATION_CONTRACT_2026-09-20.md).
 
 当前 M3 两个入口为：
 
