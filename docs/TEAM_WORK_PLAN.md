@@ -1,15 +1,12 @@
 # 双人实施分工与交接计划
 
-状态：**已采纳；按 2026-09-13 新路线修订**。
+状态：**已采纳；当前状态按 2026-09-24 更新**。
 
 本文依据 `PROJECT.md` 和 `docs/IMPLEMENTATION_PLAN.md`，明确双人职责、并行边界、公共文件所有权及交接条件。
 
 本次修订保留已完成的 M1/M1.1、M2 工程基线和 M3 模块化基线，不改变冻结的 score、tie-break、rank 和原顺序 Top-K mask 语义。
 
-当前交接主线是 **严格 M2 精确核心与通信核验 → M5 精确核心**。过去的 **M2 工程基线 → M3 模块化实现**属于已完成历史，单独保留，不重新安排执行。严格 M2
-message/material/party-view/round-exact 门当前 BLOCKED；仅 NON-EXACT 的 paper-aligned
-实验复现 READY，详见
-[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)。
+当前主线为 **M2 COMPLETED → M5 IN PROGRESS**。M2 已完成 current engineering acceptance：three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界。dated strict-gate 记录属于历史，不再阻塞 M5 runtime。
 
 ## 1. 当前分工与执行顺序
 
@@ -17,8 +14,8 @@ message/material/party-view/round-exact 门当前 BLOCKED；仅 NON-EXACT 的 pa
 
 | 角色 | 当前主责 | 后续主责 |
 | --- | --- | --- |
-| 角色 A（搭档） | future gated：strict M2 G1、官方 G2 与 G3（当前不得执行） | Protocol I 路线的升级实现与性能测试；公共比较材料和预处理 |
-| 角色 B（Protocol III 负责人） | 总体计划、实施计划和分工修订；M5 设计准备 | 基于交接接口推进 Protocol III 精确两轮核心、通信核验及对应升级 |
+| 角色 A（搭档） | 维护 M2 已完成资产并评审 CmpAgg/rank-share 复用 | Protocol I 路线的升级实现与性能测试；公共比较材料和预处理 |
+| 角色 B（Protocol III 负责人） | M5 Protocol III two-round path | 基于交接接口推进通信核验及对应升级 |
 | 双方共同 | 交叉评审、交接复跑、公共契约核对 | 图算法设计、计量审计、阶段验收和最终报告 |
 
 角色 A 不再承担 CipherGPT 实施或性能测试任务。角色 B 不重新实现已经完成的 M3 三轮基线。
@@ -26,11 +23,8 @@ message/material/party-view/round-exact 门当前 BLOCKED；仅 NON-EXACT 的 pa
 ### 1.2 当前路线
 
 ```text
-角色 A：Protocol I 精确三轮核心
-  → 实现与正确性验收
-  → 通信测量及差异解释
-  → 角色 B 接收公共接口并复跑
-  → 角色 B：Protocol III 精确两轮核心
+M2 Protocol I：COMPLETED
+  → 角色 B：M5 Protocol III two-round path（IN PROGRESS）
   → 实现与正确性验收
   → 通信测量及差异解释
   → 双方冻结基础接口与计量结果
@@ -44,15 +38,15 @@ Protocol I 的论文核心目标为三轮，Protocol III 为两轮。输入适�
 ### 1.3 里程碑边界
 
 - M1/M1.1：已完成，保持冻结。
-- M2：工程基线已完成；严格精确三轮核心 BLOCKED，非精确实验复现不通过 G1/G2/G3。
+- M2：**COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent review PASS、Theorem 4.1 online logical communication match、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN`。
 - M3：三轮模块化核心及 raw-score 五轮扩展已完成。
 - M4：取消，不再作为任何后续阶段的前置条件。
-- M5：Protocol III 精确两轮核心与通信核验。
+- M5：**IN PROGRESS / 正在进行**；shared clique CmpAgg / GRank → DPF routing → two-round composition，复用既有 ranking core。
 - M6A：Protocol I、Protocol III 的 AAV86 升级及完整性能验收。
 - M6B：Protocol I、Protocol III 的 BB90+DCF 升级及完整性能验收。
 - M7：六种方案统一汇总与报告。
 
-过去 M2 精确目标未完成并未阻止 M3 工程基线交接；这是历史阶段的决定。当前将 M2 精确核心及通信核验设为 M5 的前置条件，不反向修改过去的完成记录。
+历史 M2 状态记录保留；当前 M5 可复用已完成 M2 的 CmpAgg/rank-share handoff，不重新实现 ranking core。
 
 ## 2. 角色 A：Protocol I 精确核心与通信核验
 
@@ -210,8 +204,7 @@ G1：协议实现与正确性完成
 
 M5 完成后沿用同样三阶段结构，由角色 B 主责交付、角色 A 交叉核验，再进入 M6A。
 
-当前严格 M2 G1 未通过，因此 M2 G2 通信核验、G3 交接和 M5 runtime 均为 BLOCKED；
-不得以 non-exact 复现或已合并代码绕过此顺序。
+M2 已完成当前工程验收并完成 M2→M5 handoff；M5 runtime 为当前活动工作。`AUTHOR_EXACT = NOT_PROVEN` 仍保留为 M2 证据边界。
 
 ### 4.2 输入、rank 和输出
 
@@ -657,15 +650,13 @@ M3 继续作为 M5 的正确性和开销对照。原始测试来源、计时边�
 
 ### 角色 A
 
-当前仅进行 NON-EXACT paper-aligned 实验复现、证据准备和 canonical gate 允许的 design-only 工作。严格 G1、官方 G2、G3 和 M5 runtime 均为未来 gated sequence。
+维护 M2 已完成资产，并参与 M5 对 CmpAgg/rank-share contract 的复用评审。
 
 ### 角色 B
 
-1. 完成本轮共享计划与路线文档修订。
-2. 明确共享文件主写和评审安排。
-3. 准备通信核验与交接模板。
-4. 开展 M5 域、编码和两轮消息设计。
-5. 接收 M2 交接后推进 M5，实现完成后再做通信核验。
+1. 推进 M5 Protocol III two-round path。
+2. 复用现有 uCMP、DCF、CmpAgg Gen/Eval、priority-key semantics 与 rank-share contract。
+3. 不重新实现第二份 ranking core。
 
 ### 双方
 

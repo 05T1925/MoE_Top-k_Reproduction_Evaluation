@@ -6,10 +6,7 @@
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
 
-当前严格 M2 门以
-[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)
-为准：message/material/party-view/round-exact G1 为 BLOCKED；只有明确的 NON-EXACT
-paper-aligned experimental reproduction READY，且不能进入 G2、G3 或解除 M5 runtime 前置条件。
+当前状态：M2 为 **COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1，Protocol I PR 已合并。`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界，但不阻止 M2 工程里程碑完成。M5 为 **IN PROGRESS / 正在进行**。此前 dated strict-gate 记录保留为历史证据，不作为 M5 当前 runtime 阻塞条件。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
 OPV -> Share Translation -> Beneš -> Permute+Share -> two-pass
@@ -27,8 +24,9 @@ three-round candidate 保持为准确标记的 C-INSTANTIATION。详见
 | --- | --- | --- |
 | M0 | 仓库、来源和冻结基线已建立 | `VFSS-baseline/` 不修改 |
 | M1/M1.1 | 统一语义、oracle、基础适配、metrics 和测试入口已完成 | 不重新定义 score、tie rule 和输出 |
-| M2 工程基线 | C 级模块化实现已完成并合入 main | 四轮核心、raw-score 到 mask 共八轮，不是论文精确实现 |
+| M2 | **COMPLETED / 已完成** | three-round C-INSTANTIATION、independent review PASS、Theorem 4.1 online logical communication match、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` |
 | M3 | 三轮模块化核心及 raw-score 五轮扩展已完成并冻结 | 作为 M5 的基础和对照 |
+| M5 | **IN PROGRESS / 正在进行** | shared clique CmpAgg / GRank → DPF routing → two-round composition；复用现有 ranking core |
 
 当前 M2 工程实现标签为：
 
@@ -47,7 +45,7 @@ M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核�
 
 ### 1.2 当前待完成目标
 
-- Protocol I 论文精确三轮核心及通信核验。
+- M5 Protocol III two-round path：shared clique CmpAgg / GRank → DPF routing → two-round composition。
 - Protocol III 论文精确两轮核心及通信核验。
 - Protocol I、Protocol III 各自的 AAV86 升级及完整性能验收。
 - Protocol I、Protocol III 各自的 BB90+DCF 升级及完整性能验收。
@@ -64,10 +62,8 @@ M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核�
 ### 1.3 新执行顺序
 
 ```text
-M2 精确核心实现完成
-  → Protocol I 通信测量及差异解释
-  → M2 公共接口交接
-  → M5 精确核心实现完成
+M2：COMPLETED
+  → M5：IN PROGRESS
   → Protocol III 通信测量及差异解释
   → 基础协议接口与计量结果交接
   → M6A 两种 AAV86 升级实现
@@ -376,8 +372,7 @@ CTest 为 4/4 通过，详见：
 
 ### 4.3 M2：Protocol I 精确核心、通信核验与交接
 
-状态：C 级工程基线已关闭；Dealer-DPF 已停止；Chase-based R0 patch 待评审。
-严格 M2 G1、G2/G3 和 M5 runtime 仍是 gated sequence。
+状态：**COMPLETED / 已完成**。three-round C-INSTANTIATION implemented；independent three-round review PASS；online logical communication matches Theorem 4.1；Protocol I PR merged。`AUTHOR_EXACT = NOT_PROVEN` 是保留的证据边界，不阻止 M2 工程里程碑完成。以下阶段说明为已完成路径的历史技术记录。
 
 主责：角色 A。角色 B 交叉评审并接收接口。
 
@@ -441,7 +436,7 @@ R4: open shuffled rank shares; routing is local
 
 #### M2 通信阶段
 
-G1 通过后：
+已完成的通信核验：
 
 1. 冻结被测 candidate revision 和实现标签。
 2. 运行小规模边界与 `(128,2/8)`、`(256,2/8)` 核验。
@@ -453,7 +448,7 @@ G1 通过后：
 
 #### M2 交接阶段
 
-G2 通过后向角色 B 提供：
+已完成的 M2→M5 handoff 向角色 B 提供：
 
 - 可复跑的 revision 与构建配置；
 - 公共接口、输入输出和 layout；
@@ -477,7 +472,7 @@ G2 通过后向角色 B 提供：
 - 通信核验报告；
 - 公共接口交接记录。
 
-`agarwal_protocol_i_exact_mask_output` 为目标身份，不表示当前已有可执行目标。只有精确条件与 G1/G2/G3 均通过后才更新完成状态。
+M2 当前工程验收已完成；不得将其完成边界扩展为作者未公开实现的逐转录证明，`AUTHOR_EXACT = NOT_PROVEN`。
 
 #### 退出条件
 
@@ -554,13 +549,15 @@ carry
 
 主责：角色 B。角色 A 交叉评审。
 
+状态：**IN PROGRESS / 正在进行**。目标为 shared clique CmpAgg / GRank → DPF routing → two-round composition；复用现有 uCMP、DCF、CmpAgg Gen/Eval、priority-key semantics 与 rank-share contract，不重新实现第二份 ranking core。
+
 #### 前置条件
 
 - M3 已完成并保持稳定；
-- M2 精确核心的 G1/G2/G3 通过；
+- M2 已完成的 CmpAgg/rank-share 契约及 handoff 资产可复用；
 - M5 所需公共接口及其代数适用范围明确。
 
-在前置条件完成前，角色 B 可开展论文核对、域与编码设计、消息表和失败用例准备；不把依赖未冻结接口的实现写成已验收结果。
+M5 已进入实施；其既有技术计划、验收与计量定义保持不变。
 
 #### M5 实现阶段
 
@@ -837,11 +834,10 @@ CryptoMoE 在 M7 之后另行确定 eligibility、dummy、容量和允许公开�
 
 ### 5.1 角色 A：搭档
 
-未来 gated 主责（当前不得执行 strict G1、官方 G2、G3 或 M5 runtime）：
+M2 已完成后的主责：
 
-- M2 精确三轮核心；
-- Protocol I 相关测试、通信测量和差异解释；
-- 公共接口交接；
+- 维护 M2 已完成的 Protocol I 资产与 handoff；
+- 参与 M5 CmpAgg/rank-share 复用评审；
 - M5 的交叉评审。
 
 后续建议分工：
@@ -854,11 +850,11 @@ CryptoMoE 在 M7 之后另行确定 eligibility、dummy、容量和允许公开�
 
 ### 5.2 角色 B：你
 
-未来 gated 主责（当前不得执行 strict G1、官方 G2、G3 或 M5 runtime）：
+M5 当前主责：
 
 - 总体计划、实施计划和分工文档修订；
-- M5 域、编码、消息依赖及失败用例准备；
-- 接收并复跑 M2 交接；
+- 推进 M5 域、编码、消息依赖及失败用例；
+- 复用 M2 handoff；
 - M5 精确两轮核心、通信核验与交接。
 
 后续建议分工：

@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-21
+更新日期：2026-09-24
 
 ## 1. 项目目标与当前边界
 
@@ -39,12 +39,11 @@
 
 ### 1.3 当前执行顺序
 
-M0、M1/M1.1、M2 工程基线和 M3 模块化基线的已完成记录保持不变。后续执行顺序固定为：
+M0、M1/M1.1、M2 和 M3 的已完成记录保持不变。当前活动里程碑为 M5，后续执行顺序固定为：
 
 ```text
-M2：Protocol I 论文精确三轮核心
-  → Protocol I 通信核验与公共接口交接
-  → M5：Protocol III 论文精确两轮核心
+M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验）
+  → M5：IN PROGRESS（Protocol III 论文精确两轮核心）
   → Protocol III 通信核验
   → M6A：I+AAV86、III+AAV86 实现与完整性能测试
   → M6B：I+BB90+DCF、III+BB90+DCF 实现与完整性能测试
@@ -53,16 +52,11 @@ M2：Protocol I 论文精确三轮核心
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
-当前严格 M2 证据门见
-[M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md](docs/decisions/M2_PROTOCOL_I_CURRENT_EVIDENCE_GATE_2026-09-19.md)：
-message/material/party-view/round-exact Protocol I 目前 BLOCKED；非精确的 paper-aligned
-实验复现不得通过 M2 G1、G2 或 G3，也不得解除 M5 runtime 的依赖门。
-
-Protocol I 的独立 Dealer-DPF Candidate-B 路线已经停止；`M2CBKDF1` 和
-BoundPublicMaskShuffle 仅作为历史设计保留，不再是 active contract。当前路线沿
-Agarwal §2.4 引用的 Chase、Ghosh、Poburinnaya Secret-Shared Shuffle 栈迁移，
-见 [2026-09-21 redesign](docs/decisions/M2_PROTOCOL_I_CHASE_SECRET_SHARED_SHUFFLE_REDESIGN_2026-09-21.md)。
-该迁移是 paper-aligned C-INSTANTIATION；strict exact M2、G2/G3 仍 BLOCKED。
+M2 已完成当前工程验收：three-round C-INSTANTIATION 已实现，独立 three-round
+review 为 PASS，在线逻辑通信与 Theorem 4.1 匹配，且 Protocol I PR 已合并。
+其证据边界保持为 `AUTHOR_EXACT = NOT_PROVEN`；这不阻止 M2 工程里程碑完成。
+此前 strict gate、Dealer-DPF 与 Chase 迁移的记录属于历史决策，保留在原有 dated
+documents 中，不作为 M5 的当前 runtime 阻塞条件。
 
 Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Protocol III 的论文目标为 **2 个在线轮次**，对应 Theorem 4.2。上述目标针对论文核心，不能直接作为 raw-score 输入到原顺序 Top-K mask 的端到端轮数。
 
@@ -115,7 +109,7 @@ AAV86 和 BB90 的原始文献用于补充算法来源。引用时必须区分�
 
 | 名称 | 排名 | 路由 | 拓扑与论文在线轮数 | 本项目状态 |
 | --- | --- | --- | --- | --- |
-| Protocol I | 全对全 CmpAgg | 安全 shuffle | 2+1，3 轮 | 四轮核心工程基线已完成；精确三轮核心是当前目标 |
+| Protocol I | 全对全 CmpAgg | 安全 shuffle | 2+1，3 轮 | M2 已完成：three-round C-INSTANTIATION、review PASS 与通信逻辑匹配；`AUTHOR_EXACT = NOT_PROVEN` |
 | Protocol II | multiplicative DPF | 安全 shuffle | 3 方 | 当前不实施 |
 | Protocol III | 全对全 CmpAgg | DPF 路由及跨阶段压缩 | 2+1，2 轮 | 三轮模块化核心已完成；精确两轮核心由 M5 实现 |
 | Protocol IV | multiplicative DPF | 标准 DPF | 3 方 | 当前不实施 |
@@ -543,13 +537,14 @@ artifacts/                 被忽略的本地产物
 
 ### M2：Protocol I 精确核心与通信核验
 
-状态：C 级工程基线已完成；Dealer-DPF 路线已停止；Chase-based R0
-documentation/cleanup 已形成待评审 patch。严格 M2 G1、G2/G3 和 M5 runtime
-仍为 gated sequence。
+状态：**COMPLETED / 已完成**。
 
-当前仅允许：明确标为 NON-EXACT 的 paper-aligned 实验复现、证据准备，以及 canonical gate 明确允许的 design-only 工作。严格 G1 仍等待 authoritative transcript/material/party-view/causal-round 证据；G2 仅在严格 G1 后，G3 仅在官方 G2 后，M5 runtime 仅在严格 M2 handoff 后。
+M2 Protocol I 已完成当前工程验收：three-round C-INSTANTIATION implemented、
+independent three-round review PASS、online logical communication matches Theorem
+4.1、Protocol I PR merged。`AUTHOR_EXACT = NOT_PROVEN` 保持为明确证据边界，
+不影响该工程里程碑的完成状态。
 
-严格 G1 解除后，未来任务：
+以下为已完成路径的历史技术内容与交接范围：
 
 1. 闭合 paper-compatible public masked-list shuffle 契约。
 2. 验证同置换 payload、公开 masked list 与 GRank 材料绑定。
@@ -560,9 +555,8 @@ documentation/cleanup 已形成待评审 patch。严格 M2 G1、G2/G3 和 M5 run
 7. 完成第 5.5 节 Protocol I 通信核验。
 8. 提供可供 M5 复用的公共接口和计量交接材料。
 
-交接至少包含接口版本、输入输出、材料生成与消费、调用示例、失败语义、阶段计数和核验报告。
-
-只有论文条件、正确性、轮数、安全边界和通信核验均完成，才能将候选升级为精确基线身份。既有 C 级标签保持不变。
+交接资产见 [M2→III CmpAgg reuse handoff](docs/handoffs/M2_PROTOCOL_I_TO_III_CMPAGG_REUSE_HANDOFF_2026-09-24.md)
+及其 [Protocol III new-chat prompt](docs/handoffs/PROTOCOL_III_CMPAGG_REUSE_NEW_CHAT_PROMPT_2026-09-24.md)。
 
 ### M3：Protocol III 模块化三轮基线
 
@@ -588,10 +582,16 @@ M3 继续作为 M5 的实现基础、正确性对照和压缩前基线，不重�
 
 ### M5：Protocol III 精确两轮核心与通信核验
 
+状态：**IN PROGRESS / 正在进行**。
+
+当前目标为 Protocol III two-round path：shared clique CmpAgg / GRank → DPF
+routing → two-round composition。M5 复用现有 uCMP、DCF、CmpAgg Gen/Eval、
+priority-key semantics 与 rank-share contract，不重新实现第二份 ranking core。
+
 前置条件：
 
 - M3 三轮基线及其验收记录稳定；
-- M2 精确核心完成通信核验，所需公共接口完成交接。
+- M2 已完成的公共 CmpAgg/rank-share 契约及 handoff 资产可复用。
 
 允许提前进行域表示、非零编码、消息依赖和失败用例设计；依赖未冻结接口的核心实现与正式验收遵循上述顺序。
 
@@ -721,14 +721,14 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 
 ## 9. 当前已确认状态
 
-截至本次计划修订，已合入主线的状态为：
+当前项目状态为：
 
 - M0、M1/M1.1 已完成，冻结基线继续保留。
 - M1 score、tie rule、oracle、输入分布和基础 metrics 已冻结。
-- M2 已完成 C 级 Protocol I 工程基线，当前核心四轮、raw-score 到 mask 共八轮。
-- M2 精确三轮核心及相关 public masked-list 契约尚未在既有关闭记录中完成。
+- M2：**COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1，Protocol I PR 已合并。
+- M2 的 `AUTHOR_EXACT = NOT_PROVEN` 是保留的证据边界，不是 M2 工程里程碑阻塞项。
 - M3 三轮模块化核心与 raw-score 五轮扩展已完成整改并冻结。
-- M5 精确两轮核心及其通信核验是后续目标。
+- M5：**IN PROGRESS / 正在进行**；目标是 shared clique CmpAgg / GRank → DPF routing → two-round composition，并复用既有 ranking core。
 - VFSS 已有 DCF、DPF、CmpAgg、通信、两遍 shuffle 和独立进程测试基础。
 - M3 已有分方 report 与结构化 MetricsRecord 汇总。
 - 完整可信的在线 PRG 计数及正式 LAN/WAN 性能测量仍需补齐。
@@ -736,13 +736,13 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 - BB90+DCF 两种组合尚不能视为已有完整实现。
 - M4 CipherGPT 已从本轮实施与性能范围取消。
 
-团队未来 gated 责任归属（当前不得执行 strict G1、官方 G2、G3 或 M5 runtime）为：
+当前责任归属为：
 
-- 角色 A（搭档）：未来 gated 负责 strict Protocol I G1、官方 G2 与 G3；当前仅可进行 NON-EXACT 实验、证据准备和允许的 design-only 工作。
-- 角色 B（你）：当前负责计划修订和 M5 design-only 准备；M5 runtime 是 strict M2 G3 后的 future gated 责任。
+- 角色 A（搭档）：维护 Protocol I 已完成资产并参与 M5 的 CmpAgg/rank-share 复用评审。
+- 角色 B（你）：推进 M5 Protocol III two-round path。
 - 双方：交叉评审公共接口、语义、轮数与成本证据；后续分工按更新后的详细计划执行。
 
-上述安排仅保留责任归属，不表示 strict 工作已解锁或当前可执行。主线状态只随代码、测试和验收证据更新。
+上述安排仅描述当前工作分工；历史 strict-exact 证据记录不被本次状态更新改写。
 
 ## 10. 历史实现与验收记录
 

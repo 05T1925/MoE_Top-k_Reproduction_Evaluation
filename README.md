@@ -2,7 +2,7 @@
 
 本仓库以 **VFSS** 为唯一活动实现框架，建立统一语义、可复现、可横向比较的安全 Top-K 实验环境。
 
-当前已完成 Protocol I 四轮核心工程基线、Protocol III 三轮模块化核心。下一阶段先完成 Protocol I 论文精确三轮核心及通信核验，再基于交接接口完成 Protocol III 论文精确两轮核心及通信核验，随后依次完成 AAV86、BB90+DCF 两条升级路线及完整性能测试。
+M2 Protocol I 已完成当前工程验收；当前活动里程碑为 M5 Protocol III two-round path，之后依次完成 AAV86、BB90+DCF 两条升级路线及完整性能测试。
 
 M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参考，不作为后续阶段的前置条件。
 
@@ -13,10 +13,10 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 | M0 | 已完成 | 远端仓库及冻结基线已建立 |
 | M1/M1.1 | 已完成 | score、tie rule、oracle、基础适配、metrics 和 CTest 入口已冻结 |
 | M2 工程基线 | 已完成并合入 main | Protocol I 四轮核心；raw-score 到原顺序 mask 共八轮 |
-| M2 精确核心 | 当前推进目标 | 论文三轮核心、通信核验及公共接口交接尚需完成 |
+| M2 | 已完成 | three-round C-INSTANTIATION implemented；independent three-round review PASS；online logical communication matches Theorem 4.1；Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` |
 | M3 | 已完成并冻结 | priority-key 三轮入口，以及 raw-score 五轮扩展 |
 | M4 | 已取消 | 不实施 CipherGPT，不安排其性能实验 |
-| M5 | 后续目标 | Protocol III 论文两轮核心及通信核验 |
+| M5 | 正在进行 | shared clique CmpAgg / GRank → DPF routing → two-round composition；复用既有 ranking core |
 | M6A | 后续目标 | I+AAV86、III+AAV86 实现及完整性能验收 |
 | M6B | 后续目标 | I+BB90+DCF、III+BB90+DCF 实现及完整性能验收 |
 | M7 | 后续目标 | 六种方案统一汇总与报告 |
@@ -31,9 +31,8 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 
 需要明确：
 
-- M2.16 可行性与泄露审计已随 `f800f96` 合入 main，但没有实现 paper-exact 原语。
-- 该审计记录的缺口是：论文要求的同置换 public `pi(x)+r`，以及与后续 GRank 材料关联的秘密掩码，在当时 VFSS PS 接口中尚无完整可审计实现。
-- Protocol I 三轮核心、沿用现有适配器时的七轮总路径仍是候选目标，不能反写成既有能力。
+- M2 的完成边界为当前工程验收，不是作者未公开实现的逐转录复现；`AUTHOR_EXACT = NOT_PROVEN`。
+- M5 复用 uCMP、DCF、CmpAgg Gen/Eval、priority-key semantics 与 rank-share contract，不建立第二份 ranking core。
 - M3 已在 `main@bb0d0e8` 完成整改，不再是“可开始”的待实现阶段。
 - M3 三轮和五轮入口保留为 M5 的正确性及开销对照，不通过改名升级为论文两轮实现。
 - `VFSS/` 已包含 M1、M2、M3 的活动实现；`VFSS-baseline/` 继续保持冻结。
@@ -42,10 +41,8 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 ## 后续路线
 
 ```text
-M2 Protocol I 精确三轮核心
-  → 通信测量及差异解释
-  → 公共接口交接
-  → M5 Protocol III 精确两轮核心
+M2 Protocol I：COMPLETED
+  → M5 Protocol III two-round path：IN PROGRESS
   → 通信测量及差异解释
   → 基础接口交接
   → M6A AAV86 两种升级实现及完整性能验收
@@ -137,6 +134,8 @@ BB90 迭代参数按采用算法单独定义。
 - [Protocol III 模块化三轮设计](docs/decisions/PROTOCOL_III_MODULAR_3ROUND_DESIGN.md)
 - [M3 复检整改关闭记录](docs/reproduction/M3_REVIEW_CLOSEOUT_UBUNTU_2026-09-10.md)
 - [M3 Ubuntu 环境基线](docs/reproduction/M3_ENV_BASELINE_UBUNTU_2026-09-07.md)
+- [M2→Protocol III CmpAgg reuse handoff](docs/handoffs/M2_PROTOCOL_I_TO_III_CMPAGG_REUSE_HANDOFF_2026-09-24.md)
+- [Protocol III CmpAgg reuse new-chat prompt](docs/handoffs/PROTOCOL_III_CMPAGG_REUSE_NEW_CHAT_PROMPT_2026-09-24.md)
 
 ### 历史路线与本地资料
 
@@ -164,8 +163,8 @@ docs/                 计划、决策、来源与验收记录
 
 ## 当前协作起点
 
-- **角色 A（搭档）**：推进 Protocol I 精确三轮核心、测试、通信核验及公共接口交接。
-- **角色 B（Protocol III 负责人）**：修订计划与分工，准备 M5 设计；交接完成后推进 Protocol III 精确两轮核心及通信核验。
+- **角色 A（搭档）**：维护 Protocol I 已完成资产，并评审 M5 的 CmpAgg/rank-share 复用。
+- **角色 B（Protocol III 负责人）**：推进 M5 Protocol III two-round path。
 - **双方**：交叉复跑、维护公共契约，随后分别推进两条协议路线的 AAV86 和 BB90+DCF 升级。
 
 开始工作前：
