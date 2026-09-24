@@ -23,6 +23,9 @@ struct ProtocolIPermuteSharePoMaterial {
 struct ProtocolIPermuteShareDoMaterial {
   ProtocolIPermuteShareConfig config{};
   std::vector<std::vector<ProtocolIBlock192>> a, b;
+  // Chase w is input-independent and is sampled during preprocessing.  The
+  // online API only consumes it; it does not generate fresh protocol state.
+  std::vector<ProtocolIBlock192> w;
   ProtocolIPermuteShareCounters counters{}; bool consumed = false;
   ProtocolIPermuteShareDoMaterial() = default;
   ProtocolIPermuteShareDoMaterial(const ProtocolIPermuteShareDoMaterial&) = delete;

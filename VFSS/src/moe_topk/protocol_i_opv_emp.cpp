@@ -17,6 +17,8 @@ namespace {
 constexpr std::uint32_t kOpvProtocolId = UINT32_C(0x4f505631);  // OPV1
 constexpr std::string_view kChildDomain = "M2-OPV-CHILD-v1";
 constexpr std::string_view kLeafDomain = "M2-OPV-LEAF-v1";
+static_assert(sizeof(ProtocolISeed128) == 16);
+static_assert(sizeof(ProtocolIBlock192) == 24);
 
 [[noreturn]] void fail(const char* message) { throw std::runtime_error(message); }
 

@@ -12,6 +12,10 @@ namespace moe_topk {
 // C: EMP-backed M2.9 OPV conformance interface; this is not a shuffle API.
 using ProtocolISeed128 = std::array<std::uint8_t, 16>;
 
+// C-INSTANTIATION storage for the current Chase path.  Its logical additive
+// group is exactly (Z_(2^64))^3: each lane wraps independently, serialization
+// preserves the three lanes, and permutation only changes record positions.
+// This does not claim support for an arbitrary ell-prime group.
 struct ProtocolIBlock192 {
   std::uint64_t word0 = 0;
   std::uint64_t word1 = 0;
@@ -21,11 +25,23 @@ struct ProtocolIBlock192 {
   }
 };
 
+inline constexpr ProtocolIBlock192 protocol_i_record_add(
+    ProtocolIBlock192 left, const ProtocolIBlock192& right) {
+  return {left.word0 + right.word0, left.word1 + right.word1,
+          left.word2 + right.word2};
+}
+
+inline constexpr ProtocolIBlock192 protocol_i_record_sub(
+    ProtocolIBlock192 left, const ProtocolIBlock192& right) {
+  return {left.word0 - right.word0, left.word1 - right.word1,
+          left.word2 - right.word2};
+}
+
 struct ProtocolIOpvConfig {
   std::uint64_t session;
   std::uint64_t fingerprint;
   std::uint64_t material_id;
-  std::uint32_t vector_length;  // T
+  std::uint32_t vector_length;  // T: power of two, zero-based/MSB-first tree.
   std::uint32_t batch_count;
   int timeout_ms;
 };

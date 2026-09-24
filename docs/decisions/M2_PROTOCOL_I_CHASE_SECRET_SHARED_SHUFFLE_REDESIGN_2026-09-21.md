@@ -2,7 +2,8 @@
 
 Date: 2026-09-21
 
-Status: **ACTIVE R0 MIGRATION DECISION; IMPLEMENTATION NOT YET MIGRATED.**
+Status: **C1 CHASE CONFORMANCE COMPLETE; EXPERIMENTAL THREE-ROUND
+C-INSTANTIATION IMPLEMENTED; AUTHOR-EXACT C3 REMAINS BLOCKED.**
 
 This decision stops the independent Dealer-DPF Candidate-B route for Protocol
 I. The active route follows Chase, Ghosh, and Poburinnaya's Secret-Shared
@@ -303,12 +304,13 @@ collusion: excluded
   `pi`; P2 is absent.
 - `pi`, project compilation: P2 learning both is C-INSTANTIATION only and has
   no current author-exact claim.
-- Agarwal `r`: no individual P0, P1, or P2 may know full `r`.
-- P2 knowing full `r` remains a deliberately non-exact functional baseline,
-  not an accepted target party view.
+- Agarwal's conference wording does not resolve whether any single party
+  includes the inputless dealer during generation; this is `D-UNRESOLVED`.
+- P2 knowing full `r` remains an explicit project C-INSTANTIATION assumption,
+  not an author-exact party-view claim.
 
 Inputlessness and online disconnection do not make P2's full-`r` or full-`pi`
-knowledge compliant with the cited functionalities.
+knowledge author-exact evidence.
 
 ## Implementation stages
 
@@ -325,36 +327,85 @@ knowledge compliant with the cited functionalities.
 | R8 | Frozen-oracle differential and independent P2/P0/P1 E2E. |
 | R9 | Account rounds, bytes, OT/OPV/ST, PRG, DCF and wall-clock; unknowns stay `NOT_MEASURED`. |
 
+## C1/C3 checkpoint (2026-09-21)
+
+On `feat/m2-chase-c1-c3` at base `5d3f36a5bdf5be821ba86bcd959e4c1b5adae9b1`,
+R1--R5 conformance is implemented and the 15-test M2 matrix passes. Independent
+clear oracles establish `pi(x)[i] = x[pi[i]]`, composition `pi1(pi0(x))`,
+componentwise arithmetic in `(Z_(2^64))^3`, and direct forward-shuffle
+correctness before the separate reverse adapter is invoked. The current Beneš
+implementation deliberately rejects shapes where `log2(N) % log2(T) != 0`.
+
+Fresh searches of the local Papers tree, all Git refs, the authors' publication
+pages, MIT's final-version deposit, ACM metadata, IACR ePrint indexing, and
+public code results found only the same 15-page conference version and no
+author artifact or concrete modified-shuffle transcript. With the verified
+Chase transcript, public `y=pi(x)+r` requires a post-shuffle opening before both
+parties can evaluate GRank. The repository's centralized DCF KeyGen requires
+the complete mask difference and supplies no distributed/blind replacement.
+The result is `PATH_C = STILL_BLOCKED`; no three-round production path is
+authorized by this checkpoint.
+
+## Experimental correlated-parallel checkpoint (2026-09-23)
+
+A senior-student construction and independent Python reference motivated an
+isolated `C-INSTANTIATION`: P2 samples one hidden final permutation `Pi` and
+independent factors `sigma0,sigma1`, then distributes
+`tau0=Pi∘sigma1^{-1}` and `tau1=Pi∘sigma0^{-1}` with correlated additive
+masks. P0/P1 simultaneously exchange their independently permuted input
+shares in R1, simultaneously open the same masked shuffled list in R2, locally
+run the existing CmpAgg material bound to the same key-mask projection, and
+open rank shares in R3. P2 is inputless and exits before online input, but
+knows full `Pi` and `r` while generating the packages.
+
+The isolated C++ implementation and independent-process E2E establish
+functional correctness, three causal rounds, stable priority-key handling,
+and logical costs `4n(ell'+p)+2n ceil(log n)` online and
+`6n(ell'+p)+4n ceil(log n)` non-DCF offline. Exact cost agreement is not
+evidence of the omitted Agarwal transcript. A formal simulation proof and a
+durable cross-process material-consumption store remain review obligations.
+
+## Online communication benchmark (2026-09-24)
+
+Real independent-process measurements over `n=2,4,8,16,20,32,64,128`, with
+five fresh formal runs per size, found logical delta `0` and logical ratio
+`1.0` against Theorem 4.1 for identical `(n,ell',p)` parameters. Application
+wire bytes were measured separately and exceed the logical formula only by the
+current 48-byte frames, fixed 192-bit record storage, and rank-byte packing.
+See the
+[online communication record](../reproduction/M2_PROTOCOL_I_3ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-24.md).
+This cost match is C-INSTANTIATION evidence, not author-exact transcript proof;
+author-exact remains **NO / D-UNRESOLVED** and strict G1/G2/G3 remain blocked.
+
 ## Exactness and unresolved items
 
 | Identity or gate | Status |
 | --- | --- |
 | Dealer-DPF Candidate B | **STOPPED / SUPERSEDED** |
-| Chase base-stack reuse | **READY for staged conformance work** |
+| Chase base-stack reuse | **C1 CONFORMANCE COMPLETE (NON-EXACT)** |
 | P2-full-`r` four-round path | **FUNCTIONAL C-BASELINE ONLY** |
+| Correlated-parallel three-round path | **EXPERIMENTAL C-INSTANTIATION IMPLEMENTED** |
 | Any-party-private `r` plus r-bound GRank keys | **BLOCKED** |
-| Theorem 4.1 three rounds | **BLOCKED** |
+| Author-exact Theorem 4.1 transcript | **BLOCKED** |
 | Strict G1/G2/G3 | **BLOCKED** |
 
 Unresolved:
 
 1. Agarwal full-version adaptation transcript is absent.
-2. No proved fused same-permutation public list is available by the end of R2.
-3. Knowledge-preserving P2 correlation compilation lacks a distribution/view
-   proof.
+2. The correlated-parallel construction has correctness and single-party
+   sanity tests, but not a complete simulation proof.
+3. Durable cross-process/restart prevention of material reuse remains the
+   material-pool owner's responsibility.
 4. Distributed/blind GRank FSS KeyGen for hidden `r=r0+r1` is absent.
-5. Typed group boundaries, general Beneš shapes and standalone forward-shuffle
-   evidence remain to be completed.
+5. General Beneš shapes remain unsupported; the current restricted shape is
+   fail-closed and covered by rejection tests.
 6. Reverse original-order mask routing remains a separately counted project
    adapter.
-7. New-route performance is `NOT_MEASURED`.
+7. New-route application-level online communication is measured; runtime,
+   LAN/WAN, and full performance remain `NOT_MEASURED`.
 
-Current implementation branch: `docs/m2-chase-shuffle-migration`. No branch was
-created or switched by this documentation patch.
+Current implementation branch: `feat/m2-chase-c1-c3`.
 
-`READY_FOR_R0_REVIEW = YES`. The accompanying overview/gate/plan changes pass
-`git diff --check`; no VFSS source or frozen baseline file is modified.
-
-`STOP_REASON = NONE` for R0 review. R6 remains blocked on both the fused
-three-round causal construction and any-party-private `r` with r-bound GRank
-key generation.
+`READY_FOR_ONE_FINAL_INDEPENDENT_REVIEW = YES` for C1 and the experimental
+three-round C-INSTANTIATION. Author-exact C3 remains blocked on the missing
+transcript and unresolved dealer/full-`r` semantics.

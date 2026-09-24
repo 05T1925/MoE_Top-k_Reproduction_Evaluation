@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-21
+更新日期：2026-09-24
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -13,8 +13,8 @@ paper-aligned experimental reproduction READY，且不能进入 G2、G3 或解�
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
 OPV -> Share Translation -> Beneš -> Permute+Share -> two-pass
-SecretSharedShuffle，并把具体 P2 preprocessing 与 Agarwal public-mask adapter
-保持为准确标记的 C-INSTANTIATION。详见
+SecretSharedShuffle 作为 C1 conformance baseline；隔离的 correlated-parallel
+three-round candidate 保持为准确标记的 C-INSTANTIATION。详见
 [M2 Protocol I Chase redesign](decisions/M2_PROTOCOL_I_CHASE_SECRET_SHARED_SHUFFLE_REDESIGN_2026-09-21.md)。
 
 本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B BB90+DCF。
@@ -402,9 +402,9 @@ CTest 为 4/4 通过，详见：
 6. **R5 SecretSharedShuffle**：验证 two-pass forward shuffle，以及 P0/P1
    分别选择并保留 `pi0/pi1`、无单方获得 composed permutation 的 Chase view。
 7. **R6 Agarwal adapter**：产生 same-`pi` secret shares 与 public
-   `pi(key)+r`。完整 `r` 必须对 P0/P1/P2 任一单方未知。P2-full-`r` 四轮路径
-   仅是 functional C-baseline；knowledge-preserving 路径仍缺 distributed/blind
-   r-bound GRank KeyGen。
+   `pi(key)+r`。conference version 是否禁止 inputless P2 在生成期知道完整
+   `r` 为 `D-UNRESOLVED`；当前 C-INSTANTIATION 明确允许 P2 知道完整 `r`，
+   knowledge-preserving 路径仍缺 distributed/blind r-bound GRank KeyGen。
 8. **R7 integration**：接回 uCMP/DCF、CmpAgg、rank open 和 local routing；
    Protocol I shuffle 禁止 DPF routing。
 9. **R8 E2E**：frozen-oracle differential 和独立 P2/P0/P1 process E2E。
@@ -413,9 +413,9 @@ CTest 为 4/4 通过，详见：
 
 CHASE-DIRECT 中 P0/P1 分别选择 permutation，P2 不在其 party view 中。把
 input-independent work 移入 P2 是项目 preprocessing C-INSTANTIATION；
-input independence 本身不授权 P2 知道两方 permutation 或完整 `r`。
+P2 知道两方 permutation 或完整 `r` 不构成 author-exact 证据。
 
-当前严格 causal transcript 为：
+已验证的 serial Chase baseline transcript 为：
 
 ```text
 offline direct: P0/P1 retain pi0/pi1 and run permutation-dependent OPV/ST
@@ -427,9 +427,17 @@ R3: exchange q_b=z_b+r_b, reconstruct public y=pi(key)+r
 R4: open shuffled rank shares; routing is local
 ```
 
-因此保守路径是四个核心因果轮次。三轮目标保持 **BLOCKED**，直到获得
-Agarwal full-version transcript 或严格证明 fused adapter。P2-full-`r` 路径即使
-功能正确，也不能解除 strict G1。
+隔离的 correlated-parallel C-INSTANTIATION 以同一个 `Pi` 的两组相关分解
+并行处理 `x0/x1`：R1 双向得到 `Pi(x)` 的秘密分享，R2 双向得到公开
+`Pi(x)+r`，本地执行 CmpAgg，R3 打开 rank shares。该候选已通过 conformance
+和独立 P2/P0/P1 E2E；P2 生成期知道完整 `Pi/r`。因此实验性三轮候选已实现，
+但 Agarwal author-exact transcript、严格 G1/G2/G3 与 dealer/full-`r` 语义仍
+保持 **BLOCKED / D-UNRESOLVED**。
+
+- three-round C-INSTANTIATION online logical communication: **MATCH** Agarwal
+  Theorem 4.1 for identical `(n, ell', p)` parameters;
+- benchmark evidence:
+  [2026-09-24 online communication record](reproduction/M2_PROTOCOL_I_3ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-24.md).
 
 #### M2 通信阶段
 
