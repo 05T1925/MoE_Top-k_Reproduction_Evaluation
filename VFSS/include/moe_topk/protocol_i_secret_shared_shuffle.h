@@ -8,6 +8,10 @@
 
 namespace moe_topk {
 
+// The first two one-shot materials implement CHASE-DIRECT forward
+// SecretSharedShuffle.  The last two are a separate C-INSTANTIATION reverse
+// carrier adapter; reverse success is not evidence for forward correctness.
+//
 // Project-extension composition of four one-shot Permute+Share materials.
 // A material belongs to exactly one online party and never contains the other
 // party's permutation or a jointly-owned state object.

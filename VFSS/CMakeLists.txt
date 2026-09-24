@@ -283,7 +283,7 @@ if(MOE_TOPK_ENABLE_EMP_OT)
         src/moe_topk/protocol_i_secret_shared_shuffle.cpp
         src/moe_topk/protocol_i_pipeline.cpp)
     target_include_directories(moe_topk_share_translation_backend PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include)
-    target_link_libraries(moe_topk_share_translation_backend PRIVATE moe_topk_emp_ot_backend FSS)
+    target_link_libraries(moe_topk_share_translation_backend PRIVATE moe_topk_emp_ot_backend FSS OpenSSL::Crypto)
     add_executable(moe_topk_m2_opv_conformance_test tests/moe_topk/protocol_i_opv_conformance_test.cpp)
     target_include_directories(moe_topk_m2_opv_conformance_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(moe_topk_m2_opv_conformance_test PRIVATE moe_topk_emp_ot_backend)
