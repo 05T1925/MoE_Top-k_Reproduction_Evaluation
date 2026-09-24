@@ -275,6 +275,16 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
             package.node_mask_shares[index]);
   }
 
+  // Consume the one-shot comparison material before any online I/O.
+  // A failed exchange must not leave masks/DCF keys available for replay.
+  std::vector<ProtocolIUcmpPartyMaterial> edge_materials;
+  edge_materials.reserve(package.edge_materials.size());
+  for (auto& edge : package.edge_materials) {
+    edge_materials.push_back(std::move(edge.material));
+  }
+  package.node_mask_shares.clear();
+  package.edge_materials.clear();
+
   ProtocolIFrameConfig frame_config{
       config.session,
       config.fingerprint,
@@ -319,19 +329,6 @@ ProtocolIIIGrankOutput protocol_iii_grank_party(
          peer_masked_keys[index]) &
         comparison_ring_mask;
   }
-
-  // CmpAgg accepts only the underlying M2 party materials. Move them out in
-  // the package's validated lexicographic edge order.
-  std::vector<ProtocolIUcmpPartyMaterial> edge_materials;
-  edge_materials.reserve(package.edge_materials.size());
-
-  for (auto& edge : package.edge_materials) {
-    edge_materials.push_back(std::move(edge.material));
-  }
-
-  // Both the masks and edge keys are one-shot material.
-  package.node_mask_shares.clear();
-  package.edge_materials.clear();
 
   const auto logical_rank_shares =
       protocol_i_cmpagg_eval_party(

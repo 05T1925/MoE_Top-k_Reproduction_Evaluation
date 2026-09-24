@@ -1,6 +1,7 @@
 // TEST_ONLY: Dealer, Party 0 and Party 1 independent-process harness for
 // the M3 Protocol III modular three-round engineering baseline.
 
+#include <moe_topk/protocol_iii_offline_material_wire.h>
 #include <moe_topk/masked_mul_adapter.h>
 #include <moe_topk/protocol_i_party_package.h>
 #include <moe_topk/protocol_i_priority_key.h>
@@ -1014,6 +1015,11 @@ OfflineBundle deserialize_offline_bundle(
   bundle.combine_material.party =
       static_cast<std::uint8_t>(expected_party);
 
+  require(bytes.size() - offset ==
+              protocol_iii_offline_key_tail_bytes(
+                  grank.logical_n, test.k, grank.rank_bits),
+          "offline bundle key-tail length");
+
   char* cursor =
       reinterpret_cast<char*>(
           const_cast<std::uint8_t*>(
@@ -1617,6 +1623,16 @@ void verify_reports(
     require(metrics[11] == expected_cells, "multiplication calls");
     require(metrics[12] == expected_cells * 2U, "opened values");
     require(metrics[13] == 3U, "online round count");
+    // One 48-byte framed message is exchanged in each modular phase.
+    const auto rank_wire = 48U + 8U * logical_n;
+    const auto routing_wire = 48U + 8U * logical_n;
+    const auto combine_wire = 48U + 16U * expected_cells;
+    require(metrics[1] == rank_wire && metrics[2] == rank_wire,
+            "GRank wire accounting");
+    require(metrics[5] == routing_wire && metrics[6] == routing_wire,
+            "routing wire accounting");
+    require(metrics[9] == combine_wire && metrics[10] == combine_wire,
+            "combine wire accounting");
   }
 
   require(
@@ -1805,10 +1821,68 @@ void run_case(
 
   verify_reports(test, report0, report1);
 
+  if (test.scores.size() == 5U && test.k == 3U) {
+    std::cout << "M5-C modular baseline n=5 k=3"
+              << " offline_total_bytes="
+              << report0.metrics[0] + report1.metrics[0]
+              << " r1_wire_total_bytes="
+              << report0.metrics[1] + report1.metrics[1]
+              << " r2_wire_total_bytes="
+              << report0.metrics[5] + report1.metrics[5]
+              << " r3_wire_total_bytes="
+              << report0.metrics[9] + report1.metrics[9]
+              << '\n';
+  }
+
   descriptors.close_all();
 
   children.wait_ok(party0);
   children.wait_ok(party1);
+}
+
+void test_offline_bundle_decode_rejection() {
+  const TestCase test{
+      {7U, 7U, 3U}, 2U,
+      UINT64_C(0x35c1), UINT64_C(0x45c1), UINT64_C(0x55c1)};
+  seed_fss(test.seed);
+  auto bundles = generate_offline_bundles(test);
+  const auto encoded = serialize_offline_bundle(test, 0, bundles.first);
+  const auto decoded = deserialize_offline_bundle(test, 0, encoded);
+  require(decoded.routing_material.dpf_keys.size() == test.scores.size(),
+          "offline bundle roundtrip DPF count");
+  require(decoded.combine_material.multiplication_materials.size() ==
+              test.scores.size() * test.k,
+          "offline bundle roundtrip combine count");
+
+  auto rejects = [&](Bytes bytes, const char* message) {
+    try {
+      (void)deserialize_offline_bundle(test, 0, bytes);
+    } catch (const std::exception&) {
+      return;
+    }
+    throw std::runtime_error(message);
+  };
+
+  auto truncated = encoded;
+  truncated.pop_back();
+  rejects(std::move(truncated), "truncated offline key tail accepted");
+  auto extra = encoded;
+  extra.push_back(0);
+  rejects(std::move(extra), "extra offline key tail accepted");
+  auto wrong_version = encoded;
+  wrong_version[4] = 2U;
+  rejects(std::move(wrong_version), "wrong offline version accepted");
+  auto wrong_party = encoded;
+  wrong_party[5] = 1U;
+  rejects(std::move(wrong_party), "party-swapped bundle accepted");
+  auto wrong_session = encoded;
+  wrong_session[8] ^= 1U;
+  rejects(std::move(wrong_session), "wrong offline session accepted");
+  auto wrong_width = encoded;
+  wrong_width[6] ^= 1U;
+  rejects(std::move(wrong_width), "wrong DPF width accepted");
+  rejects(Bytes(encoded.begin(), encoded.begin() + 8),
+          "truncated offline header accepted");
 }
 
 }  // namespace
@@ -1867,7 +1941,21 @@ int main(int argc, char** argv) {
     const auto self =
         current_executable(argv[0]);
 
+    test_offline_bundle_decode_rejection();
+
     std::vector<TestCase> cases{
+        {{9U, 3U},
+         1U,
+         UINT64_C(0x35c2),
+         UINT64_C(0x45c2),
+         UINT64_C(0x55c2)},
+
+        {{7U, 7U, 7U, 7U},
+         2U,
+         UINT64_C(0x35c4),
+         UINT64_C(0x45c4),
+         UINT64_C(0x55c4)},
+
         {{7U},
          1U,
          UINT64_C(0x3501),

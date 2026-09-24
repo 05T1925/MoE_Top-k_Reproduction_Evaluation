@@ -45,6 +45,10 @@ PRIVATE
     src/moe_topk/protocol_i_parallel_shuffle.cpp
     src/moe_topk/protocol_iii_grank.cpp
     src/moe_topk/protocol_iii_dpf_routing.cpp
+    src/moe_topk/protocol_iii_field.cpp
+    src/moe_topk/protocol_iii_field_payload.cpp
+    src/moe_topk/protocol_iii_field_dpf.cpp
+    src/moe_topk/protocol_iii_field_mul.cpp
     src/moe_topk/masked_mul_adapter.cpp
     src/moe_topk/protocol_iii_secure_combine.cpp
     src/moe_topk/protocol_iii_raw_score_pipeline.cpp
@@ -347,6 +351,40 @@ target_link_libraries(
     ${PROJECT_NAME}
 )
 
+# M5-B: real shared CmpAgg output directly feeds existing DPF routing.
+add_executable(
+    moe_topk_m5b_cmpagg_to_dpf_routing_test
+    tests/moe_topk/protocol_iii_cmpagg_to_dpf_routing_test.cpp
+)
+target_link_libraries(
+    moe_topk_m5b_cmpagg_to_dpf_routing_test
+    PRIVATE
+    ${PROJECT_NAME}
+)
+
+# M5-C: same deterministic CmpAgg fixture, extended through secure combine.
+add_executable(
+    moe_topk_m5c_modular_routing_closeout_test
+    tests/moe_topk/protocol_iii_cmpagg_to_dpf_routing_test.cpp
+)
+target_compile_definitions(
+    moe_topk_m5c_modular_routing_closeout_test
+    PRIVATE MOE_TOPK_M5C_FULL_CHAIN=1
+)
+target_link_libraries(
+    moe_topk_m5c_modular_routing_closeout_test
+    PRIVATE ${PROJECT_NAME}
+)
+
+# M5-D: isolated field arithmetic, payload encoding, and field-output DPF.
+foreach(m5d_test IN ITEMS field field_payload field_mul field_dpf)
+    add_executable(
+        moe_topk_m5d_${m5d_test}_test
+        tests/moe_topk/protocol_iii_${m5d_test}_test.cpp
+    )
+    target_link_libraries(moe_topk_m5d_${m5d_test}_test PRIVATE ${PROJECT_NAME})
+endforeach()
+
 # ===== masked_mul_adapter 测试 =====
 add_executable(
     moe_topk_masked_mul_adapter_test
@@ -570,6 +608,14 @@ if(BUILD_TESTING)
     )
     add_test(NAME moe_topk_m3_grank_test COMMAND moe_topk_m3_grank_test)
     add_test(NAME moe_topk_m3_dpf_routing_test COMMAND moe_topk_m3_dpf_routing_test)
+    add_test(NAME moe_topk_m5b_cmpagg_to_dpf_routing_test
+             COMMAND moe_topk_m5b_cmpagg_to_dpf_routing_test)
+    add_test(NAME moe_topk_m5c_modular_routing_closeout_test
+             COMMAND moe_topk_m5c_modular_routing_closeout_test)
+    foreach(m5d_test IN ITEMS field field_payload field_mul field_dpf)
+        add_test(NAME moe_topk_m5d_${m5d_test}_test
+                 COMMAND moe_topk_m5d_${m5d_test}_test)
+    endforeach()
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
     add_test(

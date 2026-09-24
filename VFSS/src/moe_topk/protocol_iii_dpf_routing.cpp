@@ -133,6 +133,10 @@ void validate_material(
     const ProtocolIIIDpfRoutingConfig& config,
     const ProtocolIIIDpfRoutingPartyMaterial& material) {
   require(
+      !material.started,
+      "Protocol III DPF routing material already started");
+
+  require(
       material.session == config.session,
       "Protocol III DPF routing material session binding");
 
@@ -315,6 +319,8 @@ protocol_iii_dpf_routing_party(
 
   std::vector<std::uint8_t> peer_payload;
 
+  // From this point a masked rank may be sent or received.
+  material.started = true;
   if (config.party == 0U) {
     channel.send(encoded_local);
     peer_payload = channel.receive();

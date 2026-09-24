@@ -1,3 +1,4 @@
+#include <moe_topk/protocol_iii_offline_material_wire.h>
 #include <moe_topk/masked_mul_adapter.h>
 #include <moe_topk/protocol_i_party_package.h>
 #include <moe_topk/protocol_i_ucmp.h>
@@ -422,6 +423,12 @@ ProtocolIIIRawScorePipelineMaterial deserialize_offline_material(
   material.combine_material.logical_n = config.grank.logical_n;
   material.combine_material.k = config.grank.k;
   material.combine_material.party = config.grank.party;
+
+  require(bytes.size() - offset ==
+              protocol_iii_offline_key_tail_bytes(
+                  config.grank.logical_n, config.grank.k,
+                  config.grank.rank_bits),
+          "offline material key-tail length");
 
   char* cursor = reinterpret_cast<char*>(
       const_cast<std::uint8_t*>(bytes.data() + offset));

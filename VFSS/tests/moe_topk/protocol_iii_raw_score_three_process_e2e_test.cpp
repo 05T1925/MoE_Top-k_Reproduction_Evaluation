@@ -2,6 +2,7 @@
 // the complete M3 raw-score path: two adapter rounds followed by the
 // Protocol III modular three-round core.
 
+#include <moe_topk/protocol_iii_offline_material_wire.h>
 #include <moe_topk/masked_mul_adapter.h>
 #include <moe_topk/protocol_i_party_package.h>
 #include <moe_topk/protocol_i_ucmp.h>
@@ -1281,6 +1282,11 @@ OfflineBundle deserialize_offline_bundle(
   bundle.combine_material.k = test.k;
   bundle.combine_material.party =
       static_cast<std::uint8_t>(expected_party);
+
+  require(bytes.size() - offset ==
+              protocol_iii_offline_key_tail_bytes(
+                  grank.logical_n, test.k, grank.rank_bits),
+          "offline bundle key-tail length");
 
   char* cursor =
       reinterpret_cast<char*>(

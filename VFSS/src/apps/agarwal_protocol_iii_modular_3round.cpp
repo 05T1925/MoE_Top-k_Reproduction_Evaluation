@@ -1,3 +1,4 @@
+#include <moe_topk/protocol_iii_offline_material_wire.h>
 #include <moe_topk/masked_mul_adapter.h>
 #include <moe_topk/protocol_i_party_package.h>
 #include <moe_topk/protocol_iii_secure_core.h>
@@ -606,6 +607,13 @@ deserialize_offline_material(
       config.grank.k;
 
   material.combine_material.party = party;
+
+  // The native FSS MemBuf reader is unbounded.
+  require(bytes.size() - offset ==
+              protocol_iii_offline_key_tail_bytes(
+                  config.grank.logical_n, config.grank.k,
+                  config.grank.rank_bits),
+          "offline material key-tail length");
 
   char* cursor =
       reinterpret_cast<char*>(
