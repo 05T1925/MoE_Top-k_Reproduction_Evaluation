@@ -41,6 +41,8 @@ PRIVATE
     src/moe_topk/protocol_i_transport.cpp
     src/moe_topk/protocol_i_party_package.cpp
     src/moe_topk/protocol_i_score_input.cpp
+    src/moe_topk/protocol_i_permutation.cpp
+    src/moe_topk/protocol_i_parallel_shuffle.cpp
     src/moe_topk/protocol_iii_grank.cpp
     src/moe_topk/protocol_iii_dpf_routing.cpp
     src/moe_topk/masked_mul_adapter.cpp
@@ -260,6 +262,10 @@ add_executable(moe_topk_m2_score_input_conformance_test tests/moe_topk/protocol_
 target_link_libraries(moe_topk_m2_score_input_conformance_test ${PROJECT_NAME})
 add_executable(moe_topk_m2_paper_core_alignment_test tests/moe_topk/protocol_i_paper_core_alignment_test.cpp)
 target_link_libraries(moe_topk_m2_paper_core_alignment_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_parallel_shuffle_conformance_test tests/moe_topk/protocol_i_parallel_shuffle_conformance_test.cpp)
+target_link_libraries(moe_topk_m2_parallel_shuffle_conformance_test ${PROJECT_NAME})
+add_executable(moe_topk_m2_parallel_shuffle_process_e2e_test tests/moe_topk/protocol_i_parallel_shuffle_three_process_e2e_test.cpp)
+target_link_libraries(moe_topk_m2_parallel_shuffle_process_e2e_test ${PROJECT_NAME})
 
 if(MOE_TOPK_ENABLE_EMP_OT)
     find_package(emp-tool 1.0 CONFIG REQUIRED)
@@ -612,6 +618,8 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m2_cmpagg_process_e2e_test COMMAND moe_topk_m2_cmpagg_process_e2e_test)
     add_test(NAME moe_topk_m2_score_input_conformance_test COMMAND moe_topk_m2_score_input_conformance_test)
     add_test(NAME moe_topk_m2_paper_core_alignment_test COMMAND moe_topk_m2_paper_core_alignment_test)
+    add_test(NAME moe_topk_m2_parallel_shuffle_conformance_test COMMAND moe_topk_m2_parallel_shuffle_conformance_test)
+    add_test(NAME moe_topk_m2_parallel_shuffle_process_e2e_test COMMAND moe_topk_m2_parallel_shuffle_process_e2e_test)
     if(MOE_TOPK_ENABLE_EMP_OT)
         add_test(NAME moe_topk_m2_chosen_ot_conformance_test COMMAND moe_topk_m2_chosen_ot_conformance_test)
         add_test(NAME moe_topk_m2_opv_conformance_test COMMAND moe_topk_m2_opv_conformance_test)

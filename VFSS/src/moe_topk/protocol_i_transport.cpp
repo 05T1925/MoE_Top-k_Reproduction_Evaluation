@@ -138,7 +138,10 @@ void ProtocolIFramedChannel::exact(void* data, std::size_t size, bool writing,
       }
       throw std::runtime_error("frame poll failed");
     }
-    if ((descriptor.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0) {
+    // A peer may close immediately after its final write. poll then legally
+    // reports POLLIN|POLLHUP while the final framed bytes remain readable.
+    if ((descriptor.revents & (POLLERR | POLLNVAL)) != 0 ||
+        ((descriptor.revents & POLLHUP) != 0 && (writing || (descriptor.revents & POLLIN) == 0))) {
       throw std::runtime_error("frame poll error");
     }
     const auto chunk = std::min(size, max_io_chunk_);
