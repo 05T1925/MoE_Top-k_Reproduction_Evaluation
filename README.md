@@ -16,12 +16,14 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 | M2 | 已完成 | three-round C-INSTANTIATION implemented；independent three-round review PASS；online logical communication matches Theorem 4.1；Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` |
 | M3 | 已完成并冻结 | priority-key 三轮入口，以及 raw-score 五轮扩展 |
 | M4 | 已取消 | 不实施 CipherGPT，不安排其性能实验 |
-| M5 | 正在进行 | M5-B–G 实现/回归完成；H1 通信数量级通过；H2 最终关闭 FAIL（F1/F2）；下一步 M5-FIX/G3 复跑 |
+| M5 | 正在进行 | M5-B–G 实现/回归完成；H1 通信数量级通过；H2 当时关闭 FAIL（F1/F2）；F1 本地实现/核验完成，F2/G3 待复跑 |
 | M6A | 后续目标 | I+AAV86、III+AAV86 实现及完整性能验收 |
 | M6B | 后续目标 | I+BB90+DCF、III+BB90+DCF 实现及完整性能验收 |
 | M7 | 后续目标 | 六种方案统一汇总与报告 |
 
-M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中按用户指定数量级门槛通过；实现/论文逻辑位比约 1.42–1.44，精确式差 `254n` bits。见 [H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。M5-H2 [独立评审](docs/reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，最终关闭 FAIL；F1 输入/输出适配及统一 mask 成本、F2 接收方 G3 复跑仍待处理。见 [暂定 M5→M6A 交接](docs/handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。M5 仍在进行；`AUTHOR_EXACT = NOT_PROVEN`。
+M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中按用户指定数量级门槛通过；实现/论文逻辑位比约 1.42–1.44，精确式差 `254n` bits。见 [H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。M5-H2 [独立评审](docs/reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，H2 当时关闭 FAIL（F1/F2）；F1 此后本地实现/核验已完成，F2 接收方 G3 复跑仍待处理。见 [暂定 M5→M6A 交接](docs/handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。M5 仍在进行；`AUTHOR_EXACT = NOT_PROVEN`。
+
+M5-FIX-F1 已新增安全 raw-score shares→原顺序 XOR Top-K mask 的四轮项目专用路径并完成本地差分、独立进程、成本及 sanitizer 核验；两轮 field Fselect/Fsort 核心未改变。该路径无需 secret field record，故不宣称通用 ring→field 或 field→bit 适配已完成。F1 尚未形成可 fetch 的冻结提交；F2/G3 接收方复跑仍未完成，M5 保持 IN PROGRESS。见 [F1 decision](docs/decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 与 [F1 evidence](docs/reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。
 
 已完成的工程实现为：
 
@@ -30,6 +32,7 @@ M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中按用户指定数量
 | `m2_protocol_i_raw_score_input_modular_8round_mask_output` | raw Q20.12 score shares | 4 | 8 |
 | `agarwal_protocol_iii_modular_3round` | padded priority-key shares | 3 | 3，不含 raw-score 适配 |
 | `moe_topk_protocol_iii_raw_score_modular_5round` | raw Q20.12 score shares | 3 | 5 |
+| `m5_fix_f1_raw_score_mask_4round` | raw signed Q20.12 score shares | 2（CmpAgg + ring-DPF mask specialization） | 4（输入适配 2 + 核心 2，C-INSTANTIATION） |
 
 需要明确：
 

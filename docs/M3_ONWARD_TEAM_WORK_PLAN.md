@@ -22,7 +22,9 @@ M3 是已完成前置基础，不重新安排实现。M4 CipherGPT 已取消，�
 
 M2 已完成 current engineering acceptance：three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1、Protocol I PR merged。`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界；dated strict-gate 记录属于历史，不阻塞当前 M5 runtime。
 
-M5-B–G 已在工作分支完成；M5-H1 通信按用户指定数量级门槛通过（n=2–128，Fselect/Fsort），但 Theorem 4.2 精确逻辑式仍差 `254n` bits。M5-H2 [独立评审](reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，M5 最终关闭 FAIL（F1/F2），仍为 IN PROGRESS。下一步为 M5-FIX 和接收方 G3 复跑；见 [暂定交接](handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。
+M5-B–G 已在工作分支完成；M5-H1 通信按用户指定数量级门槛通过（n=2–128，Fselect/Fsort），但 Theorem 4.2 精确逻辑式仍差 `254n` bits。M5-H2 [独立评审](reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，M5 当时最终关闭 FAIL（F1/F2），仍为 IN PROGRESS。F1 此后本地核验完成，下一步为冻结 revision 和接收方 G3 复跑；见 [暂定交接](handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。
+
+M5-FIX-F1 四轮 Q20.12 shares→原顺序 XOR mask 专用路径已完成本地验证和全路径成本核验；通用 field payload 接口未改，不能把完整路径称为两轮。见 [F1 decision](decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 和 [F1 evidence](reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。F2/G3 接收方复跑与冻结 revision 尚待完成。
 
 ## 1. 当前基线与复用边界
 

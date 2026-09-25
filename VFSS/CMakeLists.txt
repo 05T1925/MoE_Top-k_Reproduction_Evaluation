@@ -54,6 +54,8 @@ PRIVATE
     src/moe_topk/masked_mul_adapter.cpp
     src/moe_topk/protocol_iii_secure_combine.cpp
     src/moe_topk/protocol_iii_raw_score_pipeline.cpp
+    src/moe_topk/protocol_iii_raw_score_mask.cpp
+    src/moe_topk/protocol_iii_raw_score_mask_package.cpp
     src/moe_topk/protocol_iii_secure_core.cpp
     src/moe_topk/protocol_iii_metrics_record.cpp
     # src/softmax.cpp
@@ -450,6 +452,22 @@ target_link_libraries(
     PRIVATE
     ${PROJECT_NAME}
 )
+
+add_executable(
+    moe_topk_m5_fix_f1_raw_score_mask_test
+    tests/moe_topk/protocol_iii_raw_score_mask_test.cpp
+)
+target_link_libraries(moe_topk_m5_fix_f1_raw_score_mask_test PRIVATE ${PROJECT_NAME})
+add_test(NAME moe_topk_m5_fix_f1_raw_score_mask_test
+         COMMAND moe_topk_m5_fix_f1_raw_score_mask_test)
+
+add_executable(
+    moe_topk_m5_fix_f1_process_e2e_test
+    tests/moe_topk/protocol_iii_raw_score_mask_process_test.cpp
+)
+target_link_libraries(moe_topk_m5_fix_f1_process_e2e_test PRIVATE ${PROJECT_NAME})
+add_test(NAME moe_topk_m5_fix_f1_process_e2e_test
+         COMMAND moe_topk_m5_fix_f1_process_e2e_test)
 
 # ===== raw_score_pipeline 测试 =====
 add_executable(
