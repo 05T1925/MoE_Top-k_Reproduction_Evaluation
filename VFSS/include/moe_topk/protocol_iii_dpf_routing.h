@@ -74,6 +74,10 @@ struct ProtocolIIIDpfRoutingPartyMaterial {
   // One DPF party key for f_(r_i,1) per logical input position.
   std::vector<ProtocolIIIDpfRoutingKey> dpf_keys;
 
+  // Set before the first online frame attempt. A failed exchange cannot
+  // retry with the same rank mask and DPF keys.
+  bool started = false;
+
   ProtocolIIIDpfRoutingPartyMaterial() = default;
 
   ProtocolIIIDpfRoutingPartyMaterial(

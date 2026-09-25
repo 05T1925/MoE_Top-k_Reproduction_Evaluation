@@ -1,12 +1,15 @@
 # 双人实施分工与交接计划
 
-状态：**已采纳；当前状态按 2026-09-24 更新**。
+状态：**已采纳；当前状态按 2026-09-25 更新**。
 
 本文依据 `PROJECT.md` 和 `docs/IMPLEMENTATION_PLAN.md`，明确双人职责、并行边界、公共文件所有权及交接条件。
 
 本次修订保留已完成的 M1/M1.1、M2 工程基线和 M3 模块化基线，不改变冻结的 score、tie-break、rank 和原顺序 Top-K mask 语义。
 
 当前主线为 **M2 COMPLETED → M5 IN PROGRESS**。M2 已完成 current engineering acceptance：three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界。dated strict-gate 记录属于历史，不再阻塞 M5 runtime。
+M5-B–G 已在工作分支完成；M5-H1 通信按数量级门槛通过，精确 Theorem 4.2 逻辑式仍差 `254n` bits。M5-H2 [独立评审](reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，M5 当时最终关闭 FAIL（F1/F2）；M5 整体仍 IN PROGRESS。F1 此后本地核验完成，下一步为冻结 revision 和接收方 G3 复跑；见 [暂定交接](handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。
+
+M5-FIX-F1 四轮项目标准 mask 专用入口已本地验证，成本包含两轮输入适配、GRank 与 DPF routing；其通用 field Fselect/Fsort 核心未修改，详见 [F1 decision](decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 和 [F1 evidence](reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。待用户授权冻结 revision 后由接收方独立复跑 F2/G3；M5 仍 IN PROGRESS。
 
 ## 1. 当前分工与执行顺序
 
@@ -26,8 +29,8 @@
 M2 Protocol I：COMPLETED
   → 角色 B：M5 Protocol III two-round path（IN PROGRESS）
   → 实现与正确性验收
-  → 通信测量及差异解释
-  → 双方冻结基础接口与计量结果
+  → M5-H2 独立评审完成，最终关闭 FAIL（F1/F2）
+  → M5-FIX / 接收方 G3 复跑后双方冻结基础接口与计量结果
   → AAV86 两种升级实现及完整性能验收
   → BB90+DCF 两种升级实现及完整性能验收
   → 六种方案统一报告

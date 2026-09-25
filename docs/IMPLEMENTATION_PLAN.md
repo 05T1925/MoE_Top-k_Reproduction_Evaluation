@@ -1,12 +1,13 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-24
+更新日期：2026-09-25
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
 
 当前状态：M2 为 **COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1，Protocol I PR 已合并。`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界，但不阻止 M2 工程里程碑完成。M5 为 **IN PROGRESS / 正在进行**。此前 dated strict-gate 记录保留为历史证据，不作为 M5 当前 runtime 阻塞条件。
+M5-H1 已按用户指定的数量级门槛完成通信核验；Theorem 4.2 精确逻辑成本仍差 `254n` bits。M5-H2 独立评审已完成，M5 当时最终关闭 FAIL（F1 输入/输出适配及统一 mask 成本、F2 接收方 G3 复跑）；F1 此后本地实现/核验完成，F2/G3 待接收；见 [H2 评审](reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)与 [暂定交接](handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
 OPV -> Share Translation -> Beneš -> Permute+Share -> two-pass
@@ -64,8 +65,8 @@ M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核�
 ```text
 M2：COMPLETED
   → M5：IN PROGRESS
-  → Protocol III 通信测量及差异解释
-  → 基础协议接口与计量结果交接
+  → M5-H2 独立评审完成，最终关闭 FAIL（F1/F2）
+  → M5-FIX / 接收方 G3 复跑与基础协议接口交接
   → M6A 两种 AAV86 升级实现
   → M6A 完整性能验收
   → M6B 两种 BB90+DCF 升级实现
@@ -550,6 +551,40 @@ carry
 主责：角色 B。角色 A 交叉评审。
 
 状态：**IN PROGRESS / 正在进行**。目标为 shared clique CmpAgg / GRank → DPF routing → two-round composition；复用现有 uCMP、DCF、CmpAgg Gen/Eval、priority-key semantics 与 rank-share contract，不重新实现第二份 ranking core。
+
+M5-B/C 的共享 CmpAgg 接口及三轮模块化路由已通过差分与独立进程回归。
+M5-D 已增加独立的 `F_(2^127−1)` payload field、非零编码、field Beaver
+乘法材料和 Protocol-III-only field-output DPF 包装层；决策与限制见
+[2026-09-25 field payload decision](decisions/M5_PROTOCOL_III_FIELD_PAYLOAD_DECISION_2026-09-25.md)
+及 [M5-D conformance](reproduction/M5_PROTOCOL_III_FIELD_PAYLOAD_CONFORMANCE_2026-09-24.md)。
+当前 M3/M5-C `Z_(2^64)` 三轮 bit-mask runtime 保持原样。M5-E 已在独立
+candidate 中组合 shared CmpAgg、M5-D field DPF 与非零 payload mask，
+完成单 rank Fselect 的两轮因果状态机和差分/传输测试；见
+[2026-09-25 two-round candidate decision](decisions/M5_PROTOCOL_III_TWO_ROUND_CANDIDATE_DECISION_2026-09-25.md)
+及 [M5-E closeout](reproduction/M5_PROTOCOL_III_TWO_ROUND_FSELECT_CANDIDATE_2026-09-25.md)。
+M5-F 已完成独立 fork+exec P2/P0/P1 process E2E：P2 离线分发完整 party-local
+bundle 并在在线输入释放前退出；P0/P1 各自执行两个 framed exchange，过程事件
+证明同轮 outbound 在 peer 消息读取前冻结，R2 后无协议发送。见
+[M5-F process closeout](reproduction/M5_PROTOCOL_III_TWO_ROUND_PROCESS_E2E_2026-09-25.md)
+及 [M5-F process decision](decisions/M5_PROTOCOL_III_TWO_ROUND_PROCESS_BOUNDARY_DECISION_2026-09-25.md)。
+M5-G 复用同一 CmpAgg、field DPF keys 与两轮 R1/R2 transcript，在 R2 后通过
+field FullEval 本地形成完整 rank-order field-record share vector；独立进程
+P2/P0/P1 Fsort 差分与因果回归已通过。见
+[M5-G decision](decisions/M5_PROTOCOL_III_FSORT_FULLEVAL_DECISION_2026-09-25.md)
+及 [M5-G closeout](reproduction/M5_PROTOCOL_III_FSORT_FULLEVAL_2026-09-25.md)。
+M5-H1 已完成 n=2–128 的独立进程 Fselect/Fsort 通信量测量，按用户指定的
+数量级门槛通过；实现/论文逻辑位比约 1.42–1.44，精确成本式多
+`254n` bits，且 shared uCMP 每边调用两次 DCF Eval。详见
+[M5-H1 communication evidence](reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。
+M5-H2 independent review 已完成，当时最终关闭 FAIL（F1/F2）。F1 后续本地核验已完成，下一步是冻结 F1 revision 与接收方 G3 复跑；不得把 H1 数量级通过写成精确
+Theorem 4.2 cost match 或 author-exact。
+
+M5-FIX-F1 已用独立的四轮 bit-mask 专用路径补齐项目标准 Q20.12 shares→原顺序 XOR Top-K mask 及分阶段成本，并完成本地差分/独立进程/sanitizer 核验；见 [F1 decision](decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 和 [F1 evidence](reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。该路径复用两轮 score 适配 + CmpAgg/DPF 两轮核心，不以单位 payload 消去 combine 冒充 Theorem 4.2 通用域值成本。原 field Fselect/Fsort API 保持冻结；通用 ring→field 与 field→XOR 转换仍未实现。F1 尚未冻结为可 fetch revision，F2/G3 独立接收仍待执行，M5 保持 IN PROGRESS。
+原 general-field candidate 的入口为已分享的 field payload，Fselect 出口为单个 selected
+record 份额，Fsort 出口为 rank-order record 份额向量。其通用 secure ring-to-field
+输入转换和 field-output→原顺序 mask adapter 仍未实现；F1 已另行提供 bit-only
+标准 mask 路径并完整计量。不能将完整 raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
+`Z_(2^rank_bits)` 实例化，不因 payload field 的加入而等同论文 `Z_n`。
 
 #### 前置条件
 
