@@ -657,6 +657,8 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m5g_two_round_fsort_test COMMAND moe_topk_m5g_two_round_fsort_test)
     add_test(NAME moe_topk_m5g_two_round_fsort_process_e2e_test
              COMMAND moe_topk_m5f_two_round_process_e2e_test --sort-controller)
+    add_test(NAME moe_topk_m5h1_communication_benchmark_smoke_test
+             COMMAND moe_topk_m5f_two_round_process_e2e_test --comm-benchmark 2 2)
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
     add_test(

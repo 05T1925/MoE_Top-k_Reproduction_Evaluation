@@ -16,10 +16,12 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 | M2 | 已完成 | three-round C-INSTANTIATION implemented；independent three-round review PASS；online logical communication matches Theorem 4.1；Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` |
 | M3 | 已完成并冻结 | priority-key 三轮入口，以及 raw-score 五轮扩展 |
 | M4 | 已取消 | 不实施 CipherGPT，不安排其性能实验 |
-| M5 | 正在进行 | shared clique CmpAgg / GRank → DPF routing → two-round composition；复用既有 ranking core |
+| M5 | 正在进行 | M5-B–G 实现/回归完成；H1 通信数量级核验通过；精确 Theorem 4.2 逻辑成本尚不匹配，下一阶段 H2 独立评审 |
 | M6A | 后续目标 | I+AAV86、III+AAV86 实现及完整性能验收 |
 | M6B | 后续目标 | I+BB90+DCF、III+BB90+DCF 实现及完整性能验收 |
 | M7 | 后续目标 | 六种方案统一汇总与报告 |
+
+M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中按用户指定数量级门槛通过；实现/论文逻辑位比约 1.42–1.44，精确式差 `254n` bits。见 [H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。M5 仍在进行，H2 尚未评审；`AUTHOR_EXACT = NOT_PROVEN`。
 
 已完成的工程实现为：
 
@@ -43,7 +45,7 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 ```text
 M2 Protocol I：COMPLETED
   → M5 Protocol III two-round path：IN PROGRESS
-  → 通信测量及差异解释
+  → M5-H2 独立评审与精确成本差额审计
   → 基础接口交接
   → M6A AAV86 两种升级实现及完整性能验收
   → M6B BB90+DCF 两种升级实现及完整性能验收

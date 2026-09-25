@@ -34,7 +34,8 @@
 namespace {
 using namespace moe_topk;
 using Bytes = std::vector<std::uint8_t>;
-constexpr int kIoTimeoutMs = 6000;
+int kIoTimeoutMs = 6000;
+int kChildTimeoutMs = 10000;
 constexpr std::size_t kMaxMessageBytes = 64U * 1024U * 1024U;
 
 enum class Event : std::uint8_t {
@@ -150,7 +151,7 @@ class ChildSet {
     }
   }
   void add(pid_t pid) { children_.push_back(pid); }
-  int wait_status(pid_t pid, int timeout_ms = 10000) {
+  int wait_status(pid_t pid, int timeout_ms = kChildTimeoutMs) {
     const auto deadline = std::chrono::steady_clock::now() +
         std::chrono::milliseconds(timeout_ms);
     for (;;) {
@@ -1206,6 +1207,83 @@ int sort_controller_main(const std::string& exe) {
   return 0;
 }
 
+
+// TEST_ONLY multi-scale communication measurement. Every row runs a fresh
+// offline P2 and independent online P0/P1, with the same oracle checks and
+// causal event audit as the process E2E tests above.
+int communication_benchmark_main(const std::string& exe,
+                                 std::uint32_t n, std::uint32_t repeats) {
+  check(n >= 2U && n <= 128U && repeats >= 1U && repeats <= 5U,
+        "communication benchmark shape/repetitions");
+  kIoTimeoutMs = 300000;
+  kChildTimeoutMs = 300000;
+  std::mt19937_64 random(UINT64_C(0x5f48100000000000) + n);
+  std::uint64_t case_number = 0U;
+  std::cout << "mode,n,padded_n,comparison_bits,rank_bits,repeat,target,"
+               "r1_logical_bits,r2_logical_bits,p0_r1_wire,p1_r1_wire,"
+               "p0_r2_wire,p1_r2_wire,r1_wire_total,r2_wire_total,"
+               "online_wire_total,p0_offline_bundle,p1_offline_bundle,"
+               "offline_bundle_total,rounds,post_r2_protocol_frames,"
+               "cmp_edges_per_party,dpf_eval_per_party,full_eval_per_party,"
+               "full_eval_domain,full_eval_leaves_per_party,"
+               "routing_field_mul_per_party,routing_field_add_per_party\n";
+  auto emit = [&](const char* mode, std::uint32_t repeat, std::uint32_t target,
+                  const PublicRun& p, const auto& first, const auto& second,
+                  std::uint64_t offline0, std::uint64_t offline1, bool sort) {
+    const auto c = config(p.n,p.k,p.target,p.session,p.fingerprint,0U);
+    const auto& a = first.metrics;
+    const auto& b = second.metrics;
+    check(a.round1_logical_bits == b.round1_logical_bits &&
+          a.round2_logical_bits == b.round2_logical_bits &&
+          a.round1_sent_bytes == b.round1_received_bytes &&
+          b.round1_sent_bytes == a.round1_received_bytes &&
+          a.round2_sent_bytes == b.round2_received_bytes &&
+          b.round2_sent_bytes == a.round2_received_bytes,
+          "communication benchmark party accounting");
+    const auto r1_total = a.round1_sent_bytes + b.round1_sent_bytes;
+    const auto r2_total = a.round2_sent_bytes + b.round2_sent_bytes;
+    const auto domain = UINT64_C(1) << c.rank_bits;
+    std::cout << mode << ',' << n << ',' << c.padded_n << ','
+              << unsigned(c.comparison_bits) << ',' << unsigned(c.rank_bits)
+              << ',' << repeat << ',' << target << ','
+              << a.round1_logical_bits + b.round1_logical_bits << ','
+              << a.round2_logical_bits + b.round2_logical_bits << ','
+              << a.round1_sent_bytes << ',' << b.round1_sent_bytes << ','
+              << a.round2_sent_bytes << ',' << b.round2_sent_bytes << ','
+              << r1_total << ',' << r2_total << ',' << r1_total+r2_total
+              << ',' << offline0 << ',' << offline1 << ','
+              << offline0+offline1 << ",2,0,"
+              << (std::uint64_t(n)*(n-1U)/2U) << ','
+              << (sort ? 0U : n) << ',' << (sort ? n : 0U) << ','
+              << domain << ',' << (sort ? n*domain : 0U) << ','
+              << (sort ? std::uint64_t(n)*n : n) << ','
+              << (sort ? std::uint64_t(n)*n : n) << '\n';
+    std::cout.flush();
+  };
+  for (std::uint32_t repeat = 0; repeat < repeats; ++repeat) {
+    const auto data = make_case(n,(n == 3U || n == 5U) ? 2U : 0U,random);
+    for (const auto target : {0U,n/2U,n-1U}) {
+      const auto number = ++case_number;
+      const PublicRun p{n,n,target,
+          UINT64_C(0x5f48110000000000) + n*1000U + number,
+          UINT64_C(0x5f48120000000000) + n*1000U + number,
+          UINT64_C(0x5f48130000000000) + n*1000U + number};
+      const auto sample = run_success(exe,p,data,random());
+      emit("Fselect",repeat,target,p,sample.p0,sample.p1,
+           sample.dealer_p0,sample.dealer_p1,false);
+    }
+    const auto number = ++case_number;
+    const PublicRun p{n,n,0U,
+        UINT64_C(0x5f48110000000000) + n*1000U + number,
+        UINT64_C(0x5f48120000000000) + n*1000U + number,
+        UINT64_C(0x5f48130000000000) + n*1000U + number};
+    const auto sample = run_sort_success(exe,p,data,random());
+    emit("Fsort",repeat,0U,p,sample.p0,sample.p1,
+         sample.dealer_p0,sample.dealer_p1,true);
+  }
+  return 0;
+}
+
 } // namespace
 
 int main(int argc, char** argv) {
@@ -1213,6 +1291,14 @@ int main(int argc, char** argv) {
     if (argc == 1) return controller_main(executable_path(argv[0]));
     if (argc == 2 && std::string(argv[1]) == "--sort-controller")
       return sort_controller_main(executable_path(argv[0]));
+    if (argc == 4 && std::string(argv[1]) == "--comm-benchmark") {
+      const auto n = std::stoul(argv[2]);
+      const auto repeats = std::stoul(argv[3]);
+      check(n <= UINT32_MAX && repeats <= UINT32_MAX,
+            "communication benchmark argument range");
+      return communication_benchmark_main(executable_path(argv[0]),
+          static_cast<std::uint32_t>(n), static_cast<std::uint32_t>(repeats));
+    }
     check(argc >= 2,"process role");
     const std::string role(argv[1]);
     const auto p = parse_public(argc,argv,2);

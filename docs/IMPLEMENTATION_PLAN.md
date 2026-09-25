@@ -1,12 +1,13 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-24
+更新日期：2026-09-25
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
 
 当前状态：M2 为 **COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1，Protocol I PR 已合并。`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界，但不阻止 M2 工程里程碑完成。M5 为 **IN PROGRESS / 正在进行**。此前 dated strict-gate 记录保留为历史证据，不作为 M5 当前 runtime 阻塞条件。
+M5-H1 已按用户指定的数量级门槛完成通信核验；Theorem 4.2 精确逻辑成本仍差 `254n` bits，M5-H2 独立评审待执行。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
 OPV -> Share Translation -> Beneš -> Permute+Share -> two-pass
@@ -64,7 +65,7 @@ M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核�
 ```text
 M2：COMPLETED
   → M5：IN PROGRESS
-  → Protocol III 通信测量及差异解释
+  → M5-H2 独立评审与精确成本差额审计
   → 基础协议接口与计量结果交接
   → M6A 两种 AAV86 升级实现
   → M6A 完整性能验收
@@ -571,9 +572,15 @@ field FullEval 本地形成完整 rank-order field-record share vector；独立�
 P2/P0/P1 Fsort 差分与因果回归已通过。见
 [M5-G decision](decisions/M5_PROTOCOL_III_FSORT_FULLEVAL_DECISION_2026-09-25.md)
 及 [M5-G closeout](reproduction/M5_PROTOCOL_III_FSORT_FULLEVAL_2026-09-25.md)。
+M5-H1 已完成 n=2–128 的独立进程 Fselect/Fsort 通信量测量，按用户指定的
+数量级门槛通过；实现/论文逻辑位比约 1.42–1.44，精确成本式多
+`254n` bits，且 shared uCMP 每边调用两次 DCF Eval。详见
+[M5-H1 communication evidence](reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。
+M5-H2 independent review 是下一阶段；不得把 H1 数量级通过写成精确
+Theorem 4.2 cost match 或 author-exact。
 该 candidate 的入口为已分享的 field payload，Fselect 出口为单个 selected
 record 份额，Fsort 出口为 rank-order record 份额向量。secure ring-to-field
-输入转换、原顺序 mask 输出 adapter 与 Theorem 4.2 独立成本核验仍属后续阶段；
+输入转换、原顺序 mask 输出 adapter 与精确成本差额审计仍属后续阶段；
 不能将完整 raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
 `Z_(2^rank_bits)` 实例化，不因 payload field 的加入而等同论文 `Z_n`。
 
