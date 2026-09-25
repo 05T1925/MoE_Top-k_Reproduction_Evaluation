@@ -44,7 +44,8 @@ M0、M1/M1.1、M2 和 M3 的已完成记录保持不变。当前活动里程碑�
 ```text
 M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验）
   → M5：IN PROGRESS（Protocol III 论文精确两轮核心）
-  → M5-H2 独立评审与精确成本差额审计
+  → M5-H2：独立评审完成，最终关闭 FAIL（F1/F2）
+  → M5-FIX 与接收方 G3 复跑
   → M6A：I+AAV86、III+AAV86 实现与完整性能测试
   → M6B：I+BB90+DCF、III+BB90+DCF 实现与完整性能测试
   → M7：六种方案统一汇总与报告
@@ -52,7 +53,7 @@ M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
-M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已在工作分支完成。M5-H1 通信测量按用户指定的**数量级**门槛通过（n=2–128，Fselect/Fsort 两轮；实现/论文逻辑位比约 1.42–1.44）；Theorem 4.2 **精确逻辑公式不匹配**，差额为 `254n` bits，作者转录未证明。M5 整体仍为 **IN PROGRESS**；下一阶段为 M5-H2 independent review。见 [M5-H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。
+M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已在工作分支完成。M5-H1 通信测量按用户指定的**数量级**门槛通过（n=2–128，Fselect/Fsort 两轮；实现/论文逻辑位比约 1.42–1.44）；Theorem 4.2 **精确逻辑公式不匹配**，差额为 `254n` bits，作者转录未证明。M5-H2 [独立评审](docs/reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，最终关闭结论为 FAIL：F1 输入/输出适配和统一 mask 成本未闭合，F2 接收方 G3 复跑未完成。M5 整体仍为 **IN PROGRESS**；下一步为 M5-FIX 与 [暂定 M5→M6A 交接](docs/handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。见 [M5-H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。
 
 M2 已完成当前工程验收：three-round C-INSTANTIATION 已实现，独立 three-round
 review 为 PASS，在线逻辑通信与 Theorem 4.1 匹配，且 Protocol I PR 已合并。
@@ -731,7 +732,8 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 - M2 的 `AUTHOR_EXACT = NOT_PROVEN` 是保留的证据边界，不是 M2 工程里程碑阻塞项。
 - M3 三轮模块化核心与 raw-score 五轮扩展已完成整改并冻结。
 - M5：**IN PROGRESS / 正在进行**；目标是 shared clique CmpAgg / GRank → DPF routing → two-round composition，并复用既有 ranking core。
-- M5-H1：**COMPLETED（数量级门槛）**；Fselect/Fsort 实测通信量和论文同阶，精确 logical cost 仍差 `254n` bits；M5-H2 独立评审待执行。
+- M5-H1：**COMPLETED（数量级门槛）**；Fselect/Fsort 实测通信量和论文同阶，精确 logical cost 仍差 `254n` bits。
+- M5-H2：**独立评审完成，M5 最终关闭 FAIL**；F1 安全输入/输出适配与统一 mask 成本、F2 G3 接收方复跑待解决。
 - VFSS 已有 DCF、DPF、CmpAgg、通信、两遍 shuffle 和独立进程测试基础。
 - M3 已有分方 report 与结构化 MetricsRecord 汇总。
 - 完整可信的在线 PRG 计数及正式 LAN/WAN 性能测量仍需补齐。
