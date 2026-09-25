@@ -556,9 +556,15 @@ M5-D 已增加独立的 `F_(2^127−1)` payload field、非零编码、field Bea
 乘法材料和 Protocol-III-only field-output DPF 包装层；决策与限制见
 [2026-09-25 field payload decision](decisions/M5_PROTOCOL_III_FIELD_PAYLOAD_DECISION_2026-09-25.md)
 及 [M5-D conformance](reproduction/M5_PROTOCOL_III_FIELD_PAYLOAD_CONFORMANCE_2026-09-24.md)。
-当前 M3/M5-C `Z_(2^64)` 三轮 bit-mask runtime 保持原样。field 层尚未构成
-两轮 runtime；secure ring-to-field 输入转换、输出 mask adapter、因果轮次与
-Theorem 4.2 通信核验仍属后续阶段。非 2 幂 `n` 的 rank 域仍为项目
+当前 M3/M5-C `Z_(2^64)` 三轮 bit-mask runtime 保持原样。M5-E 已在独立
+candidate 中组合 shared CmpAgg、M5-D field DPF 与非零 payload mask，
+完成单 rank Fselect 的两轮因果状态机和差分/传输测试；见
+[2026-09-25 two-round candidate decision](decisions/M5_PROTOCOL_III_TWO_ROUND_CANDIDATE_DECISION_2026-09-25.md)
+及 [M5-E closeout](reproduction/M5_PROTOCOL_III_TWO_ROUND_FSELECT_CANDIDATE_2026-09-25.md)。
+该 candidate 的入口为已分享的 field payload，出口为选中 record 的 field
+份额。secure ring-to-field 输入转换、原顺序 mask 输出 adapter、独立 P2/P0/P1
+process closeout 与 Theorem 4.2 独立成本核验仍属后续阶段；不能将完整
+raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
 `Z_(2^rank_bits)` 实例化，不因 payload field 的加入而等同论文 `Z_n`。
 
 #### 前置条件

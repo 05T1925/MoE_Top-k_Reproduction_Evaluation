@@ -49,6 +49,7 @@ PRIVATE
     src/moe_topk/protocol_iii_field_payload.cpp
     src/moe_topk/protocol_iii_field_dpf.cpp
     src/moe_topk/protocol_iii_field_mul.cpp
+    src/moe_topk/protocol_iii_two_round.cpp
     src/moe_topk/masked_mul_adapter.cpp
     src/moe_topk/protocol_iii_secure_combine.cpp
     src/moe_topk/protocol_iii_raw_score_pipeline.cpp
@@ -385,6 +386,13 @@ foreach(m5d_test IN ITEMS field field_payload field_mul field_dpf)
     target_link_libraries(moe_topk_m5d_${m5d_test}_test PRIVATE ${PROJECT_NAME})
 endforeach()
 
+# M5-E: independent field-valued two-causal-round Fselect candidate.
+add_executable(
+    moe_topk_m5e_two_round_fselect_test
+    tests/moe_topk/protocol_iii_two_round_fselect_test.cpp
+)
+target_link_libraries(moe_topk_m5e_two_round_fselect_test PRIVATE ${PROJECT_NAME})
+
 # ===== masked_mul_adapter 测试 =====
 add_executable(
     moe_topk_masked_mul_adapter_test
@@ -616,6 +624,7 @@ if(BUILD_TESTING)
         add_test(NAME moe_topk_m5d_${m5d_test}_test
                  COMMAND moe_topk_m5d_${m5d_test}_test)
     endforeach()
+    add_test(NAME moe_topk_m5e_two_round_fselect_test COMMAND moe_topk_m5e_two_round_fselect_test)
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
     add_test(
