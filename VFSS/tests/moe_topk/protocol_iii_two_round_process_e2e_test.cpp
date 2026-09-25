@@ -427,6 +427,60 @@ PartyReport decode_report(const ProtocolIIITwoRoundConfig& c,
   return result;
 }
 
+Bytes encode_sort_report(const ProtocolIIITwoRoundConfig& c,
+                         std::uint64_t id,
+                         const std::vector<ProtocolIIIField>& sorted,
+                         const ProtocolIIITwoRoundMetrics& m,
+                         std::uint64_t offline_bytes) {
+  check(sorted.size() == c.logical_n, "sort party result shape");
+  Bytes out{'M','5','S','R',1U,c.party,0U,0U};
+  put_word(out,c.session,8U);
+  put_word(out,c.fingerprint,8U);
+  put_word(out,id,8U);
+  put_word(out,c.logical_n,4U);
+  for (const auto share : sorted) put_field(out,share);
+  for (const auto value : {m.round1_sent_bytes, m.round1_received_bytes,
+                           m.round2_sent_bytes, m.round2_received_bytes,
+                           m.round1_logical_bits, m.round2_logical_bits,
+                           offline_bytes})
+    put_word(out,value,8U);
+  return out;
+}
+
+struct SortReport {
+  std::vector<ProtocolIIIField> sorted_shares;
+  ProtocolIIITwoRoundMetrics metrics;
+  std::uint64_t offline_bytes = 0;
+};
+
+SortReport decode_sort_report(const ProtocolIIITwoRoundConfig& c,
+                              std::uint64_t id, const Bytes& in) {
+  check(in.size() == 92U + static_cast<std::size_t>(c.logical_n) * 16U &&
+            in[0] == 'M' && in[1] == '5' && in[2] == 'S' &&
+            in[3] == 'R' && in[4] == 1U && in[5] == c.party &&
+            in[6] == 0U && in[7] == 0U,
+        "sort result frame length/header");
+  std::size_t offset = 8U;
+  check(get_word(in,offset,8U) == c.session &&
+            get_word(in,offset,8U) == c.fingerprint &&
+            get_word(in,offset,8U) == id &&
+            get_word(in,offset,4U) == c.logical_n,
+        "sort result frame binding/shape");
+  SortReport report;
+  report.sorted_shares.reserve(c.logical_n);
+  for (std::uint32_t i = 0; i < c.logical_n; ++i)
+    report.sorted_shares.push_back(get_field(in,offset));
+  report.metrics.round1_sent_bytes = get_word(in,offset,8U);
+  report.metrics.round1_received_bytes = get_word(in,offset,8U);
+  report.metrics.round2_sent_bytes = get_word(in,offset,8U);
+  report.metrics.round2_received_bytes = get_word(in,offset,8U);
+  report.metrics.round1_logical_bits = get_word(in,offset,8U);
+  report.metrics.round2_logical_bits = get_word(in,offset,8U);
+  report.offline_bytes = get_word(in,offset,8U);
+  check(offset == in.size(), "sort result trailing bytes");
+  return report;
+}
+
 class OwnedFd {
  public:
   explicit OwnedFd(int fd) : fd_(fd) { check(fd_ >= 0, "dup online descriptor"); }
@@ -523,7 +577,7 @@ void send_partial(int fd) {
 
 int party_main(const PublicRun& p, std::uint8_t party, int offline_fd,
                int input_fd, int r1_fd, int r2_fd, int result_fd,
-               int event_fd, const std::string& fault) {
+               int event_fd, const std::string& fault, bool sort_mode) {
   try {
     const auto c = config(p.n, p.k, p.target, p.session, p.fingerprint, party);
     std::uint32_t event_sequence = 0;
@@ -614,12 +668,18 @@ int party_main(const PublicRun& p, std::uint8_t party, int offline_fd,
       check(digest(outbound2) == r2_digest, "R2 outbound mutated");
       emit_event(event_fd, party, Event::r2_immutable, event_sequence);
     }
-    const auto selected = state.consume_round2(inbound2);
+    ProtocolIIIField selected;
+    std::vector<ProtocolIIIField> sorted;
+    if (sort_mode) sorted = state.consume_round2_sort(inbound2);
+    else selected = state.consume_round2(inbound2);
     metrics.round2_sent_bytes = r2.sent_bytes();
     metrics.round2_received_bytes = r2.received_bytes();
     emit_event(event_fd, party, Event::complete, event_sequence);
-    send_bytes(result_fd, encode_report(c, p.material_id, selected, metrics,
-                                        offline_bytes.size() + 8U));
+    send_bytes(result_fd, sort_mode
+        ? encode_sort_report(c, p.material_id, sorted, metrics,
+                             offline_bytes.size() + 8U)
+        : encode_report(c, p.material_id, selected, metrics,
+                        offline_bytes.size() + 8U));
     std::uint8_t release = 0;
     exact_io(result_fd, &release, 1U, false);
     check(release == 1U, "result-channel lifetime release");
@@ -698,7 +758,7 @@ std::vector<std::string> role_args(const char* role, const PublicRun& p,
 
 void start_roles(const std::string& exe, const PublicRun& p,
                  std::uint64_t dealer_seed, const std::string& fault,
-                 Running& run) {
+                 Running& run, bool sort_mode = false) {
   auto& s = run.sockets;
   run.p2 = launch_role(exe,
       role_args("--dealer", p, {dealer_seed,
@@ -707,7 +767,7 @@ void start_roles(const std::string& exe, const PublicRun& p,
           static_cast<std::uint64_t>(s.receipt[1])}, fault),
       s.pool, run.children, {s.offline0[0],s.offline1[0],s.receipt[1]});
   run.p0 = launch_role(exe,
-      role_args("--party", p, {0U, static_cast<std::uint64_t>(s.offline0[1]),
+      role_args(sort_mode ? "--sort-party" : "--party", p, {0U, static_cast<std::uint64_t>(s.offline0[1]),
           static_cast<std::uint64_t>(s.input0[1]),
           static_cast<std::uint64_t>(s.r1[0]),
           static_cast<std::uint64_t>(s.r2[0]),
@@ -716,7 +776,7 @@ void start_roles(const std::string& exe, const PublicRun& p,
       s.pool, run.children,
       {s.offline0[1],s.input0[1],s.r1[0],s.r2[0],s.result0[1],s.event0[1]});
   run.p1 = launch_role(exe,
-      role_args("--party", p, {1U, static_cast<std::uint64_t>(s.offline1[1]),
+      role_args(sort_mode ? "--sort-party" : "--party", p, {1U, static_cast<std::uint64_t>(s.offline1[1]),
           static_cast<std::uint64_t>(s.input1[1]),
           static_cast<std::uint64_t>(s.r1[1]),
           static_cast<std::uint64_t>(s.r2[1]),
@@ -862,9 +922,10 @@ Sample run_success(const std::string& exe, const PublicRun& p,
 // a peer-visible decode/transport failure; the controller never retries the
 // consumed material or releases online input for a malformed offline bundle.
 void run_failure(const std::string& exe, PublicRun p, const CaseData& data,
-                 std::uint64_t seed, const std::string& fault) {
+                 std::uint64_t seed, const std::string& fault,
+                 bool sort_mode = false) {
   Running run;
-  start_roles(exe,p,seed,fault,run);
+  start_roles(exe,p,seed,fault,run,sort_mode);
   (void)decode_receipt(receive_bytes(run.sockets.receipt[0],32U),p.material_id);
   check(run.children.wait_status(run.p2) == 0,"fault dealer exit");
   const bool offline = fault.rfind("bundle_",0) == 0;
@@ -885,11 +946,13 @@ void run_failure(const std::string& exe, PublicRun p, const CaseData& data,
   bool reported0 = false;
   bool reported1 = false;
   try {
-    (void)receive_bytes(run.sockets.result0[0],104U);
+    (void)receive_bytes(run.sockets.result0[0],
+        sort_mode ? 92U + 16U * p.n : 104U);
     reported0 = true;
   } catch (const std::exception&) {}
   try {
-    (void)receive_bytes(run.sockets.result1[0],104U);
+    (void)receive_bytes(run.sockets.result1[0],
+        sort_mode ? 92U + 16U * p.n : 104U);
     reported1 = true;
   } catch (const std::exception&) {}
   check(!(reported0 && reported1),
@@ -995,11 +1058,161 @@ int controller_main(const std::string& exe) {
   return 0;
 }
 
+struct SortSample {
+  PublicRun public_run;
+  SortReport p0, p1;
+  std::uint64_t dealer_p0 = 0, dealer_p1 = 0;
+};
+
+SortSample run_sort_success(const std::string& exe, const PublicRun& p,
+                            const CaseData& data, std::uint64_t seed) {
+  check(p.k == p.n && p.target == 0U,"sort process public configuration");
+  Running run;
+  start_roles(exe,p,seed,"none",run,true);
+  const auto dealer_sizes = decode_receipt(
+      receive_bytes(run.sockets.receipt[0],32U),p.material_id);
+  check(run.children.wait_status(run.p2) == 0,
+        "sort P2 must exit before online input release");
+  check_event(read_event(run.sockets.event0[0]),Event::bundle_ready,0U,0U);
+  check_event(read_event(run.sockets.event1[0]),Event::bundle_ready,1U,0U);
+  const auto input = split_test_input(p,data,seed ^ UINT64_C(0x91571591));
+  send_bytes(run.sockets.input0[0],input.p0);
+  send_bytes(run.sockets.input1[0],input.p1);
+  const auto c0 = config(p.n,p.k,p.target,p.session,p.fingerprint,0U);
+  const auto c1 = config(p.n,p.k,p.target,p.session,p.fingerprint,1U);
+  const auto report_bytes0 = receive_bytes(
+      run.sockets.result0[0],92U + 16U * p.n);
+  const auto report_bytes1 = receive_bytes(
+      run.sockets.result1[0],92U + 16U * p.n);
+  const auto report0 = decode_sort_report(c0,p.material_id,report_bytes0);
+  const auto report1 = decode_sort_report(c1,p.material_id,report_bytes1);
+  if (p.n == 3U) {
+    auto rejects_report = [&](Bytes damaged, const char* reason) {
+      try { (void)decode_sort_report(c0,p.material_id,damaged); }
+      catch (const std::exception&) { return; }
+      throw std::runtime_error(reason);
+    };
+    auto wrong_tag = report_bytes0; wrong_tag[0] ^= 1U;
+    rejects_report(wrong_tag,"sort report wrong tag accepted");
+    auto wrong_shape = report_bytes0; wrong_shape[35] ^= 1U;
+    rejects_report(wrong_shape,"sort report wrong shape accepted");
+    auto truncated = report_bytes0; truncated.pop_back();
+    rejects_report(truncated,"sort report truncation accepted");
+    auto extra = report_bytes0; extra.push_back(0U);
+    rejects_report(extra,"sort report trailing bytes accepted");
+    auto noncanonical = report_bytes0;
+    for (std::size_t i = 36U; i < 52U; ++i) noncanonical[i] = 0xffU;
+    rejects_report(noncanonical,"sort report noncanonical field accepted");
+  }
+  std::uint8_t release = 1U;
+  exact_io(run.sockets.result0[0],&release,1U,true);
+  exact_io(run.sockets.result1[0],&release,1U,true);
+  check(run.children.wait_status(run.p0) == 0 &&
+        run.children.wait_status(run.p1) == 0,
+        "sort online party exit status");
+  check_events(run.sockets.event0[0],0U);
+  check_events(run.sockets.event1[0],1U);
+  check(report0.offline_bytes == dealer_sizes.first + 8U &&
+        report1.offline_bytes == dealer_sizes.second + 8U,
+        "sort offline material accounting");
+  const auto ranks = stable_ranks_cmpagg(data.scores);
+  std::vector<bool> seen(p.n,false);
+  for (std::uint32_t target = 0; target < p.n; ++target) {
+    std::uint32_t original = 0;
+    while (original < p.n && ranks[original] != target) ++original;
+    check(original < p.n && !seen[original],
+          "sort process missing/duplicate original item");
+    seen[original] = true;
+    const auto decoded = protocol_iii_unpack_key_payload_nonzero(
+        ProtocolIIIField::add(report0.sorted_shares[target],
+                              report1.sorted_shares[target]),
+        c0.comparison_bits);
+    check(decoded.first == protocol_i_priority_key(
+              data.scores[original],original,c0.padded_n).value &&
+          decoded.second == data.payloads[original],
+          "sort process output differs from clear rank oracle");
+  }
+  check(std::all_of(seen.begin(),seen.end(),[](bool value){return value;}),
+        "sort process lost input item");
+  const auto r1_bytes = 92U + 40U * p.n;
+  const auto r2_bytes = 92U + 24U * p.n;
+  const auto r1_bits = static_cast<std::uint64_t>(p.n) *
+      (c0.comparison_bits + 254U);
+  const auto r2_bits = static_cast<std::uint64_t>(p.n) *
+      (c0.rank_bits + 127U);
+  for (const auto* report : {&report0,&report1})
+    check(report->metrics.round1_sent_bytes == r1_bytes &&
+          report->metrics.round1_received_bytes == r1_bytes &&
+          report->metrics.round2_sent_bytes == r2_bytes &&
+          report->metrics.round2_received_bytes == r2_bytes &&
+          report->metrics.round1_logical_bits == r1_bits &&
+          report->metrics.round2_logical_bits == r2_bits,
+          "sort protocol byte/bit accounting");
+  return {p,report0,report1,dealer_sizes.first,dealer_sizes.second};
+}
+
+int sort_controller_main(const std::string& exe) {
+  std::mt19937_64 random(UINT64_C(0x5f570000c0ffee));
+  std::set<std::uint64_t> issued_material;
+  std::uint64_t case_number = 1U;
+  std::size_t completed = 0;
+  SortSample sample;
+  auto execute_case = [&](std::uint32_t n, std::uint32_t variant) {
+    const auto data = make_case(n,variant,random);
+    const PublicRun p{n,n,0U,
+        UINT64_C(0x5f57100000000000) + case_number,
+        UINT64_C(0x5f57200000000000) + case_number,
+        UINT64_C(0x5f57300000000000) + case_number};
+    check(issued_material.insert(p.material_id).second,
+          "sort controller material replay");
+    sample = run_sort_success(exe,p,data,random());
+    ++case_number;
+    ++completed;
+  };
+  for (const auto n : {2U,3U,5U,8U})
+    for (const auto variant : {0U,2U,3U}) execute_case(n,variant);
+  execute_case(3U,4U);
+  execute_case(5U,6U);
+  const auto failure_data = make_case(3U,2U,random);
+  std::size_t failures = 0;
+  for (const std::string fault : {"bundle_field","r1_truncated","r2_truncated"}) {
+    const PublicRun p{3U,3U,0U,
+        UINT64_C(0x5f57100000000000) + case_number,
+        UINT64_C(0x5f57200000000000) + case_number,
+        UINT64_C(0x5f57300000000000) + case_number};
+    check(issued_material.insert(p.material_id).second,
+          "sort controller failure material replay");
+    run_failure(exe,p,failure_data,random(),fault,true);
+    ++case_number;
+    ++failures;
+  }
+  check(!issued_material.insert(sample.public_run.material_id).second,
+        "sort controller accepted duplicate material identity");
+  std::cout << "M5-G SORT_PROCESS_E2E_PASS=" << completed
+            << " SORT_PROCESS_FAILURE_PASS=" << failures << '\n';
+  std::cout << "SORT_SAMPLE_N=" << sample.public_run.n
+            << " P0_OFFLINE_BUNDLE_BYTES=" << sample.dealer_p0
+            << " P1_OFFLINE_BUNDLE_BYTES=" << sample.dealer_p1
+            << " R1_P0_BYTES=" << sample.p0.metrics.round1_sent_bytes
+            << " R1_P1_BYTES=" << sample.p1.metrics.round1_sent_bytes
+            << " R2_P0_BYTES=" << sample.p0.metrics.round2_sent_bytes
+            << " R2_P1_BYTES=" << sample.p1.metrics.round2_sent_bytes
+            << " R1_LOGICAL_BITS=" <<
+                 sample.p0.metrics.round1_logical_bits +
+                 sample.p1.metrics.round1_logical_bits
+            << " R2_LOGICAL_BITS=" <<
+                 sample.p0.metrics.round2_logical_bits +
+                 sample.p1.metrics.round2_logical_bits << '\n';
+  return 0;
+}
+
 } // namespace
 
 int main(int argc, char** argv) {
   try {
     if (argc == 1) return controller_main(executable_path(argv[0]));
+    if (argc == 2 && std::string(argv[1]) == "--sort-controller")
+      return sort_controller_main(executable_path(argv[0]));
     check(argc >= 2,"process role");
     const std::string role(argv[1]);
     const auto p = parse_public(argc,argv,2);
@@ -1008,13 +1221,13 @@ int main(int argc, char** argv) {
       return dealer_main(p,std::stoull(argv[8]),
           parse_fd(argv[9]),parse_fd(argv[10]),parse_fd(argv[11]),argv[12]);
     }
-    if (role == "--party") {
+    if (role == "--party" || role == "--sort-party") {
       check(argc == 16,"party argument count");
       const auto party = static_cast<std::uint8_t>(std::stoul(argv[8]));
       check(party <= 1U,"party id");
       return party_main(p,party,parse_fd(argv[9]),parse_fd(argv[10]),
           parse_fd(argv[11]),parse_fd(argv[12]),parse_fd(argv[13]),
-          parse_fd(argv[14]),argv[15]);
+          parse_fd(argv[14]),argv[15],role == "--sort-party");
     }
     throw std::runtime_error("unknown process role");
   } catch (const std::exception& e) {

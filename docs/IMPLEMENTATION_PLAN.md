@@ -566,9 +566,15 @@ bundle 并在在线输入释放前退出；P0/P1 各自执行两个 framed excha
 证明同轮 outbound 在 peer 消息读取前冻结，R2 后无协议发送。见
 [M5-F process closeout](reproduction/M5_PROTOCOL_III_TWO_ROUND_PROCESS_E2E_2026-09-25.md)
 及 [M5-F process decision](decisions/M5_PROTOCOL_III_TWO_ROUND_PROCESS_BOUNDARY_DECISION_2026-09-25.md)。
-该 candidate 的入口为已分享的 field payload，出口为选中 record 的 field
-份额。secure ring-to-field 输入转换、原顺序 mask 输出 adapter 与 Theorem 4.2
-独立成本核验仍属后续阶段；不能将完整 raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
+M5-G 复用同一 CmpAgg、field DPF keys 与两轮 R1/R2 transcript，在 R2 后通过
+field FullEval 本地形成完整 rank-order field-record share vector；独立进程
+P2/P0/P1 Fsort 差分与因果回归已通过。见
+[M5-G decision](decisions/M5_PROTOCOL_III_FSORT_FULLEVAL_DECISION_2026-09-25.md)
+及 [M5-G closeout](reproduction/M5_PROTOCOL_III_FSORT_FULLEVAL_2026-09-25.md)。
+该 candidate 的入口为已分享的 field payload，Fselect 出口为单个 selected
+record 份额，Fsort 出口为 rank-order record 份额向量。secure ring-to-field
+输入转换、原顺序 mask 输出 adapter 与 Theorem 4.2 独立成本核验仍属后续阶段；
+不能将完整 raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
 `Z_(2^rank_bits)` 实例化，不因 payload field 的加入而等同论文 `Z_n`。
 
 #### 前置条件

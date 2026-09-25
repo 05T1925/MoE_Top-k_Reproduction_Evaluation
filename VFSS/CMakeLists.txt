@@ -407,6 +407,18 @@ add_executable(
 )
 target_link_libraries(moe_topk_m5f_two_round_process_e2e_test PRIVATE ${PROJECT_NAME})
 
+add_executable(
+    moe_topk_m5g_field_full_eval_test
+    tests/moe_topk/protocol_iii_field_full_eval_test.cpp
+)
+target_link_libraries(moe_topk_m5g_field_full_eval_test PRIVATE ${PROJECT_NAME})
+
+add_executable(
+    moe_topk_m5g_two_round_fsort_test
+    tests/moe_topk/protocol_iii_two_round_fsort_test.cpp
+)
+target_link_libraries(moe_topk_m5g_two_round_fsort_test PRIVATE ${PROJECT_NAME})
+
 # ===== masked_mul_adapter 测试 =====
 add_executable(
     moe_topk_masked_mul_adapter_test
@@ -641,6 +653,10 @@ if(BUILD_TESTING)
     add_test(NAME moe_topk_m5e_two_round_fselect_test COMMAND moe_topk_m5e_two_round_fselect_test)
     add_test(NAME moe_topk_m5f_two_round_bundle_test COMMAND moe_topk_m5f_two_round_bundle_test)
     add_test(NAME moe_topk_m5f_two_round_process_e2e_test COMMAND moe_topk_m5f_two_round_process_e2e_test)
+    add_test(NAME moe_topk_m5g_field_full_eval_test COMMAND moe_topk_m5g_field_full_eval_test)
+    add_test(NAME moe_topk_m5g_two_round_fsort_test COMMAND moe_topk_m5g_two_round_fsort_test)
+    add_test(NAME moe_topk_m5g_two_round_fsort_process_e2e_test
+             COMMAND moe_topk_m5f_two_round_process_e2e_test --sort-controller)
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
     add_test(

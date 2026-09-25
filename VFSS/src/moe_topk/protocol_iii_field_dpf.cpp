@@ -79,6 +79,40 @@ std::pair<ProtocolIIIField, std::uint8_t> descend(
   return {field_leaf(state), t};
 }
 
+void full_eval_tree(const DPFKeyPack& key,
+                    ProtocolIIIField correction,
+                    std::uint8_t party,
+                    block seed, std::uint8_t control,
+                    std::uint8_t depth, std::uint64_t prefix,
+                    std::vector<ProtocolIIIField>& out) {
+  if (depth == static_cast<std::uint8_t>(key.bin)) {
+    const auto leaf = field_leaf(seed);
+    const auto local = control == 0U ? leaf
+        : ProtocolIIIField::add(leaf, correction);
+    out[static_cast<std::size_t>(prefix)] = party == 0U ? local
+        : ProtocolIIIField::sub(ProtocolIIIField{}, local);
+    return;
+  }
+  static const block not_one_block = osuCrypto::toBlock(
+      ~UINT64_C(0), ~UINT64_C(1));
+  const osuCrypto::AES aes(seed);
+  const block points[2] = {osuCrypto::ZeroBlock, osuCrypto::OneBlock};
+  block children[2];
+  aes.ecbEncTwoBlocks(points, children);
+  for (std::uint8_t direction = 0U; direction < 2U; ++direction) {
+    block next_seed = children[direction] & not_one_block;
+    std::uint8_t next_control = lsb(children[direction]);
+    if (control != 0U) {
+      next_seed = next_seed ^ _mm_loadu_si128(key.s + depth + 1U);
+      next_control ^= static_cast<std::uint8_t>(
+          (key.tcw[direction] >> (key.bin - 1 - depth)) & 1U);
+    }
+    full_eval_tree(key, correction, party, next_seed, next_control,
+                   static_cast<std::uint8_t>(depth + 1U),
+                   (prefix << 1U) | direction, out);
+  }
+}
+
 void append_word(std::vector<std::uint8_t>& out, std::uint64_t word, std::size_t bytes) {
   for (std::size_t index = bytes; index > 0U; --index) {
     out.push_back(static_cast<std::uint8_t>(word >> ((index - 1U) * 8U)));
@@ -222,6 +256,30 @@ ProtocolIIIField protocol_iii_field_dpf_eval(
   const auto [leaf, t] = descend(key.tree_key_.native_key(), key.party_, input);
   const auto local = t == 0U ? leaf : ProtocolIIIField::add(leaf, key.correction_);
   return key.party_ == 0U ? local : ProtocolIIIField::sub(ProtocolIIIField{}, local);
+}
+
+std::vector<ProtocolIIIField> protocol_iii_field_dpf_full_eval(
+    const ProtocolIIIFieldDpfPartyKey& key,
+    std::uint8_t expected_party,
+    std::uint64_t expected_session,
+    std::uint64_t expected_fingerprint,
+    std::uint32_t expected_slot,
+    std::uint8_t expected_domain_bits) {
+  require(key.party_ == expected_party && key.session_ == expected_session &&
+              key.fingerprint_ == expected_fingerprint &&
+              key.slot_ == expected_slot &&
+              key.domain_bits() == expected_domain_bits,
+          "Protocol III field FullEval party/session/slot/domain mismatch");
+  require(expected_domain_bits >= 1U && expected_domain_bits <= 20U,
+          "Protocol III field FullEval domain size");
+  const auto& native = key.tree_key_.native_key();
+  require(native.s != nullptr && native.bout == 64 && native.payload == 0U,
+          "Protocol III field FullEval native tree layout");
+  std::vector<ProtocolIIIField> out(
+      std::size_t{1} << expected_domain_bits);
+  full_eval_tree(native, key.correction_, key.party_,
+                 _mm_loadu_si128(native.s), key.party_, 0U, 0U, out);
+  return out;
 }
 
 std::pair<ProtocolIIIFieldPayloadPartyMaterial,

@@ -66,11 +66,24 @@ class ProtocolIIITwoRoundParty {
   [[nodiscard]] ProtocolIIIField consume_round2(
       const std::vector<std::uint8_t>& peer_message);
 
+  // Fsort extension: the same R1/R2 transcript and preprocessing yield all
+  // logical rank slots by local field DPF FullEval after receiving R2.
+  // Use k=logical_n and target_rank=0 in the existing bound configuration;
+  // the target field is unused by this finalizer. No padded slot is returned.
+  [[nodiscard]] std::vector<ProtocolIIIField> consume_round2_sort(
+      const std::vector<std::uint8_t>& peer_message);
+
   [[nodiscard]] const std::vector<std::uint64_t>& rank_additive_shares() const noexcept {
     return rank_shares_;
   }
 
  private:
+  struct OpenedRound2 {
+    std::vector<std::uint64_t> masked_ranks;
+    std::vector<ProtocolIIIField> masked_payloads;
+  };
+  [[nodiscard]] OpenedRound2 open_round2(
+      const std::vector<std::uint8_t>& peer_message);
   enum class Phase { fresh, round1_prepared, round1_consumed,
                      round2_prepared, finished, failed };
   ProtocolIIITwoRoundConfig config_;

@@ -323,35 +323,74 @@ std::vector<std::uint8_t> ProtocolIIITwoRoundParty::prepare_round2() {
   return out;
 }
 
-ProtocolIIIField ProtocolIIITwoRoundParty::consume_round2(
+ProtocolIIITwoRoundParty::OpenedRound2
+ProtocolIIITwoRoundParty::open_round2(
     const std::vector<std::uint8_t>& peer) {
   require(phase_ == Phase::round2_prepared, "two-round R2 receive lifecycle");
   phase_ = Phase::failed;
   const auto n = config_.logical_n;
   auto cursor = check_header(peer, config_, 2U, static_cast<std::size_t>(n) * 24U);
-  std::vector<std::uint64_t> masked_ranks(n);
+  OpenedRound2 opened;
+  opened.masked_ranks.reserve(n);
+  opened.masked_payloads.reserve(n);
   for (std::uint32_t i = 0; i < n; ++i) {
     const auto share = get_word(peer, cursor, 8U);
     require((share & ~low_mask(config_.rank_bits)) == 0U,
             "two-round peer rank-mask share outside ring");
-    masked_ranks[i] = (local_masked_ranks_[i] + share) & low_mask(config_.rank_bits);
+    opened.masked_ranks.push_back(
+        (local_masked_ranks_[i] + share) & low_mask(config_.rank_bits));
   }
+  for (std::uint32_t i = 0; i < n; ++i)
+    opened.masked_payloads.push_back(ProtocolIIIField::add(
+        masked_payload_shares_[i], get_field(peer, cursor)));
+  require(cursor == peer.size(), "two-round R2 trailing bytes");
+  return opened;
+}
+
+ProtocolIIIField ProtocolIIITwoRoundParty::consume_round2(
+    const std::vector<std::uint8_t>& peer) {
+  const auto opened = open_round2(peer);
   ProtocolIIIField result;
-  for (std::uint32_t i = 0; i < n; ++i) {
-    const auto public_masked_payload = ProtocolIIIField::add(
-        masked_payload_shares_[i], get_field(peer, cursor));
+  for (std::uint32_t i = 0; i < config_.logical_n; ++i) {
     const auto& dpf = material_.payload_material[i].dpf_key;
-    const auto x = (masked_ranks[i] - config_.target_rank) & low_mask(config_.rank_bits);
+    const auto x = (opened.masked_ranks[i] - config_.target_rank) &
+                   low_mask(config_.rank_bits);
     const auto indicator = protocol_iii_field_dpf_eval(
         dpf, config_.party, config_.session, config_.fingerprint, i, x);
     result = ProtocolIIIField::add(result,
-        ProtocolIIIField::mul(public_masked_payload, indicator));
+        ProtocolIIIField::mul(opened.masked_payloads[i], indicator));
   }
-  require(cursor == peer.size(), "two-round R2 trailing bytes");
   masked_payload_shares_.clear();
   local_masked_ranks_.clear();
   phase_ = Phase::finished;
   return result;
+}
+
+std::vector<ProtocolIIIField> ProtocolIIITwoRoundParty::consume_round2_sort(
+    const std::vector<std::uint8_t>& peer) {
+  require(config_.k == config_.logical_n && config_.target_rank == 0U,
+          "two-round Fsort configuration");
+  const auto opened = open_round2(peer);
+  const auto n = config_.logical_n;
+  const auto rank_mask = low_mask(config_.rank_bits);
+  std::vector<ProtocolIIIField> out(n);
+  for (std::uint32_t i = 0; i < n; ++i) {
+    const auto& dpf = material_.payload_material[i].dpf_key;
+    const auto full = protocol_iii_field_dpf_full_eval(
+        dpf, config_.party, config_.session, config_.fingerprint, i,
+        config_.rank_bits);
+    // FullEval[x] represents f_{r_rank[i],s_i^-1}(x). For public masked
+    // rank m_i, target t queries x=m_i-t in the project's rank ring.
+    for (std::uint32_t target = 0; target < n; ++target) {
+      const auto x = (opened.masked_ranks[i] - target) & rank_mask;
+      out[target] = ProtocolIIIField::add(out[target],
+          ProtocolIIIField::mul(opened.masked_payloads[i], full[x]));
+    }
+  }
+  masked_payload_shares_.clear();
+  local_masked_ranks_.clear();
+  phase_ = Phase::finished;
+  return out;
 }
 
 ProtocolIIITwoRoundOutput protocol_iii_two_round_party(

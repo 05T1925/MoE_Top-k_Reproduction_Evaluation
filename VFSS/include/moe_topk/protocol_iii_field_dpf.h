@@ -51,6 +51,10 @@ class ProtocolIIIFieldDpfPartyKey {
       const ProtocolIIIFieldDpfPartyKey&,
       std::uint8_t, std::uint64_t, std::uint64_t, std::uint32_t,
       std::uint64_t);
+  friend std::vector<ProtocolIIIField> protocol_iii_field_dpf_full_eval(
+      const ProtocolIIIFieldDpfPartyKey&,
+      std::uint8_t, std::uint64_t, std::uint64_t, std::uint32_t,
+      std::uint8_t);
 };
 
 [[nodiscard]] std::pair<ProtocolIIIFieldDpfPartyKey, ProtocolIIIFieldDpfPartyKey>
@@ -69,6 +73,17 @@ protocol_iii_field_dpf_generate(
     std::uint64_t expected_fingerprint,
     std::uint32_t expected_slot,
     std::uint64_t input);
+
+// Full-domain field shares in native DPF input order x=0,...,2^bits-1.
+// Traverses one native tree per key; never reinterprets ring FullEval outputs
+// as field shares. Limited to 2^20 entries for bounded allocation.
+[[nodiscard]] std::vector<ProtocolIIIField> protocol_iii_field_dpf_full_eval(
+    const ProtocolIIIFieldDpfPartyKey& key,
+    std::uint8_t expected_party,
+    std::uint64_t expected_session,
+    std::uint64_t expected_fingerprint,
+    std::uint32_t expected_slot,
+    std::uint8_t expected_domain_bits);
 
 // Dealer-only factory. P0 and P1 receive one additive mask share and one
 // DPF key each. Neither material contains the full s or scalar s^{-1}.
