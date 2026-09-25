@@ -50,6 +50,7 @@ PRIVATE
     src/moe_topk/protocol_iii_field_dpf.cpp
     src/moe_topk/protocol_iii_field_mul.cpp
     src/moe_topk/protocol_iii_two_round.cpp
+    src/moe_topk/protocol_iii_two_round_package.cpp
     src/moe_topk/masked_mul_adapter.cpp
     src/moe_topk/protocol_iii_secure_combine.cpp
     src/moe_topk/protocol_iii_raw_score_pipeline.cpp
@@ -393,6 +394,19 @@ add_executable(
 )
 target_link_libraries(moe_topk_m5e_two_round_fselect_test PRIVATE ${PROJECT_NAME})
 
+# M5-F: versioned complete offline party bundle across process boundaries.
+add_executable(
+    moe_topk_m5f_two_round_bundle_test
+    tests/moe_topk/protocol_iii_two_round_package_test.cpp
+)
+target_link_libraries(moe_topk_m5f_two_round_bundle_test PRIVATE ${PROJECT_NAME})
+
+add_executable(
+    moe_topk_m5f_two_round_process_e2e_test
+    tests/moe_topk/protocol_iii_two_round_process_e2e_test.cpp
+)
+target_link_libraries(moe_topk_m5f_two_round_process_e2e_test PRIVATE ${PROJECT_NAME})
+
 # ===== masked_mul_adapter 测试 =====
 add_executable(
     moe_topk_masked_mul_adapter_test
@@ -625,6 +639,8 @@ if(BUILD_TESTING)
                  COMMAND moe_topk_m5d_${m5d_test}_test)
     endforeach()
     add_test(NAME moe_topk_m5e_two_round_fselect_test COMMAND moe_topk_m5e_two_round_fselect_test)
+    add_test(NAME moe_topk_m5f_two_round_bundle_test COMMAND moe_topk_m5f_two_round_bundle_test)
+    add_test(NAME moe_topk_m5f_two_round_process_e2e_test COMMAND moe_topk_m5f_two_round_process_e2e_test)
     add_test(NAME moe_topk_masked_mul_adapter_test COMMAND moe_topk_masked_mul_adapter_test)
     add_test(NAME moe_topk_m3_secure_combine_test COMMAND moe_topk_m3_secure_combine_test)
     add_test(

@@ -561,10 +561,14 @@ candidate 中组合 shared CmpAgg、M5-D field DPF 与非零 payload mask，
 完成单 rank Fselect 的两轮因果状态机和差分/传输测试；见
 [2026-09-25 two-round candidate decision](decisions/M5_PROTOCOL_III_TWO_ROUND_CANDIDATE_DECISION_2026-09-25.md)
 及 [M5-E closeout](reproduction/M5_PROTOCOL_III_TWO_ROUND_FSELECT_CANDIDATE_2026-09-25.md)。
+M5-F 已完成独立 fork+exec P2/P0/P1 process E2E：P2 离线分发完整 party-local
+bundle 并在在线输入释放前退出；P0/P1 各自执行两个 framed exchange，过程事件
+证明同轮 outbound 在 peer 消息读取前冻结，R2 后无协议发送。见
+[M5-F process closeout](reproduction/M5_PROTOCOL_III_TWO_ROUND_PROCESS_E2E_2026-09-25.md)
+及 [M5-F process decision](decisions/M5_PROTOCOL_III_TWO_ROUND_PROCESS_BOUNDARY_DECISION_2026-09-25.md)。
 该 candidate 的入口为已分享的 field payload，出口为选中 record 的 field
-份额。secure ring-to-field 输入转换、原顺序 mask 输出 adapter、独立 P2/P0/P1
-process closeout 与 Theorem 4.2 独立成本核验仍属后续阶段；不能将完整
-raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
+份额。secure ring-to-field 输入转换、原顺序 mask 输出 adapter 与 Theorem 4.2
+独立成本核验仍属后续阶段；不能将完整 raw-score 路径称为两轮。非 2 幂 `n` 的 rank 域仍为项目
 `Z_(2^rank_bits)` 实例化，不因 payload field 的加入而等同论文 `Z_n`。
 
 #### 前置条件
