@@ -1,15 +1,13 @@
 # 双人实施分工与交接计划
 
-状态：**已采纳；当前状态按 2026-09-25 更新**。
+状态：已采纳；当前状态更新于 2026-09-26。
 
 本文依据 `PROJECT.md` 和 `docs/IMPLEMENTATION_PLAN.md`，明确双人职责、并行边界、公共文件所有权及交接条件。
 
 本次修订保留已完成的 M1/M1.1、M2 工程基线和 M3 模块化基线，不改变冻结的 score、tie-break、rank 和原顺序 Top-K mask 语义。
 
-当前主线为 **M2 COMPLETED → M5 IN PROGRESS**。M2 已完成 current engineering acceptance：three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界。dated strict-gate 记录属于历史，不再阻塞 M5 runtime。
-M5-B–G 已在工作分支完成；M5-H1 通信按数量级门槛通过，精确 Theorem 4.2 逻辑式仍差 `254n` bits。M5-H2 [独立评审](reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，M5 当时最终关闭 FAIL（F1/F2）；M5 整体仍 IN PROGRESS。F1 此后本地核验完成，下一步为冻结 revision 和接收方 G3 复跑；见 [暂定交接](handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。
-
-M5-FIX-F1 四轮项目标准 mask 专用入口已本地验证，成本包含两轮输入适配、GRank 与 DPF routing；其通用 field Fselect/Fsort 核心未修改，详见 [F1 decision](decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 和 [F1 evidence](reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。待用户授权冻结 revision 后由接收方独立复跑 F2/G3；M5 仍 IN PROGRESS。
+当前顺序：M2 COMPLETED → M5 COMPLETED → M6A ACTIVE。M5-H2 评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 在项目工程验收边界完成。见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，精确成本差异及通用 field 转换未实现等限制仍然有效。
+M5-H1 通过用户指定的数量级门槛；Theorem 4.2 精确逻辑式仍相差 `254n` bits。接收方在同一 revision 独立通过 F2/G3。`AUTHOR_EXACT = NOT_PROVEN`；通用 field 转换仍未实现。
 
 ## 1. 当前分工与执行顺序
 
@@ -18,7 +16,7 @@ M5-FIX-F1 四轮项目标准 mask 专用入口已本地验证，成本包含两�
 | 角色 | 当前主责 | 后续主责 |
 | --- | --- | --- |
 | 角色 A（搭档） | 维护 M2 已完成资产并评审 CmpAgg/rank-share 复用 | Protocol I 路线的升级实现与性能测试；公共比较材料和预处理 |
-| 角色 B（Protocol III 负责人） | M5 Protocol III two-round path | 基于交接接口推进通信核验及对应升级 |
+| 角色 B（Protocol III） | M5 交接完成 | Protocol III+AAV86 设计、实现与性能验收 |
 | 双方共同 | 交叉评审、交接复跑、公共契约核对 | 图算法设计、计量审计、阶段验收和最终报告 |
 
 角色 A 不再承担 CipherGPT 实施或性能测试任务。角色 B 不重新实现已经完成的 M3 三轮基线。
@@ -27,10 +25,7 @@ M5-FIX-F1 四轮项目标准 mask 专用入口已本地验证，成本包含两�
 
 ```text
 M2 Protocol I：COMPLETED
-  → 角色 B：M5 Protocol III two-round path（IN PROGRESS）
-  → 实现与正确性验收
-  → M5-H2 独立评审完成，最终关闭 FAIL（F1/F2）
-  → M5-FIX / 接收方 G3 复跑后双方冻结基础接口与计量结果
+  → M5 Protocol III：COMPLETED（F1/F2/G3 PASS；接收方已复跑并记录）
   → AAV86 两种升级实现及完整性能验收
   → BB90+DCF 两种升级实现及完整性能验收
   → 六种方案统一报告
@@ -44,7 +39,7 @@ Protocol I 的论文核心目标为三轮，Protocol III 为两轮。输入适�
 - M2：**COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent review PASS、Theorem 4.1 online logical communication match、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN`。
 - M3：三轮模块化核心及 raw-score 五轮扩展已完成。
 - M4：取消，不再作为任何后续阶段的前置条件。
-- M5：**IN PROGRESS / 正在进行**；shared clique CmpAgg / GRank → DPF routing → two-round composition，复用既有 ranking core。
+- M5：COMPLETED；F1 标准 mask 入口与 F2/G3 接收方签收通过。见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
 - M6A：Protocol I、Protocol III 的 AAV86 升级及完整性能验收。
 - M6B：Protocol I、Protocol III 的 BB90+DCF 升级及完整性能验收。
 - M7：六种方案统一汇总与报告。
@@ -207,7 +202,7 @@ G1：协议实现与正确性完成
 
 M5 完成后沿用同样三阶段结构，由角色 B 主责交付、角色 A 交叉核验，再进入 M6A。
 
-M2 已完成当前工程验收并完成 M2→M5 handoff；M5 runtime 为当前活动工作。`AUTHOR_EXACT = NOT_PROVEN` 仍保留为 M2 证据边界。
+M2 已完成当前工程验收并完成 M2→M5 handoff；M5 与 M5-FIX-F1 已在接收方 G3 通过后关闭，M6A 为当前活动阶段。`AUTHOR_EXACT = NOT_PROVEN` 仍保留为 M2/M5 证据边界。
 
 ### 4.2 输入、rank 和输出
 

@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-25
+更新日期：2026-09-26
 
 ## 1. 项目目标与当前边界
 
@@ -39,13 +39,11 @@
 
 ### 1.3 当前执行顺序
 
-M0、M1/M1.1、M2 和 M3 的已完成记录保持不变。当前活动里程碑为 M5，后续执行顺序固定为：
+M0、M1/M1.1、M2、M3 和 M5 已完成。当前里程碑为 M6A，后续顺序为：
 
 ```text
 M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验）
-  → M5：IN PROGRESS（Protocol III 论文精确两轮核心）
-  → M5-H2：独立评审完成，最终关闭 FAIL（F1/F2）
-  → M5-FIX 与接收方 G3 复跑
+  → M5：COMPLETED（F1/F2/G3 接收方签收通过）
   → M6A：I+AAV86、III+AAV86 实现与完整性能测试
   → M6B：I+BB90+DCF、III+BB90+DCF 实现与完整性能测试
   → M7：六种方案统一汇总与报告
@@ -53,9 +51,7 @@ M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
-M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已在工作分支完成。M5-H1 通信测量按用户指定的**数量级**门槛通过（n=2–128，Fselect/Fsort 两轮；实现/论文逻辑位比约 1.42–1.44）；Theorem 4.2 **精确逻辑公式不匹配**，差额为 `254n` bits，作者转录未证明。M5-H2 [独立评审](docs/reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，H2 当时的最终关闭结论为 FAIL，指出 F1 输入/输出适配和统一 mask 成本以及 F2 接收方 G3 复跑。M5 整体仍为 **IN PROGRESS**；F1 此后已完成本地实现/核验，下一步为 F1 revision 冻结、F2/G3 与 [暂定 M5→M6A 交接](docs/handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。见 [M5-H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。
-
-M5-FIX-F1 已新增安全 raw-score shares→原顺序 XOR Top-K mask 的四轮项目专用路径并完成本地差分、独立进程、成本及 sanitizer 核验；两轮 field Fselect/Fsort 核心未改变。该路径无需 secret field record，故不宣称通用 ring→field 或 field→bit 适配已完成。F1 尚未形成可 fetch 的冻结提交；F2/G3 接收方复跑仍未完成，M5 保持 IN PROGRESS。见 [F1 decision](docs/decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 与 [F1 evidence](docs/reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。
+M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已合入 main。M5-H1 按用户指定的数量级门槛通过（n=2–128，Fselect/Fsort）；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits，且没有作者精确复现记录。M5-H2 独立评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 已完成，F2 / G3 = PASS。详见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，精确成本及其他已记录限制仍然有效。F1 是四轮 bit-mask 项目实例化；通用 ring-to-field 与 field-to-XOR 转换仍未实现。
 
 M2 已完成当前工程验收：three-round C-INSTANTIATION 已实现，独立 three-round
 review 为 PASS，在线逻辑通信与 Theorem 4.1 匹配，且 Protocol I PR 已合并。
@@ -587,10 +583,10 @@ M3 继续作为 M5 的实现基础、正确性对照和压缩前基线，不重�
 
 ### M5：Protocol III 精确两轮核心与通信核验
 
-状态：**IN PROGRESS / 正在进行**。
+状态：**COMPLETED / 已完成**。G1/G2 与接收方 F2/G3 已关闭；具体入口、四轮全路径和保留限制见本节接收签收记录。
 
-当前目标为 Protocol III two-round path：shared clique CmpAgg / GRank → DPF
-routing → two-round composition。M5 复用现有 uCMP、DCF、CmpAgg Gen/Eval、
+M5 的核心目标为 Protocol III two-round path：shared clique CmpAgg / GRank → DPF
+routing → two-round composition。该阶段复用现有 uCMP、DCF、CmpAgg Gen/Eval、
 priority-key semantics 与 rank-share contract，不重新实现第二份 ranking core。
 
 前置条件：
@@ -733,9 +729,9 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 - M2：**COMPLETED / 已完成**；three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1，Protocol I PR 已合并。
 - M2 的 `AUTHOR_EXACT = NOT_PROVEN` 是保留的证据边界，不是 M2 工程里程碑阻塞项。
 - M3 三轮模块化核心与 raw-score 五轮扩展已完成整改并冻结。
-- M5：**IN PROGRESS / 正在进行**；目标是 shared clique CmpAgg / GRank → DPF routing → two-round composition，并复用既有 ranking core。
+- M5：**COMPLETED / 已完成（F1/F2/G3 接收方签收通过）**。标准入口 protocol_iii_raw_score_mask_party 接收 signed Q20.12 的 Z_(2^32) 加法份额，输出原输入顺序 XOR Top-K mask 份额；完整路径四轮，generic field Fselect/Fsort core 仍为两轮。
 - M5-H1：**COMPLETED（数量级门槛）**；Fselect/Fsort 实测通信量和论文同阶，精确 logical cost 仍差 `254n` bits。
-- M5-H2：**独立评审完成，M5 最终关闭 FAIL**；当时发现 F1/F2。F1 后续本地实现/核验已完成；F2/G3 接收方复跑待完成。
+- M5-H2 独立评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 完成 G3，M5 与 M5-FIX-F1 关闭。接收签收：[G3 acceptance](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
 - VFSS 已有 DCF、DPF、CmpAgg、通信、两遍 shuffle 和独立进程测试基础。
 - M3 已有分方 report 与结构化 MetricsRecord 汇总。
 - 完整可信的在线 PRG 计数及正式 LAN/WAN 性能测量仍需补齐。
@@ -745,8 +741,8 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 
 当前责任归属为：
 
-- 角色 A（搭档）：维护 Protocol I 已完成资产并参与 M5 的 CmpAgg/rank-share 复用评审。
-- 角色 B（你）：推进 M5 Protocol III two-round path。
+- 角色 A（搭档）：推进 Protocol I+AAV86 路线及公共比较材料。
+- 角色 B（Protocol III 负责人）：推进 Protocol III+AAV86 路线。
 - 双方：交叉评审公共接口、语义、轮数与成本证据；后续分工按更新后的详细计划执行。
 
 上述安排仅描述当前工作分工；历史 strict-exact 证据记录不被本次状态更新改写。
