@@ -2,7 +2,7 @@
 
 本仓库以 **VFSS** 为唯一活动实现框架，建立统一语义、可复现、可横向比较的安全 Top-K 实验环境。
 
-M2 Protocol I 已完成当前工程验收；当前活动里程碑为 M5 Protocol III two-round path，之后依次完成 AAV86、BB90+DCF 两条升级路线及完整性能测试。
+M2 Protocol I 和 M5 Protocol III 已完成当前工程验收。当前开始 M6A AAV86 实现与完整性能评估。
 
 M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参考，不作为后续阶段的前置条件。
 
@@ -16,14 +16,14 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 | M2 | 已完成 | three-round C-INSTANTIATION implemented；independent three-round review PASS；online logical communication matches Theorem 4.1；Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` |
 | M3 | 已完成并冻结 | priority-key 三轮入口，以及 raw-score 五轮扩展 |
 | M4 | 已取消 | 不实施 CipherGPT，不安排其性能实验 |
-| M5 | 正在进行 | M5-B–G 实现/回归完成；H1 通信数量级通过；H2 当时关闭 FAIL（F1/F2）；F1 本地实现/核验完成，F2/G3 待复跑 |
-| M6A | 后续目标 | I+AAV86、III+AAV86 实现及完整性能验收 |
+| M5 | 已完成 | F1 标准 mask 入口与独立 F2/G3 接收方签收通过；见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md) |
+| M6A | 进行中 | Protocol I+AAV86、Protocol III+AAV86 实现及完整性能验收 |
 | M6B | 后续目标 | I+BB90+DCF、III+BB90+DCF 实现及完整性能验收 |
 | M7 | 后续目标 | 六种方案统一汇总与报告 |
 
-M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中按用户指定数量级门槛通过；实现/论文逻辑位比约 1.42–1.44，精确式差 `254n` bits。见 [H1 communication evidence](docs/reproduction/M5_PROTOCOL_III_2ROUND_ONLINE_COMMUNICATION_UBUNTU_2026-09-25.md)。M5-H2 [独立评审](docs/reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，H2 当时关闭 FAIL（F1/F2）；F1 此后本地实现/核验已完成，F2 接收方 G3 复跑仍待处理。见 [暂定 M5→M6A 交接](docs/handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。M5 仍在进行；`AUTHOR_EXACT = NOT_PROVEN`。
+M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中通过用户指定的数量级门槛；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits。H2 评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑，41/41 回归、raw-score-to-mask E2E、进程隔离、成本 smoke 和失败 smoke 均通过。见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，Theorem 4.2 精确成本仍不匹配。
 
-M5-FIX-F1 已新增安全 raw-score shares→原顺序 XOR Top-K mask 的四轮项目专用路径并完成本地差分、独立进程、成本及 sanitizer 核验；两轮 field Fselect/Fsort 核心未改变。该路径无需 secret field record，故不宣称通用 ring→field 或 field→bit 适配已完成。F1 尚未形成可 fetch 的冻结提交；F2/G3 接收方复跑仍未完成，M5 保持 IN PROGRESS。见 [F1 decision](docs/decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 与 [F1 evidence](docs/reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。
+Protocol III 标准 mask 入口 `protocol_iii_raw_score_mask_party` 接收 signed Q20.12 的 Z_(2^32) 加法份额，输出原输入顺序的 XOR Top-K mask 份额。完整路径为四轮；通用 field Fselect/Fsort 核心仍为两轮。这个 bit-mask C-INSTANTIATION 不代表通用 ring-to-field 或 field-to-XOR 转换已完成。F1 决策与接收方 G3 签收共同关闭 M5 工程门槛。
 
 已完成的工程实现为：
 
@@ -47,9 +47,7 @@ M5-FIX-F1 已新增安全 raw-score shares→原顺序 XOR Top-K mask 的四轮�
 
 ```text
 M2 Protocol I：COMPLETED
-  → M5 Protocol III two-round path：IN PROGRESS
-  → M5-H2 独立评审完成，最终关闭 FAIL（F1/F2）
-  → M5-FIX / 接收方 G3 复跑与基础接口交接
+  → M5 Protocol III：COMPLETED（F1/F2/G3 PASS）
   → M6A AAV86 两种升级实现及完整性能验收
   → M6B BB90+DCF 两种升级实现及完整性能验收
   → M7 六种方案统一报告
@@ -168,8 +166,8 @@ docs/                 计划、决策、来源与验收记录
 
 ## 当前协作起点
 
-- **角色 A（搭档）**：维护 Protocol I 已完成资产，并评审 M5 的 CmpAgg/rank-share 复用。
-- **角色 B（Protocol III 负责人）**：推进 M5 Protocol III two-round path。
+- **角色 A（Protocol I）**：负责 Protocol I+AAV86 设计、公共比较预处理与性能评估。
+- **角色 B（Protocol III）**：M5 交接已完成；负责 Protocol III+AAV86 设计与实现。
 - **双方**：交叉复跑、维护公共契约，随后分别推进两条协议路线的 AAV86 和 BB90+DCF 升级。
 
 开始工作前：

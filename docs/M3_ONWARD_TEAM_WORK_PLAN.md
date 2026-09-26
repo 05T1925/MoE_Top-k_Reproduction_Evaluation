@@ -1,8 +1,8 @@
 # M3 及后续双人分工计划
 
-状态：**M3 已关闭；M2 COMPLETED；M5 IN PROGRESS**。
+状态：M3 已关闭；M2、M5 COMPLETED；M6A ACTIVE。
 
-更新日期：2026-09-25
+更新日期：2026-09-26
 
 本文承接 `PROJECT.md`、`docs/IMPLEMENTATION_PLAN.md` 和 `docs/TEAM_WORK_PLAN.md`，保留 M3 已完成的接口契约与证据，细化当前任务、后续分工、交叉评审、分支建议及合并顺序。
 
@@ -10,9 +10,7 @@
 
 ```text
 M2 Protocol I：COMPLETED
-  → M5 Protocol III two-round path：IN PROGRESS
-  → M5-H2 独立评审完成，最终关闭 FAIL（F1/F2）
-  → M5-FIX / 接收方 G3 复跑与基础接口交接
+  → M5 Protocol III：COMPLETED（F1/F2/G3 PASS）
   → M6A AAV86 两种升级及完整性能验收
   → M6B BB90+DCF 两种升级及完整性能验收
   → M7 六种方案统一报告
@@ -20,11 +18,11 @@ M2 Protocol I：COMPLETED
 
 M3 是已完成前置基础，不重新安排实现。M4 CipherGPT 已取消，不再作为 M5 或后续阶段的前置条件。
 
-M2 已完成 current engineering acceptance：three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1、Protocol I PR merged。`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界；dated strict-gate 记录属于历史，不阻塞当前 M5 runtime。
+M2 已完成 current engineering acceptance：three-round C-INSTANTIATION implemented、independent three-round review PASS、online logical communication matches Theorem 4.1、Protocol I PR merged。`AUTHOR_EXACT = NOT_PROVEN` 保留为证据边界；dated strict-gate 记录属于历史。
 
-M5-B–G 已在工作分支完成；M5-H1 通信按用户指定数量级门槛通过（n=2–128，Fselect/Fsort），但 Theorem 4.2 精确逻辑式仍差 `254n` bits。M5-H2 [独立评审](reviews/M5_PROTOCOL_III_INDEPENDENT_FINAL_REVIEW_2026-09-25.md)已完成，M5 当时最终关闭 FAIL（F1/F2），仍为 IN PROGRESS。F1 此后本地核验完成，下一步为冻结 revision 和接收方 G3 复跑；见 [暂定交接](handoffs/M5_PROTOCOL_III_TO_M6A_HANDOFF_2026-09-25.md)。
+M5-H1 在 n=2–128 的 Fselect/Fsort 测量中通过用户指定的数量级门槛，Theorem 4.2 精确逻辑成本仍相差 `254n` bits。H2 评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 已完成。见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`；精确成本仍不匹配，通用 field 转换未实现。
 
-M5-FIX-F1 四轮 Q20.12 shares→原顺序 XOR mask 专用路径已完成本地验证和全路径成本核验；通用 field payload 接口未改，不能把完整路径称为两轮。见 [F1 decision](decisions/M5_FIX_F1_SECURE_IO_ADAPTER_DECISION_2026-09-25.md) 和 [F1 evidence](reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md)。F2/G3 接收方复跑与冻结 revision 尚待完成。
+M5-FIX-F1 标准入口接收 signed Q20.12 份额，四轮后输出原输入顺序的 XOR Top-K mask 份额；它与两轮 field Fselect/Fsort 核心是不同接口。
 
 ## 1. 当前基线与复用边界
 
@@ -438,11 +436,13 @@ M2 已完成交接资产包括：
 
 Protocol I 专用 shuffle 不作为 Protocol III 必须调用的部件。
 
-## 5. 当前角色 B：M5 IN PROGRESS
+## 5. 当前角色 B：M6A ACTIVE
 
-### 5.1 交接前任务
+M5 和 M5-FIX-F1 已完成；接收方 G3 在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过。第 5.1–5.4 节记录已完成的 M5 规划、实现与验收职责，不再是待执行清单；当前角色 B 工作切换到 Protocol III+AAV86。
 
-角色 B 当前负责：
+### 5.1 已完成的交接前任务
+
+角色 B 在 M5 期间负责：
 
 1. 同步总体计划、实施计划和两份分工计划。
 2. 更新 README、路线决策和配套说明。
@@ -452,9 +452,9 @@ Protocol I 专用 shuffle 不作为 Protocol III 必须调用的部件。
 6. 整理 M3 复用矩阵与失败用例。
 7. 评审角色 A 的接口和通信核验方法。
 
-不修改任何尚未解锁的 strict shuffle 或公共材料实现，不基于未冻结接口宣称 M5 已完成。
+仍不得修改尚未解锁的 strict shuffle 或公共材料实现，也不得基于未冻结接口宣称后续阶段完成。
 
-### 5.2 M5 实现任务
+### 5.2 已完成的 M5 实现任务
 
 前置条件为 M3 已完成，以及 M2 已完成的 CmpAgg/rank-share handoff 可复用。
 
@@ -472,7 +472,7 @@ Protocol I 专用 shuffle 不作为 Protocol III 必须调用的部件。
 
 单位 payload 特化产生的删轮方案不能直接作为一般压缩路由的精确复现证据。
 
-### 5.3 M5 通信核验
+### 5.3 已完成的 M5 通信核验
 
 角色 B 负责：
 
@@ -486,7 +486,7 @@ Protocol I 专用 shuffle 不作为 Protocol III 必须调用的部件。
 
 角色 A 复跑代表性配置，核查通信、代数和消息依赖。
 
-### 5.4 M5 退出与交接
+### 5.4 已完成的 M5 退出与交接
 
 只有以下条件满足，才更新 `agarwal_protocol_iii_exact_2round` 精确身份：
 
