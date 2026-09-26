@@ -79,7 +79,7 @@ Command:
 
     ./build-vfss-debug/moe_topk_m5_fix_f1_process_e2e_test --cost-smoke
 
-All six smoke rows passed. Counts below are this receiver run, one process execution per configuration, and are not latency measurements. Logical bits and wire sends are totals across P0/P1; offline bytes are the serialized party bundles and their length prefixes.
+All six smoke rows passed. For compactness, the receiver table below shows the required `n=2/5/8` spot-check subset, one process execution per configuration; these are not latency measurements. The complete six-row raw-counter table from the F1 engineering reproduction is preserved in the [F1 reproduction record](../reproduction/M5_FIX_F1_SECURE_RAW_SCORE_TO_MASK_E2E_2026-09-25.md#cost-definition-and-measured-counts). Those earlier engineering counters are linked as supporting detail and are not relabeled as receiver measurements. Logical bits and wire sends are totals across P0/P1; offline bytes are the serialized party bundles and their length prefixes.
 
 | n | K | padded n | logical online bits | wire bytes | offline bytes | full rounds |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
