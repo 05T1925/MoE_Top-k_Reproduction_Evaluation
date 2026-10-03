@@ -245,8 +245,13 @@ int main() {
     std::uint64_t cases=0, active=0, reserved=0, sent0=0, sent1=0, score_eval=0;
     if (const auto* tier=std::getenv("MOE_TOPK_M6A_E9_D")) {
       const auto d=static_cast<std::uint32_t>(std::stoul(tier));
+      const auto* staged=std::getenv("MOE_TOPK_M6A_E16_R");
+      const auto staged_r=staged?static_cast<std::uint32_t>(std::stoul(staged)):0U;
+      require((d==256U)==(staged_r>=2U&&staged_r<=5U),
+              "E16 staged differential tier");
       for(const auto& fixture:moe_topk_e9_test::fixtures(d)) {
-        const auto result=run_case(fixture.scores,fixture.k,fixture.r,++cases);
+        const auto result=run_case(fixture.scores,fixture.k,
+                                   staged?staged_r:fixture.r,++cases);
         active+=result.p0.active_edges; reserved+=result.p0.pool_slots_per_party;
         score_eval+=result.p0.score_dcf_evaluations;
         sent0+=result.p0.online_sent_bytes; sent1+=result.p1.online_sent_bytes;

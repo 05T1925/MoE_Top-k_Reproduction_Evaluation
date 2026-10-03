@@ -29,11 +29,12 @@ namespace {
 
 constexpr std::uint32_t kMagic = UINT32_C(0x4d364137);
 constexpr std::uint32_t kVersion = 1;
-constexpr std::size_t kMaxPackageBytes = 64U * 1024U * 1024U;
-constexpr std::uint64_t kMaxDealerBudgetBytes = UINT64_C(512) * 1024U * 1024U;
+constexpr std::size_t kMaxPackageBytes = 192U * 1024U * 1024U;
+constexpr std::uint64_t kMaxDealerBudgetBytes = UINT64_C(2048) * 1024U * 1024U;
 constexpr std::uint64_t kDealerFixedHeadroomBytes = UINT64_C(64) * 1024U * 1024U;
 constexpr std::uint64_t kD128MinVirtualBytes = UINT64_C(640) * 1024U * 1024U;
 constexpr std::uint64_t kD128MaxVirtualBytes = UINT64_C(768) * 1024U * 1024U;
+constexpr std::uint64_t kD256VirtualBytes = UINT64_C(2048) * 1024U * 1024U;
 std::mutex dealer_mutex;
 
 void require(bool ok, const char* message) {
@@ -53,7 +54,7 @@ std::uint64_t ring(int bits) {
   return (UINT64_C(1) << bits) - 1U;
 }
 std::uint32_t domain(std::uint32_t n) {
-  require(n >= 1 && n <= 128, "AAV86 bounded logical_n");
+  require(n >= 1 && n <= 256, "AAV86 bounded logical_n");
   std::uint32_t d = 2;
   while (d < n) d <<= 1U;
   return d;
@@ -284,7 +285,7 @@ ProtocolIAav86SmallCapacityAssessment protocol_i_aav86_small_assess_capacity(
     const ProtocolIAav86SmallConfig& config) {
   ProtocolIAav86SmallCapacityAssessment result;
   result.shape=protocol_i_aav86_small_capacity_shape(config.logical_n,config.iterations);
-  result.hard_cap=result.shape.padded_n>128U;
+  result.hard_cap=result.shape.padded_n>256U;
   result.package_limit=result.shape.party_package_bytes>kMaxPackageBytes;
   result.budget_limit=result.shape.dealer_memory_budget_bytes>kMaxDealerBudgetBytes;
   result.material_id_limit=config.material_id==0 ||
@@ -306,15 +307,18 @@ ProtocolIAav86SmallCapacityAssessment protocol_i_aav86_small_assess_capacity(
           result.shape.available_memory_bytes,*limit-*used);
     }
   }
-  result.memory_limit=checked_mul(result.shape.padded_n==128U?3U:2U,
+  result.memory_limit=checked_mul(result.shape.padded_n>=128U?3U:2U,
       result.shape.dealer_memory_budget_bytes)>
       result.shape.available_memory_bytes;
-  if (result.shape.padded_n == 128U) {
+  if (result.shape.padded_n >= 128U) {
     struct rlimit virtual_limit{};
     require(::getrlimit(RLIMIT_AS,&virtual_limit)==0,"AAV86 address-space limit query");
-    result.process_limit=virtual_limit.rlim_cur==RLIM_INFINITY ||
-        virtual_limit.rlim_cur<kD128MinVirtualBytes ||
-        virtual_limit.rlim_cur>kD128MaxVirtualBytes;
+    if (result.shape.padded_n == 128U)
+      result.process_limit=virtual_limit.rlim_cur==RLIM_INFINITY ||
+          virtual_limit.rlim_cur<kD128MinVirtualBytes ||
+          virtual_limit.rlim_cur>kD128MaxVirtualBytes;
+    else
+      result.process_limit=virtual_limit.rlim_cur!=kD256VirtualBytes;
   }
   return result;
 }
@@ -322,11 +326,11 @@ ProtocolIAav86SmallCapacityAssessment protocol_i_aav86_small_assess_capacity(
 ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
     const ProtocolIAav86SmallConfig& config) {
   const auto assessment=protocol_i_aav86_small_assess_capacity(config);
-  require(!assessment.hard_cap,"AAV86 preflight hard cap D>128");
-  require(!assessment.package_limit,"AAV86 preflight package exceeds 64 MiB");
-  require(!assessment.budget_limit,"AAV86 preflight dealer budget exceeds 512 MiB");
+  require(!assessment.hard_cap,"AAV86 preflight hard cap D>256");
+  require(!assessment.package_limit,"AAV86 preflight package exceeds 192 MiB");
+  require(!assessment.budget_limit,"AAV86 preflight dealer budget exceeds 2048 MiB");
   require(!assessment.memory_limit,"AAV86 preflight insufficient available memory");
-  require(!assessment.process_limit,"AAV86 preflight D128 requires 640-768 MiB RLIMIT_AS");
+  require(!assessment.process_limit,"AAV86 preflight D128 requires 640-768 MiB or D256 requires 2048 MiB RLIMIT_AS");
   require(!assessment.material_id_limit,"AAV86 preflight material ID range");
   validate_config(config);
   return assessment.shape;

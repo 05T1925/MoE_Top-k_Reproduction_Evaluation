@@ -13,8 +13,8 @@ struct Fixture {
 };
 
 inline std::vector<Fixture> fixtures(std::uint32_t d) {
-  if (d != 16 && d != 32 && d != 64 && d != 128)
-    throw std::invalid_argument("AAV86 fixture D must be 16, 32, 64 or 128");
+  if (d != 16 && d != 32 && d != 64 && d != 128 && d != 256)
+    throw std::invalid_argument("AAV86 fixture D must be 16, 32, 64, 128 or 256");
   std::vector<std::uint32_t> ties(d - 1, 7);
   std::vector<std::uint32_t> extremes(d);
   std::vector<std::uint32_t> mixed(d - 1);

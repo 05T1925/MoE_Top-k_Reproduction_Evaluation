@@ -97,9 +97,10 @@ void case_one(const std::vector<std::uint32_t>& scores, std::uint32_t k,
     auto wrong_round=bytes0; wrong_round[found-bytes0.begin()+3]=1;
     rejects([&] { (void)protocol_i_aav86_small_deserialize_party_material(wrong_round,0,c); },
             "wrong edge round accepted");
-    auto missing_slot=bytes0; missing_slot[found-bytes0.begin()-1]=0;
+    // Toggle a count bit so the corruption is effective at every D/r.
+    auto missing_slot=bytes0; missing_slot[found-bytes0.begin()-1]^=1U;
     rejects([&] { (void)protocol_i_aav86_small_deserialize_party_material(missing_slot,0,c); },
-            "missing edge slot accepted");
+            "edge slot count tamper accepted");
   }
   if(serial==7) {
     const auto first=edge_blob(bytes0,0,0,1,c.material_id);
@@ -203,9 +204,9 @@ void case_one(const std::vector<std::uint32_t>& scores, std::uint32_t k,
 }
 int main() {
   try {
-    ProtocolIAav86SmallConfig over_cap{1,2,3,129,1,2,0,5000,""};
+    ProtocolIAav86SmallConfig over_cap{1,2,3,257,1,2,0,5000,""};
     rejects([&] { (void)protocol_i_aav86_small_dealer_generate(over_cap); },
-            "D>128 capacity accepted");
+            "D>256 capacity accepted");
     over_cap.logical_n=64; over_cap.iterations=6;
     rejects([&] { (void)protocol_i_aav86_small_dealer_generate(over_cap); },
             "r>5 capacity accepted");
@@ -214,9 +215,13 @@ int main() {
             "material ID overflow accepted");
     if (const auto* tier = std::getenv("MOE_TOPK_M6A_E9_D")) {
       const auto d = static_cast<std::uint32_t>(std::stoul(tier));
+      const auto* staged = std::getenv("MOE_TOPK_M6A_E16_R");
+      const auto staged_r = staged ? static_cast<std::uint32_t>(std::stoul(staged)) : 0U;
+      require((d==256U)==(staged_r>=2U&&staged_r<=5U),
+              "E16 staged conformance tier");
       std::uint64_t serial=0;
       for (const auto& fixture:moe_topk_e9_test::fixtures(d))
-        case_one(fixture.scores,fixture.k,fixture.r,++serial);
+        case_one(fixture.scores,fixture.k,staged ? staged_r : fixture.r,++serial);
       std::cout<<"E9_CONFORMANCE_PASS d="<<d<<" cases="<<serial<<"\n";
       return 0;
     }

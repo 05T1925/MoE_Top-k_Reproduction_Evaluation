@@ -155,9 +155,12 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
   }
   require(sent==o.metrics.online_sent_bytes&&received==o.metrics.online_received_bytes,
           "E2E trace byte accounting");
+  std::uint32_t padded_n=2;
+  while(padded_n<o.xor_mask_share.size()) padded_n*=2;
   std::uint64_t previous=0;
   for(const auto& edge:o.metrics.edge_trace) {
-    require(edge.a<edge.c&&edge.c<128&&edge.material_id>previous,"E2E edge reuse/order");
+    require(edge.a<edge.c&&edge.c<padded_n&&edge.material_id>previous,
+            "E2E edge reuse/order");
     previous=edge.material_id;
     digest=(digest^edge.material_id)*UINT64_C(1099511628211);
   }
@@ -251,7 +254,7 @@ int party_process(int argc,char** argv) {
     const auto inverse_fd=fd(argv[16]);
     std::vector<int> core_fds;
     for(int i=18;i<argc;++i) core_fds.push_back(fd(argv[i]));
-    const auto material_bytes=receive_bytes(package_fd,64U*1024U*1024U);
+    const auto material_bytes=receive_bytes(package_fd,192U*1024U*1024U);
     auto material=protocol_i_aav86_small_deserialize_party_material(material_bytes,who,c);
     if (!std::getenv("MOE_TOPK_M6A_E15_BENCH"))
       require(test_only::payload_from_shape(
@@ -595,7 +598,8 @@ int main(int argc,char** argv) {
       const auto r=static_cast<std::uint32_t>(number(argv[4]));
       const auto input_seed=number(argv[5]);
       const auto serial=number(argv[6]);
-      require(n==128&&k>=1&&k<=n&&r>=2&&r<=5,"E11 benchmark shape");
+      require((n==128||n==256)&&k>=1&&k<=n&&r>=2&&r<=5,
+              "E16 benchmark shape");
       std::mt19937_64 input_rng(input_seed);
       std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
       std::vector<std::uint32_t> scores(n);
@@ -611,9 +615,14 @@ int main(int argc,char** argv) {
     }
     if(const auto* tier=std::getenv("MOE_TOPK_M6A_E9_D")) {
       const auto d=static_cast<std::uint32_t>(std::stoul(tier));
+      const auto* staged=std::getenv("MOE_TOPK_M6A_E16_R");
+      const auto staged_r=staged?static_cast<std::uint32_t>(std::stoul(staged)):0U;
+      require((d==256U)==(staged_r>=2U&&staged_r<=5U),
+              "E16 staged E2E tier");
       std::uint64_t serial=0;
       for(const auto& fixture:moe_topk_e9_test::fixtures(d))
-        run_case(fixture.scores,fixture.k,fixture.r,++serial,totals);
+        run_case(fixture.scores,fixture.k,staged?staged_r:fixture.r,
+                 ++serial,totals);
       std::cout<<"E9_E2E_PASS d="<<d<<" cases="<<totals.cases
                <<" reserved_per_party_sum="<<totals.pool
                <<" active_edges_sum="<<totals.active<<" p0_sent_bytes_sum="<<totals.sent0

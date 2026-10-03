@@ -71,14 +71,32 @@ int main() {
                  <<" budget_limit="<<assessment.budget_limit
                  <<" memory_limit="<<assessment.memory_limit
                  <<" process_limit="<<assessment.process_limit<<"\n";
-        if(n>128U) {
+        if(n==256U) {
+          require(!assessment.hard_cap&&!assessment.package_limit&&
+                  !assessment.budget_limit&&!assessment.memory_limit,
+                  "E16 D256 finite resource budget");
+          if (assessment.process_limit) {
+            bool rejected=false;
+            try { (void)moe_topk::protocol_i_aav86_small_preflight(config); }
+            catch(const std::invalid_argument& e) {
+              rejected=std::string(e.what()).find("RLIMIT_AS")!=std::string::npos;
+            }
+            require(rejected,"E16 D256 must reject wrong process limit");
+            std::cout<<"E16_PREFLIGHT_REJECTED n="<<n<<" r="<<r
+                     <<" reason=RLIMIT_AS_NOT_2048_MIB\n";
+          } else {
+            require(moe_topk::protocol_i_aav86_small_preflight(config).padded_n==256U,
+                    "E16 D256 preflight");
+            std::cout<<"E16_PREFLIGHT_ACCEPTED n="<<n<<" r="<<r<<"\n";
+          }
+        } else if(n>256U) {
           std::string rejection;
           try { (void)moe_topk::protocol_i_aav86_small_preflight(config); }
           catch(const std::invalid_argument& e) { rejection=e.what(); }
-          require(rejection=="AAV86 preflight hard cap D>128",
-                  "E11 actual preflight must reject before keygen");
-          std::cout<<"E11_PREFLIGHT_REJECTED n="<<n<<" r="<<r
-                   <<" reason=HARD_CAP_D_GT_128\n";
+          require(rejection=="AAV86 preflight hard cap D>256",
+                  "E16 actual preflight must reject before keygen");
+          std::cout<<"E16_PREFLIGHT_REJECTED n="<<n<<" r="<<r
+                   <<" reason=HARD_CAP_D_GT_256\n";
         }
       }
     std::cout<<"E10_METRICS_CONFORMANCE_PASS dcf3=3 ucmp34=68 per_party\n";

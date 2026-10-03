@@ -11,7 +11,7 @@
 namespace moe_topk {
 
 // M6A project instance, not an author-exact Protocol I implementation.
-// E10 permits D <= 128 only with bounded address space and pre-keygen checks.
+// E16 permits D <= 256 only with bounded address space and pre-keygen checks.
 struct ProtocolIAav86SmallConfig {
   std::uint64_t session = 0, fingerprint = 0, material_id = 0;
   std::uint32_t logical_n = 0, k = 0, iterations = 0;
