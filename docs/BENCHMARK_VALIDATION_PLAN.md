@@ -731,3 +731,5 @@ V3、V4 报告额外包含：
 E14 的材料主字段仍按 ready 时在线实际留存有效载荷定义，但 E14 `offline_time_ms` 包含 ready 前的整池诊断和逐 DCF key 重序列化，不可标为纯协议预处理时间。E15 正式 party 只做与材料结构相符的 checked 恒定形状字节计算及固定数量 OT 计数读取；逐字段、逐 key 的诊断在隔离测试中与公式比对，不进入 1+5 正式计时。E15 离线时钟仍从启动角色前到 T 成功退出和双方 ready，在线时钟仍取双方 secure 入口较大耗时；每次 total 先相加再统计。E14 时间和新时间不得拼接或扣减估算。详见 [E15 合同](decisions/M6A_P2_I_E15_PROTOCOL_I_TIMING_CONTRACT_2026-10-03.md)。
 
 E15 内部计时门修正：首批 `fdcdbe5` 在 ready 前执行恒定公式，仍不满足本阶段“纯协议预处理”严格边界；保存原始数据但不作最终时间结论。修正版将有效载荷/OT 计数后处理安排在 secure 在线时钟停止后，新源码、新标签和新原始目录全矩阵重测，遵守同一 1+5 统计与独立索引。
+
+修正版 `346a923` 的 120/100 行已按此边界完成，审计为 PASS；`corrected/e15_raw_complete_index.sha256` 核对 151/151，统一 CSV 含九指标各 20 组 median/min/max，仓库外副本逐文件一致。此次 n=128、K=2/8、r=2..5、LAN/WAN 数据和限制见 [E15 重测报告](reviews/M6A_P2_I_E15_PROTOCOL_I_UNIFIED_REMEASUREMENT_2026-10-03.md)。E14 与 E15 首批时间仍不得用于正式路线胜负；n≥256 及 III+AAV86 的未测指标保持 `NOT_MEASURED`。
