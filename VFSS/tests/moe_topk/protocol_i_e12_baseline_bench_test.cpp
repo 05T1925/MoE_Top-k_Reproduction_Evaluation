@@ -194,10 +194,10 @@ pid_t launch(const char*self,const std::vector<std::string>&v,FdPool&fds,
   return p;
 }
 std::string executable(const char*fallback){char p[4096]{};const auto n=readlink("/proc/self/exe",p,sizeof(p)-1);return n>0?std::string(p,n):fallback;}
-std::vector<std::uint32_t> scores_for(const Case&t){
+std::vector<std::uint32_t> scores_for(const Case&t,std::uint64_t input_seed){
   std::vector<std::uint32_t>s(t.logical_n);
   if(t.score_style==5){
-    std::mt19937_64 input_rng(t.seed);
+    std::mt19937_64 input_rng(input_seed);
     std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
     for(auto&x:s)x=static_cast<std::uint32_t>(distribution(input_rng));
     return s;
@@ -210,11 +210,11 @@ std::vector<std::uint32_t> scores_for(const Case&t){
   if(t.score_style==4)for(std::size_t i=0;i<s.size();++i)s[i]=static_cast<std::uint32_t>(i);
   return s;
 }
-void run_case(const char*self,const Case&t){
+void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   FdPool fds;
   ChildSet children;
   const auto c=config_for(t,0);
-  const auto scores=scores_for(t);
+  const auto scores=scores_for(t,input_seed);
   const auto transport_start=std::chrono::steady_clock::now();
   std::array<std::array<int,2>,4>offline;
   std::array<std::array<int,2>,2>forward,reverse,score;
@@ -290,7 +290,7 @@ void run_case(const char*self,const Case&t){
     const auto offline_ns=elapsed_ns(offline_start,offline_end);
     const auto transport_ns=elapsed_ns(transport_start,transport_end);
     std::cout<<"E12_BASELINE_CASE n="<<t.logical_n<<" k="<<t.k
-             <<" d="<<c.padded_n<<" input_seed="<<t.seed
+             <<" d="<<c.padded_n<<" input_seed="<<input_seed
              <<" input_digest="<<digest<<" offline_ns="<<offline_ns
              <<" dealer_generate_ns="<<dealer_metrics[0]
              <<" dealer_serialize_ns="<<dealer_metrics[1]
@@ -334,4 +334,4 @@ void run_case(const char*self,const Case&t){
 }
 Case parse_case(int n,char**v,int at){require(n>=at+8,"case arguments");return{static_cast<std::uint32_t>(std::stoul(v[at])),static_cast<std::uint32_t>(std::stoul(v[at+1])),std::stoull(v[at+2]),std::stoull(v[at+3]),std::stoull(v[at+4]),static_cast<unsigned>(std::stoul(v[at+5])),static_cast<unsigned>(std::stoul(v[at+6])),static_cast<unsigned>(std::stoul(v[at+7]))};}int fd(const char*x){return std::stoi(x);}
 }
-int main(int argc,char**argv){try{if(argc>1&&std::string(argv[1])=="p2"){const auto t=parse_case(argc,argv,5);return p2_main(t,fd(argv[2]),fd(argv[3]),fd(argv[4]));}if(argc>1&&std::string(argv[1])=="party"){const int who=std::stoi(argv[2]);int at=3;std::array<int,4>o{};std::array<int,2>f{},r{},s{};for(auto&x:o)x=fd(argv[at++]);for(auto&x:f)x=fd(argv[at++]);for(auto&x:r)x=fd(argv[at++]);for(auto&x:s)x=fd(argv[at++]);const int package=fd(argv[at++]),ready=fd(argv[at++]),input=fd(argv[at++]),cmp=fd(argv[at++]),rank=fd(argv[at++]),result=fd(argv[at++]);return party_main(parse_case(argc,argv,at),who,o,f,r,s,package,ready,input,cmp,rank,result);}const auto self=executable(argv[0]);if(argc==6&&std::string(argv[1])=="bench"){const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));const auto input_seed=std::stoull(argv[4]);const auto serial=std::stoull(argv[5]);require(n==128&&(k==2||k==8),"E12 baseline benchmark shape");require(benchmark_mode(),"E12 baseline benchmark transport flag");run_case(self.c_str(),{n,k,0x120000+serial,0x220000+serial,input_seed,5,5,5});return 0;}if(const auto*n=std::getenv("MOE_TOPK_M2_E2E_N")){const auto logical=static_cast<std::uint32_t>(std::stoul(n));const auto*k=std::getenv("MOE_TOPK_M2_E2E_K");run_case(self.c_str(),{logical,k?static_cast<std::uint32_t>(std::stoul(k)):1,0x213888,0x313888,888,4,3,0});return 0;}const std::array<std::uint32_t,11>sizes{{1,2,3,4,5,7,8,11,16,17,31}};std::uint64_t serial=0;for(const auto n:sizes){std::vector<std::uint32_t>ks{1,n,static_cast<std::uint32_t>((n+1)/2)};std::sort(ks.begin(),ks.end());ks.erase(std::unique(ks.begin(),ks.end()),ks.end());for(const auto k:ks){run_case(self.c_str(),{n,k,0x213000+serial,0x313000+serial,100+serial,static_cast<unsigned>(serial%5),static_cast<unsigned>((serial+1)%5),static_cast<unsigned>(serial%5)});++serial;}}return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+int main(int argc,char**argv){try{if(argc>1&&std::string(argv[1])=="p2"){const auto t=parse_case(argc,argv,5);return p2_main(t,fd(argv[2]),fd(argv[3]),fd(argv[4]));}if(argc>1&&std::string(argv[1])=="party"){const int who=std::stoi(argv[2]);int at=3;std::array<int,4>o{};std::array<int,2>f{},r{},s{};for(auto&x:o)x=fd(argv[at++]);for(auto&x:f)x=fd(argv[at++]);for(auto&x:r)x=fd(argv[at++]);for(auto&x:s)x=fd(argv[at++]);const int package=fd(argv[at++]),ready=fd(argv[at++]),input=fd(argv[at++]),cmp=fd(argv[at++]),rank=fd(argv[at++]),result=fd(argv[at++]);return party_main(parse_case(argc,argv,at),who,o,f,r,s,package,ready,input,cmp,rank,result);}const auto self=executable(argv[0]);if(argc==6&&std::string(argv[1])=="bench"){const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));const auto input_seed=std::stoull(argv[4]);const auto serial=std::stoull(argv[5]);require(n==128&&(k==2||k==8),"E12 baseline benchmark shape");require(benchmark_mode()&&serial!=input_seed,"E12 baseline input seed isolation");run_case(self.c_str(),{n,k,0x120000+serial,0x220000+serial,serial,5,5,5},input_seed);return 0;}if(const auto*n=std::getenv("MOE_TOPK_M2_E2E_N")){const auto logical=static_cast<std::uint32_t>(std::stoul(n));const auto*k=std::getenv("MOE_TOPK_M2_E2E_K");run_case(self.c_str(),{logical,k?static_cast<std::uint32_t>(std::stoul(k)):1,0x213888,0x313888,888,4,3,0});return 0;}const std::array<std::uint32_t,11>sizes{{1,2,3,4,5,7,8,11,16,17,31}};std::uint64_t serial=0;for(const auto n:sizes){std::vector<std::uint32_t>ks{1,n,static_cast<std::uint32_t>((n+1)/2)};std::sort(ks.begin(),ks.end());ks.erase(std::unique(ks.begin(),ks.end()),ks.end());for(const auto k:ks){run_case(self.c_str(),{n,k,0x213000+serial,0x313000+serial,100+serial,static_cast<unsigned>(serial%5),static_cast<unsigned>((serial+1)%5),static_cast<unsigned>(serial%5)});++serial;}}return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
