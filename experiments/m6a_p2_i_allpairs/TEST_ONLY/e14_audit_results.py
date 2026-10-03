@@ -94,6 +94,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--raw-root", type=Path, required=True)
     parser.add_argument("--head", required=True)
+    parser.add_argument("--source-root", type=Path)
+    parser.add_argument("--aav-binary", type=Path)
+    parser.add_argument("--baseline-binary", type=Path)
     args = parser.parse_args()
     root = args.raw_root
     plan = json.loads((root / "input_plan.json").read_text(encoding="utf-8"))
@@ -111,6 +114,14 @@ def main():
             assert len(items) == (48 if route == "aav86" else 12)
             assert sum(not row["warmup"] for row in items) == (
                 40 if route == "aav86" else 10)
+            if args.source_root is not None:
+                for row in items:
+                    for name, expected in row["source_sha256"].items():
+                        assert digest(args.source_root / name) == expected, name
+            binary = args.aav_binary if route == "aav86" else args.baseline_binary
+            if binary is not None:
+                actual_binary = digest(binary)
+                assert all(row["binary_sha256"] == actual_binary for row in items)
             for row in items:
                 check_row(row, args.head, route, plan)
                 key = (profile, row["K"], row["repetition"])

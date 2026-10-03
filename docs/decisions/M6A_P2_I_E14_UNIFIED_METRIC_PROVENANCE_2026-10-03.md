@@ -39,3 +39,9 @@ E12 正式被测源码为 `8ad0725c73716ac37c96d417136958f932233d61`，事后报
 ## 正式数据门
 
 先使有效载荷计数、OT 通信和两条入口的 DCF 扩展计数在小实例可人工复算，并通过 conformance→冻结 oracle differential→独立进程 E2E 与字段守恒。门未闭合时新 `n=128` LAN/WAN 正式批次为 **NO-GO**；E12 已接收时间/在线通信保持历史有效，但不拼接成 E14 完整指标。若门通过，使用新实现标签、独立忽略目录和与 T 可见运行标签独立的输入种子及 OS fresh shares，重新测相同输入的两条路线。
+
+## E14 执行后判定
+
+在 `b0e474cfbbcae433405ac61c5240068878ba43ca` 下，上述小实例及独立进程门通过，`final/` 批次的 `offline_material_total_bits` 与 `online_prg_calls_total` 可标 **MEASURED/DERIVED FROM MEASURED**，只适用于本决策的两个完整入口。n=2 的手工账：全对全每方 T payload `4×(16+840)+840+16=4,280 B`；每方在线留存的双向 shuffle 状态 `432 B`；score 和 pipeline 的实际 DCF 扩展分别 `272`、`68`。AAV86 的 D=2、r=1 每方 payload `4,376 B`。两个入口的 n=128 独立进程检查均通过；完整正式逐次数据另见 E14 报告和冻结原始目录。
+
+全对全 `offline_ot_communication_total_bits` 是 EMP `IOChannel` 内部 `send_counter` 两方之和乘 8，**不包含**每个 OT 调用的 48-byte 自定义 preamble；每方四次 OT 调用的 preamble 发送合计 192 B。若需报告包含 preamble 的离线 OT 应用层发送量，可在该原值上加 `2×4×48=384 B`（双方发送总量），并标记为 DERIVED；不能把接收再加一次，也不能加到在线持有材料主字段。其他 AES/PRG 细分仍 `NOT_MEASURED`。公开 pivot 流式随机币不属于这里的 seed→双子 seed 长度倍增定义。

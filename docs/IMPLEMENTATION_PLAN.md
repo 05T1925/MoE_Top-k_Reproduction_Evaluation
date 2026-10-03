@@ -699,6 +699,8 @@ Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 
 
 2026-10-03 [E12 异会话数据接收](reviews/M6A_P2_I_E12_CROSS_CHAT_DATA_ACCEPTANCE_2026-10-03.md)由未参与 E12 编写与运行的接收聊天完成：151/151 原始哈希、120/120 accepted 行、20/20 组统计与同组输入配对复核为 `PASS_WITH_FINDINGS`，冻结 `8ad0725` 下 Protocol I+AAV86 的 n128 有界性能数据。E13 原聊天的程序性 FAIL 保留为历史。此接收不填补基线完整 EMP OT 材料、同定义 PRG、n≥256 性能或 Protocol III+AAV86；M6A/V3 仍未完成。
 
+2026-10-03 E14 在 E13 文档检查点 `2b48ef6` 后，以 `b0e474c` 为新正式运行 HEAD，将两条 Protocol I 完整入口的在线持有材料有效载荷和传统 DCF 长度倍增 PRG 纳入同定义计量；全对全 party 本地 EMP OT/shuffle 留存状态与离线 OT 通信分栏，不再用 T package 字节代替全部材料。TEST_ONLY 输入计划独立于 T 可见 serial，AAV86 加法份额由 OS 熵生成。新目录的 n128、K=2/8、r=2..5 AAV86 与 EMP-ON 全对全，在同主机模拟 LAN/WAN 下各配置 1 次预热+5 次正式运行，100/100 正式正确，原始行/校准/源码身份与统一列定义见 [E14 报告](reviews/M6A_P2_I_E14_PROTOCOL_I_UNIFIED_PERFORMANCE_CLOSEOUT_2026-10-03.md)。旧 E12 和初版 E14 批次均保持独立，不能混合统计。n≥256 的 24 点仍仅有 checked 容量与实际 `D>128` preflight 拒绝，Protocol III+AAV86 未实现；E14 新数据仍须下一异会话接收，M6A/V3 总验收未完成，`AUTHOR_EXACT=NOT_PROVEN`。
+
 #### 正确性与安全验收
 
 - 明文图算法与稳定 Top-K oracle 一致；

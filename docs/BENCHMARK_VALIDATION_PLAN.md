@@ -312,6 +312,14 @@ distribute 和 T 退出后的 receive barrier 保留各自实测值，不能把�
 
 逻辑密钥大小、内存对象大小、序列化材料大小和传输封装大小分别说明，不能混用。
 
+M6A E14 的 Protocol I n=128 同路线对照采用统一的“离线 ready 屏障时两方
+在线入口实际留存并读取的有效载荷”口径：逐个实际 DCF key 的 `k/g/v` 编码、
+掩码 share、置换/路由和 shuffle 预处理向量按固定宽度求和，不用 C++ RSS 或
+容器 capacity；公开标签、封装头和离线已销毁的 EMP OT 中间块不计入主字段。
+T package 的序列化/分发字节、party 本地 shuffle 有效载荷和离线 OT 通信
+分别报告。E12 旧行把 AAV86 package 长度用作材料量，保留历史口径，不能
+与 E14 的同名新字段合并统计；E14 用独立实现标签、revision 与原始目录。
+
 离线传输封装可另设诊断计数；不得把在线补发材料隐藏到“离线材料”字段。
 
 ### 5.5 在线通信
@@ -398,6 +406,13 @@ total_time_ms = offline_time_ms + online_time_ms
 AES 调用、DCF.Eval、DPF.Eval 和 PRG 调用不是同一单位。可以并列记录，但不能未经定义直接等同。
 
 由理论密钥深度或公式推算的 PRG 数只放在理论字段，不能填入实测字段。
+
+M6A E14 的两个 Protocol I 完整入口仅在传统 DCF 在线 `traverseOneDCF`
+执行 seed→双子 seed 的长度倍增处计一次，分别按 party/score/CA 或 cmpagg
+读取 thread-local 实际计数。已预处理的 Permute+Share 在线操作不执行
+OPV/EMP OT；AAV86 公开 pivot 的流式随机数与其他 AES 细分另列，不冒充
+长度倍增调用。该覆盖结论只适用于 E14 审过的两个入口，不能转用于
+Protocol III 或未来新增在线原语。
 
 并行计数不得丢失更新或重复汇总。计数器需要用可人工核对的小实例验证。
 
