@@ -2,11 +2,13 @@
 #include <moe_topk/protocol_i_transport.h>
 #include <moe_topk/topk_oracle.h>
 #include "protocol_i_aav86_e9_fixtures.h"
+#include "protocol_i_e14_material_metrics.h"
 
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <cerrno>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -17,6 +19,7 @@
 #include <stdexcept>
 #include <string>
 #include <sys/resource.h>
+#include <sys/random.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -25,6 +28,18 @@
 namespace {
 using namespace moe_topk;
 void require(bool value, const char* why) { if (!value) throw std::runtime_error(why); }
+std::uint32_t fresh_share() {
+  std::uint32_t value=0;
+  auto* p=reinterpret_cast<std::uint8_t*>(&value);
+  std::size_t left=sizeof(value);
+  while(left) {
+    const auto count=::getrandom(p,left,0);
+    if(count<0&&errno==EINTR) continue;
+    require(count>0,"E14 input share entropy");
+    p+=count;left-=static_cast<std::size_t>(count);
+  }
+  return value;
+}
 void send_all(int fd, const void* data, std::size_t length) {
   const auto* p=static_cast<const char*>(data);
   while(length) { const auto n=::write(fd,p,length); require(n>0,"E2E write"); p+=n; length-=n; }
@@ -99,6 +114,7 @@ struct ChildResult {
   std::uint64_t sent=0,received=0,rounds=0;
   std::uint64_t online_ns=0,peak_kib=0,edge_digest=0;
   std::uint64_t package_bytes=0,pivot_seed_lo=0,pivot_seed_hi=0;
+  std::uint64_t t_payload_bytes=0;
   std::uint64_t active_vertices=0,score_prg=0,ca_prg=0,inverse_prg=0,total_prg=0;
   std::uint64_t score_bytes=0,core_bytes=0,inverse_bytes=0;
   std::uint64_t score_ns=0,core_ns=0,inverse_ns=0;
@@ -108,6 +124,7 @@ struct ChildResult {
 std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
                                          std::uint64_t online_ns,
                                          std::uint64_t package_bytes,
+                                         std::uint64_t t_payload_bytes,
                                          std::uint64_t pivot_seed_lo,
                                          std::uint64_t pivot_seed_hi) {
   std::vector<std::uint8_t> bytes=o.xor_mask_share;
@@ -144,7 +161,7 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
     previous=edge.material_id;
     digest=(digest^edge.material_id)*UINT64_C(1099511628211);
   }
-  const std::array<std::uint64_t,30> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
+  const std::array<std::uint64_t,31> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
       o.metrics.score_dcf_evaluations,o.metrics.ca_dcf_evaluations,
       o.metrics.dcf_evaluations,o.metrics.online_sent_bytes,o.metrics.online_received_bytes,
       o.metrics.causal_rounds,online_ns,rss,digest,package_bytes,pivot_seed_lo,pivot_seed_hi,
@@ -153,7 +170,8 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
       o.metrics.score_sent_bytes,o.metrics.core_sent_bytes,o.metrics.inverse_sent_bytes,
       o.metrics.score_time_ns,o.metrics.core_time_ns,o.metrics.inverse_time_ns,
       o.metrics.score_received_bytes,o.metrics.core_received_bytes,
-      o.metrics.inverse_received_bytes,o.metrics.ca_time_ns,o.metrics.carrier_time_ns};
+      o.metrics.inverse_received_bytes,o.metrics.ca_time_ns,o.metrics.carrier_time_ns,
+      t_payload_bytes};
   const auto* p=reinterpret_cast<const std::uint8_t*>(values.data());
   bytes.insert(bytes.end(),p,p+sizeof(values));
   const auto* by_round=reinterpret_cast<const std::uint8_t*>(
@@ -172,9 +190,9 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
 }
 ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
                           std::size_t rounds) {
-  require(bytes.size()==n+(30U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
+  require(bytes.size()==n+(31U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
   ChildResult result; result.mask.assign(bytes.begin(),bytes.begin()+n);
-  std::array<std::uint64_t,30> values{};
+  std::array<std::uint64_t,31> values{};
   std::copy_n(bytes.begin()+n,sizeof(values),reinterpret_cast<std::uint8_t*>(values.data()));
   result.pool=values[0]; result.active=values[1]; result.score_evals=values[2];
   result.ca_evals=values[3]; result.evals=values[4];
@@ -190,6 +208,7 @@ ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
   result.score_received_bytes=values[25]; result.core_received_bytes=values[26];
   result.inverse_received_bytes=values[27];
   result.ca_ns=values[28]; result.carrier_ns=values[29];
+  result.t_payload_bytes=values[30];
   result.active_by_round.resize(rounds);
   result.vertices_by_round.resize(rounds);
   result.ca_prg_by_round.resize(rounds);
@@ -234,6 +253,7 @@ int party_process(int argc,char** argv) {
     for(int i=18;i<argc;++i) core_fds.push_back(fd(argv[i]));
     const auto material_bytes=receive_bytes(package_fd,64U*1024U*1024U);
     auto material=protocol_i_aav86_small_deserialize_party_material(material_bytes,who,c);
+    const auto payload=test_only::payload(material);
     const char ready=1;
     send_all(fd(argv[17]),&ready,1);
     const auto pivot_seed_lo=material.pivot_seed_lo;
@@ -246,7 +266,8 @@ int party_process(int argc,char** argv) {
     const auto elapsed=std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::steady_clock::now()-start).count();
     send_bytes(result_fd,encode_result(output,static_cast<std::uint64_t>(elapsed),
-        material_bytes.size(),pivot_seed_lo,pivot_seed_hi));
+        material_bytes.size(),payload.t_package_payload_bytes,
+        pivot_seed_lo,pivot_seed_hi));
     return 0;
   } catch(const std::exception& e) {
     std::cerr<<"E7_PARTY_FAIL "<<e.what()<<"\n"; return 1;
@@ -364,7 +385,10 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
       offline_end-dealer_exited).count();
   std::mt19937_64 rng(0x770000+serial);
   std::vector<std::uint32_t> x0(n),x1(n);
-  for(std::size_t i=0;i<n;++i) { x0[i]=static_cast<std::uint32_t>(rng()); x1[i]=scores[i]-x0[i]; }
+  for(std::size_t i=0;i<n;++i) {
+    x0[i]=std::getenv("MOE_TOPK_M6A_E14_BENCH")?fresh_share():static_cast<std::uint32_t>(rng());
+    x1[i]=scores[i]-x0[i];
+  }
   send_all(input[0][0],x0.data(),n*sizeof(std::uint32_t));
   send_all(input[1][0],x1.data(),n*sizeof(std::uint32_t));
   const auto a=decode_result(receive_bytes(result[0][0],1024),n,r);
@@ -403,7 +427,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
           b.total_prg==b.score_prg+b.ca_prg&&
           a.score_prg==4U*d*34U&&b.score_prg==4U*d*34U&&
           a.pivot_seed_lo==b.pivot_seed_lo&&a.pivot_seed_hi==b.pivot_seed_hi&&
-          a.package_bytes>0&&b.package_bytes>0,
+          a.package_bytes>0&&b.package_bytes>0&&
+          a.t_payload_bytes>0&&b.t_payload_bytes>0,
           "E2E metrics/trace");
   require(a.score_ns+a.core_ns+a.inverse_ns<=a.online_ns &&
           b.score_ns+b.core_ns+b.inverse_ns<=b.online_ns,
@@ -422,6 +447,12 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   }
   require(vertex_sum==a.active_vertices&&ca_prg_sum==a.ca_prg,
           "E2E vertex/PRG totals");
+  if(d==2&&r==1) {
+    // Four two-entry permutations, four two-entry word vectors, two node
+    // masks, four 34-bit score keys/mask pairs, one 34-bit edge key.
+    require(a.t_payload_bytes==4376&&b.t_payload_bytes==4376,
+            "E14 n2 hand-counted AAV86 payload fixture");
+  }
   totals.cases++; totals.pool+=slots; totals.active+=a.active;
   totals.score_evals+=a.score_evals; totals.ca_evals+=a.ca_evals; totals.evals+=a.evals;
   totals.sent0+=a.sent; totals.sent1+=b.sent;
@@ -450,6 +481,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" peak_p0_kib="<<a.peak_kib<<" peak_p1_kib="<<b.peak_kib
            <<" package_bytes_p0="<<a.package_bytes
            <<" package_bytes_p1="<<b.package_bytes
+           <<" t_payload_bytes_p0="<<a.t_payload_bytes
+           <<" t_payload_bytes_p1="<<b.t_payload_bytes
            <<" pivot_seed_lo="<<a.pivot_seed_lo
            <<" pivot_seed_hi="<<a.pivot_seed_hi
            <<" edge_digest="<<a.edge_digest<<" active_by_round=";

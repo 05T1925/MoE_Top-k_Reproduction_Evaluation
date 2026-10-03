@@ -3,6 +3,8 @@
 #include <moe_topk/protocol_i_score_input.h>
 #include <moe_topk/protocol_i_transport.h>
 #include <moe_topk/topk_oracle.h>
+#include "protocol_i_e14_material_metrics.h"
+#include <FSS/dcf.h>
 #include <FSS/prng.h>
 #include <algorithm>
 #include <array>
@@ -143,7 +145,9 @@ ProtocolIPermutation permutation(std::uint32_t n,unsigned style,std::uint64_t se
 Bytes encode_words(const std::vector<std::uint64_t>&v){Bytes b;for(auto x:v)for(int s=56;s>=0;s-=8)b.push_back(x>>s);return b;}std::vector<std::uint64_t>decode_words(const Bytes&b){require(b.size()%8==0,"word encoding");std::vector<std::uint64_t>v(b.size()/8);for(std::size_t i=0;i<v.size();++i)for(int j=0;j<8;++j)v[i]=(v[i]<<8U)|b[8*i+j];return v;}
 Bytes encode_result(const ProtocolIPriorityPipelineOutput&o,const ProtocolIScoreInputMetrics&s,
                     std::uint64_t package_bytes,std::uint64_t score_ns,
-                    std::uint64_t pipeline_ns,std::uint64_t online_ns){
+                    std::uint64_t pipeline_ns,std::uint64_t online_ns,
+                    const test_only::MaterialPayload& payload,
+                    std::uint64_t score_prg,std::uint64_t pipeline_prg){
   Bytes b=o.xor_mask_share;
   struct rusage usage{};require(::getrusage(RUSAGE_SELF,&usage)==0,"E12 party RSS");
   const std::vector<std::uint64_t>m{package_bytes,s.carry_sent_bytes,s.carry_received_bytes,
@@ -153,7 +157,10 @@ Bytes encode_result(const ProtocolIPriorityPipelineOutput&o,const ProtocolIScore
       o.metrics.rank_reveal_sent_bytes,o.metrics.rank_reveal_received_bytes,
       o.metrics.reverse_sent_bytes,o.metrics.reverse_received_bytes,
       o.metrics.comparison_edges,o.metrics.raw_dcf_calls,o.metrics.online_rounds,
-      score_ns,pipeline_ns,online_ns,static_cast<std::uint64_t>(usage.ru_maxrss)};
+      score_ns,pipeline_ns,online_ns,static_cast<std::uint64_t>(usage.ru_maxrss),
+      payload.t_package_payload_bytes,payload.local_shuffle_payload_bytes,
+      payload.local_shuffle_ot_sent_bytes,payload.local_shuffle_ot_received_bytes,
+      score_prg,pipeline_prg};
   const auto tail=encode_words(m);b.insert(b.end(),tail.begin(),tail.end());return b;
 }
 int p2_main(const Case&t,int fd0,int fd1,int telemetry_fd){
@@ -177,7 +184,64 @@ int p2_main(const Case&t,int fd0,int fd1,int telemetry_fd){
     return 0;
   }catch(const std::exception&e){std::cerr<<"P2: "<<e.what()<<'\n';return 1;}
 }
-int party_main(const Case&t,int who,const std::array<int,4>&offline,const std::array<int,2>&forward,const std::array<int,2>&reverse,const std::array<int,2>&score_fds,int package_fd,int ready_fd,int input_fd,int cmp_fd,int rank_fd,int result_fd){try{const auto c=config_for(t,who);ProtocolIFramedChannel package_channel(package_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,1,1},c.timeout_ms);auto package=deserialize_party_package(protocol_i_receive_framed_chunks(package_channel,64U*1024U*1024U),who);auto material=protocol_i_shuffle_preprocess_party({t.session,t.fingerprint,t.seed+100,t.seed+200,c.padded_n,2,static_cast<std::uint8_t>(who),c.timeout_ms},offline,permutation(c.padded_n,who?t.p1_style:t.p0_style,t.seed+who));ProtocolIFramedChannel ready(ready_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,5,1},c.timeout_ms);ready.send({1});ProtocolIFramedChannel input(input_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,4,1},c.timeout_ms);const auto encoded=decode_words(input.receive());require(encoded.size()==t.logical_n,"raw input length");std::vector<std::uint32_t> shares;for(const auto x:encoded){require(x<=UINT32_MAX,"raw input width");shares.push_back(static_cast<std::uint32_t>(x));}const auto online_started=std::chrono::steady_clock::now();ProtocolIScoreInputMetrics score_metrics;const auto keys=protocol_i_raw_score_input_party({t.session,t.fingerprint,c.logical_n,c.padded_n,t.k,protocol_i_make_input_layout(t.logical_n,t.k).index_bits,c.comparison_bits,static_cast<std::uint8_t>(who),c.timeout_ms},package,shares,score_fds,&score_metrics);const auto score_ended=std::chrono::steady_clock::now();const auto output=protocol_i_priority_pipeline_party(c,std::move(package),material,keys,forward,cmp_fd,rank_fd,reverse);const auto pipeline_ended=std::chrono::steady_clock::now();require(material.forward_consumed&&material.reverse_consumed,"shuffle material consumption");ProtocolIFramedChannel result(result_fd,{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,static_cast<std::uint8_t>(who),2,6,1},c.timeout_ms);result.send(encode_result(output,score_metrics,package_channel.received_bytes(),elapsed_ns(online_started,score_ended),elapsed_ns(score_ended,pipeline_ended),elapsed_ns(online_started,pipeline_ended)));return 0;}catch(const std::exception&e){std::cerr<<"P"<<who<<": "<<e.what()<<'\n';return 1;}}
+int party_main(const Case&t,int who,const std::array<int,4>&offline,
+               const std::array<int,2>&forward,const std::array<int,2>&reverse,
+               const std::array<int,2>&score_fds,int package_fd,int ready_fd,
+               int input_fd,int cmp_fd,int rank_fd,int result_fd){
+  try {
+    const auto c=config_for(t,who);
+    ProtocolIFramedChannel package_channel(package_fd,
+        {t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,
+         static_cast<std::uint8_t>(who),2,1,1},c.timeout_ms);
+    auto package=deserialize_party_package(
+        protocol_i_receive_framed_chunks(package_channel,64U*1024U*1024U),who);
+    auto material=protocol_i_shuffle_preprocess_party(
+        {t.session,t.fingerprint,t.seed+100,t.seed+200,c.padded_n,2,
+         static_cast<std::uint8_t>(who),c.timeout_ms},offline,
+        permutation(c.padded_n,who?t.p1_style:t.p0_style,t.seed+who));
+    const auto payload=test_only::payload(package,material);
+    ProtocolIFramedChannel ready(ready_fd,
+        {t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,
+         static_cast<std::uint8_t>(who),2,5,1},c.timeout_ms);
+    ready.send({1});
+    ProtocolIFramedChannel input(input_fd,
+        {t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,
+         static_cast<std::uint8_t>(who),2,4,1},c.timeout_ms);
+    const auto encoded=decode_words(input.receive());
+    require(encoded.size()==t.logical_n,"raw input length");
+    std::vector<std::uint32_t> shares;
+    for(const auto x:encoded){
+      require(x<=UINT32_MAX,"raw input width");
+      shares.push_back(static_cast<std::uint32_t>(x));
+    }
+    resetDCFOnlinePrgCalls();
+    const auto online_started=std::chrono::steady_clock::now();
+    ProtocolIScoreInputMetrics score_metrics;
+    const auto keys=protocol_i_raw_score_input_party(
+        {t.session,t.fingerprint,c.logical_n,c.padded_n,t.k,
+         protocol_i_make_input_layout(t.logical_n,t.k).index_bits,
+         c.comparison_bits,static_cast<std::uint8_t>(who),c.timeout_ms},
+        package,shares,score_fds,&score_metrics);
+    const auto score_ended=std::chrono::steady_clock::now();
+    const auto score_prg=readDCFOnlinePrgCalls();
+    const auto output=protocol_i_priority_pipeline_party(
+        c,std::move(package),material,keys,forward,cmp_fd,rank_fd,reverse);
+    const auto pipeline_ended=std::chrono::steady_clock::now();
+    const auto pipeline_prg=readDCFOnlinePrgCalls()-score_prg;
+    require(material.forward_consumed&&material.reverse_consumed,
+            "shuffle material consumption");
+    ProtocolIFramedChannel result(result_fd,
+        {t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,
+         static_cast<std::uint8_t>(who),2,6,1},c.timeout_ms);
+    result.send(encode_result(output,score_metrics,
+        package_channel.received_bytes(),elapsed_ns(online_started,score_ended),
+        elapsed_ns(score_ended,pipeline_ended),
+        elapsed_ns(online_started,pipeline_ended),payload,score_prg,pipeline_prg));
+    return 0;
+  } catch(const std::exception&e) {
+    std::cerr<<"P"<<who<<": "<<e.what()<<'\n';return 1;
+  }
+}
 pid_t launch(const char*self,const std::vector<std::string>&v,FdPool&fds,
              const std::vector<int>&keep,ChildSet&children){
   const auto p=fork();
@@ -273,11 +337,24 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   fds.close_all();
   children.wait_ok(p0);
   children.wait_ok(p1);
-  require(out0.size()==t.logical_n+23*8&&out1.size()==out0.size(),"result shape");
+  require(out0.size()==t.logical_n+29*8&&out1.size()==out0.size(),"result shape");
   const auto want=top_k_mask(scores,t.k);
   for(std::size_t i=0;i<t.logical_n;++i)require((out0[i]^out1[i])==want[i],"oracle mask");
   const auto m0=decode_words(Bytes(out0.begin()+t.logical_n,out0.end())),m1=decode_words(Bytes(out1.begin()+t.logical_n,out1.end()));
-  for(const auto&m:{m0,m1})require(m[0]>48&&m[5]==2U*c.padded_n&&m[6]==4U*c.padded_n&&m[7]==2&&m[16]==static_cast<std::uint64_t>(c.padded_n)*(c.padded_n-1U)/2U&&m[17]==m[16]*2U&&m[18]==6,"metrics audit");
+  for(const auto&m:{m0,m1})require(m[0]>48&&m[5]==2U*c.padded_n&&m[6]==4U*c.padded_n&&m[7]==2&&m[16]==static_cast<std::uint64_t>(c.padded_n)*(c.padded_n-1U)/2U&&m[17]==m[16]*2U&&m[18]==6&&m[23]>0&&m[24]>0&&m[27]>0&&m[28]>0,"metrics audit");
+  require(m0[25]==m1[26]&&m1[25]==m0[26],"E14 offline OT byte conservation");
+  require(m0[27]==m0[6]*34U&&m1[27]==m1[6]*34U&&
+          m0[28]==m0[17]*c.comparison_bits&&
+          m1[28]==m1[17]*c.comparison_bits,
+          "E14 DCF length-doubling fixture");
+  if(c.padded_n==2){
+    // Four 34-bit score keys + one 34-bit edge key; 840 payload bytes/key.
+    // Four score mask pairs, two node mask shares.  Four shuffle stages at
+    // T=2 retain two PO and two DO states per party.
+    require(m0[23]==4280&&m1[23]==4280&&m0[24]==432&&m1[24]==432&&
+            m0[27]==272&&m1[27]==272&&m0[28]==68&&m1[28]==68,
+            "E14 n2 hand-counted material/PRG fixture");
+  }
   if(benchmark_mode()){
     const auto sent=[](const auto&m){return m[1]+m[3]+m[8]+m[10]+m[12]+m[14];};
     const auto received=[](const auto&m){return m[2]+m[4]+m[9]+m[11]+m[13]+m[15];};
@@ -303,6 +380,15 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
              <<" p0_score_ns="<<m0[19]<<" p1_score_ns="<<m1[19]
              <<" p0_pipeline_ns="<<m0[20]<<" p1_pipeline_ns="<<m1[20]
              <<" p0_package_bytes="<<m0[0]<<" p1_package_bytes="<<m1[0]
+             <<" p0_t_payload_bytes="<<m0[23]<<" p1_t_payload_bytes="<<m1[23]
+             <<" p0_shuffle_payload_bytes="<<m0[24]
+             <<" p1_shuffle_payload_bytes="<<m1[24]
+             <<" p0_ot_sent_bytes="<<m0[25]<<" p1_ot_sent_bytes="<<m1[25]
+             <<" p0_ot_received_bytes="<<m0[26]
+             <<" p1_ot_received_bytes="<<m1[26]
+             <<" p0_score_dcf_prg="<<m0[27]<<" p1_score_dcf_prg="<<m1[27]
+             <<" p0_pipeline_dcf_prg="<<m0[28]
+             <<" p1_pipeline_dcf_prg="<<m1[28]
              <<" edges="<<m0[16]<<" dcf_eval_per_party="<<m0[6]+m0[17]
              <<" rounds="<<m0[7]+m0[18]
              <<" p0_sent_bytes="<<sent(m0)<<" p1_sent_bytes="<<sent(m1)
