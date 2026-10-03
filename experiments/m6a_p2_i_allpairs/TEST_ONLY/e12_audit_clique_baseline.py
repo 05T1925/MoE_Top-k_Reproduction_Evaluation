@@ -43,6 +43,7 @@ def verify(directory, profile, head, aav86_rows):
                 row["tracked_state"] != "CLEAN" or row["warmup"] != (rep == 0) or \
                 row["correctness"] != "frozen_oracle_and_exact_K_PASS" or \
                 row["online_rounds"] != 8 or row["comparison_edges_total"] != 8128 or \
+                row["reserved_pairs_per_party"] != 8128 or \
                 row["dcf_eval_per_party"] != 16768:
             raise RuntimeError(f"{profile} shape/status/work: {row['run_id']}")
         if row["p0_sent_bytes"] != row["p1_received_bytes"] or \

@@ -58,6 +58,9 @@ def measure(case, profile, calibration, common, repetition):
                 case[f"{party}_received_bytes"]:
             raise RuntimeError("baseline stage receive sum")
         for stage in ("score", "forward", "cmpagg", "reveal", "reverse"):
+            if case[f"{party}_{stage}_sent_bytes"] == 0 or \
+                    case[f"{party}_{stage}_received_bytes"] == 0:
+                raise RuntimeError("baseline missing observed protocol phase")
             if case[f"{party}_{stage}_received_bytes"] != \
                     case[f"{peer}_{stage}_sent_bytes"]:
                 raise RuntimeError("baseline cross-party stage mismatch")
@@ -90,6 +93,7 @@ def measure(case, profile, calibration, common, repetition):
                   package_only_material_bits=8 * (case["p0_package_bytes"] +
                                                   case["p1_package_bytes"]),
                   comparison_edges_total=case["edges"],
+                  reserved_pairs_per_party=case["edges"],
                   active_vertices_total=d,
                   dcf_eval_per_party=case["dcf_eval_per_party"],
                   online_rounds=case["rounds"],
@@ -137,6 +141,9 @@ def main():
                     "VFSS/src/moe_topk/protocol_i_pipeline.cpp",
                     "VFSS/src/moe_topk/protocol_i_score_input.cpp",
                     "VFSS/src/moe_topk/protocol_i_secret_shared_shuffle.cpp",
+                    "VFSS/src/moe_topk/protocol_i_permute_share.cpp",
+                    "VFSS/src/moe_topk/protocol_i_opv_emp.cpp",
+                    "VFSS/src/moe_topk/protocol_i_chosen_ot_emp.cpp",
                     "VFSS/ext/FSS/dcf.cpp", "VFSS/CMakeLists.txt",
                     "experiments/m6a_p2_i_allpairs/TEST_ONLY/e12_run_clique_baseline.py",
                     "experiments/m6a_p2_i_allpairs/TEST_ONLY/e12_clique_shaped_namespace.sh",
