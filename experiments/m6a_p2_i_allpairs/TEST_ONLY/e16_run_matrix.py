@@ -224,7 +224,7 @@ def main():
         "measurement_contract": "E16: canonical online-held payload counted after offline and online timers; DCF length-doubling PRG",
         "input_plan_sha256": sha256(args.input_plan),
         "topology": "one WSL2 host, T/P0/P1 fork+exec, TCP loopback in shaped netns",
-        "rlimit_as_bytes": 2048 * 1024 * 1024,
+        "rlimit_as_bytes": 3072 * 1024 * 1024,
         "thread_count_per_party": 1,
         "input_distribution": "uniform integers [-131072,131072], inclusive",
         "time_boundary": "transport TCP setup separately; offline before P0/P1/T fork through T exit and both party ready; online max party secure-call times; total=offline+online",

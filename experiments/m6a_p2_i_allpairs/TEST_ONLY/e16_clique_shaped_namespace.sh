@@ -32,14 +32,14 @@ chown moeaudit:moeaudit "$output_dir"
 ip netns exec "$namespace" tc -s qdisc show dev lo > "$output_dir/${profile}_qdisc_before.txt"
 chown moeaudit:moeaudit "$output_dir/${profile}_qdisc_before.txt"
 ip netns exec "$namespace" runuser -u moeaudit -- \
-  prlimit --as=2147483648:2147483648 -- python3 \
+  prlimit --as=3221225472:3221225472 -- python3 \
   "$source_root/experiments/m6a_p2_i_allpairs/TEST_ONLY/e11_network_calibrate.py" \
   --profile "$profile" --target-rtt-ms "$target_rtt" \
   --target-mbps "$target_mbps" --output "$output_dir/${profile}_calibration.json"
 ip netns exec "$namespace" tc -s qdisc show dev lo > "$output_dir/${profile}_qdisc_after_calibration.txt"
 chown moeaudit:moeaudit "$output_dir/${profile}_qdisc_after_calibration.txt"
 ip netns exec "$namespace" runuser -u moeaudit -- \
-  prlimit --as=2147483648:2147483648 -- python3 \
+  prlimit --as=3221225472:3221225472 -- python3 \
   "$source_root/experiments/m6a_p2_i_allpairs/TEST_ONLY/e16_run_clique_baseline.py" \
   --binary "$binary" --source-root "$source_root" --profile "$profile" \
   --calibration "$output_dir/${profile}_calibration.json" --output-dir "$output_dir" \

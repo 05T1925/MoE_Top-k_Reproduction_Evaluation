@@ -22,3 +22,9 @@ E15 实际 `preflight` 顺序为 `D>128` → `package>64 MiB` → `dealer_budget
 单次子进程上限 120 s；每条完整 `n=256,r` AAV86 档有 K=2/8 × LAN/WAN × (1+5)=24 次，最坏时间门为 48 分钟，基线全档另 24 次最多 48 分钟。先跑 r=2；r=3/4/5 各自在启动 keygen 前重新读可用内存、磁盘、RLIMIT_AS 与真实预检，且前一档的 T/P 峰值须明显低于 2 GiB；若不满足则记录 `PRECHECK_REJECTED` 或 `RESOURCE_FAILED`，不得仅因低 r 成功而放行。运行时超时、非零退出、包校验失败保留原始日志；不能事后减少样本或代填九指标。校准及所有密码学材料均新生，材料 claim 仅为一次性控制文件，不落盘存 key。
 
 n≥1000 的最小 n=1000,r=2 已有 D=1024、单方包 1,167,830,130 B、Dealer 准入预算 9,409,749,904 B，超过 192 MiB 包和 2 GiB 准入预算；D>256 硬门应先拒绝。n=10^4–10^6 的全两两槽/包更大。所有超门配置在 keygen 前拒绝，在线与峰值 `NOT_MEASURED`。E16 只允许调整有上限的 D256 接入和包/地址空间门；不改变可信 T 在线静默、全池预发、signed Q20.12、稳定同分或原序 XOR mask。若固定 key 布局变更，必须重新诊断真实材料并重新冻结材料合同。
+
+## r=5 地址空间门复核与第二个 E16 被测 revision
+
+初版 E16 `0cb011b` 在 2 GiB `RLIMIT_AS` 下已完成 r=2–4 的正确性与配对批次。r=5 配置预检接受，但 conformance 在生成并同时持有原始包和两份解码材料时连续两次 `std::bad_alloc`；第二次最高 RSS 1,601,016 KiB。该结果是**实际资源失败**，并不证明协议在线路径失败，也不能用 RSS 替代虚拟地址空间上限。两次失败原始日志保存在 `TEST_ONLY_E16_RAW/gate/r5_conformance*.log`。初版所有正式结果单独保留，绝不拼入第二版同 revision 统计。
+
+在仍保持 `D≤256`、单方包 `≤192 MiB`、Dealer 预算 `≤2 GiB`、可用内存 `≥3×` 当档预算、磁盘余量 `≥8 GiB`、子进程 `≤120 s` 的前提下，第二版仅将 D256 的有限 `RLIMIT_AS` 改为**精确 3 GiB**，不改变材料布局、协议消息或计时边界。r=5 conformance 在 3 GiB 下六例通过，最高 RSS 1,771,288 KiB；`TEST_ONLY_E16_RAW/gate/r5_conformance_3g.log` 为原始记录。`e16_final_preflight_3g.log` 记录 n=256 的 r=2–5 均接受，n≥1000 仍在 keygen 前先由 D 硬门拒绝。第二版源码冻结后全部 r=2–5 和基线重新采样到 `TEST_ONLY_E16_RAW/final_v2/`，以保证最终配对性能表共享同一 revision。3 GiB 是当前 GNU/glibc 测试主机的有限地址空间门，不是对其他主机的内存可用性承诺。

@@ -83,7 +83,7 @@ int main() {
             }
             require(rejected,"E16 D256 must reject wrong process limit");
             std::cout<<"E16_PREFLIGHT_REJECTED n="<<n<<" r="<<r
-                     <<" reason=RLIMIT_AS_NOT_2048_MIB\n";
+                     <<" reason=RLIMIT_AS_NOT_3072_MIB\n";
           } else {
             require(moe_topk::protocol_i_aav86_small_preflight(config).padded_n==256U,
                     "E16 D256 preflight");

@@ -34,7 +34,7 @@ constexpr std::uint64_t kMaxDealerBudgetBytes = UINT64_C(2048) * 1024U * 1024U;
 constexpr std::uint64_t kDealerFixedHeadroomBytes = UINT64_C(64) * 1024U * 1024U;
 constexpr std::uint64_t kD128MinVirtualBytes = UINT64_C(640) * 1024U * 1024U;
 constexpr std::uint64_t kD128MaxVirtualBytes = UINT64_C(768) * 1024U * 1024U;
-constexpr std::uint64_t kD256VirtualBytes = UINT64_C(2048) * 1024U * 1024U;
+constexpr std::uint64_t kD256VirtualBytes = UINT64_C(3072) * 1024U * 1024U;
 std::mutex dealer_mutex;
 
 void require(bool ok, const char* message) {
@@ -330,7 +330,7 @@ ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
   require(!assessment.package_limit,"AAV86 preflight package exceeds 192 MiB");
   require(!assessment.budget_limit,"AAV86 preflight dealer budget exceeds 2048 MiB");
   require(!assessment.memory_limit,"AAV86 preflight insufficient available memory");
-  require(!assessment.process_limit,"AAV86 preflight D128 requires 640-768 MiB or D256 requires 2048 MiB RLIMIT_AS");
+  require(!assessment.process_limit,"AAV86 preflight D128 requires 640-768 MiB or D256 requires 3072 MiB RLIMIT_AS");
   require(!assessment.material_id_limit,"AAV86 preflight material ID range");
   validate_config(config);
   return assessment.shape;
