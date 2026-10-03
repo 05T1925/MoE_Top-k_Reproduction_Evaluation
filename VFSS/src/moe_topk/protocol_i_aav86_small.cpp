@@ -671,6 +671,8 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
       std::chrono::duration_cast<std::chrono::nanoseconds>(core_started - score_started).count());
   metrics.score_prg_calls = readDCFOnlinePrgCalls();
   metrics.score_sent_bytes = score_metrics.carry_sent_bytes + score_metrics.sign_sent_bytes;
+  metrics.score_received_bytes =
+      score_metrics.carry_received_bytes + score_metrics.sign_received_bytes;
   metrics.score_dcf_evaluations = score_metrics.raw_dcf_calls;
   metrics.dcf_evaluations = score_metrics.raw_dcf_calls;
   metrics.online_sent_bytes += metrics.score_sent_bytes;
@@ -801,6 +803,9 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   }
   const auto sorted = flatten(nodes, 0);
   require(sorted.size() == d, "AAV86 full sort shape");
+  const auto carrier_started = std::chrono::steady_clock::now();
+  metrics.ca_time_ns = static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(carrier_started - core_started).count());
   std::vector<bool> seen(d);
   std::vector<std::uint64_t> carrier(d);
   for (std::size_t position = 0; position < sorted.size(); ++position) {
@@ -812,6 +817,8 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   const auto inverse_started = std::chrono::steady_clock::now();
   metrics.core_time_ns = static_cast<std::uint64_t>(
       std::chrono::duration_cast<std::chrono::nanoseconds>(inverse_started - core_started).count());
+  metrics.carrier_time_ns = static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(inverse_started - carrier_started).count());
   const auto inverse_first = add_vectors(
       protocol_i_apply_permutation(material.inverse_sigma, carrier),
       material.inverse_a, mask);
@@ -831,6 +838,16 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   metrics.inverse_time_ns = static_cast<std::uint64_t>(
       std::chrono::duration_cast<std::chrono::nanoseconds>(
           std::chrono::steady_clock::now() - inverse_started).count());
+  for (const auto& frame : metrics.message_trace) {
+    if (frame.phase == 4 || frame.phase == 5) continue;
+    if (frame.phase == 40) metrics.inverse_received_bytes += frame.received_bytes;
+    else metrics.core_received_bytes += frame.received_bytes;
+  }
+  require(metrics.score_received_bytes + metrics.core_received_bytes +
+              metrics.inverse_received_bytes == metrics.online_received_bytes,
+          "AAV86 stage receive accounting");
+  require(metrics.ca_time_ns + metrics.carrier_time_ns == metrics.core_time_ns,
+          "AAV86 combination timing accounting");
   return output;
 }
 }  // namespace moe_topk

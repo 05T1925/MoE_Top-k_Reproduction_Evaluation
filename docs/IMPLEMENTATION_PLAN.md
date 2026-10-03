@@ -693,6 +693,8 @@ Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 
 
 2026-10-03 [E10 异会话接收](reviews/M6A_P2_I_E10_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)为 `PASS_WITH_FINDINGS`。E11 从干净 `ac8af47a` checkout 建 TCP 测试通道与可校准的同主机 LAN/WAN network namespace，正式被测 HEAD 为 `103b76d863e68c2c318998db01073591e6a8fce8`。n=128、K=2/8、r=2..5 的两网络子矩阵各配置 1 次预热+5 次正式运行，80/80 正式正确；所有材料逐次新生、原始计数和五次统计见 [E11 报告](reviews/M6A_P2_I_E11_TCP_LAN_WAN_N128_SUBMATRIX_2026-10-03.md)。n≥256 当前 preflight 先由 D>128 硬门拒绝，且 n256/r2 的单方包本身超过 64 MiB；同路线全对全基线缺少同构 TCP/计量入口，本次无数值对照。E11 新源码与测量仍待下一次异会话接收，不能据此宣称完整 V3、Protocol III+AAV86 或作者精确复现。
 
+2026-10-03 [E11 异会话接收](reviews/M6A_P2_I_E11_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)为 `PASS_WITH_METRIC_FINDINGS`：E11 离线计时晚于 T fork，阶段接收字节由对方发送回填，旧 `core_time_ns` 包含本地 carrier 构造。E12 对同一全两两入口单列 TCP 建连时间，将离线起点前移至全部角色启动前；阶段接收量取本方 message trace；组合阶段再分 CA 与 carrier 时间。E11 原始行保持原口径，不直接合并或替换；E12 的新被测提交、重测与全对全基线状态由 E12 报告单独登记。条件性安全假设和 `AUTHOR_EXACT=NOT_PROVEN` 不变。
+
 #### 正确性与安全验收
 
 - 明文图算法与稳定 Top-K oracle 一致；

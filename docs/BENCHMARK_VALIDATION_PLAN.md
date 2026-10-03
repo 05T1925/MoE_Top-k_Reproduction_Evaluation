@@ -262,6 +262,16 @@ raw-score 输入适配
 
 论文成本没有包含的工程生命周期开销单独解释。历史结果保留原起止边界。
 
+M6A E12 的 n=128 TEST_ONLY runner 在建立 P0/P1 TCP 连接后单列
+`transport_setup_ms`；`offline_time_ms` 从启动本次 P0/P1/T 进程之前，
+至 T 发材退出且双方材料接收 ready 屏障完成。T 的 generate、serialize、
+distribute 和 T 退出后的 receive barrier 保留各自实测值，不能把它们
+直接相加替代离线包围时间。`online_time_ms` 为双方各自 secure 入口
+耗时的较大值；测试输入分发、oracle 与报告收集不计入此时间。
+`total_time_ms = offline_time_ms + online_time_ms`，不包含另列的
+`transport_setup_ms`。E11 原始离线与 total 字段保留当时的较晚起点，
+不得与 E12 的同名字段合并统计。
+
 ### 5.3 在线时间
 
 正式主指标 `online_time_ms` 的目标边界为：

@@ -344,6 +344,15 @@ if(MOE_TOPK_ENABLE_EMP_OT)
     add_executable(moe_topk_m2_protocol_i_modular_e2e_test tests/moe_topk/protocol_i_small_e2e_test.cpp)
     target_include_directories(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/cryptoTools)
     target_link_libraries(moe_topk_m2_protocol_i_modular_e2e_test PRIVATE moe_topk_share_translation_backend sytorch)
+    add_executable(moe_topk_m6a12_protocol_i_clique_benchmark_test
+        tests/moe_topk/protocol_i_e12_baseline_bench_test.cpp)
+    target_include_directories(moe_topk_m6a12_protocol_i_clique_benchmark_test PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/ext/cryptoTools)
+    target_link_libraries(moe_topk_m6a12_protocol_i_clique_benchmark_test PRIVATE
+        moe_topk_share_translation_backend sytorch)
+    add_test(NAME moe_topk_m6a12_protocol_i_clique_benchmark_test
+        COMMAND moe_topk_m6a12_protocol_i_clique_benchmark_test)
 endif()
 
 # Protocol III pre-integration primitive conformance. This validates the

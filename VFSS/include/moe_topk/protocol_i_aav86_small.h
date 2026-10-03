@@ -88,7 +88,12 @@ struct ProtocolIAav86SmallMetrics {
   std::uint64_t active_vertices = 0;
   std::uint64_t online_sent_bytes = 0, online_received_bytes = 0;
   std::uint64_t score_sent_bytes = 0, core_sent_bytes = 0, inverse_sent_bytes = 0;
+  std::uint64_t score_received_bytes = 0, core_received_bytes = 0,
+                inverse_received_bytes = 0;
   std::uint64_t score_time_ns = 0, core_time_ns = 0, inverse_time_ns = 0;
+  // core_time_ns is the CA plus local output-carrier combination stage.
+  // ca_time_ns ends after the public full-order flatten, before carrier work.
+  std::uint64_t ca_time_ns = 0, carrier_time_ns = 0;
   std::uint64_t causal_rounds = 0;
   std::vector<std::uint64_t> active_edges_by_iteration;
   std::vector<std::uint64_t> active_vertices_by_iteration;

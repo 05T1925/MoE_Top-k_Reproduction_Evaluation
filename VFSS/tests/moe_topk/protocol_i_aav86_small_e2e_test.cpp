@@ -102,6 +102,8 @@ struct ChildResult {
   std::uint64_t active_vertices=0,score_prg=0,ca_prg=0,inverse_prg=0,total_prg=0;
   std::uint64_t score_bytes=0,core_bytes=0,inverse_bytes=0;
   std::uint64_t score_ns=0,core_ns=0,inverse_ns=0;
+  std::uint64_t score_received_bytes=0,core_received_bytes=0,inverse_received_bytes=0;
+  std::uint64_t ca_ns=0,carrier_ns=0;
 };
 std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
                                          std::uint64_t online_ns,
@@ -142,14 +144,16 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
     previous=edge.material_id;
     digest=(digest^edge.material_id)*UINT64_C(1099511628211);
   }
-  const std::array<std::uint64_t,25> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
+  const std::array<std::uint64_t,30> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
       o.metrics.score_dcf_evaluations,o.metrics.ca_dcf_evaluations,
       o.metrics.dcf_evaluations,o.metrics.online_sent_bytes,o.metrics.online_received_bytes,
       o.metrics.causal_rounds,online_ns,rss,digest,package_bytes,pivot_seed_lo,pivot_seed_hi,
       o.metrics.active_vertices,o.metrics.score_prg_calls,o.metrics.ca_prg_calls,
       o.metrics.inverse_prg_calls,o.metrics.online_prg_calls,
       o.metrics.score_sent_bytes,o.metrics.core_sent_bytes,o.metrics.inverse_sent_bytes,
-      o.metrics.score_time_ns,o.metrics.core_time_ns,o.metrics.inverse_time_ns};
+      o.metrics.score_time_ns,o.metrics.core_time_ns,o.metrics.inverse_time_ns,
+      o.metrics.score_received_bytes,o.metrics.core_received_bytes,
+      o.metrics.inverse_received_bytes,o.metrics.ca_time_ns,o.metrics.carrier_time_ns};
   const auto* p=reinterpret_cast<const std::uint8_t*>(values.data());
   bytes.insert(bytes.end(),p,p+sizeof(values));
   const auto* by_round=reinterpret_cast<const std::uint8_t*>(
@@ -168,9 +172,9 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
 }
 ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
                           std::size_t rounds) {
-  require(bytes.size()==n+(25U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
+  require(bytes.size()==n+(30U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
   ChildResult result; result.mask.assign(bytes.begin(),bytes.begin()+n);
-  std::array<std::uint64_t,25> values{};
+  std::array<std::uint64_t,30> values{};
   std::copy_n(bytes.begin()+n,sizeof(values),reinterpret_cast<std::uint8_t*>(values.data()));
   result.pool=values[0]; result.active=values[1]; result.score_evals=values[2];
   result.ca_evals=values[3]; result.evals=values[4];
@@ -183,6 +187,9 @@ ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
   result.score_bytes=values[19]; result.core_bytes=values[20];
   result.inverse_bytes=values[21];
   result.score_ns=values[22]; result.core_ns=values[23]; result.inverse_ns=values[24];
+  result.score_received_bytes=values[25]; result.core_received_bytes=values[26];
+  result.inverse_received_bytes=values[27];
+  result.ca_ns=values[28]; result.carrier_ns=values[29];
   result.active_by_round.resize(rounds);
   result.vertices_by_round.resize(rounds);
   result.ca_prg_by_round.resize(rounds);
@@ -286,6 +293,7 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   auto c1=c0; c1.party=1; c1.durable_claim_directory=directory(serial,1);
   std::uint32_t d=2;
   while(d<n) d*=2;
+  const auto transport_setup_start=std::chrono::steady_clock::now();
   std::array<std::array<int,2>,2> package{pair(),pair()};
   std::array<std::array<int,2>,2> input{pair(),pair()};
   std::array<std::array<int,2>,2> result{pair(),pair()};
@@ -304,6 +312,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   for(const auto& a:core) all.insert(all.end(),a.begin(),a.end());
   all.insert(all.end(),inverse.begin(),inverse.end());
   all.insert(all.end(),dealer_telemetry.begin(),dealer_telemetry.end());
+  const auto transport_setup_end=std::chrono::steady_clock::now();
+  const auto offline_start=transport_setup_end;
   std::array<pid_t,2> parties{};
   for(int who=0;who<2;++who) {
     const auto child=::fork(); require(child>=0,"E2E party fork");
@@ -340,7 +350,6 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   std::vector<int> parent_keep{package[0][0],package[1][0],input[0][0],input[1][0],
       result[0][0],result[1][0],ready[0][0],ready[1][0],dealer_telemetry[0]};
   close_except(all,parent_keep);
-  const auto offline_start=std::chrono::steady_clock::now();
   wait_ok(dealer,"T");
   const auto dealer_exited=std::chrono::steady_clock::now();
   std::array<std::uint64_t,4> dealer_metrics{};
@@ -382,6 +391,12 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
           a.active_vertices==b.active_vertices&&
           a.score_bytes+a.core_bytes+a.inverse_bytes==a.sent&&
           b.score_bytes+b.core_bytes+b.inverse_bytes==b.sent&&
+          a.score_received_bytes+a.core_received_bytes+a.inverse_received_bytes==a.received&&
+          b.score_received_bytes+b.core_received_bytes+b.inverse_received_bytes==b.received&&
+          a.score_received_bytes==b.score_bytes&&a.core_received_bytes==b.core_bytes&&
+          a.inverse_received_bytes==b.inverse_bytes&&
+          b.score_received_bytes==a.score_bytes&&b.core_received_bytes==a.core_bytes&&
+          b.inverse_received_bytes==a.inverse_bytes&&
           a.score_prg==b.score_prg&&a.ca_prg==b.ca_prg&&
           a.inverse_prg==0&&b.inverse_prg==0&&
           a.total_prg==a.score_prg+a.ca_prg&&
@@ -393,6 +408,9 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   require(a.score_ns+a.core_ns+a.inverse_ns<=a.online_ns &&
           b.score_ns+b.core_ns+b.inverse_ns<=b.online_ns,
           "E11 stage timing bounds");
+  require(a.ca_ns+a.carrier_ns==a.core_ns &&
+          b.ca_ns+b.carrier_ns==b.core_ns,
+          "E12 CA and carrier timing bounds");
   std::uint32_t bits=33;
   for(auto value=d-1U;value;value>>=1U) ++bits;
   std::uint64_t vertex_sum=0,ca_prg_sum=0;
@@ -411,13 +429,15 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   totals.online_ns+=std::max(a.online_ns,b.online_ns);
   totals.peak_kib=std::max({totals.peak_kib,a.peak_kib,b.peak_kib});
   totals.package_bytes0+=a.package_bytes; totals.package_bytes1+=b.package_bytes;
-  std::cout<<"E7_E2E_CASE serial="<<serial<<" n="<<n<<" k="<<k<<" r="<<r
+  std::cout<<"E12_AAV86_CASE serial="<<serial<<" n="<<n<<" k="<<k<<" r="<<r
            <<" d="<<d<<" reserved="<<slots<<" active="<<a.active
            <<" score_eval_per_party="<<a.score_evals
            <<" ca_eval_per_party="<<a.ca_evals
            <<" total_eval_per_party="<<a.evals<<" p0_bytes="<<a.sent
            <<" p1_bytes="<<b.sent<<" rounds="<<a.rounds
            <<" offline_elapsed_ns="<<offline_ns
+           <<" transport_setup_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   transport_setup_end-transport_setup_start).count()
            <<" dealer_generate_ns="<<dealer_metrics[0]
            <<" dealer_serialize_ns="<<dealer_metrics[1]
            <<" dealer_distribute_ns="<<dealer_metrics[2]
@@ -450,15 +470,17 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" p1_inverse_bytes="<<b.inverse_bytes;
   std::cout<<" p0_received_bytes="<<a.received
            <<" p1_received_bytes="<<b.received
-           <<" p0_score_received_bytes="<<b.score_bytes
-           <<" p0_core_received_bytes="<<b.core_bytes
-           <<" p0_inverse_received_bytes="<<b.inverse_bytes
-           <<" p1_score_received_bytes="<<a.score_bytes
-           <<" p1_core_received_bytes="<<a.core_bytes
-           <<" p1_inverse_received_bytes="<<a.inverse_bytes
+           <<" p0_score_received_bytes="<<a.score_received_bytes
+           <<" p0_core_received_bytes="<<a.core_received_bytes
+           <<" p0_inverse_received_bytes="<<a.inverse_received_bytes
+           <<" p1_score_received_bytes="<<b.score_received_bytes
+           <<" p1_core_received_bytes="<<b.core_received_bytes
+           <<" p1_inverse_received_bytes="<<b.inverse_received_bytes
            <<" p0_score_ns="<<a.score_ns<<" p0_core_ns="<<a.core_ns
+           <<" p0_ca_ns="<<a.ca_ns<<" p0_carrier_ns="<<a.carrier_ns
            <<" p0_inverse_ns="<<a.inverse_ns
            <<" p1_score_ns="<<b.score_ns<<" p1_core_ns="<<b.core_ns
+           <<" p1_ca_ns="<<b.ca_ns<<" p1_carrier_ns="<<b.carrier_ns
            <<" p1_inverse_ns="<<b.inverse_ns
            <<" transport="<<(tcp_online()?"tcp":"unix")<<"\n";
   std::filesystem::remove_all(c0.durable_claim_directory);
@@ -542,7 +564,7 @@ int main(int argc,char** argv) {
         digest=(digest^score)*UINT64_C(1099511628211);
       }
       run_case(scores,k,r,serial,totals);
-      std::cout<<"E11_BENCH_META input_seed="<<input_seed
+      std::cout<<"E12_BENCH_META input_seed="<<input_seed
                <<" input_digest="<<digest<<" serial="<<serial<<"\n";
       return 0;
     }
