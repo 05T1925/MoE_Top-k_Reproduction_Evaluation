@@ -41,7 +41,19 @@ def sha256(path):
 
 
 def git(root, *args):
-    return subprocess.check_output(("git", "-C", str(root), *args), text=True).strip()
+    marker = root / ".git"
+    if marker.is_file():
+        value = marker.read_text(encoding="utf-8").strip()
+        if not value.startswith("gitdir: "):
+            raise RuntimeError("unrecognized worktree gitdir marker")
+        gitdir = value[len("gitdir: "):]
+        if len(gitdir) >= 3 and gitdir[1:3] == ":/":
+            gitdir = "/mnt/" + gitdir[0].lower() + "/" + gitdir[3:]
+        gitdir = str(Path(gitdir).resolve())
+    else:
+        gitdir = str(marker.resolve())
+    command = ("git", f"--git-dir={gitdir}", f"--work-tree={root}", *args)
+    return subprocess.check_output(command, text=True).strip()
 
 
 def parse_fields(line):
