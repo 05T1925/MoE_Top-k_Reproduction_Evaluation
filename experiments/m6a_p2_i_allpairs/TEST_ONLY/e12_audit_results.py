@@ -81,7 +81,7 @@ def verify(root, profile, head):
                     sum(row[f"{party}_{stage}_received_bytes"]
                         for stage in ("score", "core", "inverse")) != row[f"{party}_received_bytes"]:
                 raise RuntimeError(f"{profile} stage accounting: {row['run_id']}")
-            if abs(row[f"{party}_ca_ms"] + row[f"{party}_carrier_ms"] -
+            if abs(row[f"ca_{party}_ms"] + row[f"carrier_{party}_ms"] -
                    row[f"combination_{party}_ms"]) > 1e-9:
                 raise RuntimeError(f"{profile} CA/carrier timing: {row['run_id']}")
             peer = "p1" if party == "p0" else "p0"
