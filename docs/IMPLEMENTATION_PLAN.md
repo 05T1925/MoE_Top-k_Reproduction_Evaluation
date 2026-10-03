@@ -689,6 +689,8 @@ Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 
 
 2026-10-03 [E9 异会话接收](reviews/M6A_P2_I_E9_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)在精确源码哈希上独立复算 18/18 行原始计数，新构建逐档复跑 9/9 调用及相关 CTest 25/25 PASS，结论 `PASS_WITH_FINDINGS`，仅覆盖 D16/32/64 功能及该环境下的工程预检。口径修正：D128 在当前 API 中首先由 `D≤64` 硬上限拒绝；388.61 MiB 是解析预算，不是 D128 的实际预检返回值。后续先补计量与冻结 revision，资源受控地评估 D128；正式 V3 和 M6A 总验收仍未完成。
 
+2026-10-03 E10 在隔离分支建立 E9 本地检查点 `142db65776b6f7334dac02845109308a887d3995`，为该独立入口的传统 DCF 长度倍增 PRG、每轮活跃节点 `v_A`、分阶段通信和时间边界增加可核验计量。公开形状计算与 runtime 准入分离；在 768 MiB `RLIMIT_AS` 和资源预检下，D16/32/64/128 的 conformance、冻结 oracle differential、独立进程 E2E 均逐档各 6/6 PASS，D128 最大实际运行 r=5。n=128 的 r=3/4 只完成容量计算；n=256、r=2 时每方包已达 69,999,474 B，超过 64 MiB，未生成材料。详见 [E10 报告](reviews/M6A_P2_I_E10_FREEZE_METRICS_AND_D128_GATE_2026-10-03.md)。这些是本机 Debug/少量 Release 工程试运行；E10 新源码尚待下一次异会话接收，正式 LAN/WAN V3 矩阵、Protocol III 和作者精确复现仍未完成。
+
 #### 正确性与安全验收
 
 - 明文图算法与稳定 Top-K oracle 一致；

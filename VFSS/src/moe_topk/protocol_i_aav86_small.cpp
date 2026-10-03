@@ -10,12 +10,15 @@
 #include <cstdint>
 #include <fcntl.h>
 #include <filesystem>
+#include <fstream>
 #include <limits>
 #include <mutex>
+#include <optional>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <sys/random.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include <utility>
 #include <vector>
@@ -26,8 +29,10 @@ namespace {
 constexpr std::uint32_t kMagic = UINT32_C(0x4d364137);
 constexpr std::uint32_t kVersion = 1;
 constexpr std::size_t kMaxPackageBytes = 64U * 1024U * 1024U;
-constexpr std::uint64_t kMaxDealerBudgetBytes = UINT64_C(256) * 1024U * 1024U;
+constexpr std::uint64_t kMaxDealerBudgetBytes = UINT64_C(512) * 1024U * 1024U;
 constexpr std::uint64_t kDealerFixedHeadroomBytes = UINT64_C(64) * 1024U * 1024U;
+constexpr std::uint64_t kD128MinVirtualBytes = UINT64_C(640) * 1024U * 1024U;
+constexpr std::uint64_t kD128MaxVirtualBytes = UINT64_C(768) * 1024U * 1024U;
 std::mutex dealer_mutex;
 
 void require(bool ok, const char* message) {
@@ -47,10 +52,21 @@ std::uint64_t ring(int bits) {
   return (UINT64_C(1) << bits) - 1U;
 }
 std::uint32_t domain(std::uint32_t n) {
-  require(n >= 1 && n <= 64, "AAV86 bounded logical_n");
+  require(n >= 1 && n <= 128, "AAV86 bounded logical_n");
   std::uint32_t d = 2;
   while (d < n) d <<= 1U;
   return d;
+}
+std::optional<std::uint64_t> read_limit_file(const char* path) {
+  std::ifstream file(path);
+  if (!file) return std::nullopt;
+  std::string token;
+  require(static_cast<bool>(file >> token),"AAV86 cgroup limit read");
+  if (token == "max") return std::nullopt;
+  std::size_t used=0;
+  const auto value=std::stoull(token,&used);
+  require(used==token.size(),"AAV86 cgroup limit syntax");
+  return value;
 }
 std::uint32_t index_bits(std::uint32_t d) {
   std::uint32_t bits = 0;
@@ -236,21 +252,23 @@ void validate_material(const ProtocolIAav86SmallPartyMaterial& m) {
 
 }  // namespace
 
-ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
-    const ProtocolIAav86SmallConfig& config) {
-  validate_config(config);
+ProtocolIAav86SmallCapacity protocol_i_aav86_small_capacity_shape(
+    std::uint32_t logical_n, std::uint32_t iterations) {
+  require(logical_n >= 1 && logical_n <= 1000000U &&
+              iterations >= 1 && iterations <= 5,
+          "AAV86 shape n/r range");
   ProtocolIAav86SmallCapacity result;
-  result.padded_n = domain(config.logical_n);
+  std::uint64_t padded = 2;
+  while (padded < logical_n) padded = checked_mul(padded, 2U);
+  result.padded_n = static_cast<std::uint32_t>(padded);
   result.comparison_bits = static_cast<std::uint8_t>(33U + index_bits(result.padded_n));
   result.pairs_per_iteration = checked_mul(result.padded_n, result.padded_n - 1U) / 2U;
-  result.total_pair_slots = checked_mul(config.iterations, result.pairs_per_iteration);
+  result.total_pair_slots = checked_mul(iterations, result.pairs_per_iteration);
   const auto d_term = checked_mul(result.padded_n,
-      checked_add(1844U, checked_mul(8U, config.iterations)));
+      checked_add(1844U, checked_mul(8U, iterations)));
   const auto edge_term = checked_mul(result.total_pair_slots,
       checked_add(81U, checked_mul(24U, result.comparison_bits)));
   result.party_package_bytes = checked_add(checked_add(114U,d_term),edge_term);
-  require(result.party_package_bytes <= kMaxPackageBytes,
-          "AAV86 preflight package exceeds 64 MiB");
   // Two in-memory party pools, key-vector objects/allocator overhead, one
   // serialized package at a time, transient DCF pairs, and process overhead.
   // 8x the exact wire size plus 64 MiB is deliberately above those terms for
@@ -258,17 +276,59 @@ ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
   // portable C++ allocator theorem or a prediction of observed peak RSS.
   result.dealer_memory_budget_bytes = checked_add(
       checked_mul(8U,result.party_package_bytes),kDealerFixedHeadroomBytes);
-  require(result.dealer_memory_budget_bytes <= kMaxDealerBudgetBytes,
-          "AAV86 preflight dealer memory budget exceeds 256 MiB");
+  return result;
+}
+
+ProtocolIAav86SmallCapacityAssessment protocol_i_aav86_small_assess_capacity(
+    const ProtocolIAav86SmallConfig& config) {
+  ProtocolIAav86SmallCapacityAssessment result;
+  result.shape=protocol_i_aav86_small_capacity_shape(config.logical_n,config.iterations);
+  result.hard_cap=result.shape.padded_n>128U;
+  result.package_limit=result.shape.party_package_bytes>kMaxPackageBytes;
+  result.budget_limit=result.shape.dealer_memory_budget_bytes>kMaxDealerBudgetBytes;
+  result.material_id_limit=config.material_id==0 ||
+      config.material_id>UINT64_MAX-result.shape.total_pair_slots;
   const auto pages = ::sysconf(_SC_AVPHYS_PAGES);
   const auto page_bytes = ::sysconf(_SC_PAGESIZE);
   require(pages > 0 && page_bytes > 0,"AAV86 available memory unavailable");
-  result.available_memory_bytes = checked_mul(static_cast<std::uint64_t>(pages),
-                                               static_cast<std::uint64_t>(page_bytes));
-  require(checked_mul(2U,result.dealer_memory_budget_bytes) <=
-              result.available_memory_bytes,
-          "AAV86 preflight insufficient available memory");
+  result.shape.available_memory_bytes=checked_mul(
+      static_cast<std::uint64_t>(pages),static_cast<std::uint64_t>(page_bytes));
+  for (const auto [max_path,current_path]:{
+           std::pair{"/sys/fs/cgroup/memory.max","/sys/fs/cgroup/memory.current"},
+           std::pair{"/sys/fs/cgroup/memory/memory.limit_in_bytes",
+                     "/sys/fs/cgroup/memory/memory.usage_in_bytes"}}) {
+    const auto limit=read_limit_file(max_path);
+    const auto used=read_limit_file(current_path);
+    if (limit && used) {
+      require(*used<=*limit,"AAV86 cgroup memory exceeded");
+      result.shape.available_memory_bytes=std::min(
+          result.shape.available_memory_bytes,*limit-*used);
+    }
+  }
+  result.memory_limit=checked_mul(result.shape.padded_n==128U?3U:2U,
+      result.shape.dealer_memory_budget_bytes)>
+      result.shape.available_memory_bytes;
+  if (result.shape.padded_n == 128U) {
+    struct rlimit virtual_limit{};
+    require(::getrlimit(RLIMIT_AS,&virtual_limit)==0,"AAV86 address-space limit query");
+    result.process_limit=virtual_limit.rlim_cur==RLIM_INFINITY ||
+        virtual_limit.rlim_cur<kD128MinVirtualBytes ||
+        virtual_limit.rlim_cur>kD128MaxVirtualBytes;
+  }
   return result;
+}
+
+ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
+    const ProtocolIAav86SmallConfig& config) {
+  const auto assessment=protocol_i_aav86_small_assess_capacity(config);
+  require(!assessment.hard_cap,"AAV86 preflight hard cap D>128");
+  require(!assessment.package_limit,"AAV86 preflight package exceeds 64 MiB");
+  require(!assessment.budget_limit,"AAV86 preflight dealer budget exceeds 512 MiB");
+  require(!assessment.memory_limit,"AAV86 preflight insufficient available memory");
+  require(!assessment.process_limit,"AAV86 preflight D128 requires 640-768 MiB RLIMIT_AS");
+  require(!assessment.material_id_limit,"AAV86 preflight material ID range");
+  validate_config(config);
+  return assessment.shape;
 }
 
 ProtocolIAav86SmallDealerOutput protocol_i_aav86_small_dealer_generate(
@@ -588,6 +648,7 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   // Claim before the first online input-dependent message. A crash consumes
   // the package rather than allowing an old key to be reloaded.
   durable_claim(config);
+  resetDCFOnlinePrgCalls();
   const auto bits = material.comparison_bits;
   const auto mask = ring(bits);
   ProtocolIAav86SmallOutput output;
@@ -596,11 +657,14 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
       static_cast<std::uint64_t>(config.iterations) * edges_per_round(d);
   metrics.causal_rounds = 2U * config.iterations + 4U;
   metrics.active_edges_by_iteration.reserve(config.iterations);
+  metrics.active_vertices_by_iteration.reserve(config.iterations);
+  metrics.ca_prg_calls_by_iteration.reserve(config.iterations);
   ProtocolIScoreInputMetrics score_metrics;
   const auto key_shares = protocol_i_raw_score_input_party(
       {config.session, config.fingerprint, config.logical_n, d, config.k,
        static_cast<std::uint8_t>(index_bits(d)), bits, config.party, config.timeout_ms},
       material.score_materials, raw_score_share, score_fds, &score_metrics);
+  metrics.score_prg_calls = readDCFOnlinePrgCalls();
   metrics.score_sent_bytes = score_metrics.carry_sent_bytes + score_metrics.sign_sent_bytes;
   metrics.score_dcf_evaluations = score_metrics.raw_dcf_calls;
   metrics.dcf_evaluations = score_metrics.raw_dcf_calls;
@@ -657,6 +721,14 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
     }
     metrics.active_edges_by_iteration.push_back(graph.size());
     metrics.active_edges += graph.size();
+    std::set<std::uint32_t> graph_vertices;
+    for (const auto& pair : graph) {
+      graph_vertices.insert(pair.first);
+      graph_vertices.insert(pair.second);
+    }
+    metrics.active_vertices_by_iteration.push_back(graph_vertices.size());
+    metrics.active_vertices += graph_vertices.size();
+    const auto prg_before_round = readDCFOnlinePrgCalls();
     std::vector<std::uint64_t> rank_share(d);
     for (const auto& pair : graph) {
       const auto a = pair.first, c = pair.second;
@@ -670,6 +742,8 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
       metrics.ca_dcf_evaluations += 2U;
       metrics.dcf_evaluations += 2U;
     }
+    metrics.ca_prg_calls_by_iteration.push_back(
+        readDCFOnlinePrgCalls() - prg_before_round);
     const auto rank_mask = (UINT64_C(1) << index_bits(d)) - 1U;
     for (auto& value : rank_share) value &= rank_mask;
     const auto peer_rank = exchange_words(core_fds[2U + 2U * t], material,
@@ -733,11 +807,16 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   const auto inverse_first = add_vectors(
       protocol_i_apply_permutation(material.inverse_sigma, carrier),
       material.inverse_a, mask);
+  const auto prg_before_inverse = readDCFOnlinePrgCalls();
   const auto inverse_peer = exchange_words(inverse_fd, material, config.timeout_ms, 40,
                                            inverse_first, metrics, &metrics.inverse_sent_bytes);
   const auto original_share = add_vectors(
       protocol_i_apply_permutation(material.inverse_tau, inverse_peer),
       material.inverse_e, mask);
+  metrics.online_prg_calls = readDCFOnlinePrgCalls();
+  metrics.ca_prg_calls = metrics.online_prg_calls - metrics.score_prg_calls;
+  metrics.inverse_prg_calls = metrics.online_prg_calls - prg_before_inverse;
+  metrics.ca_prg_calls -= metrics.inverse_prg_calls;
   output.xor_mask_share.resize(config.logical_n);
   for (std::size_t j = 0; j < output.xor_mask_share.size(); ++j)
     output.xor_mask_share[j] = static_cast<std::uint8_t>(original_share[j] & 1U);

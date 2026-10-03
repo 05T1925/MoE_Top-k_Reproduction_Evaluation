@@ -59,10 +59,13 @@ void wait_ok(pid_t child,const char* role) {
 struct ChildResult {
   std::vector<std::uint8_t> mask;
   std::vector<std::uint64_t> active_by_round;
+  std::vector<std::uint64_t> vertices_by_round,ca_prg_by_round;
   std::uint64_t pool=0,active=0,score_evals=0,ca_evals=0,evals=0;
   std::uint64_t sent=0,received=0,rounds=0;
   std::uint64_t online_ns=0,peak_kib=0,edge_digest=0;
   std::uint64_t package_bytes=0,pivot_seed_lo=0,pivot_seed_hi=0;
+  std::uint64_t active_vertices=0,score_prg=0,ca_prg=0,inverse_prg=0,total_prg=0;
+  std::uint64_t score_bytes=0,core_bytes=0,inverse_bytes=0;
 };
 std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
                                          std::uint64_t online_ns,
@@ -86,27 +89,38 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
           "E2E trace byte accounting");
   std::uint64_t previous=0;
   for(const auto& edge:o.metrics.edge_trace) {
-    require(edge.a<edge.c&&edge.c<64&&edge.material_id>previous,"E2E edge reuse/order");
+    require(edge.a<edge.c&&edge.c<128&&edge.material_id>previous,"E2E edge reuse/order");
     previous=edge.material_id;
     digest=(digest^edge.material_id)*UINT64_C(1099511628211);
   }
-  const std::array<std::uint64_t,14> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
+  const std::array<std::uint64_t,22> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
       o.metrics.score_dcf_evaluations,o.metrics.ca_dcf_evaluations,
       o.metrics.dcf_evaluations,o.metrics.online_sent_bytes,o.metrics.online_received_bytes,
-      o.metrics.causal_rounds,online_ns,rss,digest,package_bytes,pivot_seed_lo,pivot_seed_hi};
+      o.metrics.causal_rounds,online_ns,rss,digest,package_bytes,pivot_seed_lo,pivot_seed_hi,
+      o.metrics.active_vertices,o.metrics.score_prg_calls,o.metrics.ca_prg_calls,
+      o.metrics.inverse_prg_calls,o.metrics.online_prg_calls,
+      o.metrics.score_sent_bytes,o.metrics.core_sent_bytes,o.metrics.inverse_sent_bytes};
   const auto* p=reinterpret_cast<const std::uint8_t*>(values.data());
   bytes.insert(bytes.end(),p,p+sizeof(values));
   const auto* by_round=reinterpret_cast<const std::uint8_t*>(
       o.metrics.active_edges_by_iteration.data());
   bytes.insert(bytes.end(),by_round,by_round+
       o.metrics.active_edges_by_iteration.size()*sizeof(std::uint64_t));
+  const auto* vertices=reinterpret_cast<const std::uint8_t*>(
+      o.metrics.active_vertices_by_iteration.data());
+  bytes.insert(bytes.end(),vertices,vertices+
+      o.metrics.active_vertices_by_iteration.size()*sizeof(std::uint64_t));
+  const auto* prg=reinterpret_cast<const std::uint8_t*>(
+      o.metrics.ca_prg_calls_by_iteration.data());
+  bytes.insert(bytes.end(),prg,prg+
+      o.metrics.ca_prg_calls_by_iteration.size()*sizeof(std::uint64_t));
   return bytes;
 }
 ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
                           std::size_t rounds) {
-  require(bytes.size()==n+(14U+rounds)*sizeof(std::uint64_t),"E2E result length");
+  require(bytes.size()==n+(22U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
   ChildResult result; result.mask.assign(bytes.begin(),bytes.begin()+n);
-  std::array<std::uint64_t,14> values{};
+  std::array<std::uint64_t,22> values{};
   std::copy_n(bytes.begin()+n,sizeof(values),reinterpret_cast<std::uint8_t*>(values.data()));
   result.pool=values[0]; result.active=values[1]; result.score_evals=values[2];
   result.ca_evals=values[3]; result.evals=values[4];
@@ -114,9 +128,20 @@ ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
   result.online_ns=values[8]; result.peak_kib=values[9]; result.edge_digest=values[10];
   result.package_bytes=values[11]; result.pivot_seed_lo=values[12];
   result.pivot_seed_hi=values[13];
+  result.active_vertices=values[14]; result.score_prg=values[15];
+  result.ca_prg=values[16]; result.inverse_prg=values[17]; result.total_prg=values[18];
+  result.score_bytes=values[19]; result.core_bytes=values[20];
+  result.inverse_bytes=values[21];
   result.active_by_round.resize(rounds);
-  std::copy(bytes.begin()+n+sizeof(values),bytes.end(),
+  result.vertices_by_round.resize(rounds);
+  result.ca_prg_by_round.resize(rounds);
+  const auto after_values=bytes.begin()+n+sizeof(values);
+  std::copy_n(after_values,rounds*sizeof(std::uint64_t),
             reinterpret_cast<std::uint8_t*>(result.active_by_round.data()));
+  std::copy_n(after_values+rounds*sizeof(std::uint64_t),rounds*sizeof(std::uint64_t),
+            reinterpret_cast<std::uint8_t*>(result.vertices_by_round.data()));
+  std::copy_n(after_values+2U*rounds*sizeof(std::uint64_t),rounds*sizeof(std::uint64_t),
+            reinterpret_cast<std::uint8_t*>(result.ca_prg_by_round.data()));
   return result;
 }
 struct Totals { std::uint64_t cases=0,pool=0,active=0,score_evals=0,ca_evals=0,evals=0;
@@ -136,21 +161,23 @@ std::uint64_t number(const char* text) { return std::stoull(text); }
 int fd(const char* text) { return std::stoi(text); }
 int party_process(int argc,char** argv) {
   try {
-    require(argc>=19,"E2E party arguments");
+    require(argc>=21,"E2E party arguments");
     const auto who=fd(argv[2]);
     require(who==0||who==1,"E2E party identity");
     ProtocolIAav86SmallConfig c{number(argv[3]),number(argv[4]),number(argv[5]),
         static_cast<std::uint32_t>(number(argv[6])),static_cast<std::uint32_t>(number(argv[7])),
         static_cast<std::uint32_t>(number(argv[8])),static_cast<std::uint8_t>(who),
         fd(argv[9]),argv[10]};
-    require(argc==18+2*static_cast<int>(c.iterations),"E2E core fd count");
+    require(argc==19+2*static_cast<int>(c.iterations),"E2E core fd count");
     const auto package_fd=fd(argv[11]),input_fd=fd(argv[12]),result_fd=fd(argv[13]);
     const std::array<int,2> score_fds{fd(argv[14]),fd(argv[15])};
     const auto inverse_fd=fd(argv[16]);
     std::vector<int> core_fds;
-    for(int i=17;i<argc;++i) core_fds.push_back(fd(argv[i]));
+    for(int i=18;i<argc;++i) core_fds.push_back(fd(argv[i]));
     const auto material_bytes=receive_bytes(package_fd,64U*1024U*1024U);
     auto material=protocol_i_aav86_small_deserialize_party_material(material_bytes,who,c);
+    const char ready=1;
+    send_all(fd(argv[17]),&ready,1);
     const auto pivot_seed_lo=material.pivot_seed_lo;
     const auto pivot_seed_hi=material.pivot_seed_hi;
     std::vector<std::uint32_t> shares(c.logical_n);
@@ -206,6 +233,7 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   std::array<std::array<int,2>,2> package{pair(),pair()};
   std::array<std::array<int,2>,2> input{pair(),pair()};
   std::array<std::array<int,2>,2> result{pair(),pair()};
+  std::array<std::array<int,2>,2> ready{pair(),pair()};
   std::array<std::array<int,2>,2> score{pair(),pair()};
   std::vector<std::array<int,2>> core(2U*r+1U);
   for(auto& edge:core) edge=pair();
@@ -215,6 +243,7 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   for(const auto& a:package) all.insert(all.end(),a.begin(),a.end());
   for(const auto& a:input) all.insert(all.end(),a.begin(),a.end());
   for(const auto& a:result) all.insert(all.end(),a.begin(),a.end());
+  for(const auto& a:ready) all.insert(all.end(),a.begin(),a.end());
   for(const auto& a:score) all.insert(all.end(),a.begin(),a.end());
   for(const auto& a:core) all.insert(all.end(),a.begin(),a.end());
   all.insert(all.end(),inverse.begin(),inverse.end());
@@ -223,7 +252,7 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   for(int who=0;who<2;++who) {
     const auto child=::fork(); require(child>=0,"E2E party fork");
     if(child==0) {
-      std::vector<int> keep{package[who][1],input[who][1],result[who][1],
+      std::vector<int> keep{package[who][1],input[who][1],result[who][1],ready[who][1],
                             score[0][who],score[1][who],inverse[who]};
       for(const auto& a:core) keep.push_back(a[who]);
       close_except(all,keep);
@@ -234,7 +263,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
           std::to_string(c.timeout_ms),c.durable_claim_directory,
           std::to_string(package[who][1]),std::to_string(input[who][1]),
           std::to_string(result[who][1]),std::to_string(score[0][who]),
-          std::to_string(score[1][who]),std::to_string(inverse[who])};
+          std::to_string(score[1][who]),std::to_string(inverse[who]),
+          std::to_string(ready[who][1])};
       for(const auto& a:core) args.push_back(std::to_string(a[who]));
       exec_role(args);
     }
@@ -252,12 +282,15 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
         std::to_string(dealer_telemetry[1])});
   }
   std::vector<int> parent_keep{package[0][0],package[1][0],input[0][0],input[1][0],
-      result[0][0],result[1][0],dealer_telemetry[0]};
+      result[0][0],result[1][0],ready[0][0],ready[1][0],dealer_telemetry[0]};
   close_except(all,parent_keep);
   const auto offline_start=std::chrono::steady_clock::now();
   wait_ok(dealer,"T");
   std::array<std::uint64_t,4> dealer_metrics{};
   receive_all(dealer_telemetry[0],dealer_metrics.data(),sizeof(dealer_metrics));
+  char ready_byte=0;
+  receive_all(ready[0][0],&ready_byte,1); require(ready_byte==1,"P0 offline ready");
+  receive_all(ready[1][0],&ready_byte,1); require(ready_byte==1,"P1 offline ready");
   const auto offline_ns=std::chrono::duration_cast<std::chrono::nanoseconds>(
       std::chrono::steady_clock::now()-offline_start).count();
   std::mt19937_64 rng(0x770000+serial);
@@ -284,9 +317,30 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
           a.rounds==2U*r+4U&&b.rounds==a.rounds&&a.sent==b.received&&b.sent==a.received&&
           a.edge_digest==b.edge_digest&&
           a.active_by_round==b.active_by_round&&
+          a.vertices_by_round==b.vertices_by_round&&
+          a.ca_prg_by_round==b.ca_prg_by_round&&
+          a.active_vertices==b.active_vertices&&
+          a.score_bytes+a.core_bytes+a.inverse_bytes==a.sent&&
+          b.score_bytes+b.core_bytes+b.inverse_bytes==b.sent&&
+          a.score_prg==b.score_prg&&a.ca_prg==b.ca_prg&&
+          a.inverse_prg==0&&b.inverse_prg==0&&
+          a.total_prg==a.score_prg+a.ca_prg&&
+          b.total_prg==b.score_prg+b.ca_prg&&
+          a.score_prg==4U*d*34U&&b.score_prg==4U*d*34U&&
           a.pivot_seed_lo==b.pivot_seed_lo&&a.pivot_seed_hi==b.pivot_seed_hi&&
           a.package_bytes>0&&b.package_bytes>0,
           "E2E metrics/trace");
+  std::uint32_t bits=33;
+  for(auto value=d-1U;value;value>>=1U) ++bits;
+  std::uint64_t vertex_sum=0,ca_prg_sum=0;
+  for(std::size_t t=0;t<r;++t) {
+    require(a.ca_prg_by_round[t]==2U*a.active_by_round[t]*bits,
+            "E2E PRG by iteration");
+    vertex_sum+=a.vertices_by_round[t];
+    ca_prg_sum+=a.ca_prg_by_round[t];
+  }
+  require(vertex_sum==a.active_vertices&&ca_prg_sum==a.ca_prg,
+          "E2E vertex/PRG totals");
   totals.cases++; totals.pool+=slots; totals.active+=a.active;
   totals.score_evals+=a.score_evals; totals.ca_evals+=a.ca_evals; totals.evals+=a.evals;
   totals.sent0+=a.sent; totals.sent1+=b.sent;
@@ -315,6 +369,20 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" pivot_seed_hi="<<a.pivot_seed_hi
            <<" edge_digest="<<a.edge_digest<<" active_by_round=";
   for(const auto count:a.active_by_round) std::cout<<count<<",";
+  std::cout<<" vertices_by_round=";
+  for(const auto count:a.vertices_by_round) std::cout<<count<<",";
+  std::cout<<" ca_prg_by_round=";
+  for(const auto count:a.ca_prg_by_round) std::cout<<count<<",";
+  std::cout<<" active_vertices="<<a.active_vertices
+           <<" score_prg_per_party="<<a.score_prg
+           <<" ca_prg_per_party="<<a.ca_prg
+           <<" inverse_prg_per_party="<<a.inverse_prg
+           <<" online_prg_per_party="<<a.total_prg
+           <<" online_prg_total="<<(a.total_prg+b.total_prg);
+  std::cout<<" p0_score_bytes="<<a.score_bytes<<" p0_core_bytes="<<a.core_bytes
+           <<" p0_inverse_bytes="<<a.inverse_bytes
+           <<" p1_score_bytes="<<b.score_bytes<<" p1_core_bytes="<<b.core_bytes
+           <<" p1_inverse_bytes="<<b.inverse_bytes;
   std::cout<<" p0_received_bytes="<<a.received
            <<" p1_received_bytes="<<b.received<<"\n";
   std::filesystem::remove_all(c0.durable_claim_directory);

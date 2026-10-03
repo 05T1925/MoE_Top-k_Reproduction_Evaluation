@@ -92,6 +92,12 @@ target_link_libraries(moe_topk_m6a7_aav86_small_e2e_test sytorch)
 add_test(NAME moe_topk_m6a7_aav86_small_e2e_test
     COMMAND moe_topk_m6a7_aav86_small_e2e_test)
 
+add_executable(moe_topk_m6a10_aav86_metrics_conformance_test
+    tests/moe_topk/protocol_i_aav86_e10_metrics_conformance_test.cpp)
+target_link_libraries(moe_topk_m6a10_aav86_metrics_conformance_test sytorch)
+add_test(NAME moe_topk_m6a10_aav86_metrics_conformance_test
+    COMMAND moe_topk_m6a10_aav86_metrics_conformance_test)
+
 # === Benchmarks ===
 # DCF，GROTTO，GTDCF 比较
 add_executable(

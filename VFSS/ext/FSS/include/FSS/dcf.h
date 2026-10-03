@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <cstdint>
 #include <vector>
 #include <utility>
 #include <cryptoTools/Common/Defines.h>
@@ -10,6 +11,11 @@
 #include <FSS/dpf.h> // half-tree需要
 
 void clearAESevals();
+// Counts completed online traditional-DCF seed -> two-block expansions on
+// the calling thread. This is one length-doubling PRG invocation, not an AES
+// block count. Reset/read around one party run; key format is unchanged.
+void resetDCFOnlinePrgCalls();
+std::uint64_t readDCFOnlinePrgCalls();
 inline osuCrypto::u8 lsb(const osuCrypto::block &b)
 {
     return _mm_cvtsi128_si64x(b) & 1;

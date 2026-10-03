@@ -203,9 +203,9 @@ void case_one(const std::vector<std::uint32_t>& scores, std::uint32_t k,
 }
 int main() {
   try {
-    ProtocolIAav86SmallConfig over_cap{1,2,3,65,1,2,0,5000,""};
+    ProtocolIAav86SmallConfig over_cap{1,2,3,129,1,2,0,5000,""};
     rejects([&] { (void)protocol_i_aav86_small_dealer_generate(over_cap); },
-            "D>64 capacity accepted");
+            "D>128 capacity accepted");
     over_cap.logical_n=64; over_cap.iterations=6;
     rejects([&] { (void)protocol_i_aav86_small_dealer_generate(over_cap); },
             "r>5 capacity accepted");

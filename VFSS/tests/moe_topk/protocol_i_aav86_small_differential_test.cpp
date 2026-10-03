@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <iostream>
 #include <random>
+#include <set>
 #include <signal.h>
 #include <stdexcept>
 #include <string>
@@ -144,6 +145,11 @@ Result run_case(const std::vector<std::uint32_t>& scores, std::uint32_t k,
                 m->ca_dcf_evaluations==2U*m->active_edges &&
                 m->dcf_evaluations==m->score_dcf_evaluations+m->ca_dcf_evaluations &&
                 m->active_edges_by_iteration.size()==r &&
+                m->active_vertices_by_iteration.size()==r &&
+                m->ca_prg_calls_by_iteration.size()==r &&
+                m->score_prg_calls==4U*d*34U &&
+                m->inverse_prg_calls==0 &&
+                m->online_prg_calls==m->score_prg_calls+m->ca_prg_calls &&
                 m->causal_rounds==2U*r+4U &&
                 m->online_sent_bytes==m->score_sent_bytes+m->core_sent_bytes+m->inverse_sent_bytes,
             "metrics accounting");
@@ -160,6 +166,7 @@ Result run_case(const std::vector<std::uint32_t>& scores, std::uint32_t k,
     require(sent==m->online_sent_bytes&&received==m->online_received_bytes,
             "message byte trace");
     std::vector<std::uint64_t> per_round(r);
+    std::vector<std::set<std::uint32_t>> vertices_by_round(r);
     std::uint64_t prior=0;
     bool first=true;
     for(const auto& e:m->edge_trace) {
@@ -170,10 +177,28 @@ Result run_case(const std::vector<std::uint32_t>& scores, std::uint32_t k,
               "edge slot/id trace");
       require(first||e.material_id>prior,"edge lookup order/reuse");
       first=false; prior=e.material_id; per_round[e.iteration]++;
+      vertices_by_round[e.iteration].insert(e.a);
+      vertices_by_round[e.iteration].insert(e.c);
     }
     require(per_round==m->active_edges_by_iteration,"edge round trace");
+    std::uint32_t index_bits=0;
+    for(auto value=d-1U;value;value>>=1U) ++index_bits;
+    std::uint64_t vertex_sum=0,prg_sum=0;
+    for(std::size_t t=0;t<r;++t) {
+      require(vertices_by_round[t].size()==m->active_vertices_by_iteration[t],
+              "vertex incidence trace");
+      require(m->ca_prg_calls_by_iteration[t]==
+                  2U*per_round[t]*(33U+index_bits),
+              "CA PRG primitive count");
+      vertex_sum+=vertices_by_round[t].size();
+      prg_sum+=m->ca_prg_calls_by_iteration[t];
+    }
+    require(vertex_sum==m->active_vertices&&prg_sum==m->ca_prg_calls,
+            "vertex/PRG round sum");
   }
   require(out0.metrics.active_edges==out1.metrics.active_edges,"edge count symmetry");
+  require(out0.metrics.active_vertices_by_iteration==
+          out1.metrics.active_vertices_by_iteration,"vertex graph symmetry");
   require(out0.metrics.edge_trace.size()==out1.metrics.edge_trace.size(),"edge graph symmetry");
   for(std::size_t i=0;i<out0.metrics.edge_trace.size();++i)
     require(out0.metrics.edge_trace[i].material_id==out1.metrics.edge_trace[i].material_id,

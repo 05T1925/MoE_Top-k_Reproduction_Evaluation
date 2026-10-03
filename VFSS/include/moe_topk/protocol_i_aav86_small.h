@@ -11,7 +11,7 @@
 namespace moe_topk {
 
 // M6A project instance, not an author-exact Protocol I implementation.
-// E9 admits only D <= 64 after pre-keygen package and dealer-memory checks.
+// E10 permits D <= 128 only with bounded address space and pre-keygen checks.
 struct ProtocolIAav86SmallConfig {
   std::uint64_t session = 0, fingerprint = 0, material_id = 0;
   std::uint32_t logical_n = 0, k = 0, iterations = 0;
@@ -50,6 +50,19 @@ struct ProtocolIAav86SmallCapacity {
   std::uint64_t available_memory_bytes = 0;
 };
 
+struct ProtocolIAav86SmallCapacityAssessment {
+  ProtocolIAav86SmallCapacity shape;
+  bool hard_cap = false, package_limit = false, budget_limit = false;
+  bool memory_limit = false, process_limit = false, material_id_limit = false;
+};
+
+// Arithmetic only: no key generation, allocation proportional to D, or
+// runtime admission. Covers the maintained matrix up to logical_n=1,000,000.
+ProtocolIAav86SmallCapacity protocol_i_aav86_small_capacity_shape(
+    std::uint32_t logical_n, std::uint32_t iterations);
+ProtocolIAav86SmallCapacityAssessment protocol_i_aav86_small_assess_capacity(
+    const ProtocolIAav86SmallConfig& config);
+
 // Pure shape arithmetic plus current memory-availability check. Dealer calls
 // this before reserve, keygen, or any size-dependent allocation.
 ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
@@ -70,10 +83,15 @@ struct ProtocolIAav86SmallMetrics {
   std::uint64_t active_edges = 0;
   std::uint64_t score_dcf_evaluations = 0, ca_dcf_evaluations = 0;
   std::uint64_t dcf_evaluations = 0;
+  std::uint64_t score_prg_calls = 0, ca_prg_calls = 0;
+  std::uint64_t inverse_prg_calls = 0, online_prg_calls = 0;
+  std::uint64_t active_vertices = 0;
   std::uint64_t online_sent_bytes = 0, online_received_bytes = 0;
   std::uint64_t score_sent_bytes = 0, core_sent_bytes = 0, inverse_sent_bytes = 0;
   std::uint64_t causal_rounds = 0;
   std::vector<std::uint64_t> active_edges_by_iteration;
+  std::vector<std::uint64_t> active_vertices_by_iteration;
+  std::vector<std::uint64_t> ca_prg_calls_by_iteration;
   std::vector<ProtocolIAav86SmallMessageTrace> message_trace;
   std::vector<ProtocolIAav86SmallEdgeTrace> edge_trace;
 };
