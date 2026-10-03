@@ -17,7 +17,7 @@ E11 **实际被测**提交是 `103b76d863e68c2c318998db01073591e6a8fce8`，`4600
 | 离线起点晚于 T fork | AAV86 E2E harness 在建立 fd/TCP 后、**首次**启动 P0/P1/T 前起表；T 退出且两方 ready 后止表。TCP 建连单列 `transport_setup_ms`。旧 E11 行原样保留。 | 小实例、D128 与逐次离线子区间审计通过。 |
 | 阶段接收量非本方实测 | secure 入口按本方 `message_trace.received_bytes` 聚合 score、CA 组合、inverse；party 结果传回真实三段计数。同方阶段和=本方总接收，本方各阶段接收=对方对应发送。 | 120 次最终双路线记录逐行守恒；AAV86 阶段接收直接源自本方 trace。 |
 | `core` 含 carrier | 保留原 `core_time_ns` 作为组合阶段，另在公开 full-order flatten 后、carrier 构造前起相邻边界；直接实测 `ca_time_ns` 与 `carrier_time_ns`，严格满足二者和=组合时间。新 JSONL 字段名为 `combination_p{0,1}_ms`、`ca_p{0,1}_ms`、`carrier_p{0,1}_ms`。 | 两方运行时与独立审计均通过。`ca_time_ns` 包含首轮 shuffle、逐轮 CA 和 flatten，不冒称作者纯 CA 实测。 |
-| 基线输入 seed 进入 T 参数 | 在 `d62f437` 初版基线试跑时发现控制器把测试输入 seed 复用为材料标签；`6d2dcec` 后控制器单独持有输入 seed，T exec 参数只收与输入独立的 session/运行标签和公开形状。固定测试 FSS seed 改为系统随机种子，score/edge mask 改为 OS 随机，OT 继续使用真实 EMP/OpenSSL。 | 初版基线 LAN 整批保留但**作废**；`8ad0725` 下重新测量。T 发材并退出后才发送输入份额。 |
+| 基线输入 seed 进入 T 参数 | 在 `d62f437` 初版基线试跑时发现控制器把测试输入 seed 复用为材料标签；`6d2dcec` 后控制器单独持有输入 seed，T exec 参数改用另一 session/运行标签和公开形状。固定测试 FSS seed 改为系统随机种子，score/edge mask 改为 OS 随机，OT 继续使用真实 EMP/OpenSSL。E13 复核发现两个标签仍可由公开 K/重复编号日程互推，因此这里的“分离”仅表示未直接传参，不能作为合成输入隐私证明。 | 初版基线 LAN 整批保留但**作废**；`8ad0725` 下重新测量。T 发材并退出后才发送输入份额。 |
 
 本次 `total_time_ms = offline_time_ms + max(online_p0_ms, online_p1_ms)`。它是两个定义明确的阶段之和，测试输入发送、oracle、报告收集以及另列的连接建立时间不包含在内。T generate/serialize/distribute 和 T 退出后的 party ready barrier 各保留实测原值；不能将它们简单相加充作离线包围时间。决策口径见 `docs/decisions/M6A_P2_I_E12_MEASUREMENT_CONTRACT_2026-10-03.md`，实施与 benchmark 计划已同步。
 

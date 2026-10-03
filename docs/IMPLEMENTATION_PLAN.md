@@ -695,6 +695,10 @@ Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 
 
 2026-10-03 [E11 异会话接收](reviews/M6A_P2_I_E11_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)为 `PASS_WITH_METRIC_FINDINGS`：E11 离线计时晚于 T fork，阶段接收字节由对方发送回填，旧 `core_time_ns` 包含本地 carrier 构造。E12 对同一全两两入口单列 TCP 建连时间，将离线起点前移至全部角色启动前；阶段接收量取本方 message trace；组合阶段再分 CA 与 carrier 时间。E11 原始行保持原口径，不直接合并或替换；E12 的新被测提交、重测与全对全基线状态由 E12 报告单独登记。条件性安全假设和 `AUTHOR_EXACT=NOT_PROVEN` 不变。
 
+2026-10-03 [E13 技术复核](reviews/M6A_P2_I_E13_E12_RECEIVER_TECHNICAL_AUDIT_AND_PROTOCOL_III_HANDOFF_2026-10-03.md)对 E12 被测提交 `8ad0725c73716ac37c96d417136958f932233d61` 的 151 项原始索引、120 条 accepted 行、20 组五次统计、源码和日志独立重算为 `PASS_WITH_FINDINGS`：n128 有界正确性、同主机模拟 LAN/WAN 的完整时间/在线通信可按明确口径引用；全对全完整 EMP OT 材料和 PRG 仍 `NOT_MEASURED`，n≥256 仅有容量/预检拒绝。E12 基线 input seed 虽未直接传 T，却可由公开测试日程与其 serial 互推；AAV86 TEST_ONLY 份额也可由 serial 重现，测试夹具不构成输入隐私证明。本 E13 聊天包含 E12 工作上下文，**不具备未参与 E12 的异会话签收资格**；程序性接收仍须另一独立聊天完成。Protocol III+AAV86 的代数、泄露、材料时序、原序路由及消息 DAG 尚待独立设计。
+
+2026-10-03 [E12 异会话数据接收](reviews/M6A_P2_I_E12_CROSS_CHAT_DATA_ACCEPTANCE_2026-10-03.md)由未参与 E12 编写与运行的接收聊天完成：151/151 原始哈希、120/120 accepted 行、20/20 组统计与同组输入配对复核为 `PASS_WITH_FINDINGS`，冻结 `8ad0725` 下 Protocol I+AAV86 的 n128 有界性能数据。E13 原聊天的程序性 FAIL 保留为历史。此接收不填补基线完整 EMP OT 材料、同定义 PRG、n≥256 性能或 Protocol III+AAV86；M6A/V3 仍未完成。
+
 #### 正确性与安全验收
 
 - 明文图算法与稳定 Top-K oracle 一致；
