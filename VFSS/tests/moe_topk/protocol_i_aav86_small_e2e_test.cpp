@@ -1,4 +1,5 @@
 #include <moe_topk/protocol_i_aav86_small.h>
+#include <moe_topk/protocol_i_transport.h>
 #include <moe_topk/topk_oracle.h>
 #include "protocol_i_aav86_e9_fixtures.h"
 
@@ -9,7 +10,10 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <random>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <sys/resource.h>
@@ -42,6 +46,37 @@ std::array<int,2> pair() {
   std::array<int,2> p{-1,-1};
   require(::socketpair(AF_UNIX,SOCK_STREAM,0,p.data())==0,"E2E socketpair"); return p;
 }
+std::array<int,2> tcp_pair() {
+  const int listener=::socket(AF_INET,SOCK_STREAM,0);
+  require(listener>=0,"E11 TCP listener");
+  sockaddr_in address{}; address.sin_family=AF_INET;
+  address.sin_addr.s_addr=htonl(INADDR_LOOPBACK); address.sin_port=0;
+  require(::bind(listener,reinterpret_cast<sockaddr*>(&address),sizeof(address))==0,
+          "E11 TCP bind");
+  require(::listen(listener,1)==0,"E11 TCP listen");
+  socklen_t length=sizeof(address);
+  require(::getsockname(listener,reinterpret_cast<sockaddr*>(&address),&length)==0,
+          "E11 TCP getsockname");
+  const int connector=::socket(AF_INET,SOCK_STREAM,0);
+  require(connector>=0,"E11 TCP connector");
+  require(::connect(connector,reinterpret_cast<sockaddr*>(&address),sizeof(address))==0,
+          "E11 TCP connect");
+  const int accepted=::accept(listener,nullptr,nullptr);
+  ::close(listener);
+  require(accepted>=0,"E11 TCP accept");
+  const int enabled=1;
+  require(::setsockopt(connector,IPPROTO_TCP,TCP_NODELAY,&enabled,sizeof(enabled))==0 &&
+          ::setsockopt(accepted,IPPROTO_TCP,TCP_NODELAY,&enabled,sizeof(enabled))==0,
+          "E11 TCP_NODELAY");
+  return {connector,accepted};
+}
+bool tcp_online() {
+  const char* setting=std::getenv("MOE_TOPK_M6A_E11_TRANSPORT");
+  if(!setting || std::string(setting)=="unix") return false;
+  require(std::string(setting)=="tcp","E11 transport name");
+  return true;
+}
+std::array<int,2> online_pair() { return tcp_online()?tcp_pair():pair(); }
 std::string directory(std::uint64_t serial,int party) {
   auto pattern="/tmp/m6a7-e2e-"+std::to_string(::getpid())+"-"+
       std::to_string(serial)+"-"+std::to_string(party)+"-XXXXXX";
@@ -66,6 +101,7 @@ struct ChildResult {
   std::uint64_t package_bytes=0,pivot_seed_lo=0,pivot_seed_hi=0;
   std::uint64_t active_vertices=0,score_prg=0,ca_prg=0,inverse_prg=0,total_prg=0;
   std::uint64_t score_bytes=0,core_bytes=0,inverse_bytes=0;
+  std::uint64_t score_ns=0,core_ns=0,inverse_ns=0;
 };
 std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
                                          std::uint64_t online_ns,
@@ -77,6 +113,19 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
                       return static_cast<std::uint64_t>(u.ru_maxrss); }();
   require(o.metrics.message_trace.size()==o.metrics.causal_rounds&&
           o.metrics.edge_trace.size()==o.metrics.active_edges,"E2E trace shape");
+  std::vector<std::set<std::uint32_t>> incident(o.metrics.active_edges_by_iteration.size());
+  std::vector<std::uint64_t> edges_by_round(incident.size());
+  for(const auto& edge:o.metrics.edge_trace) {
+    require(edge.iteration<incident.size(),"E11 public edge round");
+    incident[edge.iteration].insert(edge.a);
+    incident[edge.iteration].insert(edge.c);
+    ++edges_by_round[edge.iteration];
+  }
+  require(edges_by_round==o.metrics.active_edges_by_iteration,
+          "E11 public edge counts");
+  for(std::size_t t=0;t<incident.size();++t)
+    require(incident[t].size()==o.metrics.active_vertices_by_iteration[t],
+            "E11 public vertex count");
   std::uint64_t sent=0,received=0,digest=UINT64_C(1469598103934665603);
   for(std::size_t i=0;i<o.metrics.message_trace.size();++i) {
     const auto phase=i==0?4U:i==1?5U:i==2?9U:
@@ -93,13 +142,14 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
     previous=edge.material_id;
     digest=(digest^edge.material_id)*UINT64_C(1099511628211);
   }
-  const std::array<std::uint64_t,22> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
+  const std::array<std::uint64_t,25> values{o.metrics.pool_slots_per_party,o.metrics.active_edges,
       o.metrics.score_dcf_evaluations,o.metrics.ca_dcf_evaluations,
       o.metrics.dcf_evaluations,o.metrics.online_sent_bytes,o.metrics.online_received_bytes,
       o.metrics.causal_rounds,online_ns,rss,digest,package_bytes,pivot_seed_lo,pivot_seed_hi,
       o.metrics.active_vertices,o.metrics.score_prg_calls,o.metrics.ca_prg_calls,
       o.metrics.inverse_prg_calls,o.metrics.online_prg_calls,
-      o.metrics.score_sent_bytes,o.metrics.core_sent_bytes,o.metrics.inverse_sent_bytes};
+      o.metrics.score_sent_bytes,o.metrics.core_sent_bytes,o.metrics.inverse_sent_bytes,
+      o.metrics.score_time_ns,o.metrics.core_time_ns,o.metrics.inverse_time_ns};
   const auto* p=reinterpret_cast<const std::uint8_t*>(values.data());
   bytes.insert(bytes.end(),p,p+sizeof(values));
   const auto* by_round=reinterpret_cast<const std::uint8_t*>(
@@ -118,9 +168,9 @@ std::vector<std::uint8_t> encode_result(const ProtocolIAav86SmallOutput& o,
 }
 ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
                           std::size_t rounds) {
-  require(bytes.size()==n+(22U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
+  require(bytes.size()==n+(25U+3U*rounds)*sizeof(std::uint64_t),"E2E result length");
   ChildResult result; result.mask.assign(bytes.begin(),bytes.begin()+n);
-  std::array<std::uint64_t,22> values{};
+  std::array<std::uint64_t,25> values{};
   std::copy_n(bytes.begin()+n,sizeof(values),reinterpret_cast<std::uint8_t*>(values.data()));
   result.pool=values[0]; result.active=values[1]; result.score_evals=values[2];
   result.ca_evals=values[3]; result.evals=values[4];
@@ -132,6 +182,7 @@ ChildResult decode_result(const std::vector<std::uint8_t>& bytes,std::size_t n,
   result.ca_prg=values[16]; result.inverse_prg=values[17]; result.total_prg=values[18];
   result.score_bytes=values[19]; result.core_bytes=values[20];
   result.inverse_bytes=values[21];
+  result.score_ns=values[22]; result.core_ns=values[23]; result.inverse_ns=values[24];
   result.active_by_round.resize(rounds);
   result.vertices_by_round.resize(rounds);
   result.ca_prg_by_round.resize(rounds);
@@ -201,7 +252,12 @@ int dealer_process(int argc,char** argv) {
         static_cast<std::uint32_t>(number(argv[5])),static_cast<std::uint32_t>(number(argv[6])),
         static_cast<std::uint32_t>(number(argv[7])),0,fd(argv[8]),""};
     const auto started=std::chrono::steady_clock::now();
-    const auto materials=protocol_i_aav86_small_dealer_generate(c);
+    auto materials=protocol_i_aav86_small_dealer_generate(c);
+    if(const auto* public_seed=std::getenv("MOE_TOPK_M6A_E11_PUBLIC_PIVOT_SEED")) {
+      const auto lo=number(public_seed), hi=lo^UINT64_C(0x9e3779b97f4a7c15);
+      materials.party0.pivot_seed_lo=materials.party1.pivot_seed_lo=lo;
+      materials.party0.pivot_seed_hi=materials.party1.pivot_seed_hi=hi;
+    }
     const auto generated=std::chrono::steady_clock::now();
     const auto bytes0=protocol_i_aav86_small_serialize_party_material(materials.party0);
     const auto bytes1=protocol_i_aav86_small_serialize_party_material(materials.party1);
@@ -234,10 +290,10 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   std::array<std::array<int,2>,2> input{pair(),pair()};
   std::array<std::array<int,2>,2> result{pair(),pair()};
   std::array<std::array<int,2>,2> ready{pair(),pair()};
-  std::array<std::array<int,2>,2> score{pair(),pair()};
+  std::array<std::array<int,2>,2> score{online_pair(),online_pair()};
   std::vector<std::array<int,2>> core(2U*r+1U);
-  for(auto& edge:core) edge=pair();
-  const auto inverse=pair();
+  for(auto& edge:core) edge=online_pair();
+  const auto inverse=online_pair();
   const auto dealer_telemetry=pair();
   std::vector<int> all;
   for(const auto& a:package) all.insert(all.end(),a.begin(),a.end());
@@ -286,13 +342,17 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   close_except(all,parent_keep);
   const auto offline_start=std::chrono::steady_clock::now();
   wait_ok(dealer,"T");
+  const auto dealer_exited=std::chrono::steady_clock::now();
   std::array<std::uint64_t,4> dealer_metrics{};
   receive_all(dealer_telemetry[0],dealer_metrics.data(),sizeof(dealer_metrics));
   char ready_byte=0;
   receive_all(ready[0][0],&ready_byte,1); require(ready_byte==1,"P0 offline ready");
   receive_all(ready[1][0],&ready_byte,1); require(ready_byte==1,"P1 offline ready");
+  const auto offline_end=std::chrono::steady_clock::now();
   const auto offline_ns=std::chrono::duration_cast<std::chrono::nanoseconds>(
-      std::chrono::steady_clock::now()-offline_start).count();
+      offline_end-offline_start).count();
+  const auto receive_barrier_ns=std::chrono::duration_cast<std::chrono::nanoseconds>(
+      offline_end-dealer_exited).count();
   std::mt19937_64 rng(0x770000+serial);
   std::vector<std::uint32_t> x0(n),x1(n);
   for(std::size_t i=0;i<n;++i) { x0[i]=static_cast<std::uint32_t>(rng()); x1[i]=scores[i]-x0[i]; }
@@ -330,6 +390,9 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
           a.pivot_seed_lo==b.pivot_seed_lo&&a.pivot_seed_hi==b.pivot_seed_hi&&
           a.package_bytes>0&&b.package_bytes>0,
           "E2E metrics/trace");
+  require(a.score_ns+a.core_ns+a.inverse_ns<=a.online_ns &&
+          b.score_ns+b.core_ns+b.inverse_ns<=b.online_ns,
+          "E11 stage timing bounds");
   std::uint32_t bits=33;
   for(auto value=d-1U;value;value>>=1U) ++bits;
   std::uint64_t vertex_sum=0,ca_prg_sum=0;
@@ -358,6 +421,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" dealer_generate_ns="<<dealer_metrics[0]
            <<" dealer_serialize_ns="<<dealer_metrics[1]
            <<" dealer_distribute_ns="<<dealer_metrics[2]
+           <<" receive_barrier_ns="<<receive_barrier_ns
+           <<" t_exit=0 p0_exit=0 p1_exit=0"
            <<" peak_t_kib="<<dealer_metrics[3]
            <<" online_max_elapsed_ns="<<std::max(a.online_ns,b.online_ns)
            <<" online_p0_ns="<<a.online_ns<<" online_p1_ns="<<b.online_ns
@@ -384,16 +449,103 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" p1_score_bytes="<<b.score_bytes<<" p1_core_bytes="<<b.core_bytes
            <<" p1_inverse_bytes="<<b.inverse_bytes;
   std::cout<<" p0_received_bytes="<<a.received
-           <<" p1_received_bytes="<<b.received<<"\n";
+           <<" p1_received_bytes="<<b.received
+           <<" p0_score_received_bytes="<<b.score_bytes
+           <<" p0_core_received_bytes="<<b.core_bytes
+           <<" p0_inverse_received_bytes="<<b.inverse_bytes
+           <<" p1_score_received_bytes="<<a.score_bytes
+           <<" p1_core_received_bytes="<<a.core_bytes
+           <<" p1_inverse_received_bytes="<<a.inverse_bytes
+           <<" p0_score_ns="<<a.score_ns<<" p0_core_ns="<<a.core_ns
+           <<" p0_inverse_ns="<<a.inverse_ns
+           <<" p1_score_ns="<<b.score_ns<<" p1_core_ns="<<b.core_ns
+           <<" p1_inverse_ns="<<b.inverse_ns
+           <<" transport="<<(tcp_online()?"tcp":"unix")<<"\n";
   std::filesystem::remove_all(c0.durable_claim_directory);
   std::filesystem::remove_all(c1.durable_claim_directory);
+}
+void tcp_transport_negative() {
+  auto check=[](const char* label,auto prepare) {
+    auto fds=tcp_pair();
+    prepare(fds[1]);
+    const auto started=std::chrono::steady_clock::now();
+    bool rejected=false;
+    try {
+      ProtocolIFramedChannel channel(fds[0],{91,92,8,2,40,0,1,4,7},120);
+      (void)channel.receive();
+    } catch(const std::exception&) { rejected=true; }
+    ::close(fds[1]);
+    const auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now()-started).count();
+    require(rejected&&elapsed<1000,"E11 TCP bounded failure");
+    std::cout<<"E11_TCP_NEGATIVE case="<<label<<" elapsed_ms="<<elapsed<<" PASS\n";
+  };
+  check("closed",[](int peer) { ::shutdown(peer,SHUT_RDWR); });
+  check("silent",[](int) {});
+  check("truncated",[](int peer) {
+    const std::array<std::uint8_t,4> prefix{0x50,0x4b,0x31,0x46};
+    send_all(peer,prefix.data(),prefix.size());
+    ::shutdown(peer,SHUT_WR);
+  });
+}
+void transport_frame_conformance() {
+  const std::array<std::uint8_t,6> phases{4,5,9,10,11,40};
+  for(const auto phase:phases) {
+    std::array<std::uint64_t,4> observed{};
+    for(int mode=0;mode<2;++mode) {
+      const auto sockets=mode?tcp_pair():pair();
+      const ProtocolIFrameConfig c0{111,222,128,2,40,0,1,phase,7};
+      const ProtocolIFrameConfig c1{111,222,128,2,40,1,0,phase,7};
+      ProtocolIFramedChannel p0(sockets[0],c0,1000),p1(sockets[1],c1,1000);
+      const std::vector<std::uint8_t> outbound(32U+phase,phase);
+      const std::vector<std::uint8_t> reply(17U+phase,static_cast<std::uint8_t>(phase+1U));
+      p0.send(outbound);
+      require(p1.receive()==outbound,"E11 TCP frame P0/P1 payload");
+      p1.send(reply);
+      require(p0.receive()==reply,"E11 TCP frame P1/P0 payload");
+      const std::array<std::uint64_t,4> counters{
+          p0.sent_bytes(),p0.received_bytes(),p1.sent_bytes(),p1.received_bytes()};
+      require(counters[0]==counters[3]&&counters[1]==counters[2],
+              "E11 TCP frame cross-accounting");
+      if(mode) require(observed==counters,"E11 Unix/TCP frame byte equivalence");
+      else observed=counters;
+    }
+    std::cout<<"E11_FRAME_EQ phase="<<static_cast<unsigned>(phase)
+             <<" p0_sent="<<observed[0]<<" p1_sent="<<observed[2]<<" PASS\n";
+  }
 }
 }
 int main(int argc,char** argv) {
   try {
     if(argc>1&&std::string(argv[1])=="party") return party_process(argc,argv);
     if(argc>1&&std::string(argv[1])=="dealer") return dealer_process(argc,argv);
+    if(argc==2&&std::string(argv[1])=="transport-negative") {
+      tcp_transport_negative(); return 0;
+    }
+    if(argc==2&&std::string(argv[1])=="transport-conformance") {
+      transport_frame_conformance(); return 0;
+    }
     Totals totals;
+    if(argc==7&&std::string(argv[1])=="bench") {
+      const auto n=static_cast<std::uint32_t>(number(argv[2]));
+      const auto k=static_cast<std::uint32_t>(number(argv[3]));
+      const auto r=static_cast<std::uint32_t>(number(argv[4]));
+      const auto input_seed=number(argv[5]);
+      const auto serial=number(argv[6]);
+      require(n==128&&k>=1&&k<=n&&r>=2&&r<=5,"E11 benchmark shape");
+      std::mt19937_64 input_rng(input_seed);
+      std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
+      std::vector<std::uint32_t> scores(n);
+      std::uint64_t digest=UINT64_C(1469598103934665603);
+      for(auto& score:scores) {
+        score=static_cast<std::uint32_t>(distribution(input_rng));
+        digest=(digest^score)*UINT64_C(1099511628211);
+      }
+      run_case(scores,k,r,serial,totals);
+      std::cout<<"E11_BENCH_META input_seed="<<input_seed
+               <<" input_digest="<<digest<<" serial="<<serial<<"\n";
+      return 0;
+    }
     if(const auto* tier=std::getenv("MOE_TOPK_M6A_E9_D")) {
       const auto d=static_cast<std::uint32_t>(std::stoul(tier));
       std::uint64_t serial=0;

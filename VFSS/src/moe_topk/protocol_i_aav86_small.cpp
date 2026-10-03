@@ -5,6 +5,7 @@
 
 #include <FSS/prng.h>
 #include <algorithm>
+#include <chrono>
 #include <array>
 #include <cerrno>
 #include <cstdint>
@@ -660,10 +661,14 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   metrics.active_vertices_by_iteration.reserve(config.iterations);
   metrics.ca_prg_calls_by_iteration.reserve(config.iterations);
   ProtocolIScoreInputMetrics score_metrics;
+  const auto score_started = std::chrono::steady_clock::now();
   const auto key_shares = protocol_i_raw_score_input_party(
       {config.session, config.fingerprint, config.logical_n, d, config.k,
        static_cast<std::uint8_t>(index_bits(d)), bits, config.party, config.timeout_ms},
       material.score_materials, raw_score_share, score_fds, &score_metrics);
+  const auto core_started = std::chrono::steady_clock::now();
+  metrics.score_time_ns = static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(core_started - score_started).count());
   metrics.score_prg_calls = readDCFOnlinePrgCalls();
   metrics.score_sent_bytes = score_metrics.carry_sent_bytes + score_metrics.sign_sent_bytes;
   metrics.score_dcf_evaluations = score_metrics.raw_dcf_calls;
@@ -804,6 +809,9 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
     seen[handle] = true;
     carrier[handle] = (config.party == 0 && position < config.k) ? 1U : 0U;
   }
+  const auto inverse_started = std::chrono::steady_clock::now();
+  metrics.core_time_ns = static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(inverse_started - core_started).count());
   const auto inverse_first = add_vectors(
       protocol_i_apply_permutation(material.inverse_sigma, carrier),
       material.inverse_a, mask);
@@ -820,6 +828,9 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   output.xor_mask_share.resize(config.logical_n);
   for (std::size_t j = 0; j < output.xor_mask_share.size(); ++j)
     output.xor_mask_share[j] = static_cast<std::uint8_t>(original_share[j] & 1U);
+  metrics.inverse_time_ns = static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::steady_clock::now() - inverse_started).count());
   return output;
 }
 }  // namespace moe_topk
