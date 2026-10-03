@@ -41,6 +41,7 @@
 /CipherGPT/results_paper.csv
 /experiments/m6a_p2_i_allpairs/TEST_ONLY_E12_RAW/
 /experiments/m6a_p2_i_allpairs/TEST_ONLY_E14_RAW/
+/experiments/m6a_p2_i_allpairs/TEST_ONLY_E15_RAW/
 
 # Raw reference packages are intentionally local-only in the initial Git
 # baseline.  Their roles, paths, and later distribution decisions are recorded

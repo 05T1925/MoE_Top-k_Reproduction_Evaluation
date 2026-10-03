@@ -253,7 +253,12 @@ int party_process(int argc,char** argv) {
     for(int i=18;i<argc;++i) core_fds.push_back(fd(argv[i]));
     const auto material_bytes=receive_bytes(package_fd,64U*1024U*1024U);
     auto material=protocol_i_aav86_small_deserialize_party_material(material_bytes,who,c);
-    const auto payload=test_only::payload(material);
+    const auto payload=test_only::payload_from_shape(
+        material.padded_n,material.iterations,material.comparison_bits,true);
+    if (!std::getenv("MOE_TOPK_M6A_E15_BENCH"))
+      require(payload.t_package_payload_bytes==
+                  test_only::payload(material).t_package_payload_bytes,
+              "E15 AAV86 shape versus serialized material");
     const char ready=1;
     send_all(fd(argv[17]),&ready,1);
     const auto pivot_seed_lo=material.pivot_seed_lo;
@@ -386,7 +391,7 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   std::mt19937_64 rng(0x770000+serial);
   std::vector<std::uint32_t> x0(n),x1(n);
   for(std::size_t i=0;i<n;++i) {
-    x0[i]=std::getenv("MOE_TOPK_M6A_E14_BENCH")?fresh_share():static_cast<std::uint32_t>(rng());
+    x0[i]=std::getenv("MOE_TOPK_M6A_E15_BENCH")?fresh_share():static_cast<std::uint32_t>(rng());
     x1[i]=scores[i]-x0[i];
   }
   send_all(input[0][0],x0.data(),n*sizeof(std::uint32_t));

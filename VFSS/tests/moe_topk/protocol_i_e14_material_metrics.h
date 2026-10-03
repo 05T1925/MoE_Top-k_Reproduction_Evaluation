@@ -25,6 +25,16 @@ inline std::uint64_t checked_bytes(std::size_t count, std::uint64_t width) {
     throw std::overflow_error("E14 material byte product");
   return static_cast<std::uint64_t>(count) * width;
 }
+inline std::uint64_t key_payload_bytes_for_bits(std::uint32_t bits) {
+  if (bits < 34 || bits > 53) throw std::invalid_argument("E15 DCF bit width");
+  // serialize() writes (bits+1) blocks, one g word, and bits v words.
+  return 24U * static_cast<std::uint64_t>(bits) + 24U;
+}
+inline std::uint64_t checked_product(std::uint64_t a, std::uint64_t b) {
+  if (b && a > std::numeric_limits<std::uint64_t>::max() / b)
+    throw std::overflow_error("E15 material product");
+  return a * b;
+}
 inline std::uint64_t key_payload_bytes(const ProtocolIUcmpPartyMaterial& key) {
   // ProtocolIUcmpPartyMaterial::serialize: fixed 33-byte structure header,
   // then actual k/g/v contents.  Serialization is measured before Eval.
@@ -42,6 +52,42 @@ struct MaterialPayload {
     return checked_add(t_package_payload_bytes, local_shuffle_payload_bytes);
   }
 };
+
+// E15 formal timing: exact canonical lengths from validated fixed-shape
+// material contracts.  No key serialization or pool/vector traversal occurs.
+inline MaterialPayload payload_from_shape(std::uint32_t padded_n,
+                                          std::uint32_t iterations,
+                                          std::uint32_t comparison_bits,
+                                          bool aav86,
+                                          std::uint64_t ot_sent = 0,
+                                          std::uint64_t ot_received = 0) {
+  if (padded_n < 2 || (padded_n & (padded_n - 1U)) != 0 ||
+      (aav86 && iterations == 0) || (!aav86 && iterations != 0))
+    throw std::invalid_argument("E15 material shape");
+  std::uint32_t log_n = 0;
+  for (auto n = padded_n; n > 1; n >>= 1U) ++log_n;
+  if (comparison_bits != 33U + log_n)
+    throw std::invalid_argument("E15 comparison shape");
+  const auto d = static_cast<std::uint64_t>(padded_n);
+  const auto edges = checked_product(d, d - 1U) / 2U;
+  const auto score = checked_product(checked_product(2U, d),
+                                     16U + key_payload_bytes_for_bits(34));
+  const auto edge_keys = checked_product(
+      checked_product(aav86 ? iterations : 1U, edges),
+      key_payload_bytes_for_bits(comparison_bits));
+  MaterialPayload out;
+  out.t_package_payload_bytes = checked_add(
+      checked_add(score, edge_keys),
+      checked_product(d, aav86 ? 48U + 8U * iterations : 8U));
+  if (!aav86) {
+    const auto benes_depth = 2U * log_n - 1U;
+    out.local_shuffle_payload_bytes =
+        checked_product(d, 64U + 152U * benes_depth);
+    out.local_shuffle_ot_sent_bytes = ot_sent;
+    out.local_shuffle_ot_received_bytes = ot_received;
+  }
+  return out;
+}
 
 inline std::uint64_t score_payload_bytes(const ProtocolIPartyPackage& package) {
   std::uint64_t out = 0;

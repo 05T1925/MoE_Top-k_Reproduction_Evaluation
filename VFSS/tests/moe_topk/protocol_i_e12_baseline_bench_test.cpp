@@ -41,7 +41,7 @@ std::uint64_t secure_random_u64() {
   }
   return value;
 }
-bool benchmark_mode(){return std::getenv("MOE_TOPK_M2_E12_BENCH")!=nullptr;}
+bool benchmark_mode(){return std::getenv("MOE_TOPK_M6A_E15_BENCH")!=nullptr;}
 struct FreshRandom {std::uint64_t operator()() const {return secure_random_u64();}};
 std::uint64_t elapsed_ns(std::chrono::steady_clock::time_point from,
                          std::chrono::steady_clock::time_point to){
@@ -199,7 +199,34 @@ int party_main(const Case&t,int who,const std::array<int,4>&offline,
         {t.session,t.fingerprint,t.seed+100,t.seed+200,c.padded_n,2,
          static_cast<std::uint8_t>(who),c.timeout_ms},offline,
         permutation(c.padded_n,who?t.p1_style:t.p0_style,t.seed+who));
-    const auto payload=test_only::payload(package,material);
+    const auto ot_sent=
+        material.forward_po_first.counters.offline_ot.sent_bytes+
+        material.forward_po_second.counters.offline_ot.sent_bytes+
+        material.reverse_po_first.counters.offline_ot.sent_bytes+
+        material.reverse_po_second.counters.offline_ot.sent_bytes+
+        material.forward_do_first.counters.offline_ot.sent_bytes+
+        material.forward_do_second.counters.offline_ot.sent_bytes+
+        material.reverse_do_first.counters.offline_ot.sent_bytes+
+        material.reverse_do_second.counters.offline_ot.sent_bytes;
+    const auto ot_received=
+        material.forward_po_first.counters.offline_ot.received_bytes+
+        material.forward_po_second.counters.offline_ot.received_bytes+
+        material.reverse_po_first.counters.offline_ot.received_bytes+
+        material.reverse_po_second.counters.offline_ot.received_bytes+
+        material.forward_do_first.counters.offline_ot.received_bytes+
+        material.forward_do_second.counters.offline_ot.received_bytes+
+        material.reverse_do_first.counters.offline_ot.received_bytes+
+        material.reverse_do_second.counters.offline_ot.received_bytes;
+    const auto payload=test_only::payload_from_shape(
+        c.padded_n,0,c.comparison_bits,false,ot_sent,ot_received);
+    if (!std::getenv("MOE_TOPK_M6A_E15_BENCH")) {
+      const auto diagnostic=test_only::payload(package,material);
+      require(payload.t_package_payload_bytes==diagnostic.t_package_payload_bytes&&
+              payload.local_shuffle_payload_bytes==diagnostic.local_shuffle_payload_bytes&&
+              payload.local_shuffle_ot_sent_bytes==diagnostic.local_shuffle_ot_sent_bytes&&
+              payload.local_shuffle_ot_received_bytes==diagnostic.local_shuffle_ot_received_bytes,
+              "E15 baseline shape versus serialized material");
+    }
     ProtocolIFramedChannel ready(ready_fd,
         {t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,
          static_cast<std::uint8_t>(who),2,5,1},c.timeout_ms);
