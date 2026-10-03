@@ -43,6 +43,7 @@ PRIVATE
     src/moe_topk/protocol_i_score_input.cpp
     src/moe_topk/protocol_i_permutation.cpp
     src/moe_topk/protocol_i_parallel_shuffle.cpp
+    src/moe_topk/protocol_i_aav86_small.cpp
     src/moe_topk/protocol_iii_grank.cpp
     src/moe_topk/protocol_iii_dpf_routing.cpp
     src/moe_topk/protocol_iii_field.cpp
@@ -72,6 +73,24 @@ PUBLIC
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
 
+
+add_executable(moe_topk_m6a7_aav86_small_conformance_test
+    tests/moe_topk/protocol_i_aav86_small_conformance_test.cpp)
+target_link_libraries(moe_topk_m6a7_aav86_small_conformance_test sytorch)
+add_test(NAME moe_topk_m6a7_aav86_small_conformance_test
+    COMMAND moe_topk_m6a7_aav86_small_conformance_test)
+
+add_executable(moe_topk_m6a7_aav86_small_differential_test
+    tests/moe_topk/protocol_i_aav86_small_differential_test.cpp)
+target_link_libraries(moe_topk_m6a7_aav86_small_differential_test sytorch)
+add_test(NAME moe_topk_m6a7_aav86_small_differential_test
+    COMMAND moe_topk_m6a7_aav86_small_differential_test)
+
+add_executable(moe_topk_m6a7_aav86_small_e2e_test
+    tests/moe_topk/protocol_i_aav86_small_e2e_test.cpp)
+target_link_libraries(moe_topk_m6a7_aav86_small_e2e_test sytorch)
+add_test(NAME moe_topk_m6a7_aav86_small_e2e_test
+    COMMAND moe_topk_m6a7_aav86_small_e2e_test)
 
 # === Benchmarks ===
 # DCF，GROTTO，GTDCF 比较

@@ -677,7 +677,17 @@ Protocol III + AAV86
 
 每种方案具有独立标签、入口和计量记录。共享算法部分只保留一份明确契约，不复制另一套 score 或 oracle。
 
-不得使用在线 Dealer 原型、完整图预留或明文图测试冒充目标协议。不同模型的对照必须单独标记并完整计量。
+Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 的每轮全部无序端点对预发材料，在线仅消费活跃边。完整池预留须与实际活跃边分别计量，不得写作离线材料稀疏；固定 M 仍是延期备选。不得使用在线 Dealer 原型或明文图测试冒充目标协议。不同模型的对照必须单独标记并完整计量。
+
+2026-10-03 E7 隔离小规模门：在 `D≤8`、`1≤r≤5` 下，Protocol I+AAV86 的独立入口按两轮 score、`2r+1` 轮 CA 核心、一轮同 π 逆路由组织，raw-score 至原序 XOR mask 共 `2r+4` 因果轮；仅以该入口的实际消息 trace 和小规模验证为依据。其条件性安全归约、持久材料领取、测试结果及未覆盖项见 [E7 设计门](reviews/M6A_P2_I_E7_REVIEW_AND_SMALL_D_RUNTIME_GATE_2026-10-03.md) 与 [E7 小规模验证](reviews/M6A_P2_I_E7_SMALL_D_RUNTIME_VALIDATION_2026-10-03.md)。Protocol III、大规模性能和另一方签收仍待完成，M6A 整体状态不变。
+
+2026-10-03 E8 技术复核修正了 package 合同：反序列化仅验证外层结构标签、规格和长度，不验证同规格 DCF key blob 与声明边/mask 的数学关系；该关系依赖可信 T 与完整交付通道，并由隔离的双份 dealer 一致性测试抽查。当前聊天承接 E6/E7，**不具备异会话独立签收资格**；因此按 E8 用户门禁暂不放宽 `D≤8`，中等 D 的全池容量预检、试运行和性能准备须待真正独立接收后开展。见 [E8 接收复核](reviews/M6A_P2_I_E8_RECEIVER_REVIEW_2026-10-03.md) 与 [E8 修正及门禁结果](reviews/M6A_P2_I_E8_TECHNICAL_FIX_AND_GATE_RESULT_2026-10-03.md)。
+
+2026-10-03 异会话复核已针对 E8 精确源码哈希完成独立干净构建和相关测试 `8/8 PASS`；[接收报告](reviews/M6A_P2_I_E8_CROSS_CHAT_RECEIVER_ACCEPTANCE_2026-10-03.md)将小 D 技术接收记为 `PASS_WITH_EXPLICIT_LIMITS`。E8 原有程序性 FAIL 保留为历史，不再阻止下一执行阶段先实现 keygen 前容量与资源预检、再有界扩展 D16→32→64；每次源码改变须重新验证，D128 仍需真实资源门，正式性能和 M6A 总验收未完成。条件性安全假设及允许的公开信息口径不变。
+
+2026-10-03 E9 已按精确序列化公式在全池 reserve/keygen 前加入 checked capacity 与生成内存预算预检；`D=16/32/64` 的 conformance、冻结 oracle differential、T/P0/P1 独立进程 E2E 各 6/6 PASS，相关旧路径回归 25/25 PASS。D128 的 r5 解析生成预算 388.61 MiB 超过本阶段 256 MiB 准入上限，未生成该档材料，状态 `PRECHECK_LIMITED`。逐配置实际材料、活跃边、通信、离线分段时间与 T/P0/P1 峰值见 [E9 报告](reviews/M6A_P2_I_E9_CAPACITY_AND_BOUNDED_SCALE_2026-10-03.md)；这些是 Debug 工程试运行，E9 改动尚待下一次异会话源码接收，不能视为正式性能矩阵或作者精确复现。
+
+2026-10-03 [E9 异会话接收](reviews/M6A_P2_I_E9_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)在精确源码哈希上独立复算 18/18 行原始计数，新构建逐档复跑 9/9 调用及相关 CTest 25/25 PASS，结论 `PASS_WITH_FINDINGS`，仅覆盖 D16/32/64 功能及该环境下的工程预检。口径修正：D128 在当前 API 中首先由 `D≤64` 硬上限拒绝；388.61 MiB 是解析预算，不是 D128 的实际预检返回值。后续先补计量与冻结 revision，资源受控地评估 D128；正式 V3 和 M6A 总验收仍未完成。
 
 #### 正确性与安全验收
 
