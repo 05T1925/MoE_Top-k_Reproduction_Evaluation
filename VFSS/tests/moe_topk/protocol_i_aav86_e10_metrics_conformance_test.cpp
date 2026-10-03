@@ -71,6 +71,15 @@ int main() {
                  <<" budget_limit="<<assessment.budget_limit
                  <<" memory_limit="<<assessment.memory_limit
                  <<" process_limit="<<assessment.process_limit<<"\n";
+        if(n>128U) {
+          std::string rejection;
+          try { (void)moe_topk::protocol_i_aav86_small_preflight(config); }
+          catch(const std::invalid_argument& e) { rejection=e.what(); }
+          require(rejection=="AAV86 preflight hard cap D>128",
+                  "E11 actual preflight must reject before keygen");
+          std::cout<<"E11_PREFLIGHT_REJECTED n="<<n<<" r="<<r
+                   <<" reason=HARD_CAP_D_GT_128\n";
+        }
       }
     std::cout<<"E10_METRICS_CONFORMANCE_PASS dcf3=3 ucmp34=68 per_party\n";
     return 0;

@@ -98,6 +98,12 @@ target_link_libraries(moe_topk_m6a10_aav86_metrics_conformance_test sytorch)
 add_test(NAME moe_topk_m6a10_aav86_metrics_conformance_test
     COMMAND moe_topk_m6a10_aav86_metrics_conformance_test)
 
+add_executable(moe_topk_m6a11_tcp_material_equivalence_test
+    tests/moe_topk/protocol_i_aav86_e11_tcp_material_equivalence_test.cpp)
+target_link_libraries(moe_topk_m6a11_tcp_material_equivalence_test sytorch)
+add_test(NAME moe_topk_m6a11_tcp_material_equivalence_test
+    COMMAND moe_topk_m6a11_tcp_material_equivalence_test)
+
 # === Benchmarks ===
 # DCF，GROTTO，GTDCF 比较
 add_executable(

@@ -691,6 +691,8 @@ Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 
 
 2026-10-03 E10 在隔离分支建立 E9 本地检查点 `142db65776b6f7334dac02845109308a887d3995`，为该独立入口的传统 DCF 长度倍增 PRG、每轮活跃节点 `v_A`、分阶段通信和时间边界增加可核验计量。公开形状计算与 runtime 准入分离；在 768 MiB `RLIMIT_AS` 和资源预检下，D16/32/64/128 的 conformance、冻结 oracle differential、独立进程 E2E 均逐档各 6/6 PASS，D128 最大实际运行 r=5。n=128 的 r=3/4 只完成容量计算；n=256、r=2 时每方包已达 69,999,474 B，超过 64 MiB，未生成材料。详见 [E10 报告](reviews/M6A_P2_I_E10_FREEZE_METRICS_AND_D128_GATE_2026-10-03.md)。这些是本机 Debug/少量 Release 工程试运行；E10 新源码尚待下一次异会话接收，正式 LAN/WAN V3 矩阵、Protocol III 和作者精确复现仍未完成。
 
+2026-10-03 [E10 异会话接收](reviews/M6A_P2_I_E10_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)为 `PASS_WITH_FINDINGS`。E11 从干净 `ac8af47a` checkout 建 TCP 测试通道与可校准的同主机 LAN/WAN network namespace，正式被测 HEAD 为 `103b76d863e68c2c318998db01073591e6a8fce8`。n=128、K=2/8、r=2..5 的两网络子矩阵各配置 1 次预热+5 次正式运行，80/80 正式正确；所有材料逐次新生、原始计数和五次统计见 [E11 报告](reviews/M6A_P2_I_E11_TCP_LAN_WAN_N128_SUBMATRIX_2026-10-03.md)。n≥256 当前 preflight 先由 D>128 硬门拒绝，且 n256/r2 的单方包本身超过 64 MiB；同路线全对全基线缺少同构 TCP/计量入口，本次无数值对照。E11 新源码与测量仍待下一次异会话接收，不能据此宣称完整 V3、Protocol III+AAV86 或作者精确复现。
+
 #### 正确性与安全验收
 
 - 明文图算法与稳定 Top-K oracle 一致；
