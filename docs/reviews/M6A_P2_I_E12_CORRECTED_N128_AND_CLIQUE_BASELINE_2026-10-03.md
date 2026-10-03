@@ -151,7 +151,7 @@ python3 "$M6A_ROOT/experiments/m6a_p2_i_allpairs/TEST_ONLY/e12_audit_clique_base
 
 - **功能**：n128 两路线原序 XOR Top-K mask、signed Q20.12 和原下标稳定同分按 oracle 逐次 PASS；小 D、极值、同分、非二次幂及故障关闭由本轮相关夹具复验。安全路径未重构分数、rank、比较位、选中下标或 mask；重构仅在 TEST_ONLY 控制器。
 - **计量**：E11 三项字段口径在新 AAV86 批次闭合；真实 TCP、校准、qdisc、每方阶段收发、工作量、五次统计及原始哈希闭合。基线完整离线 OT 材料量和同定义 PRG 计数仍 `NOT_MEASURED`，基线纯论文核心阶段未单独计时；因此完整时间/通信/轮数可同口径并列，不能宣称所有成本指标或泄露边界完全同构。
-- **条件性安全**：全两两 key 池的单方视图仍依赖既有 DCF/FSS 多 key 混合归约、独立 keygen 随机币、AES/PRG、可信且不合谋的离线 T、半诚实 P0/P1、完整私有通道假设；源码测试不是这些假设的密码学证明。基线的 party 离线 EMP OT/本地材料与 AAV86 的 T 预发材料生命周期不同，比较解释必须保留此差异。
+- **条件性安全**：全两两 key 池的单方视图仍依赖既有 DCF/FSS 多 key 混合归约、独立 keygen 随机币、AES/PRG、可信且不合谋的离线 T、半诚实 P0/P1、完整私有通道假设；旧基线另依赖真实 EMP IKNP OT 的安全假设。源码测试不是这些假设的密码学证明。基线的 party 离线 EMP OT/本地材料与 AAV86 的 T 预发材料生命周期不同，比较解释必须保留此差异。
 - **覆盖**：已实测最大 D=128、r=5；`n≥256` 24 个 V3 点仅有 checked 容量和真实 preflight 拒绝，不是性能实测。此阶段未完成 V3 总矩阵、Protocol III+AAV86、物理 LAN/WAN 或作者精确复现。
 
 ## 8. 本次 Git 文件差异
