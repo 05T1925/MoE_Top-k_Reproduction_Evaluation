@@ -119,6 +119,8 @@ def measure(case, profile, calibration, common, repetition):
                       for party in ("p0", "p1") for stage in
                       ("score", "pipeline")),
                   other_aes_prg_breakdown="NOT_MEASURED",
+                  exit_t=case["t_exit"], exit_p0=case["p0_exit"],
+                  exit_p1=case["p1_exit"],
                   peak_t_kib=case["peak_t_kib"],
                   peak_p0_kib=case["peak_p0_kib"],
                   peak_p1_kib=case["peak_p1_kib"])
