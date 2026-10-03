@@ -183,10 +183,10 @@ def main():
                   matched_aav86_raw_sha256=sha256(args.aav86_raw),
                   binary_sha256=sha256(args.binary),
                   calibration_sha256=sha256(args.calibration),
-                  implementation="protocol_i_full_clique_emp_e15_payload_prg",
+                  implementation="protocol_i_full_clique_emp_e15_post_timing_accounting",
                   input_plan_sha256=sha256(args.input_plan),
                   topology="one WSL2 host, T/P0/P1 fork+exec, online TCP loopback in shaped netns",
-                  measurement_contract="E15: canonical online-held payload; DCF length-doubling PRG; E15 protocol-only timing boundary",
+                  measurement_contract="E15: canonical online-held payload counted after offline and online timers; DCF length-doubling PRG",
                   compiler_flags="Release -O3 -DNDEBUG; MOE_TOPK_ENABLE_EMP_OT=ON",
                   thread_count_per_party=1)
     out = args.output_dir
@@ -203,7 +203,7 @@ def main():
                         git(root, "status", "--porcelain=v1", "--untracked-files=no"):
                     raise RuntimeError("baseline source changed during batch")
                 input_seed = input_plan[f"k{k}-rep{repetition}"]
-                serial = (1 if args.profile == "LAN" else 2) * 1000000 + \
+                serial = (3 if args.profile == "LAN" else 4) * 1000000 + \
                     k * 10000 + repetition
                 command = [str(args.binary), "bench", "128", str(k),
                            str(input_seed), str(serial)]

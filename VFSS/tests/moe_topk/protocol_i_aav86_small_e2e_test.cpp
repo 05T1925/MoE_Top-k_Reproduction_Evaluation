@@ -253,10 +253,10 @@ int party_process(int argc,char** argv) {
     for(int i=18;i<argc;++i) core_fds.push_back(fd(argv[i]));
     const auto material_bytes=receive_bytes(package_fd,64U*1024U*1024U);
     auto material=protocol_i_aav86_small_deserialize_party_material(material_bytes,who,c);
-    const auto payload=test_only::payload_from_shape(
-        material.padded_n,material.iterations,material.comparison_bits,true);
     if (!std::getenv("MOE_TOPK_M6A_E15_BENCH"))
-      require(payload.t_package_payload_bytes==
+      require(test_only::payload_from_shape(
+                  material.padded_n,material.iterations,
+                  material.comparison_bits,true).t_package_payload_bytes==
                   test_only::payload(material).t_package_payload_bytes,
               "E15 AAV86 shape versus serialized material");
     const char ready=1;
@@ -270,6 +270,9 @@ int party_process(int argc,char** argv) {
         score_fds,core_fds,inverse_fd);
     const auto elapsed=std::chrono::duration_cast<std::chrono::nanoseconds>(
         std::chrono::steady_clock::now()-start).count();
+    const auto shape=protocol_i_aav86_small_capacity_shape(c.logical_n,c.iterations);
+    const auto payload=test_only::payload_from_shape(
+        shape.padded_n,c.iterations,shape.comparison_bits,true);
     send_bytes(result_fd,encode_result(output,static_cast<std::uint64_t>(elapsed),
         material_bytes.size(),payload.t_package_payload_bytes,
         pivot_seed_lo,pivot_seed_hi));

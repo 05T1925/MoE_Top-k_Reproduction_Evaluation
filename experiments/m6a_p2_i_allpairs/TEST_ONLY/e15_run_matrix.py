@@ -219,8 +219,8 @@ def main():
     common = {
         "head": head, "tracked_state": "CLEAN", "source_sha256": source_hashes,
         "binary_sha256": binary_hash, "calibration_sha256": sha256(args.calibration),
-        "implementation": "protocol_i_aav86_allpairs_e15_payload_prg",
-        "measurement_contract": "E15: canonical online-held payload; DCF length-doubling PRG; E15 protocol-only timing boundary",
+        "implementation": "protocol_i_aav86_allpairs_e15_post_timing_accounting",
+        "measurement_contract": "E15: canonical online-held payload counted after offline and online timers; DCF length-doubling PRG",
         "input_plan_sha256": sha256(args.input_plan),
         "topology": "one WSL2 host, T/P0/P1 fork+exec, TCP loopback in shaped netns",
         "rlimit_as_bytes": 768 * 1024 * 1024,
@@ -239,7 +239,7 @@ def main():
                         raise RuntimeError("source identity changed during batch")
                     input_seed = input_plan[f"k{k}-rep{repetition}"]
                     algorithm_seed = 0xA110000 + r * 1000 + repetition
-                    serial = (1 if args.profile == "LAN" else 2) * 100000 + \
+                    serial = (3 if args.profile == "LAN" else 4) * 100000 + \
                         k * 10000 + r * 100 + repetition
                     command = [str(args.binary), "bench", "128", str(k), str(r),
                                str(input_seed), str(serial)]

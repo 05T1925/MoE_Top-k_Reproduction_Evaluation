@@ -1150,3 +1150,5 @@ M3 在 `main@bb0d0e8` 完成整改，保留三轮 priority-key 和五轮 raw-sco
 后续正式实验新增分阶段计量，不静默替换历史数字或证据来源。
 
 2026-10-03 E15 异会话修正前接收发现：E14 两条 TEST_ONLY party 入口在 ready 前逐 key 调用 `serialize()` 计材料，整池诊断 CPU/分配计入 `offline_time_ms`，并可能间接影响紧随其后的 online cache。E14 原始完整性、功能和非时间计数保持有界有效；E14 offline/online/total 及总时间胜负撤回待新批次。E15 先冻结计时合同，再改 TEST_ONLY 恒定材料形状计数，隔离诊断逐字段校对；同 n=128/K/r LAN/WAN 完整矩阵以新标签和目录重测。Protocol III+AAV86 仅设计审查，`2r` 是未证明项目目标，不改 III secure runtime。见 [E14 修正前接收](reviews/M6A_P2_I_E15_E14_PRE_FIX_INDEPENDENT_ACCEPTANCE_2026-10-03.md)、[E15 计时合同](decisions/M6A_P2_I_E15_PROTOCOL_I_TIMING_CONTRACT_2026-10-03.md)与[III+AAV86 设计门](decisions/M6A_P2_I_E15_PROTOCOL_III_AAV86_DESIGN_GATE_2026-10-03.md)。
+
+E15 计时合同进一步收紧：`fdcdbe5` 首批 120 行虽去掉整池序列化，party 仍在 ready 前执行固定形状计数；该批冻结为作废计时候选。正式修正版把材料长度/离线 OT 字节读取全部移到双方 secure 在线计时结束之后，重新冻结源码与标签并完整重测。不能把两批拼接。
