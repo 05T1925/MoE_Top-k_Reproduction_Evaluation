@@ -1154,3 +1154,5 @@ M3 在 `main@bb0d0e8` 完成整改，保留三轮 priority-key 和五轮 raw-sco
 E15 计时合同进一步收紧：`fdcdbe5` 首批 120 行虽去掉整池序列化，party 仍在 ready 前执行固定形状计数；该批冻结为作废计时候选。正式修正版把材料长度/离线 OT 字节读取全部移到双方 secure 在线计时结束之后，重新冻结源码与标签并完整重测。不能把两批拼接。
 
 E15 修正版 `346a923` 已完成独立 120 次/100 正式 Protocol I 两路线重测，20 个五次组和 24 个输入配对组审计通过；原始目录 `TEST_ONLY_E15_RAW/corrected/` 有完整哈希索引与仓库外副本。LAN/WAN 的 r=2 时间胜负依 K/网络条件而异，r=3..5 的总时间中位在此次环境高于全对全基线；这是当前 TEST_ONLY 样本观察。n≥256 仍为预检拒绝、性能 `NOT_MEASURED`。参见 [E15 统一重测](reviews/M6A_P2_I_E15_PROTOCOL_I_UNIFIED_REMEASUREMENT_2026-10-03.md)。Protocol III+AAV86 保持设计门 NO-GO，不进入 secure 实现或性能宣称。
+
+2026-10-04 M6A-P2-III-E1 从独立 E15 接收检查点 `6a9ef844` 审查隐藏 handle AAV86→F1 ring DPF→同 π 逆路由。条件性功能代数表明公开早期桶偏移加末轮局部 rank 份额可组成全局份额，并可在 `Z_(2^64)` 指示份额取低位后逆路由；但现有 score adapter 的默认零值 padding 直接用于 D 个隐藏 handle 会让负分真实元素落在 dummy 后（`n=3,D=4,K=3,scores=[-1,-1,-1]` 只选中两个真实槽），须在独立调用边界显式把 dummy 设为 `INT32_MIN`。共享节点 mask/全预发相关 DCF keys、自适应使用、公开 local-rank/bucket、handle DPF 与双向置换的联合单方视图仍无可审阅的 hybrid；III 对新增公开字段亦无所有者许可。因此 [E1 设计门](decisions/M6A_P2_III_E1_AAV86_RING_MASK_DESIGN_GATE_2026-10-04.md)继续判 `NO-GO`，只加入隔离 TEST_ONLY 反例/差分夹具，不写 secure III+AAV86 入口；实际轮数、九指标和性能均 `NOT_PROVEN`/`NOT_MEASURED`，不影响 E15 原始记录。
