@@ -33,7 +33,7 @@ def fields(line):
     for item in line.split()[1:]:
         key, value = item.split("=", 1)
         if key in ("active_by_round", "vertices_by_round", "ca_prg_by_round"):
-            out[key] = [int(x) for x in value.split(",")]
+            out[key] = [int(x) for x in value.split(",") if x]
         elif key == "transport":
             out[key] = value
         else:
