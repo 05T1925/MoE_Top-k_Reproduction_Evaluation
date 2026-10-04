@@ -33,7 +33,8 @@ def row(n, r, physical_disk_free):
                 sealed_file_per_party_bytes=party_file,
                 sealed_files_both_bytes=both_files,
                 physical_disk_free_bytes=physical_disk_free,
-                program_first_gate="E20_LOGICAL_N_GT_1000" if n > 1000 else "NONE",
+                program_first_gate="E20_STREAM_BENCHMARK_SHAPE" if n > 1000 else "NONE",
+                next_secure_store_gate="E20_LOGICAL_N_GT_1000" if n > 1000 else "NONE",
                 resource_status="RESOURCE_INFEASIBLE" if both_files > physical_disk_free
                 else "DISK_CAPACITY_ONLY_PASS_NOT_EXECUTION")
 

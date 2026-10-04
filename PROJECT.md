@@ -629,6 +629,17 @@ priority-key semantics 与 rank-share contract，不重新实现第二份 rankin
 8. 与对应全对全基线比较计算、通信、轮数及离线成本。
 9. 形成完整性能与未测配置报告。
 
+E20 在 E17 已接收的有界 Protocol I+AAV86 内存池证据之外，另以
+`E20_STREAM_AEAD_V1` 流式全池预发、分方加密磁盘驻留和一次性领取实现
+n=1000/K80/r2–5，配同规模 `E20_CLIQUE_SEALED_V1` EMP-ON 全对全
+LAN/WAN 入口；当前为待异会话独立接收的实现与性能候选。
+n=128/256 同新 revision 锚点单列，E15–E17 历史中位不混用；
+n≥10⁴ 仍因本机物理资源在 keygen 前拒绝，九指标 `NOT_MEASURED`。
+见[实现合同](docs/decisions/M6A_P2_I_E20_STREAMED_MATERIAL_CONTRACT_2026-10-04.md)与
+[E20 交付报告](docs/reviews/M6A_P2_I_E20_STREAMED_N1000_DELIVERY_2026-10-04.md)。
+全池多 key 联合模拟尚未证明，`AUTHOR_EXACT=NOT_PROVEN`；Protocol III+AAV86
+和六方案全规模数值验收未由 E20 完成。
+
 M6A 完整验收后，再进入 M6B 的依赖实现和正式性能测试。BB90 资料研究可以提前进行。
 
 ### M6B：BB90+DCF 两种升级实现与完整性能测试
