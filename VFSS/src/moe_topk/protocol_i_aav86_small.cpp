@@ -54,7 +54,7 @@ std::uint64_t ring(int bits) {
   return (UINT64_C(1) << bits) - 1U;
 }
 std::uint32_t domain(std::uint32_t n) {
-  require(n >= 1 && n <= 256, "AAV86 bounded logical_n");
+  require(n >= 1 && n <= 1000, "AAV86 bounded logical_n");
   std::uint32_t d = 2;
   while (d < n) d <<= 1U;
   return d;
@@ -208,7 +208,8 @@ struct Reader {
   }
 };
 
-void validate_material(const ProtocolIAav86SmallPartyMaterial& m) {
+void validate_material(const ProtocolIAav86SmallPartyMaterial& m,
+                       bool base_only = false) {
   const auto d = domain(m.logical_n);
   const auto mask = ring(m.comparison_bits);
   require(m.session && m.fingerprint && m.material_id && m.party < 2 &&
@@ -227,7 +228,8 @@ void validate_material(const ProtocolIAav86SmallPartyMaterial& m) {
     for (auto value : *values) require((value & ~mask) == 0, "AAV86 mask width");
   }
   require(m.node_mask_shares.size() == static_cast<std::size_t>(m.iterations) * d &&
-              m.edge_keys.size() == static_cast<std::size_t>(m.iterations) * edges_per_round(d),
+              m.edge_keys.size() == (base_only ? 0U :
+                  static_cast<std::size_t>(m.iterations) * edges_per_round(d)),
           "AAV86 pool shape");
   for (auto value : m.node_mask_shares) require((value & ~mask) == 0, "AAV86 node mask width");
   for (const auto& key : m.edge_keys)
@@ -336,9 +338,20 @@ ProtocolIAav86SmallCapacity protocol_i_aav86_small_preflight(
   return assessment.shape;
 }
 
-ProtocolIAav86SmallDealerOutput protocol_i_aav86_small_dealer_generate(
-    const ProtocolIAav86SmallConfig& config) {
-  const auto capacity = protocol_i_aav86_small_preflight(config);
+namespace {
+ProtocolIAav86SmallDealerOutput dealer_generate_impl(
+    const ProtocolIAav86SmallConfig& config,
+    const ProtocolIAav86SmallEdgeSink* sink) {
+  const auto capacity = sink ?
+      protocol_i_aav86_small_capacity_shape(config.logical_n,config.iterations) :
+      protocol_i_aav86_small_preflight(config);
+  if (sink) {
+    require(config.logical_n <= 1000 && capacity.padded_n <= 1024 &&
+                config.material_id != 0 &&
+                config.material_id <= UINT64_MAX - capacity.total_pair_slots,
+            "AAV86 stream shape/material ID");
+    validate_config(config);
+  }
   std::lock_guard<std::mutex> guard(dealer_mutex);
   std::uint64_t seed_words[2]{};
   random_bytes(seed_words, sizeof(seed_words));
@@ -383,7 +396,8 @@ ProtocolIAav86SmallDealerOutput protocol_i_aav86_small_dealer_generate(
     m.score_materials.n = d; m.score_materials.k = config.k;
     m.score_materials.comparison_bits = bits;
     m.node_mask_shares.reserve(static_cast<std::size_t>(config.iterations) * d);
-    m.edge_keys.reserve(static_cast<std::size_t>(config.iterations) * edges_per_round(d));
+    if (!sink)
+      m.edge_keys.reserve(static_cast<std::size_t>(config.iterations) * edges_per_round(d));
   };
   init(out.party0, 0); init(out.party1, 1);
   for (std::uint32_t stage = 1; stage <= 2; ++stage) {
@@ -411,20 +425,39 @@ ProtocolIAav86SmallDealerOutput protocol_i_aav86_small_dealer_generate(
     for (std::uint32_t a = 0; a < d; ++a)
       for (std::uint32_t c = a + 1U; c < d; ++c) {
         ProtocolIUcmpMaterial material(bits, full[a], full[c]);
-        out.party0.edge_keys.push_back(material.export_party_material(0));
-        out.party1.edge_keys.push_back(material.export_party_material(1));
+        auto key0=material.export_party_material(0);
+        auto key1=material.export_party_material(1);
+        if (sink) (*sink)(t,a,c,config.material_id+
+                         t*edges_per_round(d)+edge_index(d,a,c),
+                         std::move(key0),std::move(key1));
+        else {
+          out.party0.edge_keys.push_back(std::move(key0));
+          out.party1.edge_keys.push_back(std::move(key1));
+        }
       }
   }
-  validate_material(out.party0);
-  validate_material(out.party1);
+  validate_material(out.party0,sink != nullptr);
+  validate_material(out.party1,sink != nullptr);
   return out;
 }
+}  // namespace
 
-std::vector<std::uint8_t> protocol_i_aav86_small_serialize_party_material(
-    const ProtocolIAav86SmallPartyMaterial& m) {
-  validate_material(m);
-  Writer w;
-  w.u32(kMagic); w.u32(kVersion);
+ProtocolIAav86SmallDealerOutput protocol_i_aav86_small_dealer_generate(
+    const ProtocolIAav86SmallConfig& config) {
+  return dealer_generate_impl(config,nullptr);
+}
+
+ProtocolIAav86SmallDealerOutput protocol_i_aav86_stream_dealer_generate(
+    const ProtocolIAav86SmallConfig& config,
+    const ProtocolIAav86SmallEdgeSink& sink) {
+  require(static_cast<bool>(sink),"AAV86 stream sink");
+  return dealer_generate_impl(config,&sink);
+}
+
+namespace {
+void write_base(Writer& w, const ProtocolIAav86SmallPartyMaterial& m,
+                std::uint32_t version) {
+  w.u32(kMagic); w.u32(version);
   w.u64(m.session); w.u64(m.fingerprint); w.u64(m.material_id);
   w.u32(m.logical_n); w.u32(m.padded_n); w.u32(m.k); w.u32(m.iterations);
   w.u8(m.comparison_bits); w.u8(m.party);
@@ -444,6 +477,14 @@ std::vector<std::uint8_t> protocol_i_aav86_small_serialize_party_material(
       w.blob(item.material.serialize());
     }
   }
+}
+}  // namespace
+
+std::vector<std::uint8_t> protocol_i_aav86_small_serialize_party_material(
+    const ProtocolIAav86SmallPartyMaterial& m) {
+  validate_material(m);
+  Writer w;
+  write_base(w,m,kVersion);
   w.u32(static_cast<std::uint32_t>(m.edge_keys.size()));
   std::size_t index = 0;
   for (std::uint32_t t = 0; t < m.iterations; ++t)
@@ -454,6 +495,16 @@ std::vector<std::uint8_t> protocol_i_aav86_small_serialize_party_material(
         w.blob(m.edge_keys[index++].serialize());
       }
   require(w.bytes.size() <= kMaxPackageBytes, "AAV86 serialized package limit");
+  return std::move(w.bytes);
+}
+
+std::vector<std::uint8_t> protocol_i_aav86_stream_serialize_base(
+    const ProtocolIAav86SmallPartyMaterial& m) {
+  validate_material(m,true);
+  Writer w;
+  write_base(w,m,2U);
+  w.u32(0U);
+  require(w.bytes.size() <= kMaxPackageBytes,"AAV86 stream base limit");
   return std::move(w.bytes);
 }
 
@@ -517,6 +568,60 @@ ProtocolIAav86SmallPartyMaterial protocol_i_aav86_small_deserialize_party_materi
       }
   require(r.at == bytes.size(), "AAV86 package trailing bytes");
   validate_material(m);
+  return m;
+}
+
+ProtocolIAav86SmallPartyMaterial protocol_i_aav86_stream_deserialize_base(
+    const std::vector<std::uint8_t>& bytes, int expected_party,
+    const ProtocolIAav86SmallConfig& expected_config) {
+  validate_config(expected_config);
+  require(expected_party == expected_config.party &&
+              bytes.size() <= kMaxPackageBytes,
+          "AAV86 stream base party/size");
+  Reader r{bytes};
+  require(r.u32() == kMagic && r.u32() == 2U,
+          "AAV86 stream base magic/version");
+  ProtocolIAav86SmallPartyMaterial m;
+  m.session=r.u64(); m.fingerprint=r.u64(); m.material_id=r.u64();
+  m.logical_n=r.u32(); m.padded_n=r.u32(); m.k=r.u32(); m.iterations=r.u32();
+  m.comparison_bits=r.u8(); m.party=r.u8();
+  m.pivot_seed_lo=r.u64(); m.pivot_seed_hi=r.u64();
+  require(m.session==expected_config.session &&
+              m.fingerprint==expected_config.fingerprint &&
+              m.material_id==expected_config.material_id &&
+              m.logical_n==expected_config.logical_n &&
+              m.padded_n==domain(expected_config.logical_n) &&
+              m.k==expected_config.k && m.iterations==expected_config.iterations &&
+              m.comparison_bits==33U+index_bits(m.padded_n) &&
+              m.party==expected_party,
+          "AAV86 stream base binding");
+  const auto d=m.padded_n;
+  m.forward_sigma=r.perm(d); m.forward_tau=r.perm(d);
+  m.inverse_sigma=r.perm(d); m.inverse_tau=r.perm(d);
+  m.forward_a=r.words(d); m.forward_e=r.words(d);
+  m.inverse_a=r.words(d); m.inverse_e=r.words(d);
+  m.node_mask_shares=r.words(static_cast<std::size_t>(m.iterations)*d);
+  auto& score=m.score_materials;
+  score.session=m.session; score.fingerprint=m.fingerprint;
+  score.party=m.party; score.n=d; score.k=m.k;
+  score.comparison_bits=m.comparison_bits;
+  for(std::uint32_t stage=1;stage<=2;++stage) {
+    require(r.u32()==d,"AAV86 stream score count");
+    auto& items=stage==1?score.carry_materials:score.sign_materials;
+    for(std::uint32_t slot=0;slot<d;++slot) {
+      const auto received_slot=r.u32();
+      const auto received_stage=r.u8();
+      const auto left=r.u64(),right=r.u64();
+      auto key=ProtocolIUcmpPartyMaterial::deserialize(r.blob());
+      require(received_slot==slot&&received_stage==stage,
+              "AAV86 stream score slot/stage");
+      items.emplace_back(slot,static_cast<std::uint8_t>(stage),
+                         left,right,std::move(key));
+    }
+  }
+  require(r.u32()==0U&&r.at==bytes.size(),
+          "AAV86 stream base edge/trailing data");
+  validate_material(m,true);
   return m;
 }
 
@@ -630,14 +735,17 @@ std::vector<std::uint32_t> flatten(const std::vector<Node>& nodes, int id) {
 }
 }  // namespace
 
-ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
+namespace {
+ProtocolIAav86SmallOutput party_with_reader(
     const ProtocolIAav86SmallConfig& config,
-    ProtocolIAav86SmallPartyMaterial&& material,
+    ProtocolIAav86SmallPartyMaterial& material,
+    const ProtocolIAav86SmallEdgeReader& read_edge,
+    bool base_only,
     const std::vector<std::uint32_t>& raw_score_share,
     const std::array<int, 2>& score_fds,
     const std::vector<int>& core_fds, int inverse_fd) {
   validate_config(config);
-  validate_material(material);
+  validate_material(material,base_only);
   const auto d = domain(config.logical_n);
   require(config.party == material.party &&
               config.session == material.session &&
@@ -703,7 +811,7 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   for (std::uint32_t a = 0; a < d; ++a) root.vertices[a] = a;
   nodes.push_back(std::move(root));
   std::vector<int> active{0};
-  std::vector<bool> consumed(material.edge_keys.size(), false);
+  std::vector<bool> consumed(metrics.pool_slots_per_party, false);
   for (std::uint32_t t = 0; t < config.iterations; ++t) {
     std::vector<std::uint64_t> local_open(d);
     for (std::uint32_t a = 0; a < d; ++a)
@@ -744,10 +852,14 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
     for (const auto& pair : graph) {
       const auto a = pair.first, c = pair.second;
       const auto slot = t * edges_per_round(d) + edge_index(d, a, c);
-      require(slot < material.edge_keys.size() && !consumed[slot], "AAV86 edge reuse");
+      require(slot < consumed.size() && !consumed[slot], "AAV86 edge reuse");
       consumed[slot] = true;
       metrics.edge_trace.push_back({t,a,c,material.material_id+slot});
-      const auto lt = material.edge_keys[slot].eval_strict_lt(opened[a], opened[c]);
+      auto key=read_edge(t,a,c,material.material_id+slot);
+      require(key.party_id()==config.party &&
+                  key.comparison_bits()==material.comparison_bits,
+              "AAV86 read edge key binding");
+      const auto lt = key.eval_strict_lt(opened[a], opened[c]);
       rank_share[a] += (config.party == 0 ? 1U : 0U) - lt;
       rank_share[c] += lt;
       metrics.ca_dcf_evaluations += 2U;
@@ -853,5 +965,41 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
   require(metrics.ca_time_ns + metrics.carrier_time_ns == metrics.core_time_ns,
           "AAV86 combination timing accounting");
   return output;
+}
+}  // namespace
+
+ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
+    const ProtocolIAav86SmallConfig& config,
+    ProtocolIAav86SmallPartyMaterial&& material,
+    const std::vector<std::uint32_t>& raw_score_share,
+    const std::array<int, 2>& score_fds,
+    const std::vector<int>& core_fds, int inverse_fd) {
+  const auto d=domain(config.logical_n);
+  auto read=[&](std::uint32_t t,std::uint32_t a,std::uint32_t c,
+               std::uint64_t id) {
+    const auto slot=t*edges_per_round(d)+edge_index(d,a,c);
+    require(id==material.material_id+slot && slot<material.edge_keys.size(),
+            "AAV86 in-memory edge reader");
+    return std::move(material.edge_keys[slot]);
+  };
+  return party_with_reader(config,material,read,false,raw_score_share,
+                           score_fds,core_fds,inverse_fd);
+}
+
+ProtocolIAav86SmallOutput protocol_i_aav86_stream_party(
+    const ProtocolIAav86SmallConfig& config,
+    ProtocolIAav86SmallPartyMaterial&& base,
+    const ProtocolIAav86SmallEdgeReader& read_edge,
+    const std::vector<std::uint32_t>& raw_score_share,
+    const std::array<int, 2>& score_fds,
+    const std::vector<int>& core_fds, int inverse_fd) {
+  require(static_cast<bool>(read_edge),"AAV86 stream edge reader");
+  return party_with_reader(config,base,read_edge,true,raw_score_share,
+                           score_fds,core_fds,inverse_fd);
+}
+
+void protocol_i_aav86_stream_claim(const ProtocolIAav86SmallConfig& config) {
+  validate_config(config);
+  durable_claim(config);
 }
 }  // namespace moe_topk

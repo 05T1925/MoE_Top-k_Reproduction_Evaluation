@@ -73,6 +73,14 @@ PUBLIC
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
 
+find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto)
+add_library(moe_topk_aav86_streamed_store STATIC
+    src/moe_topk/protocol_i_aav86_streamed_store.cpp)
+target_include_directories(moe_topk_aav86_streamed_store PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_features(moe_topk_aav86_streamed_store PRIVATE cxx_std_20)
+target_link_libraries(moe_topk_aav86_streamed_store PUBLIC sytorch OpenSSL::Crypto)
+
 
 add_executable(moe_topk_m6a7_aav86_small_conformance_test
     tests/moe_topk/protocol_i_aav86_small_conformance_test.cpp)
@@ -88,9 +96,28 @@ add_test(NAME moe_topk_m6a7_aav86_small_differential_test
 
 add_executable(moe_topk_m6a7_aav86_small_e2e_test
     tests/moe_topk/protocol_i_aav86_small_e2e_test.cpp)
-target_link_libraries(moe_topk_m6a7_aav86_small_e2e_test sytorch)
+target_link_libraries(moe_topk_m6a7_aav86_small_e2e_test
+    moe_topk_aav86_streamed_store sytorch)
 add_test(NAME moe_topk_m6a7_aav86_small_e2e_test
     COMMAND moe_topk_m6a7_aav86_small_e2e_test)
+add_test(NAME moe_topk_m6a20_aav86_stream_process_e2e_test
+    COMMAND ${CMAKE_COMMAND} -E env
+        MOE_TOPK_M6A_E20_STREAM=1 MOE_TOPK_M6A_E9_D=16
+        $<TARGET_FILE:moe_topk_m6a7_aav86_small_e2e_test>)
+
+add_executable(moe_topk_m6a20_aav86_store_conformance_test
+    tests/moe_topk/protocol_i_aav86_e20_store_conformance_test.cpp)
+target_link_libraries(moe_topk_m6a20_aav86_store_conformance_test
+    moe_topk_aav86_streamed_store sytorch Threads::Threads)
+add_test(NAME moe_topk_m6a20_aav86_store_conformance_test
+    COMMAND moe_topk_m6a20_aav86_store_conformance_test)
+
+add_executable(moe_topk_m6a20_aav86_stream_differential_test
+    tests/moe_topk/protocol_i_aav86_e20_stream_differential_test.cpp)
+target_link_libraries(moe_topk_m6a20_aav86_stream_differential_test
+    moe_topk_aav86_streamed_store sytorch Threads::Threads)
+add_test(NAME moe_topk_m6a20_aav86_stream_differential_test
+    COMMAND moe_topk_m6a20_aav86_stream_differential_test)
 
 add_executable(moe_topk_m6a10_aav86_metrics_conformance_test
     tests/moe_topk/protocol_i_aav86_e10_metrics_conformance_test.cpp)
@@ -309,7 +336,6 @@ target_link_libraries(moe_topk_m2_parallel_shuffle_process_e2e_test ${PROJECT_NA
 if(MOE_TOPK_ENABLE_EMP_OT)
     find_package(emp-tool 1.0 CONFIG REQUIRED)
     find_package(emp-ot 1.0 CONFIG REQUIRED)
-    find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto)
     add_library(moe_topk_emp_ot_backend STATIC
         src/moe_topk/protocol_i_chosen_ot_emp.cpp
         src/moe_topk/protocol_i_opv_emp.cpp)

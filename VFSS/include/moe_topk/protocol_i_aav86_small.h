@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -112,6 +113,21 @@ struct ProtocolIAav86SmallOutput {
 ProtocolIAav86SmallDealerOutput protocol_i_aav86_small_dealer_generate(
     const ProtocolIAav86SmallConfig& config);
 
+// E20_STREAM_AEAD_V1: generate the same full candidate pool one edge at a
+// time. The sink must deliver both keys over private offline T->party channels
+// before returning. The returned materials contain only O(D) base state.
+using ProtocolIAav86SmallEdgeSink = std::function<void(
+    std::uint32_t, std::uint32_t, std::uint32_t, std::uint64_t,
+    ProtocolIUcmpPartyMaterial&&, ProtocolIUcmpPartyMaterial&&)>;
+ProtocolIAav86SmallDealerOutput protocol_i_aav86_stream_dealer_generate(
+    const ProtocolIAav86SmallConfig& config,
+    const ProtocolIAav86SmallEdgeSink& sink);
+std::vector<std::uint8_t> protocol_i_aav86_stream_serialize_base(
+    const ProtocolIAav86SmallPartyMaterial& material);
+ProtocolIAav86SmallPartyMaterial protocol_i_aav86_stream_deserialize_base(
+    const std::vector<std::uint8_t>& bytes, int expected_party,
+    const ProtocolIAav86SmallConfig& expected_config);
+
 std::vector<std::uint8_t> protocol_i_aav86_small_serialize_party_material(
     const ProtocolIAav86SmallPartyMaterial& material);
 // Deserialization checks structural labels, lengths, party and key format.
@@ -131,5 +147,16 @@ ProtocolIAav86SmallOutput protocol_i_aav86_small_party(
     const std::vector<std::uint32_t>& raw_score_share,
     const std::array<int, 2>& score_fds,
     const std::vector<int>& core_fds, int inverse_fd);
+
+using ProtocolIAav86SmallEdgeReader = std::function<ProtocolIUcmpPartyMaterial(
+    std::uint32_t, std::uint32_t, std::uint32_t, std::uint64_t)>;
+ProtocolIAav86SmallOutput protocol_i_aav86_stream_party(
+    const ProtocolIAav86SmallConfig& config,
+    ProtocolIAav86SmallPartyMaterial&& base,
+    const ProtocolIAav86SmallEdgeReader& read_edge,
+    const std::vector<std::uint32_t>& raw_score_share,
+    const std::array<int, 2>& score_fds,
+    const std::vector<int>& core_fds, int inverse_fd);
+void protocol_i_aav86_stream_claim(const ProtocolIAav86SmallConfig& config);
 
 }  // namespace moe_topk

@@ -1,4 +1,5 @@
 #include <moe_topk/protocol_i_aav86_small.h>
+#include <moe_topk/protocol_i_aav86_streamed_store.h>
 #include <moe_topk/protocol_i_transport.h>
 #include <moe_topk/topk_oracle.h>
 #include "protocol_i_aav86_e9_fixtures.h"
@@ -11,6 +12,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <filesystem>
+#include <grp.h>
 #include <iostream>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -91,6 +93,7 @@ bool tcp_online() {
   require(std::string(setting)=="tcp","E11 transport name");
   return true;
 }
+bool streamed_mode() { return std::getenv("MOE_TOPK_M6A_E20_STREAM")!=nullptr; }
 std::array<int,2> online_pair() { return tcp_online()?tcp_pair():pair(); }
 std::string directory(std::uint64_t serial,int party) {
   auto pattern="/tmp/m6a7-e2e-"+std::to_string(::getpid())+"-"+
@@ -254,6 +257,31 @@ int party_process(int argc,char** argv) {
     const auto inverse_fd=fd(argv[16]);
     std::vector<int> core_fds;
     for(int i=18;i<argc;++i) core_fds.push_back(fd(argv[i]));
+    if(streamed_mode()) {
+      auto stored=protocol_i_aav86_stream_receive_party(
+          c,package_fd,c.durable_claim_directory);
+      const auto shape=protocol_i_aav86_small_capacity_shape(c.logical_n,c.iterations);
+      const auto payload=test_only::payload_from_shape(
+          shape.padded_n,c.iterations,shape.comparison_bits,true);
+      require(stored.plaintext_payload_bytes()==payload.t_package_payload_bytes,
+              "E20 store plaintext payload shape");
+      const auto disk_bytes=stored.disk_bytes();
+      const auto payload_bytes=stored.plaintext_payload_bytes();
+      const auto pivot_seed_lo=stored.base.pivot_seed_lo;
+      const auto pivot_seed_hi=stored.base.pivot_seed_hi;
+      const char ready=1;
+      send_all(fd(argv[17]),&ready,1);
+      std::vector<std::uint32_t> shares(c.logical_n);
+      receive_all(input_fd,shares.data(),shares.size()*sizeof(std::uint32_t));
+      const auto start=std::chrono::steady_clock::now();
+      const auto output=protocol_i_aav86_stream_party_from_store(
+          c,std::move(stored),shares,score_fds,core_fds,inverse_fd);
+      const auto elapsed=std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::steady_clock::now()-start).count();
+      send_bytes(result_fd,encode_result(output,static_cast<std::uint64_t>(elapsed),
+          disk_bytes,payload_bytes,pivot_seed_lo,pivot_seed_hi));
+      return 0;
+    }
     const auto material_bytes=receive_bytes(package_fd,192U*1024U*1024U);
     auto material=protocol_i_aav86_small_deserialize_party_material(material_bytes,who,c);
     if (!std::getenv("MOE_TOPK_M6A_E15_BENCH"))
@@ -290,6 +318,19 @@ int dealer_process(int argc,char** argv) {
     ProtocolIAav86SmallConfig c{number(argv[2]),number(argv[3]),number(argv[4]),
         static_cast<std::uint32_t>(number(argv[5])),static_cast<std::uint32_t>(number(argv[6])),
         static_cast<std::uint32_t>(number(argv[7])),0,fd(argv[8]),""};
+    if(streamed_mode()) {
+      const auto started=std::chrono::steady_clock::now();
+      protocol_i_aav86_stream_dealer_send(c,fd(argv[9]),fd(argv[10]));
+      const auto finished=std::chrono::steady_clock::now();
+      struct rusage usage{};
+      require(::getrusage(RUSAGE_SELF,&usage)==0,"E20 T getrusage");
+      const std::array<std::uint64_t,4> telemetry{
+          static_cast<std::uint64_t>(std::chrono::duration_cast<
+              std::chrono::nanoseconds>(finished-started).count()),0,0,
+          static_cast<std::uint64_t>(usage.ru_maxrss)};
+      send_all(fd(argv[11]),telemetry.data(),sizeof(telemetry));
+      return 0;
+    }
     const auto started=std::chrono::steady_clock::now();
     auto materials=protocol_i_aav86_small_dealer_generate(c);
     if(const auto* public_seed=std::getenv("MOE_TOPK_M6A_E11_PUBLIC_PIVOT_SEED")) {
@@ -321,8 +362,18 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
               std::uint32_t r,std::uint64_t serial,Totals& totals) {
   const auto n=static_cast<std::uint32_t>(scores.size());
   auto c0=ProtocolIAav86SmallConfig{0xd70000+serial,0xe70000+serial,0xf70000+serial,
-                                    n,k,r,0,15000,directory(serial,0)};
+                                    n,k,r,0,
+                                    streamed_mode()&&n>=1000?120000:15000,
+                                    directory(serial,0)};
   auto c1=c0; c1.party=1; c1.durable_claim_directory=directory(serial,1);
+  const bool uid_isolation=streamed_mode()&&
+      std::getenv("MOE_TOPK_M6A_E20_REQUIRE_UID_ISOLATION");
+  if(uid_isolation) {
+    require(::geteuid()==0,"E20 isolated launcher requires root");
+    require(::chown(c0.durable_claim_directory.c_str(),20001,20001)==0&&
+            ::chown(c1.durable_claim_directory.c_str(),20002,20002)==0,
+            "E20 private party directory owner");
+  }
   std::uint32_t d=2;
   while(d<n) d*=2;
   const auto transport_setup_start=std::chrono::steady_clock::now();
@@ -354,6 +405,11 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
                             score[0][who],score[1][who],inverse[who]};
       for(const auto& a:core) keep.push_back(a[who]);
       close_except(all,keep);
+      if(uid_isolation) {
+        const auto uid=static_cast<uid_t>(20001+who);
+        require(::setgroups(0,nullptr)==0&&::setgid(uid)==0&&
+                ::setuid(uid)==0,"E20 party UID isolation");
+      }
       const auto c=who?c1:c0;
       std::vector<std::string> args{"party",std::to_string(who),std::to_string(c.session),
           std::to_string(c.fingerprint),std::to_string(c.material_id),
@@ -402,8 +458,9 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   }
   send_all(input[0][0],x0.data(),n*sizeof(std::uint32_t));
   send_all(input[1][0],x1.data(),n*sizeof(std::uint32_t));
-  const auto a=decode_result(receive_bytes(result[0][0],1024),n,r);
-  const auto b=decode_result(receive_bytes(result[1][0],1024),n,r);
+  const auto result_limit=streamed_mode()?8192U:1024U;
+  const auto a=decode_result(receive_bytes(result[0][0],result_limit),n,r);
+  const auto b=decode_result(receive_bytes(result[1][0],result_limit),n,r);
   wait_ok(parties[0],"P0"); wait_ok(parties[1],"P1");
   for(const auto fd:parent_keep) ::close(fd);
   const auto oracle=top_k_mask(scores,k);
@@ -471,7 +528,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   totals.online_ns+=std::max(a.online_ns,b.online_ns);
   totals.peak_kib=std::max({totals.peak_kib,a.peak_kib,b.peak_kib});
   totals.package_bytes0+=a.package_bytes; totals.package_bytes1+=b.package_bytes;
-  std::cout<<"E12_AAV86_CASE serial="<<serial<<" n="<<n<<" k="<<k<<" r="<<r
+  std::cout<<(streamed_mode()?"E20_STREAM_CASE":"E12_AAV86_CASE")
+           <<" serial="<<serial<<" n="<<n<<" k="<<k<<" r="<<r
            <<" d="<<d<<" reserved="<<slots<<" active="<<a.active
            <<" score_eval_per_party="<<a.score_evals
            <<" ca_eval_per_party="<<a.ca_evals
@@ -480,7 +538,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" offline_elapsed_ns="<<offline_ns
            <<" transport_setup_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
                    transport_setup_end-transport_setup_start).count()
-           <<" dealer_generate_ns="<<dealer_metrics[0]
+           <<(streamed_mode()?" dealer_stream_generate_send_ns=":" dealer_generate_ns=")
+           <<dealer_metrics[0]
            <<" dealer_serialize_ns="<<dealer_metrics[1]
            <<" dealer_distribute_ns="<<dealer_metrics[2]
            <<" receive_barrier_ns="<<receive_barrier_ns
@@ -490,8 +549,10 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" online_p0_ns="<<a.online_ns<<" online_p1_ns="<<b.online_ns
            <<" peak_party_kib="<<std::max(a.peak_kib,b.peak_kib)
            <<" peak_p0_kib="<<a.peak_kib<<" peak_p1_kib="<<b.peak_kib
-           <<" package_bytes_p0="<<a.package_bytes
-           <<" package_bytes_p1="<<b.package_bytes
+           <<(streamed_mode()?" store_disk_bytes_p0=":" package_bytes_p0=")
+           <<a.package_bytes
+           <<(streamed_mode()?" store_disk_bytes_p1=":" package_bytes_p1=")
+           <<b.package_bytes
            <<" t_payload_bytes_p0="<<a.t_payload_bytes
            <<" t_payload_bytes_p1="<<b.t_payload_bytes
            <<" pivot_seed_lo="<<a.pivot_seed_lo
@@ -527,6 +588,17 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" p1_ca_ns="<<b.ca_ns<<" p1_carrier_ns="<<b.carrier_ns
            <<" p1_inverse_ns="<<b.inverse_ns
            <<" transport="<<(tcp_online()?"tcp":"unix")<<"\n";
+  if(streamed_mode()) {
+    const auto disk_plain=slots*(24U*bits+24U);
+    require(a.t_payload_bytes>=disk_plain&&b.t_payload_bytes>=disk_plain,
+            "E20 ready material partition");
+    std::cout<<"E20_READY_MATERIAL serial="<<serial
+             <<" disk_plain_payload_per_party_bytes="<<disk_plain
+             <<" memory_payload_p0_bytes="<<(a.t_payload_bytes-disk_plain)
+             <<" memory_payload_p1_bytes="<<(b.t_payload_bytes-disk_plain)
+             <<" disk_ciphertext_p0_bytes="<<a.package_bytes
+             <<" disk_ciphertext_p1_bytes="<<b.package_bytes<<"\n";
+  }
   std::filesystem::remove_all(c0.durable_claim_directory);
   std::filesystem::remove_all(c1.durable_claim_directory);
 }
@@ -592,14 +664,23 @@ int main(int argc,char** argv) {
       transport_frame_conformance(); return 0;
     }
     Totals totals;
-    if(argc==7&&std::string(argv[1])=="bench") {
+    if(argc==7&&(std::string(argv[1])=="bench"||
+                 std::string(argv[1])=="bench-stream")) {
+      const bool stream_bench=std::string(argv[1])=="bench-stream";
+      if(stream_bench)
+        require(::setenv("MOE_TOPK_M6A_E20_STREAM","1",1)==0,
+                "E20 stream environment");
+      if(stream_bench)
+        require(::setenv("MOE_TOPK_M6A_E20_REQUIRE_UID_ISOLATION","1",1)==0,
+                "E20 UID isolation environment");
       const auto n=static_cast<std::uint32_t>(number(argv[2]));
       const auto k=static_cast<std::uint32_t>(number(argv[3]));
       const auto r=static_cast<std::uint32_t>(number(argv[4]));
       const auto input_seed=number(argv[5]);
       const auto serial=number(argv[6]);
-      require((n==128||n==256)&&k>=1&&k<=n&&r>=2&&r<=5,
-              "E16 benchmark shape");
+      require((stream_bench?(n==128||n==256||n==1000):(n==128||n==256))&&
+                  k>=1&&k<=n&&r>=2&&r<=5,
+              stream_bench?"E20 stream benchmark shape":"E16 benchmark shape");
       std::mt19937_64 input_rng(input_seed);
       std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
       std::vector<std::uint32_t> scores(n);
