@@ -52,4 +52,26 @@ std::vector<std::uint64_t> protocol_i_cmpagg_eval_party(
   return ranks;
 }
 
+std::vector<std::uint64_t> protocol_i_cmpagg_eval_party_stream(
+    int party, int comparison_bits, const std::vector<std::uint64_t>& masked_keys,
+    const ProtocolICmpAggEdgeReader& read_edge) {
+  if (party < 0 || party > 1 || masked_keys.empty() || !read_edge)
+    throw std::invalid_argument("CmpAgg streamed input");
+  const auto ring_mask = mask(comparison_bits);
+  for (const auto key : masked_keys)
+    if ((key & ~ring_mask) != 0)
+      throw std::invalid_argument("masked key outside ring");
+  std::vector<std::uint64_t> ranks(masked_keys.size());
+  for (std::uint32_t left = 0; left < masked_keys.size(); ++left)
+    for (std::uint32_t right = left + 1; right < masked_keys.size(); ++right) {
+      auto material = read_edge(left,right);
+      if (material.comparison_bits() != comparison_bits || material.party_id() != party)
+        throw std::invalid_argument("streamed edge material mismatch");
+      const auto less_than = material.eval_strict_lt(masked_keys[left],masked_keys[right]);
+      ranks[left] += (party == 0 ? 1 : 0) - less_than;
+      ranks[right] += less_than;
+    }
+  return ranks;
+}
+
 }  // namespace moe_topk

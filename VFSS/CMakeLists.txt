@@ -379,6 +379,13 @@ if(MOE_TOPK_ENABLE_EMP_OT)
         moe_topk_share_translation_backend sytorch)
     add_test(NAME moe_topk_m6a12_protocol_i_clique_benchmark_test
         COMMAND moe_topk_m6a12_protocol_i_clique_benchmark_test)
+    add_executable(moe_topk_m6a20_protocol_i_clique_stream_benchmark_test
+        tests/moe_topk/protocol_i_e20_baseline_stream_bench_test.cpp)
+    target_include_directories(moe_topk_m6a20_protocol_i_clique_stream_benchmark_test PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/ext/cryptoTools)
+    target_link_libraries(moe_topk_m6a20_protocol_i_clique_stream_benchmark_test PRIVATE
+        moe_topk_share_translation_backend moe_topk_aav86_streamed_store sytorch)
 endif()
 
 # Protocol III pre-integration primitive conformance. This validates the

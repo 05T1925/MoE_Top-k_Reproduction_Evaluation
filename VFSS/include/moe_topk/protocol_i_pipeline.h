@@ -49,4 +49,11 @@ ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party(
     ProtocolIShufflePartyMaterial&, const std::vector<std::uint64_t>& priority_key_share,
     const std::array<int, 2>& forward_fds, int cmpagg_fd, int rank_reveal_fd,
     const std::array<int, 2>& reverse_fds);
+// E20 baseline: the complete clique is preissued, then each canonical key is
+// consumed once from a sealed party-local store during the online comparison.
+ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party_stream(
+    const ProtocolIPriorityPipelineConfig&, ProtocolIPartyPackage&&,
+    ProtocolIShufflePartyMaterial&, const std::vector<std::uint64_t>& priority_key_share,
+    const std::array<int, 2>& forward_fds, int cmpagg_fd, int rank_reveal_fd,
+    const std::array<int, 2>& reverse_fds, const ProtocolICmpAggEdgeReader&);
 }  // namespace moe_topk

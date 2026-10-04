@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <thread>
 #include <unistd.h>
@@ -138,6 +139,8 @@ int main() {
             "E20 noncanonical pair accepted");
     rejects([&]{(void)b.p0.read_edge(0,0,2,b.c0.material_id);},
             "E20 wrong edge ID accepted");
+    rejects([&]{(void)b.p0.read_edge(2,0,1,b.c0.material_id);},
+            "E20 wrong round accepted");
     const auto slots=2U*16U*15U/2U;
     const auto record=(b.p0.disk_bytes()-80U)/slots;
     flip(b.p0.path(),80U+record+32U);
@@ -167,8 +170,26 @@ int main() {
     rejects([&]{(void)protocol_i_aav86_stream_receive_party(c,failed[1],dir);},
             "E20 T close accepted");
     ::close(failed[1]);std::filesystem::remove_all(dir);
+    std::array<int,2> silent{};
+    require(::socketpair(AF_UNIX,SOCK_STREAM,0,silent.data())==0,
+            "E20 silent socket");
+    dir=directory();c.durable_claim_directory=dir;c.timeout_ms=50;
+    rejects([&]{(void)protocol_i_aav86_stream_receive_party(c,silent[1],dir);},
+            "E20 silent T accepted");
+    ::close(silent[0]);::close(silent[1]);std::filesystem::remove_all(dir);
+    auto interrupted=make_bundle(16,2,4);
+    const auto child=::fork();require(child>=0,"E20 interrupted fork");
+    if(child==0) {
+      try {interrupted.p0.claim(interrupted.c0);::_exit(0);}
+      catch(...) {::_exit(1);}
+    }
+    int status=0;
+    require(::waitpid(child,&status,0)==child&&WIFEXITED(status)&&
+            WEXITSTATUS(status)==0,"E20 interrupted claim child");
+    rejects([&]{interrupted.p0.claim(interrupted.c0);},
+            "E20 claimed material survived interrupted process");
     std::cout<<"E20_STORE_CONFORMANCE_PASS algebra=1 binding=1 reuse=1 "
-             <<"tamper=1 swap=1 truncate=1 t_close=1\n";
+             <<"tamper=1 swap=1 truncate=1 t_close=1 t_silent=1 interrupted=1\n";
     return 0;
   } catch(const std::exception& e) {
     std::cerr<<"E20_STORE_CONFORMANCE_FAIL "<<e.what()<<"\n";

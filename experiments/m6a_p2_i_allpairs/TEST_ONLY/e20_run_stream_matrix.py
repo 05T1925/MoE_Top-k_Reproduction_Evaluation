@@ -55,9 +55,12 @@ def main():
     p.add_argument("--output-dir", type=Path, required=True)
     p.add_argument("--profile", choices=("LAN", "WAN"), required=True)
     p.add_argument("--revision", required=True)
+    p.add_argument("--n", type=int, choices=(128, 256, 1000), default=1000)
+    p.add_argument("--k", type=int, default=80)
     p.add_argument("--r", type=int, nargs="+", default=[2, 3, 4, 5])
     args = p.parse_args()
-    if os.geteuid() != 0 or any(r not in range(2, 6) for r in args.r):
+    if (os.geteuid() != 0 or any(r not in range(2, 6) for r in args.r) or
+            not 1 <= args.k <= args.n):
         raise RuntimeError("root and r=2..5 required for per-party OS identity")
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -69,7 +72,7 @@ def main():
                "experiments/m6a_p2_i_allpairs/TEST_ONLY/e20_run_stream_matrix.py"]
     common = {"source_revision": args.revision, "binary_sha256": sha(args.binary),
               "source_sha256": {name: sha(script_root / name) for name in sources},
-              "implementation": "E20_STREAM_AEAD_V1", "n": 1000, "K": 80,
+              "implementation": "E20_STREAM_AEAD_V1", "n": args.n, "K": args.k,
               "topology": "same-host WSL2 T/P0/P1 exec; distinct OS UIDs; TCP in netem namespace",
               "rlimit_as_bytes_per_process": 1073741824}
     delay, rate, target_rtt, target_rate = {
@@ -101,10 +104,11 @@ def main():
                 (out / f"pre_r{r}_resource.json").write_text(json.dumps(snapshot(), indent=2))
                 for rep, seed in enumerate(SEEDS):
                     serial = (20 if args.profile == "LAN" else 21) * 100000 + r * 100 + rep
-                    run_id = f"{args.profile}-n1000-k80-r{r}-rep{rep}"
+                    run_id = f"{args.profile}-n{args.n}-k{args.k}-r{r}-rep{rep}"
                     log = out / f"{run_id}.log"
                     argv = ["ip", "netns", "exec", ns, "prlimit", "--as=1073741824:1073741824",
-                            "--", str(args.binary), "bench-stream", "1000", "80", str(r),
+                            "--", str(args.binary), "bench-stream", str(args.n),
+                            str(args.k), str(r),
                             str(seed), str(serial)]
                     env = dict(os.environ, MOE_TOPK_M6A_E11_TRANSPORT="tcp",
                                MOE_TOPK_M6A_E15_BENCH="1",
@@ -129,8 +133,8 @@ def main():
                         case = next(fields(x) for x in lines if x.startswith("E20_STREAM_CASE "))
                         ready = next(fields(x) for x in lines if x.startswith("E20_READY_MATERIAL "))
                         meta = next(fields(x) for x in lines if x.startswith("E12_BENCH_META "))
-                        if (case["transport"] != "tcp" or case["n"] != 1000 or
-                                case["k"] != 80 or case["r"] != r or meta["input_seed"] != seed or
+                        if (case["transport"] != "tcp" or case["n"] != args.n or
+                                case["k"] != args.k or case["r"] != r or meta["input_seed"] != seed or
                                 case["p0_bytes"] != case["p1_received_bytes"] or
                                 case["p1_bytes"] != case["p0_received_bytes"] or
                                 case["rounds"] != 2*r+4 or case["t_exit"] or
@@ -186,7 +190,7 @@ def main():
                     entry = {"min": min(values), "median": statistics.median(values),
                              "max": max(values)}
                     summary[str(r)][key] = entry
-                    writer.writerow((args.profile, 1000, 80, r, key, *entry.values(), 5))
+                    writer.writerow((args.profile, args.n, args.k, r, key, *entry.values(), 5))
         (out / "summary.json").write_text(json.dumps({"common": common,
             "calibration_sha256": sha(calibration), "raw_sha256": sha(raw),
             "nine": summary}, indent=2, sort_keys=True)+"\n")

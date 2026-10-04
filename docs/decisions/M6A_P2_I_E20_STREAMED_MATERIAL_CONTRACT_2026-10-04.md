@@ -21,7 +21,22 @@
 每方独立的 0700 目录、0600 文件，以 `openat(O_NOFOLLOW|O_EXCL)` 建临时文件，完成全池写入、`fdatasync`、原子重命名及目录 `fsync` 后才发送 ready。文件首部包括格式版本、party、session、fingerprint、logical n、D、K、r、比较宽度、material ID、记录长、预期条数；每条记录重复 `(t,a,c,material ID+slot)`，从 canonical 序数与文件偏移对照。每条 DCF key 密文使用 OpenSSL AES-256-GCM、独立本方临时 256-bit 密钥及由唯一 slot 编码的 96-bit nonce；首部和记录标签作为 AAD，GCM tag 验证失败立即终止。这里的完整性来自 AEAD 与私有分发/未落盘的独立密钥，普通 checksum 只可用于原始证据文件，不称材料认证。两个 P 在同一测试主机同 UID 时，0700 目录本身不构成对另一同 UID 进程的 DAC 隔离；仍须使用独立 OS 身份/挂载空间或将实际隔离限于 AEAD 与可信宿主假设，报告必须如实区分。
 
 文件截断、记录序号/端点/轮次/party/session 错误、同规格 blob 交换、tag 篡改、重复领取、T 失败、peer 关闭/静默及进程中断均 fail closed，不退回旧材料、不请求 T、不以空 key 替代。外层 AEAD/标签不能证明 uCMP key 与节点 mask 的代数关联；该关联仍依赖可信 T，并由 TEST_ONLY dealer 一致性检查补充。材料秘密离线输入无关，但算法随机性/同 key 重用仍必须一次性。
+离线私有 socket 的读写分别设置 `SO_RCVTIMEO` / `SO_SNDTIMEO`，按配置的
+`timeout_ms` 对静默端点或中途停发做有界关闭；超时只导致本次材料失败，
+不发生重领或补发。
 
 ## 计量和放行
 
 E15 离线从 T/P 启动前至 T 退出及双方 ready，包含全池 keygen、私有交付、P 加密写盘和同步；在线从双方收到输入后的 secure 入口至原序 mask，包含首次领取与活跃边文件读取/验证/解码。ready 时分别记录双方磁盘密文占用、内存材料有效载荷、临时文件与实际 RSS，不能把包长或准入预算代入实际峰值。每配置每次 fresh 全池；先 conformance→冻结 oracle differential→独立 T/P0/P1 E2E，之后才准同 revision、配对输入、LAN/WAN 1 预热+5 正式。基线 n1000 另设清楚的低内存交付标签并独立三层验证；无法同规模成功时不写配对胜负。任何安全/绑定/一次性关闭无法成立即 `NO-GO`，所有未跑指标 `NOT_MEASURED`。n≥10⁴ 仍为当前全两两资源受限。多 key 联合模拟未证明，`AUTHOR_EXACT=NOT_PROVEN`。
+# 同规模全对全基线扩展（实现前补充）
+
+为使 n=1000 的 EMP-ON Protocol I 基线拥有同样有界的材料驻留，新增独立
+`E20_CLIQUE_SEALED_V1` 标签。T 使用同一个已审查的流式生成器、AES-GCM
+分方存储和一次性领取机制，取 `r=1`，离线完整预发 `C(D,2)` 条 uCMP key。
+基线只取其中与全对全 CmpAgg 相同的节点 mask、score carry/sign key 和逐边
+uCMP key；独立的双方 shuffle 仍执行原有真实 EMP OT，不使用 T 所生成的
+AAV86 permutation/shuffle 候选状态。T 为该存储生成的额外 O(D) 状态仍计入
+基线 ready 材料和离线时间，不隐去成本。在线完整消费全对全边，序列化格式、
+私有交付、OS 用户隔离、AEAD 校验、整份原子领取及故障关闭边界与上述 E20
+存储合同一致；没有在线 T 或额外在线网络轮次。该基线新路径须单独通过
+oracle 与独立进程验证，不能将既有 E15/E16 基线数值重新贴标签。

@@ -14,6 +14,8 @@
 #include <string>
 #include <sys/random.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -101,6 +103,13 @@ void random_bytes(void* out,std::size_t count) {
     check(got>0,"E20 OS entropy");
     bytes+=got;count-=static_cast<std::size_t>(got);
   }
+}
+void bound_socket(int fd,int timeout_ms) {
+  check(fd>=0&&timeout_ms>0,"E20 bounded delivery descriptor");
+  const timeval limit{timeout_ms/1000,(timeout_ms%1000)*1000};
+  check(::setsockopt(fd,SOL_SOCKET,SO_RCVTIMEO,&limit,sizeof(limit))==0&&
+        ::setsockopt(fd,SOL_SOCKET,SO_SNDTIMEO,&limit,sizeof(limit))==0,
+        "E20 bounded delivery socket");
 }
 void send_exact(int fd,const void* data,std::size_t count) {
   const auto* bytes=static_cast<const std::uint8_t*>(data);
@@ -210,6 +219,8 @@ void protocol_i_aav86_stream_dealer_send(
     const ProtocolIAav86SmallConfig& config,int party0_fd,int party1_fd) {
   check(party0_fd>=0&&party1_fd>=0&&party0_fd!=party1_fd,"E20 dealer channels");
   const auto h0=header_for(config,0),h1=header_for(config,1);
+  bound_socket(party0_fd,config.timeout_ms);
+  bound_socket(party1_fd,config.timeout_ms);
   send_exact(party0_fd,h0.data(),h0.size());
   send_exact(party1_fd,h1.data(),h1.size());
   const auto key_bytes=24U*bits_for(padded(config.logical_n))+57U;
@@ -261,6 +272,7 @@ ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
     const std::string& private_directory) {
   check(dealer_fd>=0&&config.party<2,"E20 party delivery channel");
   const auto expected=header_for(config,config.party);
+  bound_socket(dealer_fd,config.timeout_ms);
   Header received{};receive_exact(dealer_fd,received.data(),received.size());
   check(received==expected,"E20 delivery header binding");
   const auto d=padded(config.logical_n),b=bits_for(d);

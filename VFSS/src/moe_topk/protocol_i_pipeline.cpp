@@ -24,12 +24,16 @@ std::vector<std::uint64_t> decode_words(const std::vector<std::uint8_t>& bytes) 
   return words;
 }
 
-void validate_package(const ProtocolIPartyPackage& package, const ProtocolIPriorityPipelineConfig& config) {
+void validate_package(const ProtocolIPartyPackage& package, const ProtocolIPriorityPipelineConfig& config,
+                      bool streamed) {
   require(package.party == config.party && package.n == config.padded_n && package.k == config.k &&
               package.comparison_bits == config.comparison_bits && package.session == config.session && package.fingerprint == config.fingerprint,
           "pipeline package binding");
   const auto expected = static_cast<std::uint64_t>(config.padded_n) * (config.padded_n - 1U) / 2U;
-  require(package.node_mask_shares.size() == config.padded_n && package.edge_materials.size() == expected, "pipeline package shape");
+  require(package.node_mask_shares.size() == config.padded_n &&
+          package.edge_materials.size() == (streamed ? 0U : expected),
+          "pipeline package shape");
+  if (streamed) return;
   std::size_t edge = 0;
   for (std::uint32_t left = 0; left < config.padded_n; ++left) for (std::uint32_t right = left + 1; right < config.padded_n; ++right) {
     const auto& item = package.edge_materials[edge++];
@@ -60,15 +64,16 @@ ProtocolIInputLayout protocol_i_make_input_layout(std::uint32_t logical_n, std::
   return {logical_n, padded, k, index_bits, minimum};
 }
 
-ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party(
+static ProtocolIPriorityPipelineOutput pipeline_impl(
     const ProtocolIPriorityPipelineConfig& config, ProtocolIPartyPackage&& package,
     ProtocolIShufflePartyMaterial& material, const std::vector<std::uint64_t>& key_shares,
     const std::array<int, 2>& forward_fds, int cmpagg_fd, int rank_reveal_fd,
-    const std::array<int, 2>& reverse_fds) {
+    const std::array<int, 2>& reverse_fds,
+    const ProtocolICmpAggEdgeReader* read_edge) {
   const auto layout = protocol_i_make_input_layout(config.logical_n, config.k);
   require(config.party < 2 && config.padded_n == layout.padded_n && config.comparison_bits >= layout.minimum_comparison_bits &&
               config.comparison_bits <= 53 && config.timeout_ms > 0 && key_shares.size() == config.padded_n, "pipeline config");
-  validate_package(package, config);
+  validate_package(package, config, read_edge != nullptr);
   const auto ring = (UINT64_C(1) << config.comparison_bits) - 1U;
   for (const auto share : key_shares) require((share & ~ring) == 0, "priority key share outside ring");
 
@@ -89,11 +94,17 @@ ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party(
   std::vector<std::uint64_t> opened(config.padded_n);
   for (std::size_t index = 0; index < opened.size(); ++index) opened[index] = (local[index] + peer[index]) & ring;
 
-  std::vector<ProtocolIUcmpPartyMaterial> edges;
-  edges.reserve(package.edge_materials.size());
-  for (auto& edge : package.edge_materials) edges.push_back(std::move(edge.material));
-  package.edge_materials.clear();
-  const auto ranks = protocol_i_cmpagg_eval_party(config.party, config.comparison_bits, opened, edges);
+  std::vector<std::uint64_t> ranks;
+  if (read_edge) {
+    ranks = protocol_i_cmpagg_eval_party_stream(config.party, config.comparison_bits,
+                                                opened, *read_edge);
+  } else {
+    std::vector<ProtocolIUcmpPartyMaterial> edges;
+    edges.reserve(package.edge_materials.size());
+    for (auto& edge : package.edge_materials) edges.push_back(std::move(edge.material));
+    package.edge_materials.clear();
+    ranks = protocol_i_cmpagg_eval_party(config.party, config.comparison_bits, opened, edges);
+  }
 
   ProtocolIFrameConfig reveal_config{config.session, config.fingerprint, config.padded_n, config.k, config.comparison_bits,
                                      config.party, static_cast<std::uint8_t>(1U - config.party), 3, 1};
@@ -126,5 +137,25 @@ ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party(
   output.metrics.comparison_edges = static_cast<std::uint64_t>(config.padded_n) * (config.padded_n - 1U) / 2U;
   output.metrics.raw_dcf_calls = output.metrics.comparison_edges * 2U;
   return output;
+}
+
+ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party(
+    const ProtocolIPriorityPipelineConfig& config, ProtocolIPartyPackage&& package,
+    ProtocolIShufflePartyMaterial& material, const std::vector<std::uint64_t>& key_shares,
+    const std::array<int, 2>& forward_fds, int cmpagg_fd, int rank_reveal_fd,
+    const std::array<int, 2>& reverse_fds) {
+  return pipeline_impl(config,std::move(package),material,key_shares,
+                       forward_fds,cmpagg_fd,rank_reveal_fd,reverse_fds,nullptr);
+}
+
+ProtocolIPriorityPipelineOutput protocol_i_priority_pipeline_party_stream(
+    const ProtocolIPriorityPipelineConfig& config, ProtocolIPartyPackage&& package,
+    ProtocolIShufflePartyMaterial& material, const std::vector<std::uint64_t>& key_shares,
+    const std::array<int, 2>& forward_fds, int cmpagg_fd, int rank_reveal_fd,
+    const std::array<int, 2>& reverse_fds,
+    const ProtocolICmpAggEdgeReader& read_edge) {
+  require(static_cast<bool>(read_edge),"pipeline edge reader");
+  return pipeline_impl(config,std::move(package),material,key_shares,
+                       forward_fds,cmpagg_fd,rank_reveal_fd,reverse_fds,&read_edge);
 }
 }  // namespace moe_topk
