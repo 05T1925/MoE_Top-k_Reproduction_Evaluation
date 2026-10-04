@@ -10,6 +10,7 @@ import signal
 import statistics
 import subprocess
 import sys
+import time
 
 from e20_run_stream_matrix import NINE, SEEDS, sha, fields, snapshot
 
@@ -74,6 +75,7 @@ def main():
                 env = dict(os.environ, MOE_TOPK_M6A_E15_BENCH="1",
                            MOE_TOPK_M2_E12_TRANSPORT="tcp")
                 with log.open("x", encoding="utf-8") as f:
+                    started_utc_ns=time.time_ns()
                     proc = subprocess.Popen(cmd, env=env, stdout=f, stderr=subprocess.STDOUT,
                                             start_new_session=True)
                     try:
@@ -82,11 +84,14 @@ def main():
                         os.killpg(proc.pid,signal.SIGKILL)
                         proc.wait()
                         code = 124
+                    finished_utc_ns=time.time_ns()
                 record = dict(common, profile=args.profile, repetition=rep,
                               warmup=(rep==0), run_id=run_id, input_seed=seed,
                               command=cmd, env={"MOE_TOPK_M6A_E15_BENCH":"1",
                                                 "MOE_TOPK_M2_E12_TRANSPORT":"tcp"},
                               exit_code=code, raw_log=str(log), raw_log_sha256=sha(log))
+                record.update(started_utc_ns=started_utc_ns,
+                              finished_utc_ns=finished_utc_ns)
                 if code == 0:
                     case = next(fields(line) for line in log.read_text().splitlines()
                                 if line.startswith("E12_BASELINE_CASE "))

@@ -11,6 +11,7 @@ import signal
 import statistics
 import subprocess
 import sys
+import time
 
 
 SEEDS = (20201004, 20201005, 20201006, 20201007, 20201008, 20201009)
@@ -114,6 +115,7 @@ def main():
                                MOE_TOPK_M6A_E15_BENCH="1",
                                MOE_TOPK_M6A_E11_PUBLIC_PIVOT_SEED=str(200000 + 1000*r + rep))
                     with log.open("x", encoding="utf-8") as f:
+                        started_utc_ns = time.time_ns()
                         proc = subprocess.Popen(argv, env=env, stdout=f, stderr=subprocess.STDOUT,
                                                 start_new_session=True)
                         try:
@@ -122,12 +124,15 @@ def main():
                             os.killpg(proc.pid, signal.SIGKILL)
                             proc.wait()
                             code = 124
+                        finished_utc_ns = time.time_ns()
                     record = dict(common, profile=args.profile, r=r, repetition=rep,
                                   warmup=(rep == 0), run_id=run_id, input_seed=seed,
                                   command=argv, env={k: env[k] for k in
                                   ("MOE_TOPK_M6A_E11_TRANSPORT", "MOE_TOPK_M6A_E15_BENCH",
                                    "MOE_TOPK_M6A_E11_PUBLIC_PIVOT_SEED")},
                                   exit_code=code, raw_log=str(log), raw_log_sha256=sha(log))
+                    record.update(started_utc_ns=started_utc_ns,
+                                  finished_utc_ns=finished_utc_ns)
                     if code == 0:
                         lines = log.read_text().splitlines()
                         case = next(fields(x) for x in lines if x.startswith("E20_STREAM_CASE "))
