@@ -6,6 +6,8 @@
 
 `git fetch origin main` 后，本地 `main`、`origin/main` 和候选 merge-base 均为 `c3926c68fd14f270faa8b55234311071947fa080`。隔离 checkout 从 `codex/m6a-p2-i-e17-independent-receiver@01f3c04fdbe5bcc8de6722bd72cd63bf3bad0b31` 建立 `codex/m6a-p2-i-e18-delivery`；E17 起始工作树干净。主工作区 `C:/Users/28641/Desktop/MoE_Top-k_Reproduction_Evaluation/` 原有 tracked 修改：`PROJECT.md`、`docs/IMPLEMENTATION_PLAN.md`、`docs/PAPERS.sha256`、`docs/REFERENCE_MANIFEST.md`；原有未跟踪：两份 P1/P2 决策、一份 P0 盘点、`siamjdiscrmath.pdf`。该工作区仅只读检查，未 reset、覆盖、移动或清理。E15/E16 工作树也仅只读使用。
 
+`git worktree list --porcelain` 所列八个 checkout 均做只读状态核对：主工作区有上述保留修改；`61dd` 与 E11/E14 工作树为干净的 `b521c5e`；E15 `6a9ef84`、E16 `267cb692` 干净；本 E18 checkout 在最终提交后干净；`f516` 的 Protocol III 工作树有其自身 tracked/未跟踪修改；早期全两两实验工作树 `ac8af47` 有未跟踪历史审计、夹具和原始目录。其他 checkout 的这些内容均未改动、移动或清理。
+
 四个提交身份不可互换：
 
 | 提交 | 角色 |
