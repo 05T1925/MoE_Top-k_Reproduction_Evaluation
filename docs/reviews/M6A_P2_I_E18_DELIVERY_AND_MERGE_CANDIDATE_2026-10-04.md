@@ -1,6 +1,6 @@
 # M6A-P2-I-E18：独立接收后的交付与合入候选审查报告
 
-日期：2026-10-04。结论：**READY_FOR_DRAFT_REVIEW_WITH_EXPLICIT_LIMITS**。交付范围仅为 E17 已独立接收的 Protocol I+AAV86 **全两两预发有界项目实现**、EMP-ON 全对全基线和对应性能证据；不把它称为 adaptive exact-edge、作者精确复现、Protocol III+AAV86 或 M6A/V3 总完成。六方案分栏与九指标定义见 [E18 数据关闭说明](../reproduction/M6A_P2_I_E18_BOUNDED_DATA_CLOSEOUT_2026-10-04.md)。
+日期：2026-10-04。结论：**READY_FOR_DRAFT_REVIEW_WITH_EXPLICIT_LIMITS**；交付至 [draft PR #28](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/28)，目标 `main`，未合并。交付范围仅为 E17 已独立接收的 Protocol I+AAV86 **全两两预发有界项目实现**、EMP-ON 全对全基线和对应性能证据；不把它称为 adaptive exact-edge、作者精确复现、Protocol III+AAV86 或 M6A/V3 总完成。六方案分栏与九指标定义见 [E18 数据关闭说明](../reproduction/M6A_P2_I_E18_BOUNDED_DATA_CLOSEOUT_2026-10-04.md)。
 
 ## 1. Git 起点、身份和工作区保护
 
@@ -70,7 +70,7 @@ E15 原目录/副本 151/151，索引 `E997A85D974EA498CE0999045451C5A29D3521440
 - Protocol III+AAV86 仍独立设计门 NO-GO；BB90+DCF 两路在本阶段没有实现或性能。`AUTHOR_EXACT=NOT_PROVEN`，M6A/V3 总验收未完成。
 - 审查需关注 E15/E16 旧批次排除、E16 r5 2 GiB 失败历史、同主机网络限制、固定材料布局推导与 E17 索引/仓库外证据可获取性；不得将零值或预算写成未测指标。
 
-提交前使用 `git diff --check` 和 `git diff --name-status origin/main..HEAD` 审查全部差异，确认 `VFSS-baseline/`、`Papers/`、密钥、构建物、原始日志和 `Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/` 均不在差异。候选只待 draft PR 审查，不合并 main。
+提交前使用 `git diff --check` 和 `git diff --name-status origin/main..HEAD` 审查全部差异，确认 `VFSS-baseline/`、`Papers/`、密钥、构建物、原始日志和 `Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/` 均不在差异。候选已进入 draft PR 审查，未合并 main。
 
 ## 附录：main..候选逐文件盘点
 
