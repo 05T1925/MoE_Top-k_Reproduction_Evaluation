@@ -114,8 +114,20 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" active="<<out0.metrics.active_edges<<" PASS\n";
 }
 } // namespace
-int main() {
+int main(int argc,char** argv) {
   try {
+    if(argc==5&&std::string(argv[1])=="bench") {
+      const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));
+      const auto r=static_cast<std::uint32_t>(std::stoul(argv[3]));
+      const auto seed=std::stoull(argv[4]);
+      require(n==1000&&r>=2&&r<=5,"E20 differential large shape");
+      std::mt19937_64 rng(seed);
+      std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
+      std::vector<std::uint32_t> scores(n);
+      for(auto& score:scores) score=static_cast<std::uint32_t>(distribution(rng));
+      run_case(scores,80,r,0xE200+r);
+      return 0;
+    }
     std::uint64_t cases=0;
     for(const auto& fixture:moe_topk_e9_test::fixtures(16))
       run_case(fixture.scores,fixture.k,fixture.r,++cases);
