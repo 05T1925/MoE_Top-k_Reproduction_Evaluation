@@ -733,3 +733,7 @@ E14 的材料主字段仍按 ready 时在线实际留存有效载荷定义，但
 E15 内部计时门修正：首批 `fdcdbe5` 在 ready 前执行恒定公式，仍不满足本阶段“纯协议预处理”严格边界；保存原始数据但不作最终时间结论。修正版将有效载荷/OT 计数后处理安排在 secure 在线时钟停止后，新源码、新标签和新原始目录全矩阵重测，遵守同一 1+5 统计与独立索引。
 
 修正版 `346a923` 的 120/100 行已按此边界完成，审计为 PASS；`corrected/e15_raw_complete_index.sha256` 核对 151/151，统一 CSV 含九指标各 20 组 median/min/max，仓库外副本逐文件一致。此次 n=128、K=2/8、r=2..5、LAN/WAN 数据和限制见 [E15 重测报告](reviews/M6A_P2_I_E15_PROTOCOL_I_UNIFIED_REMEASUREMENT_2026-10-03.md)。E14 与 E15 首批时间仍不得用于正式路线胜负；n≥256 及 III+AAV86 的未测指标保持 `NOT_MEASURED`。
+
+### M6A-P2-III-E2 全对全正式入口基线准备
+
+[E2 全对全 Protocol III 九指标合同](decisions/M6A_P2_III_E2_FULL_CLIQUE_BASELINE_CONTRACT_2026-10-04.md)沿用 E17 的九指标定义、同 `(K,rep)` 输入配对、fresh T 材料、LAN/WAN TCP 校准、1 次预热+5 次正式与逐行 total 后统计规则。对象为 `protocol_iii_raw_score_mask_party` 的四轮 signed Q20.12 raw-score→原序 XOR mask 完整入口。n=128/256、K=2/8 已由 TEST_ONLY 独立 T/P0/P1 进程和真实 TCP loopback 在线通道通过 oracle、包长、分阶段通信、DCF PRG 计数核验；这些是容量/功能/计数冒烟，**不是** LAN/WAN 正式九指标。ready 离线计时、双方 secure 在线时间、正式材料有效载荷、资源峰值和网络原始批次仍 `NOT_MEASURED`。III+AAV86 另有扩展泄露许可但 secure 构造门仍 NO-GO，不能把两条进展或 Protocol I 数字并表。

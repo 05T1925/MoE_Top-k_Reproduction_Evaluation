@@ -6,6 +6,7 @@
 #include <moe_topk/protocol_iii_raw_score_mask_package.h>
 #include <moe_topk/topk_oracle.h>
 
+#include <FSS/dcf.h>
 #include <FSS/dpf.h>
 #include <FSS/prng.h>
 
@@ -23,6 +24,7 @@
 #include <vector>
 
 #include <poll.h>
+#include <netinet/in.h>
 #include <sys/random.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
@@ -215,7 +217,7 @@ std::uint32_t get_u32_at(const Bytes& b,std::size_t at) {
          (static_cast<std::uint32_t>(b[at+2])<<8U) | b[at+3];
 }
 Bytes encode_report(const ProtocolIIIRawScoreMaskOutput& out,
-                    const Bytes& offline) {
+                    const Bytes& offline,std::uint64_t dcf_online_prg_calls) {
   const auto score=get_u32_at(offline,46U);
   const auto grank=get_u32_at(offline,50U);
   const auto dpf=get_u32_at(offline,54U);
@@ -237,15 +239,16 @@ Bytes encode_report(const ProtocolIIIRawScoreMaskOutput& out,
                            out.metrics.grank.sent_bytes,
                            out.metrics.routing.sent_bytes,
                            static_cast<std::uint64_t>(score),
-                           static_cast<std::uint64_t>(grank),routing,metadata}) put(b,value);
+                           static_cast<std::uint64_t>(grank),routing,metadata,
+                           dcf_online_prg_calls}) put(b,value);
   return b;
 }
 struct Report {
   Bytes mask;
-  std::array<std::uint64_t,19> metrics{};
+  std::array<std::uint64_t,20> metrics{};
 };
 Report decode_report(const Bytes& b, std::uint32_t n) {
-  require(b.size() == n+19U*8U, "F1 report length");
+  require(b.size() == n+20U*8U, "F1 report length");
   Report r; r.mask.assign(b.begin(),b.begin()+n);
   std::size_t at=n;
   for (auto& v:r.metrics) v=get(b,at);
@@ -277,8 +280,10 @@ int party(std::uint8_t id,int offline_fd,int input_fd,int carry_fd,int sign_fd,
   const auto raw=decode_shares(receive_packet(input_fd),n);
   if (force_close) { ::close(carry_fd); throw std::runtime_error("injected early close"); }
   ProtocolIIIRawScoreMaskFds fds{{carry_fd,sign_fd},grank_fd,routing_fd};
+  resetDCFOnlinePrgCalls();
   const auto output=protocol_iii_raw_score_mask_party(c,material,raw,fds);
-  send_packet(report_fd,encode_report(output,bytes));
+  const auto dcf_online_prg_calls=readDCFOnlinePrgCalls();
+  send_packet(report_fd,encode_report(output,bytes,dcf_online_prg_calls));
   // TEST_ONLY lifetime barrier on the report socket. It conveys no protocol
   // value and is outside all online metrics; both parties have finished.
   std::uint8_t done=0; read_all(report_fd,&done,1U);
@@ -287,6 +292,29 @@ int party(std::uint8_t id,int offline_fd,int input_fd,int carry_fd,int sign_fd,
 }
 int pair_fds(std::array<int,2>& p) {
   return ::socketpair(AF_UNIX,SOCK_STREAM,0,p.data());
+}
+int pair_tcp_loopback(std::array<int,2>& p) {
+  const int listener=::socket(AF_INET,SOCK_STREAM,0);
+  if (listener<0) return -1;
+  sockaddr_in address{};
+  address.sin_family=AF_INET;
+  address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
+  address.sin_port=0;
+  if (::bind(listener,reinterpret_cast<sockaddr*>(&address),sizeof(address))!=0 ||
+      ::listen(listener,1)!=0) { ::close(listener); return -1; }
+  socklen_t length=sizeof(address);
+  if (::getsockname(listener,reinterpret_cast<sockaddr*>(&address),&length)!=0) {
+    ::close(listener); return -1;
+  }
+  p[0]=::socket(AF_INET,SOCK_STREAM,0);
+  if (p[0]<0 || ::connect(p[0],reinterpret_cast<sockaddr*>(&address),length)!=0) {
+    if (p[0]>=0) ::close(p[0]);
+    ::close(listener); return -1;
+  }
+  p[1]=::accept(listener,nullptr,nullptr);
+  ::close(listener);
+  if (p[1]<0) { ::close(p[0]); return -1; }
+  return 0;
 }
 void close_except(const std::vector<int>& keep) {
   for (int fd=3;fd<128;++fd)
@@ -312,14 +340,17 @@ void wait_success(pid_t pid,const char* role) {
   require(::waitpid(pid,&status,0)==pid,"F1 waitpid");
   require(WIFEXITED(status)&&WEXITSTATUS(status)==0,role);
 }
-void run_case(const TestCase& test,bool inject_early_close=false) {
+void run_case(const TestCase& test,bool inject_early_close=false,
+              bool tcp_online=false) {
   const auto n=static_cast<std::uint32_t>(test.scores.size());
   std::array<std::array<int,2>,2> offline{},input{},report{};
   std::array<std::array<int,2>,4> online{};
   for (auto& p:offline) require(pair_fds(p)==0,"F1 offline socket");
   for (auto& p:input) require(pair_fds(p)==0,"F1 input socket");
   for (auto& p:report) require(pair_fds(p)==0,"F1 report socket");
-  for (auto& p:online) require(pair_fds(p)==0,"F1 online socket");
+  for (auto& p:online)
+    require((tcp_online ? pair_tcp_loopback(p) : pair_fds(p))==0,
+            "F1 online socket");
   // Public bindings are sampled independently of the controller's private
   // deterministic input-sharing seed. A party cannot infer the peer share
   // by recovering that seed from session or material metadata.
@@ -386,11 +417,16 @@ void run_case(const TestCase& test,bool inject_early_close=false) {
           "F1 process wire accounting");
   require(a.metrics[10]==4U&&b.metrics[10]==4U,
           "F1 process causal round count");
+  const auto d=pad(n);
+  const auto pairs=static_cast<std::uint64_t>(n)*(n-1U)/2U;
+  const auto expected_prg=4U*static_cast<std::uint64_t>(d)*34U+
+                          2U*pairs*(33U+width(d-1U));
   for (const auto* r : {&a,&b}) {
     require(r->metrics[11]+r->metrics[12]+r->metrics[13]+r->metrics[14]==
                 r->metrics[1], "F1 stage wire sum");
     require(r->metrics[15]+r->metrics[16]+r->metrics[17]+r->metrics[18]==
                 r->metrics[0], "F1 stage offline sum");
+    require(r->metrics[19]==expected_prg,"F1 DCF online PRG coverage");
   }
   const std::uint8_t done=1U;
   write_all(report[0][0],&done,1U); write_all(report[1][0],&done,1U);
@@ -399,10 +435,12 @@ void run_case(const TestCase& test,bool inject_early_close=false) {
   const auto wire=a.metrics[1]+b.metrics[1];
   const auto offline_bytes=a.metrics[0]+b.metrics[0];
   std::cout<<"F1_PROCESS_PASS n="<<n<<" k="<<test.k
+           <<" online_transport="<<(tcp_online ? "TCP_LOOPBACK" : "UNIX_SOCKETPAIR")
            <<" rounds=4 logical_bits="<<a.metrics[3]
            <<" wire_bytes="<<wire<<" offline_bytes="<<offline_bytes
            <<" raw_dcf="<<(a.metrics[7]+b.metrics[7]+a.metrics[8]+b.metrics[8])
            <<" dpf_eval="<<(a.metrics[9]+b.metrics[9])
+           <<" dcf_prg="<<(a.metrics[19]+b.metrics[19])
            <<" stage_wire="<<(a.metrics[11]+b.metrics[11])<<","
            <<(a.metrics[12]+b.metrics[12])<<","
            <<(a.metrics[13]+b.metrics[13])<<","
@@ -432,10 +470,34 @@ int main(int argc,char** argv) {
                    parse_u(argv[11]),parse_u(argv[12]),parse_u(argv[13]),
                    parse_u(argv[14]),std::string(argv[1])=="--party-close");
     require(argc==1 || (argc==2 && (std::string(argv[1])=="--cost-smoke" ||
-                                  std::string(argv[1])=="--failure-smoke")),
+                                  std::string(argv[1])=="--failure-smoke" ||
+                                  std::string(argv[1])=="--e2-tcp-smoke" ||
+                                  std::string(argv[1])=="--e2-tcp-n128-smoke" ||
+                                  std::string(argv[1])=="--e2-tcp-n256-smoke" ||
+                                  std::string(argv[1])=="--e2-tcp-n128-k8-smoke" ||
+                                  std::string(argv[1])=="--e2-tcp-n256-k8-smoke")),
             "F1 command arguments");
     if (argc==2 && std::string(argv[1])=="--failure-smoke") {
       run_case({{7U,7U,7U},1U,201U},true);
+      return 0;
+    }
+    if (argc==2 && std::string(argv[1])=="--e2-tcp-smoke") {
+      run_case({{UINT32_C(0x80000000),0U,UINT32_C(0x7fffffff),
+                 UINT32_MAX,UINT32_MAX},2U,202U},false,true);
+      return 0;
+    }
+    if (argc==2 && (std::string(argv[1])=="--e2-tcp-n128-smoke" ||
+                    std::string(argv[1])=="--e2-tcp-n256-smoke" ||
+                    std::string(argv[1])=="--e2-tcp-n128-k8-smoke" ||
+                    std::string(argv[1])=="--e2-tcp-n256-k8-smoke")) {
+      const std::string mode(argv[1]);
+      const std::uint32_t n=mode.find("n128")!=std::string::npos ? 128U : 256U;
+      const std::uint32_t k=mode.find("k8")!=std::string::npos ? 8U : 2U;
+      std::vector<std::uint32_t> scores(n);
+      for (std::uint32_t i=0;i<n;++i)
+        scores[i]=(i%3U==0U) ? UINT32_C(0x80000000) :
+                  (i%3U==1U) ? UINT32_MAX : i*4096U;
+      run_case({std::move(scores),k,203U+n+k},false,true);
       return 0;
     }
     const bool cost=argc==2;

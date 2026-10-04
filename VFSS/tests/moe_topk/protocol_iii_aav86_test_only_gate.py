@@ -2,6 +2,8 @@
 
 import random
 import unittest
+from collections import Counter
+from itertools import product
 
 MASK32 = (1 << 32) - 1
 MASK64 = (1 << 64) - 1
@@ -150,6 +152,31 @@ class GateFixture(unittest.TestCase):
         prime = (1 << 127) - 1
         self.assertEqual((prime - 1 + 2) % prime, 1)
         self.assertNotEqual(((prime - 1) & 1) ^ (2 & 1), 1)
+
+    def test_inverse_peer_frame_conditional_uniformity_toy_ring(self):
+        # TEST_ONLY exhaustive two-handle, Z4 check of the E7 inverse
+        # algebra with a secret peer carrier share (as III DPF would supply).
+        # e0=-tau(a1)-h, h is fresh uniform, so conditioning on e0 leaves
+        # a1 uniform even if the peer carrier c1 is fixed.
+        ring = 4
+        tau = (1, 0)
+        gamma_peer = (0, 1)
+        fixed_e0 = (1, 3)
+        for peer_carrier in product(range(ring), repeat=2):
+            outcomes = Counter()
+            for peer_a in product(range(ring), repeat=2):
+                h = tuple((-peer_a[tau[i]] - fixed_e0[i]) % ring
+                          for i in range(2))
+                self.assertEqual(
+                    tuple((-peer_a[tau[i]] - h[i]) % ring for i in range(2)),
+                    fixed_e0)
+                peer_frame = tuple((peer_carrier[gamma_peer[i]] + peer_a[i]) % ring
+                                   for i in range(2))
+                own_output = tuple((peer_frame[tau[i]] + fixed_e0[i]) % ring
+                                   for i in range(2))
+                outcomes[own_output] += 1
+            self.assertEqual(len(outcomes), ring ** 2)
+            self.assertEqual(set(outcomes.values()), {1})
 
     def test_differential_boundaries_and_seeds(self):
         cases = [
