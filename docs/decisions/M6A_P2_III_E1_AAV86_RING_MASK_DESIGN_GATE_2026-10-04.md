@@ -1,5 +1,7 @@
 # M6A-P2-III-E1：隐藏 handle AAV86 与 ring mask 设计门
 
+**E2 勘误（2026-10-04）：** 本文对现有 score adapter 的“零值 dummy”源码判断错误，相关正式入口缺陷推论已撤回。实际 P0/P1 padding 份额是 `0x80000000/0`，重构为 `INT32_MIN`；正式 III GRank 只处理 `logical_n`。下文保留该历史反例，但它只描述**反事实零值接线**。实调证据和源码 blob 见 [E2 勘误](M6A_P2_III_E2_E1_PADDING_ERRATUM_2026-10-04.md)。本设计门其余联合视图/泄露问题须重新审查。
+
 日期：2026-10-04。状态：**NO-GO for secure runtime**；仅允许隔离的 `TEST_ONLY` 明文模型。`2r` 是项目候选核心目标，`AUTHOR_EXACT=NOT_PROVEN`。本门先于任何本任务 secure runtime 修改保存。E15 的正式被测源码是 `346a92326e81aa3ab573c162439968503e792354`，事后报告是 `40a1ccb450447c00ce604a08b058cbe5c0255e88`，本任务起点为独立接收检查点 `6a9ef8447cfd6b74c17f9a5645eedebcb8a6ea72`；三者不能合并成一个 revision。起点干净且 detached，`main=origin/main=merge-base(HEAD,main)=c3926c68fd14f270faa8b55234311071947fa080`，本任务分支 `codex/m6a-p2-iii-e1` 从指定检查点建立。E15 原始记录和主工作区差异不属于本分支。
 
 ## 证据身份和接口
@@ -8,7 +10,7 @@
 
 | 阶段 | 现有对象和实际合同 | E1 判断 |
 | --- | --- | --- |
-| score / stable key | `protocol_i_raw_score_input_party` 两轮；`(UINT32_MAX-(raw^0x80000000))<<index_bits | original_index`，小 key 高优先级 | 真正复用 carry/sign uCMP；须在本候选调用边界给 D 个槽构造 dummy `INT32_MIN` 加法份额并保留原下标，不可直接把现有 n→D 输出用于图。原 score adapter 默认补齐原始份额为 `0`。 |
+| score / stable key | `protocol_i_raw_score_input_party` 两轮；`(UINT32_MAX-(raw^0x80000000))<<index_bits | original_index`，小 key 高优先级 | 可复用 carry/sign uCMP 及现有 `INT32_MIN` dummy 份额；候选若比较 D 个隐藏 handle，须消费其 D 个 priority-key 输出并证明同一 shuffle 绑定。E1 原称默认零值 padding 已撤回。 |
 | 隐藏布局 | I+AAV86 两遍 share shuffle，有同一秘密 π 的前向/逆向材料；P0/P1 单方不持完整 π，T 当前生成时知道 π | 仅可最小适配，必须证明组合单方视图；不能复用 I 的公开全序 carrier 或把 I rank reveal 当 III 授权。 |
 | GRank / CA | M5 `protocol_iii_grank_party` 固定原序 n 全两两、一轮 masked key；I+AAV86 用 D handle、每轮 fresh 节点 mask、全两两预发边 key、在线只求值动态图边 | 复用 `protocol_i_cmpagg_eval_party`/uCMP 的比较约定和单边原语；不能直接调用固定图 GRank。须新建按 `(session,party,t,a,b,parameters,one-shot ID)` 绑定的图适配器。 |
 | rank→位 | F1 每**原槽**一个 rank mask 与输入宽 `ceil(log2 n)`、输出 `Z_(2^64)` 的 DPF key，`rank<K` 后逐方取低位 | 可复用 DPF 算法；必须为每个**隐藏 handle**（含 dummy）生成独立 key/mask，位宽改为 `ceil(log2 D)`，目标点和 mask 与同一 handle 绑定，不能复用原槽 key 向量。 |
@@ -17,9 +19,9 @@
 
 角色/材料：T 仅接收公开 `shape/session/fingerprint/material-id`，输入份额释放前完成所有材料分发并退出；P0/P1 各持 Q20.12 原始分数加法份额和自己的包、在线互通；测试控制器独占原始分数、输入份额种子和 oracle。保持可信、不合谋、无需擦除的 T 模型。固定 M 延期，不以在线 Dealer、补料、文件轮询或模拟 shuffle 替代。新候选的每轮 key 必须预发 `r·C(D,2)` 槽/方，实际 `e_A=Σ|E_t|` 次求值；节点 mask 为 `rD` 份额，另有 D 个 handle 的 rank mask/DPF key 及前向/逆向 shuffle 材料。未消费槽仍占离线材料，不计实际比较边。单个 package 的 session、party、轮次、端点、handle、宽度、K、一次性 ID/重放与截断失败合同尚未实现。
 
-## 功能代数：条件性成立，直接接线有反例
+## 功能代数：条件性成立；零值反例仅属反事实
 
-定义 `D=2^ceil(log2 n)`（至少 2）、严格 priority key，分数降序、原下标升序；dummy 为 `INT32_MIN` 且下标 `n..D-1`。即使真实分数为 `INT32_MIN`，dummy 也恒后于真实元素。**直接复用**现有 score adapter 的补齐结果不满足此条件：它把未给出的 raw score 份额置零。最小反例 `n=3,D=4,K=3,scores=[-1,-1,-1]`：dummy 的 score `0` 排第一，三个真实 key 只占 rank 1..3；`rank<K` 选两个真实槽，原序 mask 基数为 2。修复候选须在新调用边界显式提供 D 个输入份额，把每个 dummy 设为 `0x80000000`，且保持索引 `n..D-1`；冻结 F1/I 入口不改。该修复目前只有 TEST_ONLY 代数模型，没有 secure 证明。
+定义 `D=2^ceil(log2 n)`（至少 2）、严格 priority key，分数降序、原下标升序；现有 score adapter 已把 dummy 设为 `INT32_MIN`，下标为 `n..D-1`。即使真实分数为 `INT32_MIN`，dummy 也恒后于真实元素。E1 原文误称“直接复用会得到 score 0 dummy”；现撤回。保留反事实最小反例 `n=3,D=4,K=3,scores=[-1,-1,-1]`：**只有错误实现自行把 dummy 设为 0** 时，它才排第一并使原序 mask 基数为 2。它不是当前适配器或正式 III 入口的失败证据。E2 的真实适配器定向调用及正式入口 n=3/K=3 通过；隐藏 D-handle 组合仍需独立安全与消息审查。
 
 对递归节点 `B` 定义公开全局偏移 `o(B)`、严格 key 全序下的局部 rank。前 `r-1` 层公开每个参与 handle 的 local rank，故 pivot 以公开 local rank 排序，非 pivot 按其前面 pivot 的个数进入桶。若 pivot local rank 为 `p_j`，它的全局 rank 是 `o(B)+p_j`；第 `j` 桶的公开偏移是 `o(B)+p_j+1`（`j=0` 用 `o(B)`，空桶无子节点），大小由公开 membership 给出。归纳到叶：先前产生的 singleton 与 pivot 的 rank 已由公开偏移确定；末轮每个活跃节点 depth=1，`q=|B|-1`，图是该节点完整 clique，uCMP 聚合产生所有 handle 的**局部加法 rank 份额**。给一方加公开 `o(B)` 后得到全局份额。`B` 中至多 `D` 个位置，选 `b=ceil(log2 D)`，`0≤rank<D≤2^b`，所以真 rank 无模回绕；逐方在 `Z_(2^b)` 约减保持和。`D=2`、空桶、最后 pivot、同分及非二次幂 n 均由严格 key、递归偏移和 D padding 规则覆盖。此归纳只证明功能；它依赖早期 local-rank/bucket 的公开和最后 clique 的 share-only 输出，不能把 I 的公开末轮 `flatten` 重命名。
 
@@ -59,7 +61,7 @@ CA/DPF 核心在此特定候选 DAG 上的**条件性**交换数为 `r+(r-1)+1=2
 
 容量门：D≤8、1≤r≤5 候选每方全边预留至多 `5·C(8,2)=140` key 槽，另 `rD≤40` 节点 mask、D 个 rank mask/DPF key 和前/逆置换材料；这只是 checked shape，**包字节、峰值、时间均 NOT_MEASURED**。D=128,r=5 则每方 40,640 key 槽；III 新 key/逆向材料必须重新做 64 MiB 包与 768 MiB RSS 预检，不可借 E15 的 I 字节数。`e_t/v_t` 是实耗边/顶点；预留 `r·C(D,2)` 与实耗分列。固定 M 不接入。
 
-门项：功能代数 = **CONDITIONAL**（直接接线反例，显式 dummy 修复和最终份额偏移有模型）；离线材料 = **NO-GO**（联合视图与绑定未验证）；单方视图/泄露 = **NO-GO**（新增公开字段待许可及混合证明）；同一隐藏布局/逆映射 = **CONDITIONAL**（功能线性，联合隐私未证）；消息 DAG = **CONDITIONAL / ACTUAL NOT_PROVEN**；容量 = **SHAPE ONLY / ACTUAL NOT_MEASURED**。总门为 **NO-GO**，本任务不写伪 secure 入口。
+E1 原门项中的 padding 理由依 [E2 勘误](M6A_P2_III_E2_E1_PADDING_ERRATUM_2026-10-04.md)撤回。其余历史门项为：功能代数 **CONDITIONAL**（末轮份额偏移有 TEST_ONLY 模型）；离线材料 **NO-GO**（联合视图与绑定未验证）；单方视图/泄露 **NO-GO**（新增公开字段待许可及混合证明）；同一隐藏布局/逆映射 **CONDITIONAL**；消息 DAG **ACTUAL NOT_PROVEN**；容量 **SHAPE ONLY / ACTUAL NOT_MEASURED**。E2 将重新判门，不能把本历史门当成修正后的最终结论。
 
 下一研究步骤：先在独立隐私审查中固定新增字段许可或选择 oblivious 控制；给共享节点 mask + 全预发相关 key + adaptive use + DPF + 双向置换的单方 hybrid；在通过后冻结 per-party package 和帧，做 D≤8 conformance→冻结 oracle differential→独立 T/P0/P1 进程 E2E。覆盖 n=2/5/8，K=1/中间/n，全等/重复/signed 极值、非二次幂、不同 pivot seed、错误材料/重放/peer abort/截断；逐次记录输入和算法种子、每轮 e_t/v_t、分方帧及因果轮。九指标原始列：离线时间、离线材料 bit、在线时间、总时间、总通信 bit、每方通信 bit、因果轮、实际 DCF 长度倍增 PRG 调用、实际比较边；另列 DPF Eval、DCF Eval、AES、预留槽、阶段及分方计数。此门未实测者一律 `NOT_MEASURED`。
 

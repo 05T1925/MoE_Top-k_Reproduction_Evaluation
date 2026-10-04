@@ -1,5 +1,7 @@
 # M6A-P2-III-E1 执行报告：隐藏 handle AAV86→ring DPF→原序 mask
 
+**E2 勘误（2026-10-04）：** 本报告第 2 项把现有 score adapter 的 dummy 误判为零，关于正式 III 入口的 padding 缺陷推论已撤回。实际份额为 P0=`0x80000000`、P1=`0`；`n=3,K=3` 两个定向实调用例通过。原零值反例保留为反事实错误接线。见 [E2 勘误](../decisions/M6A_P2_III_E2_E1_PADDING_ERRATUM_2026-10-04.md)。
+
 日期：2026-10-04。执行结论：**DESIGN_GATE = NO-GO，secure runtime 未写，正式性能未运行**。设计与 TEST_ONLY 夹具的已提交源码检查点为 `8d6fc748263fe988b427912b647235916424d547`；本报告在其后单独提交，不把事后文档提交当成被测源码 revision。本任务不是对自己的 III secure 候选进行异会话独立签收。
 
 ## 基点、范围及未动对象
@@ -11,7 +13,7 @@
 ## 判定和原始证据
 
 1. **接口/代数。** F1 raw-score→原序 XOR mask 是正确的四轮工程基线；其 `Z_(2^64)` DPF 指示份额可逐方取低位，或先约减到较窄 2 幂环再取低位。M5 odd-prime field Fselect/Fsort 没有此同态，且不是本 bit-mask 入口的必需接口。候选不能直接调用固定原序 n 全两两 GRank；需要 D 个隐藏 handle 的图聚合、同 handle 的 rank-mask/DPF key，以及同一 π 的逆路由。
-2. **最小功能反例。** 现有 score adapter 将未给出的 padding raw shares 置零。`n=3,D=4,K=3,scores=[-1,-1,-1]` 时，若直接对 D 个输出运行隐藏图，dummy score `0` 高于全部真实元素；`rank<K` 后截原序只余 2 个选中位。正确候选须在新调用边界显式构造 D 个输入份额，使 dummy 为 `INT32_MIN` 且下标在真实元素之后。`n=2` 且 π 交换时，handle mask `[0,1]` 直接返回原槽亦错误，必须逆路由成 `[1,0]`。
+2. **已撤回的 padding 断言与仍有效的逆路由反例。** E1 错把 adapter 的 padding 份额读成零；现有实现其实已给 dummy `INT32_MIN` 和较大下标。`n=3,D=4,K=3,scores=[-1,-1,-1]` 只有在**反事实错误接线**自行使用 score `0` dummy 时才会只选中两个真实槽；不得指称正式入口失败。另 `n=2` 且 π 交换时，handle mask `[0,1]` 直接返回原槽仍错误，必须逆路由成 `[1,0]`。
 3. **条件性 rank 归纳。** 前 `r-1` 层在隐藏 handle 域公开 pivot local rank、bucket membership；由父偏移、pivot 局部 rank、桶边界可归纳公开子偏移。最后活跃节点的 pivot 数是 `m-1`，图是完整 clique，故每 handle 得到局部 rank 加法份额；加公开偏移为全局 rank 份额。先前 singleton/pivot 可按已公开 rank 加分享常数。严格 score+original_index key 和 `INT32_MIN` dummy 处理同分与非二次幂。rank 真值小于 D，`ceil(log2 D)` 位环无真值回绕。该推导不是安全证明，也不允许在末轮公开 rank。
 4. **安全/泄露阻塞。** F1 只打开均匀 masked rank；候选还公开早期 local rank、pivot、bucket、图、访问/流量。即使 π 隐藏，尚无证明这些量在任一 P0/P1 联合本地视图下可模拟；III 所有者对这些新增字段的许可为 `PENDING`。同一节点 mask 对全两两预发 DCF key 的关联、adaptive use、handle DPF/rank mask 与前/逆置换材料，亦没有一条覆盖全联合单方视图的 hybrid。I 的条件性论证及小规模测试不能替代此证明。T 仅看公开 shape/session、离线发材并在输入前退出，不能在线补料；可信、不合谋、无需擦除模型保持。
 5. **消息/容量。** 候选依赖链为 score carry→sign→前向 shuffle→每轮 masked key open→早期 local rank open/下一轮图→末轮 rank shares→masked rank open/DPF→逆路由。CA/DPF 的 `2r` 只是该候选帧图的条件性计数；实际全入口因果轮 `NOT_PROVEN`，不能冒充已执行的 `2r+4`。D≤8,r≤5 的解析上界为每方 140 个预发 edge key 与 40 个节点 mask，实际 `e_t/v_t` 和材料字节/峰值尚未测；D128,r5 为每方 40,640 key 槽，仍受独立 64 MiB 包与 768 MiB RSS 预检约束。固定 M 延期。

@@ -171,7 +171,9 @@ void run_f1_case(const TestCase& test) {
     selected += bit;
   }
   require(selected == test.k, "F1 selected count");
-  if (test.k==1U && test.scores[0]==test.scores.size()*4096U)
+  if ((test.k==1U && test.scores[0]==test.scores.size()*4096U) ||
+      test.session == UINT64_C(0xE20000) ||
+      test.session == UINT64_C(0xE20001))
     check_input_and_m3_output_reference(test,raw,oracle);
   for (const auto* output : {&output0, &output1}) {
     require(output->metrics.input_adapter_rounds == 2U &&
@@ -249,6 +251,18 @@ int main() {
           ++counter;
         }
       }
+    }
+    // E2 correction: these call the real score adapter (via the helper above)
+    // and the formal raw-score-to-mask entry. The padding score is INT32_MIN,
+    // including when a real item has the same minimum signed score.
+    for (const auto& test : {
+             TestCase{{UINT32_MAX, UINT32_MAX, UINT32_MAX}, 3U,
+                      UINT64_C(0xE20000), UINT64_C(0xE21000), UINT64_C(0xE22000)},
+             TestCase{{UINT32_C(0x80000000), UINT32_C(0x80000000),
+                       UINT32_C(0x80000000)}, 3U,
+                      UINT64_C(0xE20001), UINT64_C(0xE21001), UINT64_C(0xE22001)}}) {
+      run_f1_case(test);
+      ++counter;
     }
     std::cout << "M5-FIX-F1 raw-score-to-XOR-mask differential PASS cases="
               << counter << '\n';

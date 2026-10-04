@@ -16,10 +16,10 @@ def padded_size(n):
     return max(2, 1 << (n - 1).bit_length())
 
 
-def priority_keys(words, use_legacy_zero_dummy=False):
+def priority_keys(words, use_counterfactual_zero_dummy=False):
     n, d = len(words), padded_size(len(words))
     index_bits = (d - 1).bit_length()
-    padded = list(words) + [0 if use_legacy_zero_dummy else 0x80000000] * (d - n)
+    padded = list(words) + [0 if use_counterfactual_zero_dummy else 0x80000000] * (d - n)
     return [((MASK32 - ((word & MASK32) ^ 0x80000000)) << index_bits) | i
             for i, word in enumerate(padded)]
 
@@ -34,7 +34,7 @@ def ceil_root(m, depth):
     return next(t for t in range(1, m + 1) if t ** depth >= m)
 
 
-def model(words, k, rounds, seed, use_legacy_zero_dummy=False):
+def model(words, k, rounds, seed, use_counterfactual_zero_dummy=False):
     """Returns reconstruction, public graph trace, and ring rank shares.
 
     All sorting, comparisons, shares and inverse routing are in this TEST_ONLY
@@ -43,7 +43,7 @@ def model(words, k, rounds, seed, use_legacy_zero_dummy=False):
     n = len(words)
     d = padded_size(n)
     assert n >= 2 and 1 <= k <= n and 1 <= rounds <= 5
-    keys = priority_keys(words, use_legacy_zero_dummy)
+    keys = priority_keys(words, use_counterfactual_zero_dummy)
     rng = random.Random(seed)
     by_handle = list(range(d))
     rng.shuffle(by_handle)  # TEST_ONLY clear permutation
@@ -129,9 +129,10 @@ def model(words, k, rounds, seed, use_legacy_zero_dummy=False):
 
 
 class GateFixture(unittest.TestCase):
-    def test_legacy_zero_padding_is_a_real_counterexample(self):
+    def test_counterfactual_zero_padding_fails(self):
         words = [MASK32] * 3  # signed -1, -1, -1
-        got, _, _, _ = model(words, 3, 2, 7, use_legacy_zero_dummy=True)
+        # This deliberately bypasses the real adapter, which uses INT32_MIN.
+        got, _, _, _ = model(words, 3, 2, 7, use_counterfactual_zero_dummy=True)
         self.assertEqual(sum(got), 2)
         self.assertEqual(oracle(words, 3), [1, 1, 1])
 
