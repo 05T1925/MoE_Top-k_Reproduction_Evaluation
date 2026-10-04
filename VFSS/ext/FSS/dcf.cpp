@@ -4,9 +4,17 @@
 
 #include <array>
 #include <cstdint>
+#include <limits>
+#include <stdexcept>
 
 using namespace osuCrypto;
 // uint64_t aes_evals_count = 0;
+namespace {
+thread_local std::uint64_t dcf_online_prg_calls = 0;
+}
+
+void resetDCFOnlinePrgCalls() { dcf_online_prg_calls = 0; }
+std::uint64_t readDCFOnlinePrgCalls() { return dcf_online_prg_calls; }
 
 #define SERVER0 0
 #define SERVER1 1
@@ -83,6 +91,9 @@ block traverseOneDCF(int Bin, int Bout, int groupSize, int party,
 
     AES ak(ss);
     ak.ecbEncTwoBlocks(blocks + 2 * keep, ct);
+    if (dcf_online_prg_calls == std::numeric_limits<std::uint64_t>::max())
+        throw std::overflow_error("DCF online PRG counter overflow");
+    ++dcf_online_prg_calls;
 
     stcw = ((scw ^ ds[keep]) & mask) ^ ct[0];
     uint64_t sign = (party == SERVER1) ? -1 : 1;

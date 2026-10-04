@@ -1,0 +1,3 @@
+experiments/m6a_p2_i_allpairs/TEST_ONLY/e16_shaped_namespace.sh text eol=lf
+experiments/m6a_p2_i_allpairs/TEST_ONLY/e16_clique_shaped_namespace.sh text eol=lf
+experiments/m6a_p2_i_allpairs/TEST_ONLY/e17_bridge_namespace.sh text eol=lf

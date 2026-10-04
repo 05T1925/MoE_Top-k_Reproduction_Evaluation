@@ -262,6 +262,16 @@ raw-score 输入适配
 
 论文成本没有包含的工程生命周期开销单独解释。历史结果保留原起止边界。
 
+M6A E12 的 n=128 TEST_ONLY runner 在建立 P0/P1 TCP 连接后单列
+`transport_setup_ms`；`offline_time_ms` 从启动本次 P0/P1/T 进程之前，
+至 T 发材退出且双方材料接收 ready 屏障完成。T 的 generate、serialize、
+distribute 和 T 退出后的 receive barrier 保留各自实测值，不能把它们
+直接相加替代离线包围时间。`online_time_ms` 为双方各自 secure 入口
+耗时的较大值；测试输入分发、oracle 与报告收集不计入此时间。
+`total_time_ms = offline_time_ms + online_time_ms`，不包含另列的
+`transport_setup_ms`。E11 原始离线与 total 字段保留当时的较晚起点，
+不得与 E12 的同名字段合并统计。
+
 ### 5.3 在线时间
 
 正式主指标 `online_time_ms` 的目标边界为：
@@ -301,6 +311,14 @@ raw-score 输入适配
 - 索引、路由和共享转换材料。
 
 逻辑密钥大小、内存对象大小、序列化材料大小和传输封装大小分别说明，不能混用。
+
+M6A E14 的 Protocol I n=128 同路线对照采用统一的“离线 ready 屏障时两方
+在线入口实际留存并读取的有效载荷”口径：逐个实际 DCF key 的 `k/g/v` 编码、
+掩码 share、置换/路由和 shuffle 预处理向量按固定宽度求和，不用 C++ RSS 或
+容器 capacity；公开标签、封装头和离线已销毁的 EMP OT 中间块不计入主字段。
+T package 的序列化/分发字节、party 本地 shuffle 有效载荷和离线 OT 通信
+分别报告。E12 旧行把 AAV86 package 长度用作材料量，保留历史口径，不能
+与 E14 的同名新字段合并统计；E14 用独立实现标签、revision 与原始目录。
 
 离线传输封装可另设诊断计数；不得把在线补发材料隐藏到“离线材料”字段。
 
@@ -388,6 +406,13 @@ total_time_ms = offline_time_ms + online_time_ms
 AES 调用、DCF.Eval、DPF.Eval 和 PRG 调用不是同一单位。可以并列记录，但不能未经定义直接等同。
 
 由理论密钥深度或公式推算的 PRG 数只放在理论字段，不能填入实测字段。
+
+M6A E14 的两个 Protocol I 完整入口仅在传统 DCF 在线 `traverseOneDCF`
+执行 seed→双子 seed 的长度倍增处计一次，分别按 party/score/CA 或 cmpagg
+读取 thread-local 实际计数。已预处理的 Permute+Share 在线操作不执行
+OPV/EMP OT；AAV86 公开 pivot 的流式随机数与其他 AES 细分另列，不冒充
+长度倍增调用。该覆盖结论只适用于 E14 审过的两个入口，不能转用于
+Protocol III 或未来新增在线原语。
 
 并行计数不得丢失更新或重复汇总。计数器需要用可人工核对的小实例验证。
 
@@ -700,3 +725,21 @@ V3、V4 报告额外包含：
 - 未解释的关键通信或协议差异不能被数量级结论覆盖。
 - 后续改动使既有结果失效时，只重跑受影响范围并保留版本关系。
 - M7 汇总已经验收的证据，不通过写最终报告追认未完成工作。
+
+### M6A E15 Protocol I 时间边界修正
+
+E14 的材料主字段仍按 ready 时在线实际留存有效载荷定义，但 E14 `offline_time_ms` 包含 ready 前的整池诊断和逐 DCF key 重序列化，不可标为纯协议预处理时间。E15 正式 party 只做与材料结构相符的 checked 恒定形状字节计算及固定数量 OT 计数读取；逐字段、逐 key 的诊断在隔离测试中与公式比对，不进入 1+5 正式计时。E15 离线时钟仍从启动角色前到 T 成功退出和双方 ready，在线时钟仍取双方 secure 入口较大耗时；每次 total 先相加再统计。E14 时间和新时间不得拼接或扣减估算。详见 [E15 合同](decisions/M6A_P2_I_E15_PROTOCOL_I_TIMING_CONTRACT_2026-10-03.md)。
+
+E15 内部计时门修正：首批 `fdcdbe5` 在 ready 前执行恒定公式，仍不满足本阶段“纯协议预处理”严格边界；保存原始数据但不作最终时间结论。修正版将有效载荷/OT 计数后处理安排在 secure 在线时钟停止后，新源码、新标签和新原始目录全矩阵重测，遵守同一 1+5 统计与独立索引。
+
+修正版 `346a923` 的 120/100 行已按此边界完成，审计为 PASS；`corrected/e15_raw_complete_index.sha256` 核对 151/151，统一 CSV 含九指标各 20 组 median/min/max，仓库外副本逐文件一致。此次 n=128、K=2/8、r=2..5、LAN/WAN 数据和限制见 [E15 重测报告](reviews/M6A_P2_I_E15_PROTOCOL_I_UNIFIED_REMEASUREMENT_2026-10-03.md)。E14 与 E15 首批时间仍不得用于正式路线胜负；n≥256 及 III+AAV86 的未测指标保持 `NOT_MEASURED`。
+
+### M6A E16 Protocol I 的 n=256 分档覆盖
+
+E16 从已独立接收的 E15 提交建立隔离分支。32 形状先复算 D、每方全两两槽、包长与 Dealer 预算，再核对旧/新预检真实首个拒绝理由；D256 的单方包限 192 MiB、Dealer 预算限 2 GiB、运行进程精确 3 GiB `RLIMIT_AS`，另设 3×预算可用内存、8 GiB 磁盘与单次 120 s 限额。初版 2 GiB 在 r=5 conformance 实际 `std::bad_alloc`，其部分批次单独存档；最终被测 `7515aac` 在 3 GiB 有界门下重新完成 r=2–5 的三层验证与整批计时。材料固定布局未变，沿用 E15 已诊断布局的公式推导标注，不将包字节或材料预算写成实测峰值。
+
+最终 n=256、K=2/8、r=2–5 AAV86 与 r 无关的 EMP-ON 全对全 Protocol I，均使用同 revision、相同输入计划、E15 计时边界和同主机 TCP 模拟 LAN/WAN 校准。AAV86 96 次、基线 24 次；20 组各 1 预热+5 正式，100 次正式均正确。九指标各组 median/min/max、阶段计时、每轮活跃边/节点、峰值与原始日志见 [E16 报告](reviews/M6A_P2_I_E16_D256_PAIRED_PERFORMANCE_2026-10-04.md)。n=128 只引用 E15 独立批次，不组成同 revision 跨规模曲线；n≥1000 在 keygen 前拒绝，仅能作容量结论。Protocol III+AAV86 仍无运行时或性能结论。
+
+E17 异会话独立接收核对 E16 376/376 原始哈希、120/120 日志、100/100 正式正确性标记、20 组九指标全部 540 个统计值，并独立复跑一个 n256 三层验证档位。E17 又在仓库外单独目录，用 E16 `7515aac` 的原二进制和冻结计时合同完成 n=128、K=2/8、r=2–5 的 AAV86/EMP-ON 全对全 LAN/WAN 配对桥接：120 次含 20 预热，100 正式，20 组九指标 min/median/max 另 540 项核验。该桥接允许 **E16 同 revision** 的 n128/n256 分栏比较；E15 `346a923` 的 n128 与 E16 不混算。E17 报告、原始目录和限制见 [独立接收](reviews/M6A_P2_I_E17_INDEPENDENT_RECEIVER_2026-10-04.md)。n≥1000 仅 `PRECHECK_REJECTED`/`NOT_MEASURED`，同主机模拟网络不能代表异机 LAN/WAN，Protocol III+AAV86 和 M6A/V3 总验收仍未完成。
+
+E18 交付沿用 E15 计时合同和 E16/E17 被测原始数据，未增加正式重复次数或新网络样本。复验索引/副本及自建目标的有界功能、材料和故障回归仅支持审查交付，不改变上述统计结论；九指标的实测、固定布局推导、准入预算与未测字段见 [E18 对比数据说明](reproduction/M6A_P2_I_E18_BOUNDED_DATA_CLOSEOUT_2026-10-04.md)。

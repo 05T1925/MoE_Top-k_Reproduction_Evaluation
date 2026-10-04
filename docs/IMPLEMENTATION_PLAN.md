@@ -296,6 +296,8 @@ M6A、M6B 各自执行：
 
 M6A 完成两种路线的性能验收后，再进入 M6B 依赖实现及正式实验。
 
+2026-09-27 的设计审查顺序先处理 Protocol I+AAV86 的算法、adaptive exact-edge 预处理、参与方视图/泄露、因果消息和原顺序 mask，再单独审查 Protocol III+AAV86；此时 Protocol III 设计为 `DEFERRED BY USER DECISION`。该历史顺序不批准 secure runtime。后续 E6–E17 采用有条件的全两两预发项目路线，其有界实现和接收结论见下文；Protocol III 仍受独立设计门约束。
+
 资料核对、明文算法 oracle 和不依赖未冻结接口的设计可以提前开展。
 
 ### 3.5 性能状态与失败配置
@@ -656,13 +658,12 @@ G2 通过后，为 M6A 提供：
 
 #### 设计阶段
 
-1. 固定 AAV86 算法及 CA 转换来源。
-2. 明确图生成、pivot、bucket、局部 rank 和稳定同分语义。
-3. 定义输入种子与算法随机种子。
-4. 写明每轮公开值、图生成时机、材料和 Dealer 行为。
-5. 解决输入无关、Dealer 在线静默的自适应 exact-edge 预处理。
-6. 分别给出 Protocol I、Protocol III 组合协议与输出路径。
-7. 审计 Protocol III 组合的代数条件和泄露，不能直接套用 shuffle-based compiler 的证明。
+按 2026-09-27 的设计顺序记录；后续有界实现的状态由下文 E6–E17 记录更新：
+
+1. **先审 Protocol I+AAV86。** 固定 AAV86 完整排序算法及 CA 转换来源；明确 pivot、bucket、local-rank 和稳定同分语义；定义输入种子与算法随机种子。
+2. 写明 Protocol I 每轮公开值、图生成时机、可信离线 T 的完整视图、party-specific 材料、edge/mask/round/session binding、one-shot 消费、rank reveal、mask 逆映射和因果消息。
+3. 对输入无关、T 在线静默的 adaptive exact-edge 预处理和 Protocol I leakage/party-view 论证作独立设计与可行性评审。此时 exact-edge 路线未得到 secure runtime GO；后来采用的全两两预发方案及其条件性结论单独标记，不能称为 exact-edge 实现。
+4. **再单独审查 Protocol III+AAV86。** Protocol III 的图、公开值、代数条件、预处理时序、泄露与输出适配须独立论证，不继承 Protocol I 的安全或轮数结论；其 `2r` 仍只是组合目标。
 
 Protocol I+AAV86 对应构造的核心目标为 `2r+1`。Protocol III+AAV86 的 `2r` 是团队组合目标，必须独立推导与验证。
 
@@ -677,7 +678,29 @@ Protocol III + AAV86
 
 每种方案具有独立标签、入口和计量记录。共享算法部分只保留一份明确契约，不复制另一套 score 或 oracle。
 
-不得使用在线 Dealer 原型、完整图预留或明文图测试冒充目标协议。不同模型的对照必须单独标记并完整计量。
+Protocol I+AAV86 的 E3–E7 项目路线采用可信 T 在在线前按固定 D 的每轮全部无序端点对预发材料，在线仅消费活跃边。完整池预留须与实际活跃边分别计量，不得写作离线材料稀疏；固定 M 仍是延期备选。不得使用在线 Dealer 原型或明文图测试冒充目标协议。不同模型的对照必须单独标记并完整计量。
+
+2026-10-03 E7 隔离小规模门：在 `D≤8`、`1≤r≤5` 下，Protocol I+AAV86 的独立入口按两轮 score、`2r+1` 轮 CA 核心、一轮同 π 逆路由组织，raw-score 至原序 XOR mask 共 `2r+4` 因果轮；仅以该入口的实际消息 trace 和小规模验证为依据。其条件性安全归约、持久材料领取、测试结果及未覆盖项见 [E7 设计门](reviews/M6A_P2_I_E7_REVIEW_AND_SMALL_D_RUNTIME_GATE_2026-10-03.md) 与 [E7 小规模验证](reviews/M6A_P2_I_E7_SMALL_D_RUNTIME_VALIDATION_2026-10-03.md)。Protocol III、大规模性能和另一方签收仍待完成，M6A 整体状态不变。
+
+2026-10-03 E8 技术复核修正了 package 合同：反序列化仅验证外层结构标签、规格和长度，不验证同规格 DCF key blob 与声明边/mask 的数学关系；该关系依赖可信 T 与完整交付通道，并由隔离的双份 dealer 一致性测试抽查。当前聊天承接 E6/E7，**不具备异会话独立签收资格**；因此按 E8 用户门禁暂不放宽 `D≤8`，中等 D 的全池容量预检、试运行和性能准备须待真正独立接收后开展。见 [E8 接收复核](reviews/M6A_P2_I_E8_RECEIVER_REVIEW_2026-10-03.md) 与 [E8 修正及门禁结果](reviews/M6A_P2_I_E8_TECHNICAL_FIX_AND_GATE_RESULT_2026-10-03.md)。
+
+2026-10-03 异会话复核已针对 E8 精确源码哈希完成独立干净构建和相关测试 `8/8 PASS`；[接收报告](reviews/M6A_P2_I_E8_CROSS_CHAT_RECEIVER_ACCEPTANCE_2026-10-03.md)将小 D 技术接收记为 `PASS_WITH_EXPLICIT_LIMITS`。E8 原有程序性 FAIL 保留为历史，不再阻止下一执行阶段先实现 keygen 前容量与资源预检、再有界扩展 D16→32→64；每次源码改变须重新验证，D128 仍需真实资源门，正式性能和 M6A 总验收未完成。条件性安全假设及允许的公开信息口径不变。
+
+2026-10-03 E9 已按精确序列化公式在全池 reserve/keygen 前加入 checked capacity 与生成内存预算预检；`D=16/32/64` 的 conformance、冻结 oracle differential、T/P0/P1 独立进程 E2E 各 6/6 PASS，相关旧路径回归 25/25 PASS。D128 的 r5 解析生成预算 388.61 MiB 超过本阶段 256 MiB 准入上限，未生成该档材料，状态 `PRECHECK_LIMITED`。逐配置实际材料、活跃边、通信、离线分段时间与 T/P0/P1 峰值见 [E9 报告](reviews/M6A_P2_I_E9_CAPACITY_AND_BOUNDED_SCALE_2026-10-03.md)；这些是 Debug 工程试运行，E9 改动尚待下一次异会话源码接收，不能视为正式性能矩阵或作者精确复现。
+
+2026-10-03 [E9 异会话接收](reviews/M6A_P2_I_E9_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)在精确源码哈希上独立复算 18/18 行原始计数，新构建逐档复跑 9/9 调用及相关 CTest 25/25 PASS，结论 `PASS_WITH_FINDINGS`，仅覆盖 D16/32/64 功能及该环境下的工程预检。口径修正：D128 在当前 API 中首先由 `D≤64` 硬上限拒绝；388.61 MiB 是解析预算，不是 D128 的实际预检返回值。后续先补计量与冻结 revision，资源受控地评估 D128；正式 V3 和 M6A 总验收仍未完成。
+
+2026-10-03 E10 在隔离分支建立 E9 本地检查点 `142db65776b6f7334dac02845109308a887d3995`，为该独立入口的传统 DCF 长度倍增 PRG、每轮活跃节点 `v_A`、分阶段通信和时间边界增加可核验计量。公开形状计算与 runtime 准入分离；在 768 MiB `RLIMIT_AS` 和资源预检下，D16/32/64/128 的 conformance、冻结 oracle differential、独立进程 E2E 均逐档各 6/6 PASS，D128 最大实际运行 r=5。n=128 的 r=3/4 只完成容量计算；n=256、r=2 时每方包已达 69,999,474 B，超过 64 MiB，未生成材料。详见 [E10 报告](reviews/M6A_P2_I_E10_FREEZE_METRICS_AND_D128_GATE_2026-10-03.md)。这些是本机 Debug/少量 Release 工程试运行；E10 新源码尚待下一次异会话接收，正式 LAN/WAN V3 矩阵、Protocol III 和作者精确复现仍未完成。
+
+2026-10-03 [E10 异会话接收](reviews/M6A_P2_I_E10_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)为 `PASS_WITH_FINDINGS`。E11 从干净 `ac8af47a` checkout 建 TCP 测试通道与可校准的同主机 LAN/WAN network namespace，正式被测 HEAD 为 `103b76d863e68c2c318998db01073591e6a8fce8`。n=128、K=2/8、r=2..5 的两网络子矩阵各配置 1 次预热+5 次正式运行，80/80 正式正确；所有材料逐次新生、原始计数和五次统计见 [E11 报告](reviews/M6A_P2_I_E11_TCP_LAN_WAN_N128_SUBMATRIX_2026-10-03.md)。n≥256 当前 preflight 先由 D>128 硬门拒绝，且 n256/r2 的单方包本身超过 64 MiB；同路线全对全基线缺少同构 TCP/计量入口，本次无数值对照。E11 新源码与测量仍待下一次异会话接收，不能据此宣称完整 V3、Protocol III+AAV86 或作者精确复现。
+
+2026-10-03 [E11 异会话接收](reviews/M6A_P2_I_E11_CROSS_CHAT_RECEIVER_AUDIT_2026-10-03.md)为 `PASS_WITH_METRIC_FINDINGS`：E11 离线计时晚于 T fork，阶段接收字节由对方发送回填，旧 `core_time_ns` 包含本地 carrier 构造。E12 对同一全两两入口单列 TCP 建连时间，将离线起点前移至全部角色启动前；阶段接收量取本方 message trace；组合阶段再分 CA 与 carrier 时间。E11 原始行保持原口径，不直接合并或替换；E12 的新被测提交、重测与全对全基线状态由 E12 报告单独登记。条件性安全假设和 `AUTHOR_EXACT=NOT_PROVEN` 不变。
+
+2026-10-03 [E13 技术复核](reviews/M6A_P2_I_E13_E12_RECEIVER_TECHNICAL_AUDIT_AND_PROTOCOL_III_HANDOFF_2026-10-03.md)对 E12 被测提交 `8ad0725c73716ac37c96d417136958f932233d61` 的 151 项原始索引、120 条 accepted 行、20 组五次统计、源码和日志独立重算为 `PASS_WITH_FINDINGS`：n128 有界正确性、同主机模拟 LAN/WAN 的完整时间/在线通信可按明确口径引用；全对全完整 EMP OT 材料和 PRG 仍 `NOT_MEASURED`，n≥256 仅有容量/预检拒绝。E12 基线 input seed 虽未直接传 T，却可由公开测试日程与其 serial 互推；AAV86 TEST_ONLY 份额也可由 serial 重现，测试夹具不构成输入隐私证明。本 E13 聊天包含 E12 工作上下文，**不具备未参与 E12 的异会话签收资格**；程序性接收仍须另一独立聊天完成。Protocol III+AAV86 的代数、泄露、材料时序、原序路由及消息 DAG 尚待独立设计。
+
+2026-10-03 [E12 异会话数据接收](reviews/M6A_P2_I_E12_CROSS_CHAT_DATA_ACCEPTANCE_2026-10-03.md)由未参与 E12 编写与运行的接收聊天完成：151/151 原始哈希、120/120 accepted 行、20/20 组统计与同组输入配对复核为 `PASS_WITH_FINDINGS`，冻结 `8ad0725` 下 Protocol I+AAV86 的 n128 有界性能数据。E13 原聊天的程序性 FAIL 保留为历史。此接收不填补基线完整 EMP OT 材料、同定义 PRG、n≥256 性能或 Protocol III+AAV86；M6A/V3 仍未完成。
+
+2026-10-03 E14 在 E13 文档检查点 `2b48ef6` 后，以 `b0e474c` 为新正式运行 HEAD，将两条 Protocol I 完整入口的在线持有材料有效载荷和传统 DCF 长度倍增 PRG 纳入同定义计量；全对全 party 本地 EMP OT/shuffle 留存状态与离线 OT 通信分栏，不再用 T package 字节代替全部材料。TEST_ONLY 输入计划独立于 T 可见 serial，AAV86 加法份额由 OS 熵生成。新目录的 n128、K=2/8、r=2..5 AAV86 与 EMP-ON 全对全，在同主机模拟 LAN/WAN 下各配置 1 次预热+5 次正式运行，100/100 正式正确，原始行/校准/源码身份与统一列定义见 [E14 报告](reviews/M6A_P2_I_E14_PROTOCOL_I_UNIFIED_PERFORMANCE_CLOSEOUT_2026-10-03.md)。旧 E12 和初版 E14 批次均保持独立，不能混合统计。n≥256 的 24 点仍仅有 checked 容量与实际 `D>128` preflight 拒绝，Protocol III+AAV86 未实现；E14 新数据仍须下一异会话接收，M6A/V3 总验收未完成，`AUTHOR_EXACT=NOT_PROVEN`。
 
 #### 正确性与安全验收
 
@@ -1126,3 +1149,15 @@ M3 在 `main@bb0d0e8` 完成整改，保留三轮 priority-key 和五轮 raw-sco
 历史计时包括已披露的 Dealer 生命周期、输入分发和 report 收集边界；网络 bandwidth/RTT 及完整在线 PRG 计数仍按原记录保留未测状态。
 
 后续正式实验新增分阶段计量，不静默替换历史数字或证据来源。
+
+2026-10-03 E15 异会话修正前接收发现：E14 两条 TEST_ONLY party 入口在 ready 前逐 key 调用 `serialize()` 计材料，整池诊断 CPU/分配计入 `offline_time_ms`，并可能间接影响紧随其后的 online cache。E14 原始完整性、功能和非时间计数保持有界有效；E14 offline/online/total 及总时间胜负撤回待新批次。E15 先冻结计时合同，再改 TEST_ONLY 恒定材料形状计数，隔离诊断逐字段校对；同 n=128/K/r LAN/WAN 完整矩阵以新标签和目录重测。Protocol III+AAV86 仅设计审查，`2r` 是未证明项目目标，不改 III secure runtime。见 [E14 修正前接收](reviews/M6A_P2_I_E15_E14_PRE_FIX_INDEPENDENT_ACCEPTANCE_2026-10-03.md)、[E15 计时合同](decisions/M6A_P2_I_E15_PROTOCOL_I_TIMING_CONTRACT_2026-10-03.md)与[III+AAV86 设计门](decisions/M6A_P2_I_E15_PROTOCOL_III_AAV86_DESIGN_GATE_2026-10-03.md)。
+
+E15 计时合同进一步收紧：`fdcdbe5` 首批 120 行虽去掉整池序列化，party 仍在 ready 前执行固定形状计数；该批冻结为作废计时候选。正式修正版把材料长度/离线 OT 字节读取全部移到双方 secure 在线计时结束之后，重新冻结源码与标签并完整重测。不能把两批拼接。
+
+E15 修正版 `346a923` 已完成独立 120 次/100 正式 Protocol I 两路线重测，20 个五次组和 24 个输入配对组审计通过；原始目录 `TEST_ONLY_E15_RAW/corrected/` 有完整哈希索引与仓库外副本。LAN/WAN 的 r=2 时间胜负依 K/网络条件而异，r=3..5 的总时间中位在此次环境高于全对全基线；这是当前 TEST_ONLY 样本观察。n≥256 仍为预检拒绝、性能 `NOT_MEASURED`。参见 [E15 统一重测](reviews/M6A_P2_I_E15_PROTOCOL_I_UNIFIED_REMEASUREMENT_2026-10-03.md)。Protocol III+AAV86 保持设计门 NO-GO，不进入 secure 实现或性能宣称。
+
+2026-10-04 E16 从已独立接收的 E15 `6a9ef84` 开隔离工作树，以逐配置资源门将 Protocol I+AAV86 的 D256 完整路径扩至 n=256、K=2/8、r=2..5。初版 2 GiB 地址空间门在 r=5 conformance 两次 `std::bad_alloc`，保留失败和旧计时批次；在本机可用内存、包格式、磁盘、Dealer 预算与 120 s 单次上限复核后，只把 D256 进程地址空间门改为精确 3 GiB。最终被测 `7515aac` 的四档 conformance、冻结 oracle differential、独立 T/P0/P1 E2E 全过；同 revision 重新运行 Protocol I+AAV86 与 EMP-ON 全对全配对矩阵，120/120 次运行、100/100 正式正确，20 组五次统计与 32 配置状态审计通过。n=256 八形状支持两路线九指标的本机同口径结论；n≥1000 十六形状在 keygen 前由 D>256 首门拒绝，仅支持容量结论；n=128 八形状未做 E16 桥接，不得与 E15 拼成同 revision 跨规模趋势。见 [E16 报告](reviews/M6A_P2_I_E16_D256_PAIRED_PERFORMANCE_2026-10-04.md)及[资源决策](decisions/M6A_P2_I_E16_STAGED_RESOURCE_GATE_2026-10-03.md)。E16 尚待另一会话独立接收；Protocol III+AAV86 和 M6A 总验收仍未完成，`AUTHOR_EXACT=NOT_PROVEN`。
+
+2026-10-04 [E17 异会话独立接收](reviews/M6A_P2_I_E17_INDEPENDENT_RECEIVER_2026-10-04.md)将 E16 n=256 同规模数据包判为 `PASS_WITH_EXPLICIT_LIMITS`：独立复核原始 376 项 SHA、120 条运行/日志、100 正式正确性标记、32 形状及 540 项九指标统计，并在独立 worktree 顺序复跑 n256/r2 的 conformance、冻结 oracle differential、T/P0/P1 E2E。另用 E16 原二进制、同计时合同、独立 E17 目录完成 n=128 两路线配对 LAN/WAN 1+5 桥接（120/100，20 组九指标），可以同 E16 revision 分栏观察 n128/n256；E15 n128 仍以其独立被测 revision 接收，不与 E16 混成一批。n≥1000 保持真实 `D>256` 首门 `PRECHECK_REJECTED`，keygen/耗时/峰值 `NOT_MEASURED`。关闭范围仅为全两两预发方案的有界 Protocol I+AAV86 项目实现及性能数据包，安全结论依条件性假设，`AUTHOR_EXACT=NOT_PROVEN`；Protocol III+AAV86 与 M6A/V3 总验收未完成。
+
+2026-10-04 E18 将上述已独立接收的有界实现与数据包整理为待审合入候选，补入 P0/P1/P2 历史来源文档并保留 exact-edge 与后续全两两预发方案的区别。E18 自建 Release/EMP-ON 目标、复核三份原始索引及仓库外副本，并对 n256/r2、r5 顺序复跑三层验证；协议源码和 E15 计时合同未改变，冻结 LAN/WAN 全矩阵不重测。数据与六方案状态见 [E18 关闭说明](reproduction/M6A_P2_I_E18_BOUNDED_DATA_CLOSEOUT_2026-10-04.md)，交付命令和风险见 [E18 审查报告](reviews/M6A_P2_I_E18_DELIVERY_AND_MERGE_CANDIDATE_2026-10-04.md)。
