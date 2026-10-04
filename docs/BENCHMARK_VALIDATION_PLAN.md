@@ -733,3 +733,9 @@ E14 的材料主字段仍按 ready 时在线实际留存有效载荷定义，但
 E15 内部计时门修正：首批 `fdcdbe5` 在 ready 前执行恒定公式，仍不满足本阶段“纯协议预处理”严格边界；保存原始数据但不作最终时间结论。修正版将有效载荷/OT 计数后处理安排在 secure 在线时钟停止后，新源码、新标签和新原始目录全矩阵重测，遵守同一 1+5 统计与独立索引。
 
 修正版 `346a923` 的 120/100 行已按此边界完成，审计为 PASS；`corrected/e15_raw_complete_index.sha256` 核对 151/151，统一 CSV 含九指标各 20 组 median/min/max，仓库外副本逐文件一致。此次 n=128、K=2/8、r=2..5、LAN/WAN 数据和限制见 [E15 重测报告](reviews/M6A_P2_I_E15_PROTOCOL_I_UNIFIED_REMEASUREMENT_2026-10-03.md)。E14 与 E15 首批时间仍不得用于正式路线胜负；n≥256 及 III+AAV86 的未测指标保持 `NOT_MEASURED`。
+
+### M6A E16 Protocol I 的 n=256 分档覆盖
+
+E16 从已独立接收的 E15 提交建立隔离分支。32 形状先复算 D、每方全两两槽、包长与 Dealer 预算，再核对旧/新预检真实首个拒绝理由；D256 的单方包限 192 MiB、Dealer 预算限 2 GiB、运行进程精确 3 GiB `RLIMIT_AS`，另设 3×预算可用内存、8 GiB 磁盘与单次 120 s 限额。初版 2 GiB 在 r=5 conformance 实际 `std::bad_alloc`，其部分批次单独存档；最终被测 `7515aac` 在 3 GiB 有界门下重新完成 r=2–5 的三层验证与整批计时。材料固定布局未变，沿用 E15 已诊断布局的公式推导标注，不将包字节或材料预算写成实测峰值。
+
+最终 n=256、K=2/8、r=2–5 AAV86 与 r 无关的 EMP-ON 全对全 Protocol I，均使用同 revision、相同输入计划、E15 计时边界和同主机 TCP 模拟 LAN/WAN 校准。AAV86 96 次、基线 24 次；20 组各 1 预热+5 正式，100 次正式均正确。九指标各组 median/min/max、阶段计时、每轮活跃边/节点、峰值与原始日志见 [E16 报告](reviews/M6A_P2_I_E16_D256_PAIRED_PERFORMANCE_2026-10-04.md)。n=128 只引用 E15 独立批次，不组成同 revision 跨规模曲线；n≥1000 在 keygen 前拒绝，仅能作容量结论。Protocol III+AAV86 仍无运行时或性能结论。

@@ -20,6 +20,45 @@ def rows(path):
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
 
 
+def raw_fields(line):
+    return dict(part.split("=", 1) for part in line.split()[1:])
+
+
+def check_raw_log(row, route):
+    lines = Path(row["raw_log"]).read_text(encoding="utf-8").splitlines()
+    marker = "E12_AAV86_CASE " if route == "aav86" else "E12_BASELINE_CASE "
+    cases = [raw_fields(line) for line in lines if line.startswith(marker)]
+    assert len(cases) == 1
+    case = cases[0]
+    for field, value in (("n", row["n"]), ("k", row["K"]),
+                         ("d", row["D"]), ("rounds", row["online_rounds"])):
+        assert int(case[field]) == value, (row["run_id"], field)
+    for party in ("p0", "p1"):
+        assert int(case[f"package_bytes_{party}" if route == "aav86"
+                        else f"{party}_package_bytes"]) == row[f"package_bytes_{party}"]
+        assert int(case[f"{party}_bytes" if route == "aav86"
+                        else f"{party}_sent_bytes"]) == row[f"{party}_sent_bytes"]
+    if route == "aav86":
+        meta = [raw_fields(line) for line in lines if line.startswith("E12_BENCH_META ")]
+        assert len(meta) == 1
+        assert int(case["r"]) == row["r"]
+        assert int(case["reserved"]) == row["reserved_slots_per_party"]
+        assert int(case["active"]) == row["comparison_edges_total"]
+        assert int(case["serial"]) == int(row["command"][-1])
+        assert int(meta[0]["serial"]) == int(row["command"][-1])
+        assert int(meta[0]["input_seed"]) == row["input_seed"]
+        assert int(meta[0]["input_digest"]) == row["input_digest"]
+        d, r = row["D"], row["r"]
+        bits = 33 + (d.bit_length() - 1)
+        package = 114 + d * (1844 + 8 * r) + r * (d * (d - 1) // 2) * (81 + 24 * bits)
+        assert row["package_bytes_p0"] == row["package_bytes_p1"] == package
+    else:
+        assert int(case["input_seed"]) == row["input_seed"]
+        assert int(case["input_digest"]) == row["input_digest"]
+        assert int(row["command"][-2]) == row["input_seed"]
+        assert int(case["edges"]) == row["comparison_edges_total"]
+
+
 def check_statistics(source, summary):
     values = json.loads(summary.read_text(encoding="utf-8"))
     assert values["raw_sha256"] == digest(source)
@@ -46,6 +85,7 @@ def check_row(row, head, route, plan):
         "frozen_oracle_and_exact_K_PASS"
     assert row["input_seed"] == plan[f'k{row["K"]}-rep{row["repetition"]}']
     assert row["raw_log_sha256"] == digest(Path(row["raw_log"]))
+    check_raw_log(row, route)
     assert row["online_comm_total_bits"] == 8 * (
         row["p0_sent_bytes"] + row["p1_sent_bytes"])
     assert row["online_comm_per_party_bits"] * 2 == row["online_comm_total_bits"]
