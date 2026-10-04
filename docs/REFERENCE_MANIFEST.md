@@ -72,6 +72,14 @@ CipherGPT/
 | CipherGPT-style 旧实验 | `ADSMPC/src/ciphergpt_topk_dcf_shuffle.cpp` | 历史 FSS/DCF 对照原型，不是原生 CipherGPT，也不是 BB90 |
 | 历史测试要求 | `Papers/测试指标.md`、`Papers/Agarwal与CipherGPT实验对比.pdf` | 统一输出、矩阵和指标的历史来源；当前要求以更新后的项目文档为准 |
 
+### AAV86 原始论文与本地副本（M6A-P0，2026-09-27）
+
+书目：Noga Alon、Yossi Azar、Uzi Vishkin，*Tight Complexity Bounds for Parallel Comparison Sorting*，27th Annual Symposium on Foundations of Computer Science (FOCS 1986)，pp. 502–510，DOI 10.1109/SFCS.1986.57。书目信息由 [Princeton 作者论文目录](https://web.math.princeton.edu/~nalon/PDFS/publications.html)、[Tel Aviv University 机构记录](https://cris.tau.ac.il/en/publications/tight-complexity-bounds-for-parallel-comparison-sorting) 和 IEEE DOI 记录核对。
+
+作者托管来源：[PDF](https://web.math.princeton.edu/~nalon/PDFS/Publications2/Tight%20complexity%20bounds%20for%20parallel%20comparison%20sorting.pdf)。于 2026-09-27 获取到本地忽略文件 `Papers/Alon_Azar_Vishkin_1986_Tight_Complexity_Bounds_for_Parallel_Comparison_Sorting_FOCS_AuthorHosted.pdf`；实测 9 页、1,063,055 bytes，SHA-256 为 `322f1bd761a987fd09e6b59b3a3ae77d6e4b1ca9dcb1c2765e45ac4a2a7e2b83`。本地副本为作者托管 PDF；本记录不指定其算法变体或项目映射。
+
+本次盘点未核实到经作者、作者机构、出版方或正式 artifact 来源确认的 Agarwal CCS ’24 full version 或对应作者代码。`Agarwal_TopK/` 中存在 AAV86 参考代码，但其目录根部没有 Git 元数据，本地目录状态不能证明作者发布来源、revision 或许可证；详见 `docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md`。此状态表示本次未核实到，不表示公开世界不存在。
+
 旧参考代码只能支持其实际验证过的行为，不能反向成为论文定义或当前安全性证明。
 
 历史测试资料中的 CipherGPT 比较安排不再构成现行任务。保留其中的来源记录，不据此恢复 M4。

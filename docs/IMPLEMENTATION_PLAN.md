@@ -296,6 +296,8 @@ M6A、M6B 各自执行：
 
 M6A 完成两种路线的性能验收后，再进入 M6B 依赖实现及正式实验。
 
+2026-09-27 的设计审查顺序先处理 Protocol I+AAV86 的算法、adaptive exact-edge 预处理、参与方视图/泄露、因果消息和原顺序 mask，再单独审查 Protocol III+AAV86；此时 Protocol III 设计为 `DEFERRED BY USER DECISION`。该历史顺序不批准 secure runtime。后续 E6–E17 采用有条件的全两两预发项目路线，其有界实现和接收结论见下文；Protocol III 仍受独立设计门约束。
+
 资料核对、明文算法 oracle 和不依赖未冻结接口的设计可以提前开展。
 
 ### 3.5 性能状态与失败配置
@@ -656,13 +658,12 @@ G2 通过后，为 M6A 提供：
 
 #### 设计阶段
 
-1. 固定 AAV86 算法及 CA 转换来源。
-2. 明确图生成、pivot、bucket、局部 rank 和稳定同分语义。
-3. 定义输入种子与算法随机种子。
-4. 写明每轮公开值、图生成时机、材料和 Dealer 行为。
-5. 解决输入无关、Dealer 在线静默的自适应 exact-edge 预处理。
-6. 分别给出 Protocol I、Protocol III 组合协议与输出路径。
-7. 审计 Protocol III 组合的代数条件和泄露，不能直接套用 shuffle-based compiler 的证明。
+按 2026-09-27 的设计顺序记录；后续有界实现的状态由下文 E6–E17 记录更新：
+
+1. **先审 Protocol I+AAV86。** 固定 AAV86 完整排序算法及 CA 转换来源；明确 pivot、bucket、local-rank 和稳定同分语义；定义输入种子与算法随机种子。
+2. 写明 Protocol I 每轮公开值、图生成时机、可信离线 T 的完整视图、party-specific 材料、edge/mask/round/session binding、one-shot 消费、rank reveal、mask 逆映射和因果消息。
+3. 对输入无关、T 在线静默的 adaptive exact-edge 预处理和 Protocol I leakage/party-view 论证作独立设计与可行性评审。此时 exact-edge 路线未得到 secure runtime GO；后来采用的全两两预发方案及其条件性结论单独标记，不能称为 exact-edge 实现。
+4. **再单独审查 Protocol III+AAV86。** Protocol III 的图、公开值、代数条件、预处理时序、泄露与输出适配须独立论证，不继承 Protocol I 的安全或轮数结论；其 `2r` 仍只是组合目标。
 
 Protocol I+AAV86 对应构造的核心目标为 `2r+1`。Protocol III+AAV86 的 `2r` 是团队组合目标，必须独立推导与验证。
 

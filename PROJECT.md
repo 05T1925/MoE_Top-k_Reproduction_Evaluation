@@ -124,8 +124,12 @@ AAV86 和 BB90 的原始文献用于补充算法来源。引用时必须区分�
 Protocol I 依赖 Chase、Ghosh、Poburinnaya 的两方静态半诚实
 secret-shared shuffle。当前实际论文为 `Papers/Secret-Shared Shuffle.pdf`。
 
-本 checkout 未安装 `Agarwal_TopK/`、`ADSMPC/` 或 `CipherGPT/`。本次结论只引用
-本地论文和 tracked VFSS 实现，不引用缺失参考树的行为。
+Git 管理的干净 checkout 不包含或固定 `Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/`
+参考树。本机可能另有被 `.gitignore` 忽略的本地副本；这些目录的存在不证明其上游、
+revision、许可证或作者来源。本机 2026-09-27 的实际目录状态和可核验边界见
+[`docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md`](docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md)。
+在来源链得到核验前，项目结论仍只引用本地论文和 tracked `VFSS/` 实现，不把参考树
+行为当作论文定义或作者实现。
 
 VFSS 已有通过验收的 C 级两遍 secret-shared shuffle，但当前冻结实现尚未满足论文所需的完整 public masked-list 契约。
 
