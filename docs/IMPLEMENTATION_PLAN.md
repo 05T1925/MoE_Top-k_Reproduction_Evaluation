@@ -13,7 +13,7 @@ SecretSharedShuffle 作为 C1 conformance baseline；隔离的 correlated-parall
 three-round candidate 保持为准确标记的 C-INSTANTIATION。详见
 [M2 Protocol I Chase redesign](decisions/M2_PROTOCOL_I_CHASE_SECRET_SHARED_SHUFFLE_REDESIGN_2026-09-21.md)。
 
-本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B BB90+DCF。
+本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B 选择算法+DCF（当前 Protocol I 为 BMW16-derived Select 候选，Protocol III 保留 BB90+DCF）。
 
 ## 1. 当前结论与执行主线
 
@@ -46,7 +46,7 @@ M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核�
 ### 1.2 当前待完成目标
 
 - Protocol I、Protocol III 各自的 AAV86 升级及完整性能验收。
-- Protocol I、Protocol III 各自的 BB90+DCF 升级及完整性能验收。
+- Protocol I 的 BMW16-derived Select+DCF 候选、Protocol III 的 BB90+DCF 升级及各自完整性能验收（均受安全设计门约束）。
 - 六种目标方案的统一横向报告。
 
 轮数口径固定为：
@@ -64,7 +64,7 @@ M2：COMPLETED
   → M5：COMPLETED（F1/F2/G3 PASS；接收方复核 revision 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1）
   → M6A 两种 AAV86 升级实现
   → M6A 完整性能验收
-  → M6B 两种 BB90+DCF 升级实现
+  → M6B：Protocol I BMW16-derived Select+DCF、Protocol III BB90+DCF 升级实现
   → M6B 完整性能验收
   → M7 六种方案统一报告
 ```
@@ -79,7 +79,7 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BB90+DCF。
+5. Protocol I + BMW16-derived Select + DCF。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
@@ -722,7 +722,7 @@ Protocol III + AAV86
 - 报告经另一方复核；
 - M6A 实现与性能验收完成后，才进入 M6B 依赖实现和正式实验。
 
-### 4.8 M6B：BB90+DCF 两种升级与完整性能验收
+### 4.8 M6B：选择算法 + DCF 升级与完整性能验收
 
 #### 前置条件
 
@@ -732,7 +732,7 @@ BB90 原文研究和明文算法设计可以提前进行，但不能以此跳过
 
 #### 设计阶段
 
-1. 固定 BB90 采用版本、适用范围、迭代参数及概率保证。
+1. 固定 Protocol I BMW16-derived Select 的有限规模规则、正确性和失败概率；固定 Protocol III BB90 的版本、适用范围、迭代参数及概率保证。
 2. 明确从算法顺序统计量到本项目第 K 大稳定优先级的映射。
 3. 明确随机成本界、失败事件与输出正确性条件。
 4. 给出比较图到 CA 的转换。
@@ -746,14 +746,14 @@ BB90 原文研究和明文算法设计可以提前进行，但不能以此跳过
 分别实现：
 
 ```text
-Protocol I + BB90+DCF
+Protocol I + BMW16-derived Select + DCF
 Protocol III + BB90+DCF
 ```
 
 完整功能为：
 
 ```text
-BB90 得到稳定第 K 大阈值
+所选 Select 路线得到稳定第 K 大阈值
   → DCF 生成成员指示共享
   → 必要的路由、逆映射和共享转换
   → 原顺序 Top-K mask
@@ -791,7 +791,7 @@ BB90 得到稳定第 K 大阈值
 
 #### 交付物
 
-- 两种 BB90+DCF 组合实现；
+- 两种各自标明算法来源的选择+DCF 组合实现；
 - 算法版本、阈值表示及预处理设计；
 - 正确性、泄露和消息审计；
 - 全部适用性能指标；
@@ -819,12 +819,12 @@ M7 汇总前述已完成结果，不把 M6A、M6B 的性能验收推迟到此阶
 | I vs III | 比较全对全精确核心路线 |
 | I vs I+AAV86 | 评估 I 路线的图排序升级 |
 | III vs III+AAV86 | 评估 III 路线的图排序升级 |
-| I vs I+BB90+DCF | 评估 I 路线的选择升级 |
+| I vs I+BMW16-derived Select+DCF | 评估 I 路线的选择升级 |
 | III vs III+BB90+DCF | 评估 III 路线的选择升级 |
-| I+AAV86 vs I+BB90+DCF | 相同路线比较两种升级算法 |
+| I+AAV86 vs I+BMW16-derived Select+DCF | 相同路线比较两种升级算法 |
 | III+AAV86 vs III+BB90+DCF | 相同路线比较两种升级算法 |
 | I+AAV86 vs III+AAV86 | 相同图算法比较组合路线 |
-| I+BB90+DCF vs III+BB90+DCF | 相同选择算法比较组合路线 |
+| I+BMW16-derived Select+DCF vs III+BB90+DCF | 选择算法来源不同，需分别解释，不能作为同算法对照 |
 
 工程对照另列：
 
@@ -1023,7 +1023,7 @@ runtime 保持 gated；任何 C-baseline 都不能解除这些门。
 - 本轮目标是 I 三轮核心、III 两轮核心。
 - I 四轮工程基线和 III 三轮工程基线继续保留。
 - M2、M5 均执行“实现→通信核验→交接”。
-- AAV86 两种路线完成完整性能验收后再推进 BB90+DCF。
+- AAV86 两种路线完成完整性能验收后再推进 M6B；Protocol I 使用 BMW16-derived Select+DCF 候选，Protocol III 保留 BB90+DCF，并且各自须先通过设计/安全门。
 - 六种方案共用语义和全部指标。
 - CipherGPT 实施和性能任务已取消。
 - 分支进度不能直接写成 main 已完成。
@@ -1136,3 +1136,5 @@ M3 在 `main@bb0d0e8` 完成整改，保留三轮 priority-key 和五轮 raw-sco
 S2 更新（2026-10-05）：依据 S1 revision `0a0593deaccb55225566da6af3aac661814e717c`，在独立 `codex/bmw16-bmw16-s2` 分支推导并实现 `BMW16_DERIVED_SELECT_4R_TEST_ONLY`。它对 A5 `r=1`、A7 第三轮 rank、R4 的 z 边界和有限样本分支采用显式 `PROJECT_DERIVED` 规则，并保留失败状态。该进展只更新隔离算法参考门；不改写 S1 报告中的历史 NO-GO，不更改 BB90 正式路线，不解除 V4 性能前置门，也不构成 secure Protocol I/DCF/mask 完成。当前验证和逐项门禁见 `docs/reproduction/BMW16_S2_DERIVED_SELECT_4R_VALIDATION_2026-10-05.md`。
 
 S3 独立复审（2026-10-05）：对 S2 精确 revision `691260833206533882e042ca37e8a21c7b9ecc24` 原样重放 776 例，复现 570 `SUCCESS`、47 S2 `PAPER_RANDOM_FAILURE_PATH`、159 `UNDEFINED/INVALID_FINITE_CASE`；40 个正式规模种子仅 16 个返回 oracle-correct `SUCCESS`，另有一个失败分支候选错误。S2 的边 trace 调度可复核为四个 plaintext comparison layers，S2 有条件比较界 `≤254n`；有限规模完整 Select、每次正确项目契约和 Protocol I 安全组合均未通过。S2 的逐次原始数据已先校验并归档于 `C:\Users\28641\.codex\evidence\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24`，S3 新提交只从当前树移除这些原始大文件并保留 summary/hash manifest，不重写 S2 历史。详细分类、Protocol I blocker 和后续门禁见 `docs/reproduction/BMW16_S3_INDEPENDENT_REVIEW_AND_PROTOCOL_I_GATE_2026-10-05.md`。当前状态：`FINITE_N_RUNNABLE_REFERENCE=NO-GO`、`STABLE_KTH_DIFFERENTIAL=CONDITIONAL`、`SECURE_PROTOCOL_I_DESIGN_GATE=NO-GO`；不进入生产 `VFSS/` 或正式 LAN/WAN 性能矩阵。
+
+S4 更新（2026-10-05）：保留 S1/S2/S3 的历史结论和原始证据；S2 776 例在 S4 worktree 原样重放且输出哈希一致。S4 另行定义并实现 `BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY`，不声称修复为论文 Algorithm 7，也不继承 Theorem 8。穷举和正式规模矩阵结果、有限概率/成本推导与所有门禁见 `docs/decisions/BMW16_S4_SAMPLE_BRACKET_SELECT_DECISION_2026-10-05.md` 和 `docs/reproduction/BMW16_S4_SELECT_4R_HIGH_SUCCESS_VALIDATION_2026-10-05.md`。Protocol I 的候选目标标签更新为 BMW16-derived Select+DCF；Protocol III 的 BB90+DCF 目标保留。四轮只表示明文比较深度；安全边图、离线材料、泄露、完整轮数和原序 mask 仍待独立审查，`VFSS/` 未修改，也未运行正式 LAN/WAN 矩阵。

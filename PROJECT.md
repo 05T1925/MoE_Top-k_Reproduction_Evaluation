@@ -4,7 +4,7 @@
 
 ## 1. 项目目标与当前边界
 
-本项目在 **VFSS** 中建立统一、可验证、可复现的安全 Top-K 实验环境。先完成 Agarwal Protocol I、Protocol III 的论文精确核心与通信核验，再分别实现 AAV86 和 BB90+DCF 两条升级路线，最后完成统一性能比较。
+本项目在 **VFSS** 中建立统一、可验证、可复现的安全 Top-K 实验环境。先完成 Agarwal Protocol I、Protocol III 的论文精确核心与通信核验，再分别推进 AAV86 与选择算法+DCF 升级，最后完成统一性能比较。Protocol I 的选择候选现标记为 BMW16-derived Select；Protocol III 保留 BB90+DCF 目标。
 
 密码学原语、通信、预处理和序列化统一绑定到 VFSS。现有参考工程提供算法语义、局部实现和失败模式参考；旧密钥文件、旧 FSS ABI、文件轮询和在线 Dealer 依赖不得直接迁入活动实现。
 
@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol I 路线 | 选择算法与 Top-K 输出组合扩展 |
+| Protocol I + BMW16-derived Select + DCF | BMW16 派生四轮 Select + DCF，接入 Protocol I 路线 | TEST_ONLY 候选；安全组合仍待独立设计审查 |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -32,7 +32,7 @@
 - 保留 M2、M3、M5 的编号、既有实现和历史验收记录。
 - M2 增加 Protocol I 精确核心完成后的通信核验与接口交接。
 - M5 增加 Protocol III 精确核心完成后的通信核验。
-- M6 拆分为 M6A AAV86 和 M6B BB90+DCF；每条路线均包含 Protocol I、Protocol III 两种升级实现及全部统一指标的性能测试。
+- M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 目标为 BMW16-derived Select，Protocol III 仍为 BB90+DCF。各自只有在安全设计门通过后才进入正式实现和性能测试。
 - M7 保留为最终统一汇总与横向报告，不把 M6A、M6B 的性能测试全部推迟到 M7。
 - CryptoMoE 保留为 M7 之后的独立工作负载方向，不属于本轮六种方案的完成条件。
 - 历史 `Direct Top-K` 原型保留其原有身份，不直接改名为 BB90+DCF，也不自动成为额外实施任务。
@@ -45,7 +45,7 @@ M0、M1/M1.1、M2、M3 和 M5 已完成。当前里程碑为 M6A，后续顺序�
 M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验）
   → M5：COMPLETED（F1/F2/G3 接收方签收通过）
   → M6A：I+AAV86、III+AAV86 实现与完整性能测试
-  → M6B：I+BB90+DCF、III+BB90+DCF 实现与完整性能测试
+  → M6B：I+BMW16-derived Select+DCF、III+BB90+DCF（各自通过安全设计门后实现与性能测试）
   → M7：六种方案统一汇总与报告
 ```
 
@@ -70,6 +70,8 @@ Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Proto
 本次 BMW16 审计发现 Algorithm 5 与 Algorithm 7 的纸面伪代码存在未闭合步骤，因此当前参考实现门为 NO-GO。正式计划和历史证据中原有的 BB90 目标、身份与性能边界继续保留；不得将 BMW16 候选改名为 BB90，也不得据此启动 M6B/V4 正式性能矩阵或修改 VFSS secure runtime。详见 docs/decisions/BMW16_DERIVED_SELECT_4R_SOURCE_AND_COMPOSITION_DECISION_2026-10-05.md 和对应验证报告。
 
 2026-10-05 的 S2 延续上述研究范围，新增 `BMW16_DERIVED_SELECT_4R_TEST_ONLY` 明文参考，按项目衍生规则实现 A5 `r=1`、A7 中位 Partition、任意 K 两哨兵归约及并行四轮比较调度。S1 的 NO-GO 报告保留为当时的来源审计结论；S2 的有限样本失败、比较证据和门禁见 `docs/decisions/BMW16_S2_DERIVED_SELECT_4R_DECISION_2026-10-05.md` 与 `docs/reproduction/BMW16_S2_DERIVED_SELECT_4R_VALIDATION_2026-10-05.md`。这是隔离 TEST_ONLY 算法候选，不是 BB90 复现、secure Protocol I、DCF 或原序 Top-K mask，也不启动正式 V4 LAN/WAN 矩阵。
+
+S4 更新（2026-10-05）：S2/S3 证据及 NO-GO 作为历史记录保留。S4 单独交付 `BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY` 项目推导构造；它不是论文 Algorithm 7 修复版，不继承 Theorem 8。协议 I 目标槽位采用 BMW16-derived Select+DCF；Protocol III 的 BB90+DCF 槽位不变。TEST_ONLY 门禁与安全设计阻塞项见 [S4 决策](docs/decisions/BMW16_S4_SAMPLE_BRACKET_SELECT_DECISION_2026-10-05.md) 和 [S4 验证报告](docs/reproduction/BMW16_S4_SELECT_4R_HIGH_SUCCESS_VALIDATION_2026-10-05.md)。这不表示 secure runtime、DCF、完整入口轮数或 Top-K mask 已实现或获批。
 
 ## 2. 仓库角色与修改规则
 
@@ -229,17 +231,19 @@ Protocol III + AAV86 的 `2r` 保留为团队组合目标；实现前必须补�
 
 完整图预留若作为独立对照，必须如实记录其离线材料与计算成本，不得混入目标方案的优化结论。
 
-### 4.5 BB90+DCF 升级
+### 4.5 选择算法 + DCF 升级
 
 M6B 在 M6A 两种升级实现及完整性能验收完成后推进，分别交付：
 
-1. Protocol I + BB90+DCF。
+1. Protocol I + BMW16-derived Select + DCF（当前只有 TEST_ONLY 明文候选；不得进入 secure runtime，直到设计审查门通过）。
 2. Protocol III + BB90+DCF。
+
+BMW16-derived Select 的四层只计明文 noiseless comparison 调度。它不能直接视为 Protocol I 的在线轮数；每条自适应边的保密生成、分发及控制流都需在安全消息 DAG 中单独实现和计数。
 
 目标流程为：
 
 ```text
-BB90 选择第 K 大元素对应的稳定优先级阈值
+所选路线的 Select 算法得到第 K 大元素对应的稳定优先级阈值
   → DCF 安全比较并生成 Top-K 成员指示共享
   → 必要的路由、逆映射和共享转换
   → 原始输入顺序下的秘密共享 Top-K bit-mask
@@ -251,16 +255,16 @@ BB90 选择第 K 大元素对应的稳定优先级阈值
 
 需要明确：
 
-- BB90 采用的具体算法版本、适用范围、迭代参数及随机性；
+- Protocol I 使用 BMW16-derived Select 的显式项目标签、适用范围和概率失败合同；Protocol III 的 BB90 具体版本、适用范围、迭代参数及随机性；
 - 从目标顺序统计量到本项目最高优先级 rank 为 0 的映射；
-- BB90 比较图如何转换为 CA 步骤；
+- 各路线比较图如何转换为 CA 步骤；
 - 第 K 大阈值的共享表示、允许公开值及与 DCF 的衔接；
 - 阈值在在线阶段产生时，DCF 预处理如何保持输入无关；
 - 原顺序 mask 的恢复与共享转换；
 - Protocol I、Protocol III 两种路线分别保留或调整哪些阶段；
 - 随机算法的正确性保证、成本保证和失败事件，不能将概率成本界与输出正确性混写。
 
-Agarwal 会议版讨论 BB90 用于 selection，但没有给出本项目这两种 BB90+DCF Top-K mask 组合的完整协议。因此，两种组合初始均属于项目扩展或待验证候选。
+Agarwal 会议版讨论 BB90 用于 selection，但没有给出 Protocol III + BB90+DCF Top-K mask 的完整协议。Protocol I 的 BMW16-derived Select 是单独的项目推导候选，也没有 secure 组合证明。本节任一候选均不因 TEST_ONLY 正确性或比较轮数而获得安全性结论。
 
 其在线轮数必须从完整消息依赖推导并验证，不预先套用 `2r+1`、`2r` 或“BB90 轮数加一”。DCF 阈值比较、必要的表示转换和 mask 输出成本全部计入。
 
@@ -429,7 +433,7 @@ BB90+DCF 必须分别记录 BB90 选择阶段和最终 DCF 成员选择阶段的
 | Protocol III | Theorem 4.2 的两轮目标 |
 | Protocol I + AAV86 | 对应 Theorem 5.1 构造的 `2r+1` 目标 |
 | Protocol III + AAV86 | 团队 `2r` 组合目标，需独立论证 |
-| Protocol I + BB90+DCF | 按完整组合消息依赖推导并实测 |
+| Protocol I + BMW16-derived Select + DCF | 安全设计审查后按完整组合消息依赖推导并实测 |
 | Protocol III + BB90+DCF | 按完整组合消息依赖推导并实测 |
 
 历史结果保持原计量边界。若历史 online time 包含输入分发或报告收集，应如实标明；新正式实验应分别记录可分离的辅助成本，不能静默重解释旧数字。
@@ -633,13 +637,13 @@ priority-key semantics 与 rank-share contract，不重新实现第二份 rankin
 8. 与对应全对全基线比较计算、通信、轮数及离线成本。
 9. 形成完整性能与未测配置报告。
 
-M6A 完整验收后，再进入 M6B 的依赖实现和正式性能测试。BB90 资料研究可以提前进行。
+M6A 完整验收后，再进入 M6B 的依赖实现和正式性能测试。来源研究可提前进行；Protocol I BMW16 候选须先通过独立安全设计门。Protocol III 的 BB90 路线保持其既定身份。
 
-### M6B：BB90+DCF 两种升级实现与完整性能测试
+### M6B：选择算法 + DCF 两种升级目标与完整性能测试
 
 任务：
 
-1. 固定 BB90 具体版本、参数、正确性和概率成本条件。
+1. 固定 Protocol I BMW16-derived Select 的版本、有限规模规则、正确性和失败概率；固定 Protocol III 的 BB90 版本、参数和概率成本条件。
 2. 明确稳定第 K 大阈值的表示与输出契约。
 3. 设计并实现阈值到 DCF 成员选择的安全衔接。
 4. 分别接入 Protocol I、Protocol III 路线。
@@ -663,12 +667,12 @@ M7 汇总前述阶段已经完成的结果，并在实现、环境或计量边�
 | Protocol I vs Protocol III | 全对全条件下比较两条核心路线 |
 | I vs I+AAV86 | 评估 Protocol I 路线的图排序升级 |
 | III vs III+AAV86 | 评估 Protocol III 路线的图排序升级 |
-| I vs I+BB90+DCF | 评估 Protocol I 路线的选择升级 |
+| I vs I+BMW16-derived Select+DCF | 评估 Protocol I 路线的选择升级 |
 | III vs III+BB90+DCF | 评估 Protocol III 路线的选择升级 |
-| I+AAV86 vs I+BB90+DCF | 相同路线下比较排序后选择与阈值选择 |
+| I+AAV86 vs I+BMW16-derived Select+DCF | 相同 I 路线下比较排序后选择与阈值选择 |
 | III+AAV86 vs III+BB90+DCF | 相同路线下比较两种升级算法 |
 | I+AAV86 vs III+AAV86 | 相同图算法下比较两种组合路线 |
-| I+BB90+DCF vs III+BB90+DCF | 相同选择算法下比较两种组合路线 |
+| I+BMW16-derived Select+DCF vs III+BB90+DCF | 两种选择路线算法来源不同，分开解释，不作同算法对照 |
 
 工程对照另列：
 
@@ -744,7 +748,7 @@ M6A、M6B 分别完成两种实现的完整性能验收。未测数据不能用�
 - M3 已有分方 report 与结构化 MetricsRecord 汇总。
 - 完整可信的在线 PRG 计数及正式 LAN/WAN 性能测量仍需补齐。
 - AAV86 的自适应预处理与组合安全边界尚未闭合。
-- BB90+DCF 两种组合尚不能视为已有完整实现。
+- Protocol I BMW16-derived Select+DCF 与 Protocol III BB90+DCF 均尚不能视为已完成安全组合。
 - M4 CipherGPT 已从本轮实施与性能范围取消。
 
 当前责任归属为：
