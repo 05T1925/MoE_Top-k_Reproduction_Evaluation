@@ -143,6 +143,9 @@ def validate_material_diagnostic(path):
             continue
         row = {}
         for token in line.split()[1:]:
+            if token == "PASS":
+                row["status"] = token
+                continue
             key, value = token.split("=", 1)
             row[key] = int(value) if key != "status" else value
         required = {"n", "d", "score_payload_bytes_per_party",
