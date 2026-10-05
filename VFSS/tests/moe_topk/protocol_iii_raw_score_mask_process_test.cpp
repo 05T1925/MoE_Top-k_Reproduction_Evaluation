@@ -9,6 +9,7 @@
 #include <FSS/dcf.h>
 #include <FSS/dpf.h>
 #include <FSS/prng.h>
+#include <FSS/config.h>
 
 #include <algorithm>
 #include <array>
@@ -590,6 +591,7 @@ void run_case(const TestCase& test,bool inject_early_close=false,
            <<" raw_dcf="<<(a.metrics[7]+b.metrics[7]+a.metrics[8]+b.metrics[8])
            <<" dpf_eval="<<(a.metrics[9]+b.metrics[9])
            <<" dcf_prg="<<(a.metrics[19]+b.metrics[19])
+           <<" thread_count="<<FSSConfig::num_threads
            <<" comparison_edges="<<pairs
            <<" p0_sent_bytes="<<a.metrics[1]<<" p0_received_bytes="<<a.metrics[2]
            <<" p1_sent_bytes="<<b.metrics[1]<<" p1_received_bytes="<<b.metrics[2]
@@ -616,6 +618,8 @@ std::uint64_t parse_u(const char* s) { return std::stoull(s); }
 }  // namespace
 
 int main(int argc,char** argv) {
+  // Match E17's single FSS worker per T/P0/P1 process and report it per run.
+  FSSConfig::num_threads = 1;
   try {
     if (argc==2 && std::string(argv[1])=="--material-diagnostic") {
       run_material_diagnostic(128U);

@@ -108,7 +108,8 @@ def parse_output(text):
         "offline_material_total_bits", "offline_material_score_bits",
         "offline_material_grank_bits", "offline_material_routing_bits",
         "total_ns", "peak_t_kib", "peak_p0_kib", "peak_p1_kib", "input_seed",
-        "input_share_seed", "input_digest", "raw_dcf", "dpf_eval", "dcf_prg", "comparison_edges",
+        "input_share_seed", "input_digest", "raw_dcf", "dpf_eval", "dcf_prg",
+        "thread_count", "comparison_edges",
         "p0_sent_bytes", "p0_received_bytes", "p1_sent_bytes", "p1_received_bytes",
         "session", "fingerprint", "material_id",
     }
@@ -122,6 +123,8 @@ def parse_output(text):
         raise ValueError("unexpected material provenance")
     if row["online_transport"] != "TCP_LOOPBACK" or row["rounds"] != 4:
         raise ValueError("online transport/causal-round contract mismatch")
+    if row["thread_count"] != 1:
+        raise ValueError("expected E17-matched single-thread FSS setting")
     if row["stage_wire_bytes"] != row["stage_receive_bytes"]:
         raise ValueError("aggregate stage sent/received byte mismatch")
     if sum(row["stage_dcf_prg_calls"]) != row["dcf_prg"]:
@@ -179,7 +182,7 @@ def run_one(binary, n, k, rep, seed, binary_hash, source_revision,
         "ended_utc": utc_now(),
         "wall_elapsed_ns": wall_end_ns - wall_start_ns,
         "profile": PROFILE,
-        "implementation_label": "M6A-P2-III-E3-ALLPAIRS-RAW-SCORE-MASK-TEST_ONLY",
+        "implementation_label": "M6A-P2-III-E3-ALLPAIRS-RAW-SCORE-MASK-TEST_ONLY-T1",
         "source_revision": source_revision,
         "source_manifest_sha256": source_manifest_hash,
         "binary_sha256": binary_hash,
@@ -340,7 +343,7 @@ def main():
     args.output_dir.mkdir(parents=True, exist_ok=False)
     source_manifest = {
         "source_revision": args.source_revision,
-        "implementation_label": "M6A-P2-III-E3-ALLPAIRS-RAW-SCORE-MASK-TEST_ONLY",
+        "implementation_label": "M6A-P2-III-E3-ALLPAIRS-RAW-SCORE-MASK-TEST_ONLY-T1",
         "runner_path": str(pathlib.Path(__file__).resolve()),
         "runner_sha256": sha256(pathlib.Path(__file__).resolve()),
         "binary_path": str(binary),
@@ -384,7 +387,7 @@ def main():
         "source_revision": args.source_revision,
         "source_manifest": source_manifest,
         "source_manifest_sha256": source_manifest_hash,
-        "implementation_label": "M6A-P2-III-E3-ALLPAIRS-RAW-SCORE-MASK-TEST_ONLY",
+        "implementation_label": "M6A-P2-III-E3-ALLPAIRS-RAW-SCORE-MASK-TEST_ONLY-T1",
         "python": sys.version,
         "platform": sys.platform,
         "platform_release": os.uname().release if hasattr(os, "uname") else "NOT_AVAILABLE",
@@ -397,6 +400,7 @@ def main():
         "cgroup_cpu_max": pathlib.Path("/sys/fs/cgroup/cpu.max").read_text().strip() if pathlib.Path("/sys/fs/cgroup/cpu.max").exists() else "NOT_AVAILABLE",
         "command_template": [str(binary), "--bench", "{n}", "{k}", "{input_seed}"],
         "build_type": "Release",
+        "thread_count_per_party": 1,
     }
     (args.output_dir / "environment.json").write_text(json.dumps(environment, indent=2) + "\n", encoding="utf-8")
     raw_path = args.output_dir / "raw_runs.jsonl"
