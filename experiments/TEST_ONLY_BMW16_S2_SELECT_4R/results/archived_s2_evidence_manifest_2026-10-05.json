@@ -1,0 +1,256 @@
+{
+  "archive_verification": "PASS: every archived S2 source file re-read and SHA-256/byte count matched the archive manifest; source hashes derive from exact S2 Git blobs via git cat-file, not CRLF working-tree bytes.",
+  "date": "2026-10-05",
+  "external_evidence_directory": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24",
+  "independent_replay": {
+    "candidate_counts": {
+      "MATCH": 571,
+      "MISMATCH": 1,
+      "NO_CANDIDATE": 204
+    },
+    "comparison_calls": {
+      "R1": 207672,
+      "R2": 207790,
+      "R3": 1172921,
+      "R4": 1074,
+      "dummy_related": 1105904,
+      "max_calls_per_n": 134.96875,
+      "max_single_run": 124661,
+      "prior_round_repeat": 65078,
+      "real_real": 483553,
+      "repeated_total": 215074,
+      "same_round_duplicate": 149996,
+      "total": 1589457,
+      "unique_unordered_sum_per_run": 1374383
+    },
+    "directory": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay",
+    "failure_events_partition_level": {
+      "A5_R1_missing_sample_bracket_calls": 172,
+      "A7_U_greater_4D_random_labels": 26,
+      "A7_W_greater_threshold_random_labels": 6,
+      "A7_crossed_cut_project_abort_misclassified_by_S2_status": 22
+    },
+    "mismatch_case": {
+      "algorithm_seed": 2707453233,
+      "candidate_original_index": 244,
+      "case_id": "official_n256_k8_seed1",
+      "input_seed": 2975888689,
+      "input_sha256": "e158e66224702e372f99f5fb1af1dc3bdfa162633239ad898730cb9bcaacaee7",
+      "oracle_original_index": 169
+    },
+    "official_matrix": {
+      "PAPER_RANDOM_FAILURE_PATH": 24,
+      "SUCCESS": 16,
+      "UNDEFINED/INVALID_FINITE_CASE": 0,
+      "by_config": {
+        "n1000_k80": {
+          "PAPER_RANDOM_FAILURE_PATH": 5,
+          "SUCCESS": 3
+        },
+        "n128_k2": {
+          "PAPER_RANDOM_FAILURE_PATH": 3,
+          "SUCCESS": 5
+        },
+        "n128_k8": {
+          "PAPER_RANDOM_FAILURE_PATH": 5,
+          "SUCCESS": 3
+        },
+        "n256_k2": {
+          "PAPER_RANDOM_FAILURE_PATH": 6,
+          "SUCCESS": 2
+        },
+        "n256_k8": {
+          "PAPER_RANDOM_FAILURE_PATH": 5,
+          "SUCCESS": 3
+        }
+      },
+      "total": 40
+    },
+    "outputs": [
+      {
+        "bytes": 922654,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\independent_edge_audit.jsonl",
+        "sha256": "fcb4039b6d1eaf0cfec9eab90144a2e62a7ccb9a7ca9e41e8c25a590ea76b8d4"
+      },
+      {
+        "bytes": 378903,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\oracle_validation.jsonl",
+        "sha256": "a62e559d881f1c920373ec7e791287a38572837f0995cb5c571b2f1f7303153f"
+      },
+      {
+        "bytes": 1131,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\oracle_validation_summary.json",
+        "sha256": "e9f74cc1aaabd6412d64b75c6b7685ce86585bd46c34286dc2960f066804f9dc"
+      },
+      {
+        "bytes": 9221112,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\select4r_edge_traces.jsonl.gz",
+        "sha256": "4c635eb600b2d5be9d336a52d157ae29a0975fe5415e95119535c080430d8b73"
+      },
+      {
+        "bytes": 734237,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\select4r_failed_or_non-success_runs.jsonl",
+        "sha256": "c8f9478f3c921880111f993ba0d41e97139048e6c961ff6886de01c761358936"
+      },
+      {
+        "bytes": 701,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\select4r_run_matrix_meta.json",
+        "sha256": "cbdaeb851ea3ef7b166a5869edb4b5311005c68797f205fa872d824e84b949e2"
+      },
+      {
+        "bytes": 2677598,
+        "path": "C:\\Users\\28641\\.codex\\evidence\\BMW16_S2_691260833206533882e042ca37e8a21c7b9ecc24\\independent_replay\\select4r_run_summaries.jsonl",
+        "sha256": "ceaec6f180efb9729f24f459924d5701e58b7ede87817f1b2827d7683e55b53e"
+      }
+    ],
+    "python_cpp_oracle_agreement": 776,
+    "reproduction_command": "python -B run_matrix.py --seeds 8 --small-max-n 5 --out-dir <external evidence directory>/independent_replay; then audit_edges.py and validate_results.py using archived trace and summary paths",
+    "runs": 776,
+    "status_counts": {
+      "PAPER_RANDOM_FAILURE_PATH": 47,
+      "SUCCESS": 570,
+      "UNDEFINED/INVALID_FINITE_CASE": 159
+    }
+  },
+  "oracle_dependencies": [
+    {
+      "bytes": 1758,
+      "git_blob": "4fd5777de78bf3ebf9dad6608c2d2e4610a0b08f",
+      "path": "experiments/TEST_ONLY_BMW16_DERIVED_SELECT_4R/oracle.py",
+      "sha256": "c70c847f175fb000bac97eab932922612d5504960c6f12f6326a43962ee7fbf3"
+    },
+    {
+      "bytes": 2433,
+      "git_blob": "f084e065a56fd5ed6c88fd23663ee7e0fd4a4691",
+      "path": "VFSS/include/moe_topk/topk_oracle.h",
+      "sha256": "5b5de74fbb8fd965846f864875f1b6c10c80ac47b76392cccfadd614836ff766"
+    }
+  ],
+  "purpose": "Preserve byte-verified S2 raw test evidence outside Git before ordinary S3 cleanup; independent replay artifacts are separately recorded.",
+  "s2_branch": "codex/bmw16-bmw16-s2",
+  "s2_raw_files": [
+    {
+      "bytes": 9221112,
+      "git_blob": "c2f7e8f18779f4295de696175aa59ef8ba5eeab1",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_edge_traces.jsonl.gz",
+      "sha256": "4c635eb600b2d5be9d336a52d157ae29a0975fe5415e95119535c080430d8b73"
+    },
+    {
+      "bytes": 734237,
+      "git_blob": "0628d92568a5a07dfa14cc2672c257b802077a53",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_failed_or_non-success_runs.jsonl",
+      "sha256": "c8f9478f3c921880111f993ba0d41e97139048e6c961ff6886de01c761358936"
+    },
+    {
+      "bytes": 921878,
+      "git_blob": "62f8196b118bc6d34a49cea71a40401c9d4f7627",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_independent_edge_audit.jsonl",
+      "sha256": "31107fe66a37d5eb25f879c0a8372a0976b6f35bda247564db053ff395dda203"
+    },
+    {
+      "bytes": 378127,
+      "git_blob": "32bbb46bc1d73df3e34cc0924f4d979b906e6de1",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_oracle_validation.jsonl",
+      "sha256": "102aa07871f2cb57a27a9921994bf9df61144e179b50c5053c550aee3a772f79"
+    },
+    {
+      "bytes": 1102,
+      "git_blob": "6c8722f7320b30cf935bb14974e2920e2c95d10b",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_oracle_validation_summary.json",
+      "sha256": "2d96f91dd615520dc3964665a846410e1268a0f66c671e45ee254e04632dc462"
+    },
+    {
+      "bytes": 678,
+      "git_blob": "3e27556b8e306657d74413deda1e2e035ae806f4",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_run_matrix_meta.json",
+      "sha256": "19863f0340151eac723623cb2283b41ee17341bb8e7bf279cd77710ba2c7f623"
+    },
+    {
+      "bytes": 2677598,
+      "git_blob": "8c5210e67291ad41bfce78a4165a317b8ee8e4c1",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_run_summaries.jsonl",
+      "sha256": "ceaec6f180efb9729f24f459924d5701e58b7ede87817f1b2827d7683e55b53e"
+    },
+    {
+      "bytes": 1148,
+      "git_blob": "abfea4b1038e29f86cb12126fc900ab54f9de4f7",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_small_trace_edge_audit.json",
+      "sha256": "b4673168042a7ab0a3bdec58f570b7d0cf07759b8eed56b496ae39666633a867"
+    },
+    {
+      "bytes": 146193,
+      "git_blob": "a3c7f78d12f049ac8ac3f59386b67bbb902af5eb",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_small_trace_seed1.json",
+      "sha256": "c0267a4d7ed3d850cb7f28da717c482a5040dfd45c713f07298560763a622cea"
+    },
+    {
+      "bytes": 1072,
+      "git_blob": "6d284dbf1f76de030deb00bcdc551cfef2c4a1a5",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/select4r_unittest_2026-10-05.txt",
+      "sha256": "fab4f860e4fc16f910cf4b1984944105293e675edf45b438182164c96f0f51f4"
+    }
+  ],
+  "s2_revision": "691260833206533882e042ca37e8a21c7b9ecc24",
+  "s2_source_files": [
+    {
+      "bytes": 21229,
+      "git_blob": "cf1d6ed7d45575b6e38b8c46e8087662975134a8",
+      "path": "docs/decisions/BMW16_S2_DERIVED_SELECT_4R_DECISION_2026-10-05.md",
+      "sha256": "2d6bf9193b410f0e4d37a556a30e70219ba3c3bd663e3823470225558b8774c6"
+    },
+    {
+      "bytes": 12031,
+      "git_blob": "be4461327f3b13b67ef60974058f87204632a03f",
+      "path": "docs/reproduction/BMW16_S2_DERIVED_SELECT_4R_VALIDATION_2026-10-05.md",
+      "sha256": "60f9c286d445f878779ef0eaf9ea72c8730586621a4a5d9cfbfe100bc79d7c1e"
+    },
+    {
+      "bytes": 3046,
+      "git_blob": "003be0536da72f1233028c74d62426461e38a7ad",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/README.md",
+      "sha256": "5fabf3ca382d1592d59c2e0ef1caee49a4e132a2bbd2e8b65e096b112af71b83"
+    },
+    {
+      "bytes": 10524,
+      "git_blob": "783351c345fdbef06d4fc7c34ed404f461647751",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/audit_edges.py",
+      "sha256": "66d56b320f45b5d6eccd7ad0b0c6efc9a47d9558b9f5e35f7896d180171de0a4"
+    },
+    {
+      "bytes": 1118,
+      "git_blob": "0ec6ba0d29a996a641ff04a8fdc05b8ead3fc271",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/oracle_harness.cpp",
+      "sha256": "2ce9086f416a6e94ddbbf80fef7a195741c7152d90d32b3f3a6d3b7b235e1de5"
+    },
+    {
+      "bytes": 5467,
+      "git_blob": "fff6d767b8c0389fb8254bcde6cc128f9e323c70",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/run_matrix.py",
+      "sha256": "5a364df5d5de0d8986f837e9c2472be2070e92ae5750e998ef2e82556987a7a9"
+    },
+    {
+      "bytes": 1448,
+      "git_blob": "4e0707f57777a7106477b033f438a5ae6556dba8",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/run_one.py",
+      "sha256": "e3577f750b9969687899f7cf1a0cb43b5ae446e7a563f5f30d49bacaf34b9927"
+    },
+    {
+      "bytes": 38597,
+      "git_blob": "a9222a9309be210cc2ba7cd40572317308ce6c29",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/select4r.py",
+      "sha256": "491be2865d2c29ed40fb33877dd73485890b069bc09c37fc9d38eaa824dc8d67"
+    },
+    {
+      "bytes": 4113,
+      "git_blob": "3e35803235e21aa93e4fec028976148580fc343c",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/test_select4r.py",
+      "sha256": "f9564c3445ea69be8316abef91f6f675fc96412a46b137e5921000a06795d03c"
+    },
+    {
+      "bytes": 6515,
+      "git_blob": "bd88e28aed2cb04a38ef0c9ca0d9cab8b5d5ea65",
+      "path": "experiments/TEST_ONLY_BMW16_S2_SELECT_4R/validate_results.py",
+      "sha256": "ffede20bddfbff57eac2deb09ec635975d9b33e5c5ac25eb5dbbc323db1e8abf"
+    }
+  ]
+}
