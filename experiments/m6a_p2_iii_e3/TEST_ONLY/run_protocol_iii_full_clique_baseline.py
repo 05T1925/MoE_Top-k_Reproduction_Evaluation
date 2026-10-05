@@ -130,8 +130,8 @@ def parse_output(text):
         raise ValueError("party sent/received byte mismatch")
     if sum(row["stage_wire_bytes"]) != row["wire_bytes"]:
         raise ValueError("stage communication total mismatch")
-    if sum(row["stage_offline_bytes"]) + 2 * 66 != row["offline_bytes"]:
-        # Per-party serialized sections plus two 66-byte header/IPC envelopes.
+    if sum(row["stage_offline_bytes"]) != row["offline_bytes"]:
+        # Each party report already includes its complete offline bundle bytes.
         raise ValueError("offline bundle stage accounting mismatch")
     return row
 
