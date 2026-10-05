@@ -1,0 +1,14 @@
+test_algorithm5_literal_line_can_make_b_undefined (test_audit.PaperAlgebraTests.test_algorithm5_literal_line_can_make_b_undefined) ... ok
+test_algorithm7_line11_negative_rank_on_exact_partitions (test_audit.PaperAlgebraTests.test_algorithm7_line11_negative_rank_on_exact_partitions) ... ok
+test_appendix_reduction_expansion_for_all_small_k (test_audit.PaperAlgebraTests.test_appendix_reduction_expansion_for_all_small_k) ... ok
+test_integer_roots (test_audit.PaperAlgebraTests.test_integer_roots) ... ok
+test_project_rank_endpoints_and_middle (test_audit.PaperAlgebraTests.test_project_rank_endpoints_and_middle) ... ok
+test_smallest_project_input_is_reported_as_not_runnable (test_audit.PaperAlgebraTests.test_smallest_project_input_is_reported_as_not_runnable) ... ok
+test_all_equal_uses_original_index (test_audit.StableOracleTests.test_all_equal_uses_original_index) ... ok
+test_input_contract (test_audit.StableOracleTests.test_input_contract) ... ok
+test_signed_boundaries_and_ties (test_audit.StableOracleTests.test_signed_boundaries_and_ties) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.006s
+
+OK

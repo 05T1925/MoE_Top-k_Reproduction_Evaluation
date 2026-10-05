@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-26
+更新日期：2026-10-05
 
 ## 1. 项目目标与当前边界
 
@@ -62,6 +62,12 @@ documents 中，不作为 M5 的当前 runtime 阻塞条件。
 Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Protocol III 的论文目标为 **2 个在线轮次**，对应 Theorem 4.2。上述目标针对论文核心，不能直接作为 raw-score 输入到原顺序 Top-K mask 的端到端轮数。
 
 本次修订替代 `docs/decisions/ROADMAP_PRIORITY_2026-09-04.md` 中与本节冲突的路线。`docs/IMPLEMENTATION_PLAN.md`、`docs/TEAM_WORK_PLAN.md` 和 `docs/M3_ONWARD_TEAM_WORK_PLAN.md` 需要同步更新；同步期间以本文和团队本次明确决定为准，旧 M4 前置门不再适用。
+
+### 1.4 2026-10-05：BMW16 派生选择算法研究范围
+
+用户将当前研究任务的算法来源目标从“BB90 原算法复现”调整为：依据 Braverman、Mao、Weinberg 2016 年论文推导四轮、线性比较量的高概率 Select 候选，并设计其 Protocol I 安全组合接口。该范围只授权来源研究、隔离 TEST_ONLY 明文验证和安全组合设计；不表示算法步骤、概率保证、Protocol I 轮数或 Top-K mask 已验收。
+
+本次 BMW16 审计发现 Algorithm 5 与 Algorithm 7 的纸面伪代码存在未闭合步骤，因此当前参考实现门为 NO-GO。正式计划和历史证据中原有的 BB90 目标、身份与性能边界继续保留；不得将 BMW16 候选改名为 BB90，也不得据此启动 M6B/V4 正式性能矩阵或修改 VFSS secure runtime。详见 docs/decisions/BMW16_DERIVED_SELECT_4R_SOURCE_AND_COMPOSITION_DECISION_2026-10-05.md 和对应验证报告。
 
 ## 2. 仓库角色与修改规则
 

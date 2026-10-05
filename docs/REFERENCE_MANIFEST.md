@@ -1,6 +1,6 @@
 # 本地参考资料清单
 
-更新日期：2026-09-13。
+更新日期：2026-10-05。
 
 ## 1. 状态与用途
 
@@ -323,3 +323,9 @@ vfss-baseline-2026-09-03
 | 资料配置与哈希同步 | 文档和资料负责人协调 | 本清单、配置说明和哈希记录一致 |
 
 来源、版本或代码尚未确认时保持待登记状态。不得为了填满清单而虚构副本、仓库、许可证、revision 或完成结论。
+
+## 12. BMW16 论文来源与当前研究身份
+
+本次用户指定的算法来源为 Papers/1603.04941v1.pdf：Mark Braverman、Jieming Mao、S. Matthew Weinberg，arXiv:1603.04941v1，2016-03-16，44 页。当前本地 SHA-256 为 F46F83CBA279F37E9E3AAA0D64B145FDFCFBC52C0C9C8B79BACEC1259CA9CA23。Papers/017.pdf 是 Jieming Mao 2018 年 Princeton dissertation，249 页，作为相关作者的交叉核对资料登记，SHA-256 为 3EAE3A93F12AB71EEA8AC040167F21351FCF3FF54DC423985A04087E3E90CB15；不把它视为独立证明，也不以其复述替代 2016 年论文原页。
+
+当前研究标签为 BMW16_DERIVED_SELECT_4R_TEST_ONLY，不是 BB90 复现身份。PDF 保持本地只读，不纳入 Git；哈希登记在 docs/PAPERS.sha256。本次逐页审计记录见 docs/decisions/BMW16_DERIVED_SELECT_4R_SOURCE_AND_COMPOSITION_DECISION_2026-10-05.md。该审计发现 Algorithm 5/7 纸面步骤未闭合；不得登记为已实现算法或将其与 BB90 源码、结果互换。

@@ -1,0 +1,88 @@
+{
+  "algorithm_seed": null,
+  "appendix_a_partition_reduction": {
+    "equivalent_ascending_rank_1_based": 1,
+    "high_padding": 0,
+    "low_padding": 0,
+    "median_input_n": 2,
+    "median_rank_1_based": 1,
+    "outer_partition_n": 2,
+    "project_K_highest_1_based": 1
+  },
+  "complete_select_implemented": false,
+  "conditional_cost_exponents": {
+    "A5_round2_exponent": "1",
+    "A5_skeleton_times_pivots_exponent": "1",
+    "A7_R3_with_explicit_integer_sampling_rule": "1",
+    "A7_R4_pairwise_exponent": "5/6",
+    "R4_exponent_less_than_1": true,
+    "interpretation": "conditional on a repaired, fully specified A7 schedule"
+  },
+  "gates": {
+    "FINITE_N_RUNNABLE_REFERENCE": "NO_GO_SOURCE_STEPS_UNRESOLVED",
+    "FOUR_ROUND_SCHEDULE": "CONDITIONAL_ONLY_NO_RUNNABLE_SELECT",
+    "LINEAR_COMPARISONS": "CONDITIONAL_ASYMPTOTIC_BOUND_ONLY",
+    "PAPER_SOURCE_AND_REDUCTION": "PARTIAL_SOURCE_VERIFIED_K_ALGEBRA_CLOSED_BMW16_STEPS_UNRESOLVED",
+    "PROJECT_EXACT_MASK": "NOT_IMPLEMENTED",
+    "SECURE_PROTOCOL_I_COMPOSITION": "DESIGN_LIMITS_DOCUMENTED_NOT_REVIEWED",
+    "STABLE_KTH_ORACLE": "AVAILABLE_FOR_VALIDATION_ONLY"
+  },
+  "label": "BMW16_DERIVED_SELECT_4R_TEST_ONLY_AUDIT_NOT_IMPLEMENTATION",
+  "per_partition_algorithm7_candidate": {
+    "A5_input_n_after_inner_dummies": 6,
+    "Algorithm5_literal_r1_parameters": {
+      "Algorithm5_line4_literal_k1": 3,
+      "S1_size_project_ceil": 4,
+      "T1_size_project_ceil": 2,
+      "classification": "PARAMETER_BOUND_ALONE_DOES_NOT_DECIDE",
+      "input_n": 6,
+      "line11_b_exists_possible": true,
+      "max_distinct_A1_items_any_pivot_can_beat": 3,
+      "r": 1
+    },
+    "candidate_R3_calls_per_algorithm7": null,
+    "candidate_R4_ordered_pair_requests_per_algorithm7_upper_bound": 2,
+    "candidate_R4_unique_unordered_edges_per_algorithm7": 1,
+    "candidate_W_cutoff_ceil": 2,
+    "candidate_project_v_size_ceil_then_bound_by_u": null,
+    "conditional_logical_call_upper_bounds_for_two_parallel_A7_instances": {
+      "R1_four_A5_requests": 32,
+      "R2_four_A5_requests": 24,
+      "R3_two_A7_requests": null,
+      "R4_two_A7_ordered_pair_request_upper_bound": 4,
+      "R4_two_A7_unique_unordered_edge_upper_bound": 2,
+      "actual_unique_comparison_calls": "NOT_MEASURED_NO_ALGORITHM_EXECUTION",
+      "real_real_sentinel_duplicate_breakdown": "NOT_MEASURED_NO_SAMPLED_EDGE_LIST"
+    },
+    "exact_first_two_round_cardinality_witness": {
+      "A1_base_size": 3,
+      "A2_base_size": -1,
+      "Algorithm7_line11_source_rank_n_over_2_minus_R2": -2,
+      "R1_base_size": -1,
+      "R2_base_size": 3,
+      "U_half": 2,
+      "U_size": 4,
+      "base_n": 2,
+      "each_A5_input_n": 6,
+      "exact_half_cut": 3,
+      "inner_dummy_cardinality_feasible": false,
+      "inner_dummy_side_count_D": 2,
+      "rank_from_rejected_prefix_invariant_n_over_2_minus_R1": 2
+    },
+    "given_input_n": 2,
+    "ideal_cardinality_witness_feasible": false,
+    "inner_dummy_count_per_side_project_ceil": 2,
+    "paper_V_size_expression": "2/4 = 1/2",
+    "paper_V_size_is_integer": false
+  },
+  "randomized_algorithm_executed": false,
+  "request": {
+    "K_highest_1_based": 1,
+    "n": 1,
+    "project_order": "score descending, original_index ascending"
+  },
+  "source_parameters": {
+    "epsilon": "1/36",
+    "epsilon_interval": "(0, 1/18)"
+  }
+}
