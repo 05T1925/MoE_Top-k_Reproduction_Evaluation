@@ -1,0 +1,29 @@
+{
+  "cases": 776,
+  "counts": {
+    "ORACLE_CROSSCHECK_MATCH": 776,
+    "candidate:MATCH": 571,
+    "candidate:MISMATCH": 1,
+    "candidate:NO_CANDIDATE": 204,
+    "execution:PAPER_RANDOM_FAILURE_PATH": 47,
+    "execution:SUCCESS": 570,
+    "execution:UNDEFINED/INVALID_FINITE_CASE": 159,
+    "validated:PAPER_RANDOM_FAILURE_PATH": 47,
+    "validated:SUCCESS": 570,
+    "validated:UNDEFINED/INVALID_FINITE_CASE": 159
+  },
+  "cpp_compile_command": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "-IC:\\Users\\28641\\.codex\\worktrees\\bmw16-s2\\MoE_Top-k_Reproduction_Evaluation\\VFSS\\include",
+    "C:\\Users\\28641\\.codex\\worktrees\\bmw16-s2\\MoE_Top-k_Reproduction_Evaluation\\experiments\\TEST_ONLY_BMW16_S2_SELECT_4R\\oracle_harness.cpp",
+    "-o",
+    "C:\\Users\\28641\\AppData\\Local\\Temp\\bmw16_s2_oracle_q9cfh4ec\\oracle_harness.exe"
+  ],
+  "cpp_compile_exit_code": 0,
+  "cpp_oracle": "VFSS/include/moe_topk/topk_oracle.h via TEST_ONLY harness",
+  "python_oracle": "S1 frozen TEST_ONLY oracle.py",
+  "selector_imported_oracle": false,
+  "validated_success_requires_candidate_match": true
+}

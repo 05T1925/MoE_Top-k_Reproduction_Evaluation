@@ -1132,3 +1132,5 @@ M3 在 `main@bb0d0e8` 完成整改，保留三轮 priority-key 和五轮 raw-sco
 本任务的算法研究来源改为 Braverman–Mao–Weinberg 2016 年论文，目标为推导四轮、线性比较量的高概率 Select 候选，再设计 Protocol I 安全组合。它取代本任务中先前使用“复现 BB90 原算法”的措辞，不改写既有 BB90 路线文档和历史结果。
 
 此阶段仅允许源文推导、TEST_ONLY 明文审计/参考工作和组合接口设计，不进入 VFSS/ secure runtime，不运行正式 LAN/WAN 性能矩阵。本次审计的 Algorithm 5/7 伪代码步骤未闭合，故 runnable Select 与安全组合均不能标记完成。下一步必须先解决带页码证据的伪代码缺口并完成独立证明；旧 M6A/V4 正式验收顺序仍是性能工作门，不阻止本次隔离资料研究。
+
+S2 更新（2026-10-05）：依据 S1 revision `0a0593deaccb55225566da6af3aac661814e717c`，在独立 `codex/bmw16-bmw16-s2` 分支推导并实现 `BMW16_DERIVED_SELECT_4R_TEST_ONLY`。它对 A5 `r=1`、A7 第三轮 rank、R4 的 z 边界和有限样本分支采用显式 `PROJECT_DERIVED` 规则，并保留失败状态。该进展只更新隔离算法参考门；不改写 S1 报告中的历史 NO-GO，不更改 BB90 正式路线，不解除 V4 性能前置门，也不构成 secure Protocol I/DCF/mask 完成。当前验证和逐项门禁见 `docs/reproduction/BMW16_S2_DERIVED_SELECT_4R_VALIDATION_2026-10-05.md`。

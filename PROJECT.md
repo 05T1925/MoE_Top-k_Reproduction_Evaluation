@@ -69,6 +69,8 @@ Protocol I 的论文目标为 **3 个在线轮次**，对应 Theorem 4.1；Proto
 
 本次 BMW16 审计发现 Algorithm 5 与 Algorithm 7 的纸面伪代码存在未闭合步骤，因此当前参考实现门为 NO-GO。正式计划和历史证据中原有的 BB90 目标、身份与性能边界继续保留；不得将 BMW16 候选改名为 BB90，也不得据此启动 M6B/V4 正式性能矩阵或修改 VFSS secure runtime。详见 docs/decisions/BMW16_DERIVED_SELECT_4R_SOURCE_AND_COMPOSITION_DECISION_2026-10-05.md 和对应验证报告。
 
+2026-10-05 的 S2 延续上述研究范围，新增 `BMW16_DERIVED_SELECT_4R_TEST_ONLY` 明文参考，按项目衍生规则实现 A5 `r=1`、A7 中位 Partition、任意 K 两哨兵归约及并行四轮比较调度。S1 的 NO-GO 报告保留为当时的来源审计结论；S2 的有限样本失败、比较证据和门禁见 `docs/decisions/BMW16_S2_DERIVED_SELECT_4R_DECISION_2026-10-05.md` 与 `docs/reproduction/BMW16_S2_DERIVED_SELECT_4R_VALIDATION_2026-10-05.md`。这是隔离 TEST_ONLY 算法候选，不是 BB90 复现、secure Protocol I、DCF 或原序 Top-K mask，也不启动正式 V4 LAN/WAN 矩阵。
+
 ## 2. 仓库角色与修改规则
 
 | 路径 | 角色 | 规则 |
