@@ -1,6 +1,6 @@
 # M6A-P2-III-E2：隐藏 handle AAV86 + ring DPF 构造门
 
-日期 2026-10-04。基点为 E1 事后报告 `67739472c4409a62a676823c9e786fe4aa40bb57`，E2 勘误源码检查点 `ae100e7c7df9d11437aadcd5be40d5b5d5bdcf73`，分支 `codex/m6a-p2-iii-e2`。**候选身份仅为项目组合，非 Agarwal 作者精确 Protocol III+AAV86。项目所有者已明确允许第 3 节的扩展泄露，继续审查稀疏图方案。当前 `SECURE_RUNTIME_GATE = NO-GO`：native ring DPF 的联合辅助信息目标隐私缺可审阅依据，完整组合帧/材料尚未实现和审计。**功能 TEST_ONLY 可继续；不能把这个门写成“padding 缺陷”，E1 的该事实错误已另行勘误。
+日期 2026-10-04。基点为 E1 事后报告 `67739472c4409a62a676823c9e786fe4aa40bb57`，E2 勘误源码检查点 `ae100e7c7df9d11437aadcd5be40d5b5d5bdcf73`，分支 `codex/m6a-p2-iii-e2`。**E2 当时结论：** native ring DPF 的联合辅助信息目标隐私缺可审阅依据，故 `SECURE_RUNTIME_GATE = NO-GO`；E3 后续决策覆盖该审查状态，见 [E3 安全门](M6A_P2_III_E3_RING_DPF_SECURITY_GATE_2026-10-05.md)。E2 功能 TEST_ONLY 可继续；不能把该门写成 padding 缺陷，E1 的该事实错误已另行勘误。
 
 ## 0. 证据及冻结接口
 
@@ -18,8 +18,8 @@ E2 直接核查 main/E1 的 score adapter 相同 blob：padding 输入份额 P0=
 | S2 同 π 前向布局 | T 均匀 π，分发 P0/P1 各自 `σ,τ,a,e` 与 fresh 首轮节点 mask share；不得把 π 给任一在线方 | 一次 share-shuffle exchange 后各方获 `π(key)` 的 D 个加法份额；不公开 handle↔原槽 | 复用 I+AAV86 的两遍线性 shuffle 代数/材料格式；新 III package 必须绑定与逆向同 π、与首轮 mask/key 一致。 |
 | S3 每轮图 CA | 对每个 `t∈[1,r]`、`a<c<D` 独立 keygen `uCMP(ell,R[t,a],R[t,c])`，每方持 `rD` node-mask shares 与 `r·C(D,2)` key 槽；仅访问公开图 `E_t` | 固定 D-word `y_t=π(key)+R_t` masked-list exchange；本地 Eval 仅对 `E_t`，产生 local-rank shares。`t<r` 时再交换 D-word rank shares 并公开 `L_t`，决定 pivot/bucket/下一图；`t=r` **不得交换 rank shares** | 可复用 uCMP/DCF 单边 Eval 与 E7 图规则；必须新增 `III local-rank-share` 边界，禁止调用 I 的 final `flatten`/public carrier。 |
 | S4 全局 rank ring | T 不需输入相关材；前轮公开 pivot rank/bucket 给每个子节点公开偏移 | P0 对已公开 pivot/singleton 或最后局部份额加公开 offset，P1 加 0；双方得到每个 D handle 在 `Z_(2^b)` 的全局 rank 份额，`b=log2 D`，不公开最终 rank | 最小 rank-offset adapter；不能复用固定原槽 `protocol_iii_grank_party`。 |
-| S5 handle ring DPF | T 对每个 D handle 独立采样 `u_h∈Z_(2^b)`、两方加法 mask shares 和一对 `DPF(b,64,u_h,1)` keys；key/点均绑定该 handle | 双方交换 D-word `rank_share+u_share`，公开均匀 `m_h`；各自在 `m_h-j mod 2^b`、`0≤j<K` Eval，`Z_(2^64)` 累加取低位，得 handle XOR bit 份额 | 可复用 F1 ring DPF 算法/64 位输出与本地 parity；新 D-handle package/路由层。不能按原槽 n-key 向量错配。 |
-| S6 同 π 逆路由 | T 另采独立 `γ,δ,a',e',h'`，目标恰为 S2 的 `π^{-1}`；新随机币，不重用 S2 掩码 | 每方把 handle bit 视为 `Z_(2^b)` 加法 share，一次 inverse share-shuffle exchange，原槽份额再取低位并截 `n`，输出各自 n 个 XOR bit | 可复用 I 逆置换线性代数，但输入不再是 I 的**公开** carrier；须审 DPF bit shares 与逆材料联合单方视图。 |
+| S5 handle ring DPF | T 对每个 D handle 独立采样 `u_h∈Z_(2^b)`、两方加法 mask shares 和一对 `DPF(b,64,u_h,1)` keys；key/点均绑定该 handle | 双方交换 D-word `rank_share+u_share`，公开均匀 `m_h`；各自在 `m_h-j mod 2^b`、`0≤j<K` Eval，保留每方 `Z_(2^64)` 累加份额并约化到 `Z_(2^b)`，供逆路由使用 | 可复用 F1 ring DPF 算法/64 位输出与本地求和；新 D-handle package/路由层。不能按原槽 n-key 向量错配。 |
+| S6 同 π 逆路由 | T 另采独立 `γ,δ,a',e',h'`，目标恰为 S2 的 `π^{-1}`；新随机币，不重用 S2 掩码 | 每方先将完整 DPF 累加份额约化到 `Z_(2^b)`，把它作为 additive share 做一次 inverse share-shuffle；原槽结果最后取低位并截 `n`，输出各自 n 个 XOR bit | 可复用 I 逆置换线性代数，但输入不再是 I 的**公开** carrier；须审 DPF ring shares 与逆材料联合单方视图。 |
 
 每个包/材料须绑定 `(version,session,fingerprint,material ID,party,n,D,K,r,ell,b,stage,t,canonical a<c 或 handle)`；T keygen 单线程独立随机币，fresh 每轮 R 与每条 keygen 币，D 个 DPF mask/key 一对一。应用包、fd/帧、材料领取需在首个输入相关消息前一次性 claim；崩溃、超时、短包、错误 peer/phase、重放都不可重试同一 ID。现有 F1 bundle 与 I+AAV86 bundle 是各自合同，**没有**这样一个组合包；这是最小新增接口之一，绝不通过文件轮询或在线 T 拼接。离线预留 `r·C(D,2)` 与实际 `e_A=Σ|E_t|`、逐轮 `v_t` 分列。固定 M 延期。
 
@@ -27,7 +27,7 @@ E2 直接核查 main/E1 的 score adapter 相同 blob：padding 输入份额 P0=
 
 E1 TEST_ONLY 明文模型对 n=2/5/8、K=1/中间/n、r=1..5、不同 pivot seed、全等/重复/极值、非二次幂验证 rank-offset 递归与原序恰 K；E2 已把其 score-0 分支明确标成反事实，默认正确 dummy 与现有 adapter 相同。公开早期 local rank 让根及子节点的 pivot 名次与桶大小可见。每个 pivot 的全局 rank 是公开 `offset+local_rank`；第 j 桶偏移由前一 pivot rank+1 给出，空桶不产生子节点。提前 singleton 的名次也公开。最终 depth=1 的节点取 `m-1` pivot，其比较图为完整 clique，故 final local-rank **份额**加公开 offset 为全局份额。唯一严格 key 保证 0..D−1 是置换，无 rank 真值回绕；dummy 同 `INT32_MIN` 时仍因原下标靠后。该归纳不允许末轮像 I 一样公开全序。
 
-对每个 handle，`m_h=(rank_h+u_h) mod 2^b`，DPF 目标为 `u_h`，在 `m_h-j` 处得到重构 `[rank_h=j]`。逐方的 `Z_(2^64)→Z_2` 低位投影保加法，故 XOR 为 `[rank_h<K]`；也可先映到任何较窄 2 幂环而保持低位。odd-prime field 低位无此性质。前/逆置换同 π，线性逆变换后的低位等于原槽 mask，截 dummy 后恰 K。错误地直接返回 handle mask 的 n=2 π-swap 反例仍有效。以上明文/代数夹具不调用真实新 secure 帧；不能当成 conformance、冻结 C++ oracle differential 或独立进程 E2E。
+**E2 原稿的低位/逆路由次序已由 E3 勘误：** 不可先把两方 DPF ring 累加份额各自取低位，再把得到的 XOR shares 当作 `Z_(2^b)` 加法 shares。最小反例为双方局部 bit 都是 1：XOR 重构为 0，而 `Z4` 加法重构为 2。正确顺序为：每方保留所有 K 个 64-bit DPF payload share 的 ring 累加，取其低 b 位（同态约化 `Z_(2^64)→Z_(2^b)`），用该 additive share 逆路由；只有原序逆路由结果才逐方取低位。对每槽，双方完整 accumulator 之和在 `Z_(2^64)` 是 0/1 指示值，所以约化后仍是 `Z_(2^b)` 的 0/1 additive sharing；末端低位映射是 `Z_(2^b)→Z_2` 的加法同态，XOR 恰等于该指示值。odd-prime field 低位无此性质。前/逆置换同 π，截 dummy 后恰 K。旧 TEST_ONLY 模型只按 clear permutation 重构了低位 XOR shares，不能充当该 ring-inverse 同态验证；E3 必须增加最小反例与修正代数测试。错误地直接返回 handle mask 的 n=2 π-swap 反例仍有效。
 
 ## 3. 逐方泄露合同与项目所有者选择
 
@@ -39,6 +39,8 @@ P0/P1 的现有正式 F1 视图：自己的 raw-score shares、离线 GRank/DPF 
 | B：保持 F1 的公开范围，隐藏图控制 | 不公开 `L_t`/桶/活跃 edge 访问，可用 oblivious control、secure mux/ORAM 或每轮求值全池并固定流量；需给出密文图更新与 rank-offset 计算的新协议。 | 现有代码无接口/证明；简单全池 Eval 使在线比较升至 `r·C(D,2)`，失去 AAV 稀疏工作优势；ORAM/mux 的交互、材料与轮数均 `NOT_MEASURED/NOT_PROVEN`，不能先声称 `2r`。 |
 
 **已记录的项目决定：** 允许在线双方看到每轮 hidden-handle masked list、前 `r−1` 轮 local rank、pivot、bucket、活跃图、edge 访问/帧长和 abort 时点；末轮 rank、原槽 selected index 与明文 mask 仍不公开。此许可只确定选项 A 的泄露边界，不构成安全证明或 secure runtime 准入；选项 B 留作成本参照。不得把 Protocol I 的许可或证明直接转给 III。
+
+> E3 代数勘误补记（2026-10-05）：旧版 S5/S6 的“先取低位再逆路由”描述不正确，已在上方替换为 `Z_(2^64)` 完整累加→`Z_(2^b)` 逆路由→原序低位输出。历史 TEST_ONLY 模型没有覆盖该错误接线，E3 新增反例与修正验证。
 
 ## 4. E7 全池 hybrid 的逐步迁移及首个未闭合点
 

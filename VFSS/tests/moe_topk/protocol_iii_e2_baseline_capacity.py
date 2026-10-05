@@ -28,11 +28,14 @@ def shape(n, k):
     grank_section = 48 + 8 * n + pairs * (24 + edge_key_serialized)
     routing_section = n * (8 + dpf_key_bytes)
     party_bundle = 58 + score_section + grank_section + routing_section
-    # Same effective-payload boundary as E17: online-retained shares and
-    # native FSS key payloads, excluding application metadata/headers.
+    # E17 effective-payload boundary: actual online-retained scalar shares
+    # and native FSS arrays, excluding package/app metadata and vector capacity.
     effective_score = 2 * d * (16 + 840)
     effective_grank = 8 * n + pairs * (24 * comparison_bits + 24)
-    effective_routing = routing_section
+    # DPFKeyPack holds (rank_bits+1) native blocks, two uint64 correction
+    # words, and one uint64 payload. Its wire sentinel/bit-packed correction
+    # words are package encoding, not retained material.
+    effective_routing = 8 * n + n * (16 * (rank_bits + 1) + 24)
     return {
         "n": n, "k": k, "padded_d": d,
         "comparison_bits": comparison_bits, "rank_bits": rank_bits,
@@ -41,6 +44,11 @@ def shape(n, k):
         "party_score_section_bytes_derived": score_section,
         "party_grank_section_bytes_derived": grank_section,
         "party_routing_section_bytes_derived": routing_section,
+        "party_effective_score_payload_bytes_derived": effective_score,
+        "party_effective_grank_payload_bytes_derived": effective_grank,
+        "party_effective_routing_payload_bytes_derived": effective_routing,
+        "party_effective_material_payload_bytes_derived":
+            effective_score + effective_grank + effective_routing,
         "two_party_effective_material_bits_derived": 16 * (
             effective_score + effective_grank + effective_routing),
         "bundle_under_64_mib": party_bundle <= PACKET_LIMIT,

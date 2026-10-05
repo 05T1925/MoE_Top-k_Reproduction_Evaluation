@@ -46,6 +46,7 @@ PRIVATE
     src/moe_topk/protocol_i_aav86_small.cpp
     src/moe_topk/protocol_iii_grank.cpp
     src/moe_topk/protocol_iii_dpf_routing.cpp
+    src/moe_topk/protocol_iii_aav86_small.cpp
     src/moe_topk/protocol_iii_field.cpp
     src/moe_topk/protocol_iii_field_payload.cpp
     src/moe_topk/protocol_iii_field_dpf.cpp
@@ -101,6 +102,17 @@ add_test(NAME moe_topk_m6a10_aav86_metrics_conformance_test
 add_executable(moe_topk_m6a11_tcp_material_equivalence_test
     tests/moe_topk/protocol_i_aav86_e11_tcp_material_equivalence_test.cpp)
 target_link_libraries(moe_topk_m6a11_tcp_material_equivalence_test sytorch)
+
+add_executable(moe_topk_m6a_p2_iii_aav86_small_conformance_test
+    tests/moe_topk/protocol_iii_aav86_small_conformance_test.cpp)
+target_link_libraries(moe_topk_m6a_p2_iii_aav86_small_conformance_test sytorch)
+add_test(NAME moe_topk_m6a_p2_iii_aav86_small_conformance_test
+    COMMAND moe_topk_m6a_p2_iii_aav86_small_conformance_test)
+add_executable(moe_topk_m6a_p2_iii_aav86_small_process_e2e_test
+    tests/moe_topk/protocol_iii_aav86_small_process_e2e_test.cpp)
+target_link_libraries(moe_topk_m6a_p2_iii_aav86_small_process_e2e_test sytorch)
+add_test(NAME moe_topk_m6a_p2_iii_aav86_small_process_e2e_test
+    COMMAND moe_topk_m6a_p2_iii_aav86_small_process_e2e_test)
 add_test(NAME moe_topk_m6a11_tcp_material_equivalence_test
     COMMAND moe_topk_m6a11_tcp_material_equivalence_test)
 

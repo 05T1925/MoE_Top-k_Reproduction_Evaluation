@@ -106,7 +106,7 @@ def model(words, k, rounds, seed, use_counterfactual_zero_dummy=False):
     rank_share1 = [(ranks[h] - rank_share0[h]) % ring for h in range(d)]
     assert all((rank_share0[h] + rank_share1[h]) % ring == ranks[h]
                for h in range(d))
-    handle_bit0, handle_bit1 = [], []
+    handle_ring0, handle_ring1 = [], []
     for h in range(d):
         rank_mask = rng.randrange(ring)
         opened = (rank_share0[h] + rank_share1[h] + rank_mask) % ring
@@ -118,15 +118,17 @@ def model(words, k, rounds, seed, use_counterfactual_zero_dummy=False):
             share1 = (indicator - share0) & MASK64
             total0 = (total0 + share0) & MASK64
             total1 = (total1 + share1) & MASK64
-        handle_bit0.append(total0 & 1)
-        handle_bit1.append(total1 & 1)
-    # TEST_ONLY clear inverse π. This is the secure construction obligation.
+        # Keep additive ring shares through inverse routing. Taking each
+        # party's low bit here would make XOR shares, not Z_(2^b) shares.
+        handle_ring0.append(total0 & (ring - 1))
+        handle_ring1.append(total1 & (ring - 1))
+    # TEST_ONLY clear inverse π on Z_(2^b) additive shares.
     original0 = [0] * d
     original1 = [0] * d
     for h, original in enumerate(by_handle):
-        original0[original] = handle_bit0[h]
-        original1[original] = handle_bit1[h]
-    return ([original0[i] ^ original1[i] for i in range(n)],
+        original0[original] = handle_ring0[h]
+        original1[original] = handle_ring1[h]
+    return ([((original0[i] + original1[i]) % ring) & 1 for i in range(n)],
             public_trace, (rank_share0, rank_share1), by_handle)
 
 
@@ -147,6 +149,23 @@ class GateFixture(unittest.TestCase):
             correct[original] = handle_mask[h]
         self.assertEqual(correct, [1, 0])
         self.assertNotEqual(handle_mask, correct)
+
+    def test_xor_share_is_not_a_z2b_additive_share(self):
+        # Minimal wrong-wiring counterexample: each party's low bit is 1.
+        # XOR reconstructs 0, while treating them as Z4 shares reconstructs 2.
+        self.assertEqual(1 ^ 1, 0)
+        self.assertEqual((1 + 1) % 4, 2)
+
+    def test_ring_accumulator_reduction_preserves_indicator(self):
+        # Reduction Z_(2^64) -> Z_(2^b) is additive. The selected indicator
+        # is 0/1, so inverse routing can operate on reduced ring shares.
+        ring = 8
+        for indicator in (0, 1):
+            share0 = 0xFEDCBA9876543210
+            share1 = (indicator - share0) & MASK64
+            opened = ((share0 & (ring - 1)) +
+                      (share1 & (ring - 1))) % ring
+            self.assertEqual(opened, indicator)
 
     def test_odd_field_parity_is_not_additive(self):
         prime = (1 << 127) - 1

@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cerrno>
 #include <cstdint>
 #include <cstdlib>
@@ -26,6 +27,7 @@
 #include <poll.h>
 #include <netinet/in.h>
 #include <sys/random.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -120,6 +122,26 @@ ProtocolIIIRawScoreMaskConfig config(std::uint32_t n, std::uint32_t k,
                n,k,rank,comparison,party,kTimeoutMs};
   return c;
 }
+struct EffectivePayload {
+  std::uint64_t score = 0, grank = 0, routing = 0;
+  std::uint64_t total() const { return score + grank + routing; }
+};
+EffectivePayload expected_effective_material_bytes(std::uint32_t n) {
+  const auto d = pad(n);
+  const auto comparison_bits = 33U + width(d - 1U);
+  const auto rank_bits = width(n - 1U);
+  const auto pairs = static_cast<std::uint64_t>(n) * (n - 1U) / 2U;
+  const auto dcf_payload = [](std::uint32_t bits) {
+    return UINT64_C(16) * (bits + 1U) + UINT64_C(8) * (bits + 1U);
+  };
+  EffectivePayload payload;
+  payload.score = UINT64_C(2) * d *
+      (UINT64_C(16) + dcf_payload(34U));
+  payload.grank = UINT64_C(8) * n + pairs * dcf_payload(comparison_bits);
+  payload.routing = UINT64_C(8) * n + UINT64_C(16) * n *
+      (rank_bits + 1U) + UINT64_C(24) * n;
+  return payload;
+}
 void seed_fss(osuCrypto::PRNG& private_random) {
   for (int i = 0; i < 256; ++i)
     FSSConfig::prngs[i].SetSeed(
@@ -194,6 +216,59 @@ make_material(const ProtocolIIIRawScoreMaskConfig& c, osuCrypto::PRNG& random) {
   }
   return {std::move(a),std::move(b)};
 }
+std::uint64_t actual_effective_material_bytes(
+    const ProtocolIIIRawScoreMaskMaterial& material) {
+  std::uint64_t bytes = 0;
+  const auto count_score = [&](const auto& slots) {
+    for (const auto& item : slots)
+      bytes += sizeof(item.left_mask_share) + sizeof(item.right_mask_share) +
+               item.material.payload_bytes();
+  };
+  count_score(material.score_input_package.carry_materials);
+  count_score(material.score_input_package.sign_materials);
+  bytes += material.grank_package.node_mask_shares.size() * sizeof(std::uint64_t);
+  for (const auto& edge : material.grank_package.edge_materials)
+    bytes += edge.material.payload_bytes();
+  bytes += material.routing_material.rank_mask_shares.size() * sizeof(std::uint64_t);
+  for (const auto& owner : material.routing_material.dpf_keys) {
+    const auto& key = owner.native_key();
+    require(key.s != nullptr, "F1 diagnostic DPF seed storage");
+    bytes += static_cast<std::uint64_t>(key.bin + 1) * sizeof(*key.s) +
+             sizeof(key.tLcw) + sizeof(key.tRcw) + sizeof(key.payload);
+  }
+  return bytes;
+}
+void run_material_diagnostic(std::uint32_t n) {
+  std::array<std::uint64_t, 2> seed{};
+  require(::getrandom(seed.data(), sizeof(seed), 0) == sizeof(seed),
+          "F1 material diagnostic OS seed");
+  osuCrypto::PRNG random;
+  random.SetSeed(osuCrypto::toBlock(seed[0], seed[1]));
+  seed_fss(random);
+  const auto c0 = config(n, 2U, 0U, 0x501U, 0x502U, 0x503U);
+  const auto c1 = config(n, 2U, 1U, 0x501U, 0x502U, 0x503U);
+  auto materials = make_material(c0, random);
+  const auto actual0 = actual_effective_material_bytes(materials.first);
+  const auto actual1 = actual_effective_material_bytes(materials.second);
+  const auto expected = expected_effective_material_bytes(n);
+  require(actual0 == expected.total() && actual1 == expected.total(),
+          "F1 actual retained material diagnostic vs fixed layout");
+  const auto serialized0 = protocol_iii_raw_score_mask_serialize_bundle(
+      c0, materials.first);
+  const auto serialized1 = protocol_iii_raw_score_mask_serialize_bundle(
+      c1, materials.second);
+  require(serialized0.size() != actual0 && serialized1.size() != actual1,
+          "F1 payload diagnostic excludes package encoding");
+  std::cout << "F1_MATERIAL_DIAGNOSTIC n=" << n
+            << " d=" << pad(n)
+            << " score_payload_bytes_per_party=" << expected.score
+            << " grank_payload_bytes_per_party=" << expected.grank
+            << " routing_payload_bytes_per_party=" << expected.routing
+            << " actual_party0=" << actual0 << " actual_party1=" << actual1
+            << " bundle0=" << serialized0.size()
+            << " bundle1=" << serialized1.size()
+            << " PASS\n";
+}
 std::vector<std::uint32_t> decode_shares(const Bytes& b, std::uint32_t n) {
   require(b.size() == static_cast<std::size_t>(n)*4U, "F1 input length");
   std::vector<std::uint32_t> out(n);
@@ -217,7 +292,8 @@ std::uint32_t get_u32_at(const Bytes& b,std::size_t at) {
          (static_cast<std::uint32_t>(b[at+2])<<8U) | b[at+3];
 }
 Bytes encode_report(const ProtocolIIIRawScoreMaskOutput& out,
-                    const Bytes& offline,std::uint64_t dcf_online_prg_calls) {
+                    const Bytes& offline,std::uint64_t dcf_online_prg_calls,
+                    std::uint64_t online_ns, std::uint32_t n) {
   const auto score=get_u32_at(offline,46U);
   const auto grank=get_u32_at(offline,50U);
   const auto dpf=get_u32_at(offline,54U);
@@ -226,6 +302,9 @@ Bytes encode_report(const ProtocolIIIRawScoreMaskOutput& out,
   require(metadata+score+grank+routing==offline.size()+8U,
           "F1 offline stage accounting");
   Bytes b(out.xor_mask_shares.begin(),out.xor_mask_shares.end());
+  const auto padded = pad(n);
+  const auto pairs = static_cast<std::uint64_t>(n) * (n - 1U) / 2U;
+  const auto effective_material = expected_effective_material_bytes(n);
   for (const auto value : {static_cast<std::uint64_t>(offline.size()+8U),
                            out.metrics.sent_bytes,out.metrics.received_bytes,
                            out.metrics.total_logical_bits,out.metrics.input_logical_bits,
@@ -240,15 +319,26 @@ Bytes encode_report(const ProtocolIIIRawScoreMaskOutput& out,
                            out.metrics.routing.sent_bytes,
                            static_cast<std::uint64_t>(score),
                            static_cast<std::uint64_t>(grank),routing,metadata,
-                           dcf_online_prg_calls}) put(b,value);
+                           dcf_online_prg_calls,online_ns,
+                           effective_material.score,
+                           effective_material.grank,
+                           effective_material.routing,
+                           out.metrics.score_input.carry_received_bytes,
+                           out.metrics.score_input.sign_received_bytes,
+                           out.metrics.grank.received_bytes,
+                           out.metrics.routing.received_bytes,
+                           out.metrics.score_dcf_prg_calls,
+                           out.metrics.grank_dcf_prg_calls,
+                           out.metrics.routing_dcf_prg_calls,
+                           out.metrics.grank.comparison_edges}) put(b,value);
   return b;
 }
 struct Report {
   Bytes mask;
-  std::array<std::uint64_t,20> metrics{};
+  std::array<std::uint64_t,32> metrics{};
 };
 Report decode_report(const Bytes& b, std::uint32_t n) {
-  require(b.size() == n+20U*8U, "F1 report length");
+  require(b.size() == n+32U*8U, "F1 report length");
   Report r; r.mask.assign(b.begin(),b.begin()+n);
   std::size_t at=n;
   for (auto& v:r.metrics) v=get(b,at);
@@ -277,13 +367,23 @@ int party(std::uint8_t id,int offline_fd,int input_fd,int carry_fd,int sign_fd,
   const auto c=config(n,k,id,session,fingerprint,material_id);
   const auto bytes=receive_packet(offline_fd);
   auto material=protocol_iii_raw_score_mask_deserialize_bundle(c,bytes);
+  const std::uint8_t ready=1U;
+  write_all(report_fd,&ready,1U);
   const auto raw=decode_shares(receive_packet(input_fd),n);
   if (force_close) { ::close(carry_fd); throw std::runtime_error("injected early close"); }
   ProtocolIIIRawScoreMaskFds fds{{carry_fd,sign_fd},grank_fd,routing_fd};
   resetDCFOnlinePrgCalls();
+  const auto online_started=std::chrono::steady_clock::now();
   const auto output=protocol_iii_raw_score_mask_party(c,material,raw,fds);
+  const auto online_ns=static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::steady_clock::now()-online_started).count());
   const auto dcf_online_prg_calls=readDCFOnlinePrgCalls();
-  send_packet(report_fd,encode_report(output,bytes,dcf_online_prg_calls));
+  require(dcf_online_prg_calls == output.metrics.score_dcf_prg_calls +
+              output.metrics.grank_dcf_prg_calls +
+              output.metrics.routing_dcf_prg_calls,
+          "F1 stage DCF PRG counter conservation");
+  send_packet(report_fd,encode_report(output,bytes,dcf_online_prg_calls,online_ns,n));
   // TEST_ONLY lifetime barrier on the report socket. It conveys no protocol
   // value and is outside all online metrics; both parties have finished.
   std::uint8_t done=0; read_all(report_fd,&done,1U);
@@ -335,10 +435,12 @@ pid_t launch(const std::vector<std::string>& arguments,const std::vector<int>& k
   return pid;
 }
 std::string number(std::uint64_t x) { return std::to_string(x); }
-void wait_success(pid_t pid,const char* role) {
+std::uint64_t wait_success(pid_t pid,const char* role) {
   int status=0;
-  require(::waitpid(pid,&status,0)==pid,"F1 waitpid");
+  struct rusage usage{};
+  require(::wait4(pid,&status,0,&usage)==pid,"F1 wait4");
   require(WIFEXITED(status)&&WEXITSTATUS(status)==0,role);
+  return static_cast<std::uint64_t>(usage.ru_maxrss);
 }
 void run_case(const TestCase& test,bool inject_early_close=false,
               bool tcp_online=false) {
@@ -351,9 +453,9 @@ void run_case(const TestCase& test,bool inject_early_close=false,
   for (auto& p:online)
     require((tcp_online ? pair_tcp_loopback(p) : pair_fds(p))==0,
             "F1 online socket");
-  // Public bindings are sampled independently of the controller's private
-  // deterministic input-sharing seed. A party cannot infer the peer share
-  // by recovering that seed from session or material metadata.
+  // Public bindings are sampled independently of the controller's fresh
+  // input-sharing seed. A party cannot infer the peer share from session or
+  // material metadata.
   std::array<std::uint64_t,3> public_ids{};
   require(::getrandom(public_ids.data(),sizeof(public_ids),0)==sizeof(public_ids),
           "F1 public binding random IDs");
@@ -361,6 +463,7 @@ void run_case(const TestCase& test,bool inject_early_close=false,
   const auto session=public_ids[0];
   const auto fingerprint=public_ids[1];
   const auto material_id=public_ids[2];
+  const auto offline_started=std::chrono::steady_clock::now();
   const auto dealer_pid=launch({"--dealer",number(offline[0][1]),number(offline[1][1]),
                                  number(n),number(test.k),number(session),
                                  number(fingerprint),number(material_id)},
@@ -380,9 +483,19 @@ void run_case(const TestCase& test,bool inject_early_close=false,
   for (auto& p:offline) { ::close(p[0]); ::close(p[1]); }
   for (auto& p:input) ::close(p[1]);
   for (auto& p:report) ::close(p[1]);
-  wait_success(dealer_pid,"F1 dealer exited unsuccessfully");
+  const auto peak_t_kib=wait_success(dealer_pid,"F1 dealer exited unsuccessfully");
+  std::array<std::uint8_t,2> ready{};
+  read_all(report[0][0],&ready[0],1U);
+  read_all(report[1][0],&ready[1],1U);
+  require(ready[0]==1U&&ready[1]==1U,"F1 party ready barrier");
+  const auto offline_ns=static_cast<std::uint64_t>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+          std::chrono::steady_clock::now()-offline_started).count());
   // Dealer has exited before controller releases any online input share.
-  std::mt19937_64 random(test.seed^UINT64_C(0x1A2B3C));
+  std::uint64_t share_seed = 0;
+  require(::getrandom(&share_seed, sizeof(share_seed), 0) == sizeof(share_seed),
+          "F1 independent input-sharing OS seed");
+  std::mt19937_64 random(share_seed);
   std::vector<std::uint32_t> s0(n),s1(n);
   for (std::size_t i=0;i<n;++i) {
     s0[i]=static_cast<std::uint32_t>(random());
@@ -427,24 +540,70 @@ void run_case(const TestCase& test,bool inject_early_close=false,
     require(r->metrics[15]+r->metrics[16]+r->metrics[17]+r->metrics[18]==
                 r->metrics[0], "F1 stage offline sum");
     require(r->metrics[19]==expected_prg,"F1 DCF online PRG coverage");
+    require(r->metrics[19] == r->metrics[28] + r->metrics[29] +
+                r->metrics[30], "F1 per-stage DCF PRG coverage");
+    require(r->metrics[1] == r->metrics[11] + r->metrics[12] +
+                r->metrics[13] + r->metrics[14],
+            "F1 stage sent-byte conservation");
+    require(r->metrics[2] == r->metrics[24] + r->metrics[25] +
+                r->metrics[26] + r->metrics[27],
+            "F1 stage received-byte conservation");
+    require(r->metrics[31] == pairs, "F1 actual GRank edge counter");
   }
+  require(a.metrics[1] == b.metrics[2] && b.metrics[1] == a.metrics[2],
+          "F1 cross-party overall byte conservation");
+  for (const auto [sent, received] : {
+           std::pair<std::size_t,std::size_t>{11U,24U}, {12U,25U},
+           {13U,26U}, {14U,27U}})
+    require(a.metrics[sent] == b.metrics[received] &&
+                b.metrics[sent] == a.metrics[received],
+            "F1 cross-party per-stage byte conservation");
   const std::uint8_t done=1U;
   write_all(report[0][0],&done,1U); write_all(report[1][0],&done,1U);
-  wait_success(p0,"F1 P0 exited unsuccessfully");
-  wait_success(p1,"F1 P1 exited unsuccessfully");
+  const auto peak_p0_kib=wait_success(p0,"F1 P0 exited unsuccessfully");
+  const auto peak_p1_kib=wait_success(p1,"F1 P1 exited unsuccessfully");
   const auto wire=a.metrics[1]+b.metrics[1];
   const auto offline_bytes=a.metrics[0]+b.metrics[0];
+  std::uint64_t digest=UINT64_C(1469598103934665603);
+  for (const auto value:test.scores) digest=(digest^value)*UINT64_C(1099511628211);
   std::cout<<"F1_PROCESS_PASS n="<<n<<" k="<<test.k
            <<" online_transport="<<(tcp_online ? "TCP_LOOPBACK" : "UNIX_SOCKETPAIR")
            <<" rounds=4 logical_bits="<<a.metrics[3]
            <<" wire_bytes="<<wire<<" offline_bytes="<<offline_bytes
+           <<" offline_ns="<<offline_ns
+           <<" online_p0_ns="<<a.metrics[20]<<" online_p1_ns="<<b.metrics[20]
+           <<" online_max_ns="<<std::max(a.metrics[20],b.metrics[20])
+           <<" offline_material_total_bits="
+           <<(a.metrics[21]+a.metrics[22]+a.metrics[23]+
+              b.metrics[21]+b.metrics[22]+b.metrics[23])*8U
+           <<" offline_material_score_bits="<<(a.metrics[21]+b.metrics[21])*8U
+           <<" offline_material_grank_bits="<<(a.metrics[22]+b.metrics[22])*8U
+           <<" offline_material_routing_bits="<<(a.metrics[23]+b.metrics[23])*8U
+           <<" offline_material_status=DERIVED_FROM_VALIDATED_FIXED_LAYOUT"
+           <<" total_ns="<<offline_ns+std::max(a.metrics[20],b.metrics[20])
+           <<" peak_t_kib="<<peak_t_kib<<" peak_p0_kib="<<peak_p0_kib
+           <<" peak_p1_kib="<<peak_p1_kib
+           <<" session="<<session<<" fingerprint="<<fingerprint
+           <<" material_id="<<material_id
+           <<" input_share_seed="<<share_seed
+           <<" input_seed="<<test.seed<<" input_digest="<<digest
            <<" raw_dcf="<<(a.metrics[7]+b.metrics[7]+a.metrics[8]+b.metrics[8])
            <<" dpf_eval="<<(a.metrics[9]+b.metrics[9])
            <<" dcf_prg="<<(a.metrics[19]+b.metrics[19])
+           <<" comparison_edges="<<pairs
+           <<" p0_sent_bytes="<<a.metrics[1]<<" p0_received_bytes="<<a.metrics[2]
+           <<" p1_sent_bytes="<<b.metrics[1]<<" p1_received_bytes="<<b.metrics[2]
            <<" stage_wire="<<(a.metrics[11]+b.metrics[11])<<","
            <<(a.metrics[12]+b.metrics[12])<<","
            <<(a.metrics[13]+b.metrics[13])<<","
            <<(a.metrics[14]+b.metrics[14])
+           <<" stage_receive="<<(a.metrics[24]+b.metrics[24])<<","
+           <<(a.metrics[25]+b.metrics[25])<<","
+           <<(a.metrics[26]+b.metrics[26])<<","
+           <<(a.metrics[27]+b.metrics[27])
+           <<" stage_dcf_prg="<<(a.metrics[28]+b.metrics[28])<<","
+           <<(a.metrics[29]+b.metrics[29])<<","
+           <<(a.metrics[30]+b.metrics[30])
            <<" stage_offline="<<(a.metrics[15]+b.metrics[15])<<","
            <<(a.metrics[16]+b.metrics[16])<<","
            <<(a.metrics[17]+b.metrics[17])<<","
@@ -458,6 +617,24 @@ std::uint64_t parse_u(const char* s) { return std::stoull(s); }
 
 int main(int argc,char** argv) {
   try {
+    if (argc==2 && std::string(argv[1])=="--material-diagnostic") {
+      run_material_diagnostic(128U);
+      run_material_diagnostic(256U);
+      return 0;
+    }
+    if (argc==5 && std::string(argv[1])=="--bench") {
+      const auto n=static_cast<std::uint32_t>(parse_u(argv[2]));
+      const auto k=static_cast<std::uint32_t>(parse_u(argv[3]));
+      const auto input_seed=parse_u(argv[4]);
+      require((n==128U||n==256U)&&(k==2U||k==8U),
+              "F1 benchmark matrix shape");
+      std::mt19937_64 random(input_seed);
+      std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
+      std::vector<std::uint32_t> scores(n);
+      for (auto& score:scores) score=static_cast<std::uint32_t>(distribution(random));
+      run_case({std::move(scores),k,input_seed},false,true);
+      return 0;
+    }
     if (argc==9 && std::string(argv[1])=="--dealer")
       return dealer(parse_i(argv[2]),parse_i(argv[3]),parse_u(argv[4]),
                     parse_u(argv[5]),parse_u(argv[6]),parse_u(argv[7]),

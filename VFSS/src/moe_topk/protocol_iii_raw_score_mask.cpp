@@ -1,5 +1,7 @@
 #include <moe_topk/protocol_iii_raw_score_mask.h>
 
+#include <FSS/dcf.h>
+
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -115,14 +117,23 @@ ProtocolIIIRawScoreMaskOutput protocol_iii_raw_score_mask_party(
   // A failed exchange is terminal; never retry this input-dependent state.
   material.started = true;
   ProtocolIIIRawScoreMaskOutput output;
+  auto prg_before = readDCFOnlinePrgCalls();
   const auto priority_key_shares = protocol_i_raw_score_input_party(
       config.score_input, material.score_input_package, raw_score_shares,
       fds.score_input_fds, &output.metrics.score_input);
+  auto prg_after = readDCFOnlinePrgCalls();
+  output.metrics.score_dcf_prg_calls = prg_after - prg_before;
+  prg_before = prg_after;
   const auto rank_output = protocol_iii_grank_party(
       config.grank, material.grank_package, priority_key_shares, fds.grank_fd);
+  prg_after = readDCFOnlinePrgCalls();
+  output.metrics.grank_dcf_prg_calls = prg_after - prg_before;
+  prg_before = prg_after;
   const auto routing_output = protocol_iii_dpf_routing_party(
       config.routing, material.routing_material,
       rank_output.rank_additive_shares, fds.routing_fd);
+  prg_after = readDCFOnlinePrgCalls();
+  output.metrics.routing_dcf_prg_calls = prg_after - prg_before;
   output.xor_mask_shares = protocol_iii_ring_indicators_to_xor_mask(
       config.routing.logical_n, config.routing.k, routing_output.indicator_shares);
   output.metrics.grank = rank_output.metrics;

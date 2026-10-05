@@ -55,6 +55,11 @@ struct ProtocolIIIRawScoreMaskMetrics {
   std::uint64_t routing_logical_bits = 0;
   std::uint64_t total_logical_bits = 0;
   std::uint64_t output_local_ring_additions = 0;
+  // TEST/measurement counters bracket the real secure stages. Native DPF
+  // AES calls are not DCF PRG calls and remain reported separately.
+  std::uint64_t score_dcf_prg_calls = 0;
+  std::uint64_t grank_dcf_prg_calls = 0;
+  std::uint64_t routing_dcf_prg_calls = 0;
 };
 
 struct ProtocolIIIRawScoreMaskOutput {
