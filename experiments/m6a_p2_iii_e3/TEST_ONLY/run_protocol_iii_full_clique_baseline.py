@@ -336,6 +336,7 @@ def main():
             raise SystemExit("unshaped profile must not claim calibration evidence")
         CALIBRATION = None
         CALIBRATION_VALID = False
+    binary_hash = sha256(binary)
     args.output_dir.mkdir(parents=True, exist_ok=False)
     source_manifest = {
         "source_revision": args.source_revision,
@@ -357,7 +358,6 @@ def main():
         shutil.copyfile(args.profile_command, args.output_dir / "profile_command.txt")
         shutil.copyfile(args.material_diagnostic,
                         args.output_dir / "material_diagnostic.txt")
-    binary_hash = sha256(binary)
     plan = {
         "source": "E17 bridge_final_v2 LAN/WAN JSONL seed rows",
         "source_original_input_plan_hash": E17_PLAN_HASH,
@@ -374,7 +374,6 @@ def main():
     (args.output_dir / "seed_plan.json").write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
     environment = {
         "created_utc": utc_now(),
-        "profile": PROFILE,
         "profile": PROFILE,
         "formal_lan_wan_status": "PROFILE_CALIBRATED_BATCH_RUNNING" if CALIBRATION_VALID else "NOT_RUN",
         "network_calibration": CALIBRATION if CALIBRATION is not None else "NOT_MEASURED",
