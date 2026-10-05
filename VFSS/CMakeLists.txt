@@ -112,6 +112,13 @@ target_link_libraries(moe_topk_m6a20_aav86_store_conformance_test
 add_test(NAME moe_topk_m6a20_aav86_store_conformance_test
     COMMAND moe_topk_m6a20_aav86_store_conformance_test)
 
+add_executable(moe_topk_m6a21_clique_store_conformance_test
+    tests/moe_topk/protocol_i_e21_clique_store_conformance_test.cpp)
+target_link_libraries(moe_topk_m6a21_clique_store_conformance_test
+    moe_topk_aav86_streamed_store sytorch Threads::Threads)
+add_test(NAME moe_topk_m6a21_clique_store_conformance_test
+    COMMAND moe_topk_m6a21_clique_store_conformance_test)
+
 add_executable(moe_topk_m6a20_aav86_stream_differential_test
     tests/moe_topk/protocol_i_aav86_e20_stream_differential_test.cpp)
 target_link_libraries(moe_topk_m6a20_aav86_stream_differential_test

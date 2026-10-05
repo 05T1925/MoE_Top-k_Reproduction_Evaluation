@@ -8,10 +8,20 @@
 
 namespace moe_topk {
 
+struct ProtocolIStreamDeliveryBytes {
+  std::uint64_t party0 = 0, party1 = 0;
+};
+
 // E20_STREAM_AEAD_V1. The two descriptors must be private, intact offline
 // T->party channels. The function sends every canonical edge before the base
 // bundle and returns only after both deliveries finish.
-void protocol_i_aav86_stream_dealer_send(
+ProtocolIStreamDeliveryBytes protocol_i_aav86_stream_dealer_send(
+    const ProtocolIAav86SmallConfig& config, int party0_fd, int party1_fd);
+
+// E21_CLIQUE_MINIMAL_SEALED_V1. Generates only full-clique node masks,
+// score carry/sign materials, and every canonical comparison key. No AAV86
+// permutation, translation, or pivot state is generated or delivered.
+ProtocolIStreamDeliveryBytes protocol_i_clique_minimal_dealer_send(
     const ProtocolIAav86SmallConfig& config, int party0_fd, int party1_fd);
 
 class ProtocolIAav86StreamedPartyMaterial {
@@ -41,6 +51,12 @@ class ProtocolIAav86StreamedPartyMaterial {
   friend ProtocolIAav86StreamedPartyMaterial
   protocol_i_aav86_stream_receive_party(const ProtocolIAav86SmallConfig&,
                                        int, const std::string&);
+  friend ProtocolIAav86StreamedPartyMaterial
+  protocol_i_clique_minimal_receive_party(const ProtocolIAav86SmallConfig&,
+                                         int, const std::string&);
+  friend ProtocolIAav86StreamedPartyMaterial
+  protocol_i_stream_receive_impl(const ProtocolIAav86SmallConfig&,
+                                 int, const std::string&, bool);
   friend ProtocolIAav86SmallOutput protocol_i_aav86_stream_party_from_store(
       const ProtocolIAav86SmallConfig&,
       ProtocolIAav86StreamedPartyMaterial&&,
@@ -59,6 +75,9 @@ class ProtocolIAav86StreamedPartyMaterial {
 // Each party creates its own AEAD key from OS entropy, never stores that key,
 // and atomically seals the full file before returning ready to the controller.
 ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
+    const ProtocolIAav86SmallConfig& config, int dealer_fd,
+    const std::string& private_directory);
+ProtocolIAav86StreamedPartyMaterial protocol_i_clique_minimal_receive_party(
     const ProtocolIAav86SmallConfig& config, int dealer_fd,
     const std::string& private_directory);
 

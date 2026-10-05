@@ -1,5 +1,7 @@
 #include <moe_topk/protocol_i_aav86_streamed_store.h>
 
+#include <FSS/prng.h>
+
 #include <openssl/crypto.h>
 #include <openssl/evp.h>
 
@@ -10,6 +12,7 @@
 #include <filesystem>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <string>
 #include <sys/random.h>
@@ -60,7 +63,8 @@ void put(std::uint8_t* out,std::size_t& at,std::uint64_t value,unsigned bytes) {
   for(unsigned shift=bytes;shift;--shift)
     out[at++]=static_cast<std::uint8_t>(value>>(8U*(shift-1U)));
 }
-Header header_for(const ProtocolIAav86SmallConfig& c,std::uint32_t party) {
+Header header_for(const ProtocolIAav86SmallConfig& c,std::uint32_t party,
+                  bool minimal=false) {
   const auto d=padded(c.logical_n),b=bits_for(d);
   check(c.session&&c.fingerprint&&c.material_id&&c.k>=1&&c.k<=c.logical_n&&
             c.iterations>=1&&c.iterations<=5&&party<2&&c.timeout_ms>0,
@@ -70,7 +74,7 @@ Header header_for(const ProtocolIAav86SmallConfig& c,std::uint32_t party) {
   const auto key_bytes=24U*b+57U;
   const auto record_bytes=kRecordHeaderBytes+key_bytes+kTagBytes;
   Header out{};std::size_t at=0;
-  put(out.data(),at,kMagic,4);put(out.data(),at,kVersion,4);
+  put(out.data(),at,kMagic,4);put(out.data(),at,minimal?2U:kVersion,4);
   put(out.data(),at,c.session,8);put(out.data(),at,c.fingerprint,8);
   put(out.data(),at,c.material_id,8);
   put(out.data(),at,c.logical_n,4);put(out.data(),at,d,4);
@@ -198,8 +202,9 @@ std::vector<std::uint8_t> open_record(
         "E20 store authentication failed");
   return plain;
 }
-std::string file_name(const ProtocolIAav86SmallConfig& c) {
-  return "aav86-e20-"+std::to_string(c.session)+"-"+
+std::string file_name(const ProtocolIAav86SmallConfig& c,bool minimal=false) {
+  return std::string(minimal?"clique-e21-":"aav86-e20-")+
+         std::to_string(c.session)+"-"+
          std::to_string(c.material_id)+"-p"+std::to_string(c.party)+".sealed";
 }
 int private_dir(const std::string& path) {
@@ -215,7 +220,7 @@ int private_dir(const std::string& path) {
 }
 } // namespace
 
-void protocol_i_aav86_stream_dealer_send(
+ProtocolIStreamDeliveryBytes protocol_i_aav86_stream_dealer_send(
     const ProtocolIAav86SmallConfig& config,int party0_fd,int party1_fd) {
   check(party0_fd>=0&&party1_fd>=0&&party0_fd!=party1_fd,"E20 dealer channels");
   const auto h0=header_for(config,0),h1=header_for(config,1);
@@ -223,6 +228,7 @@ void protocol_i_aav86_stream_dealer_send(
   bound_socket(party1_fd,config.timeout_ms);
   send_exact(party0_fd,h0.data(),h0.size());
   send_exact(party1_fd,h1.data(),h1.size());
+  ProtocolIStreamDeliveryBytes sent{h0.size(),h1.size()};
   const auto key_bytes=24U*bits_for(padded(config.logical_n))+57U;
   auto sink=[&](std::uint32_t,std::uint32_t,std::uint32_t,std::uint64_t,
                 ProtocolIUcmpPartyMaterial&& k0,
@@ -231,6 +237,8 @@ void protocol_i_aav86_stream_dealer_send(
     check(b0.size()==key_bytes&&b1.size()==key_bytes,"E20 key width");
     send_exact(party0_fd,b0.data(),b0.size());
     send_exact(party1_fd,b1.data(),b1.size());
+    sent.party0=add(sent.party0,b0.size());
+    sent.party1=add(sent.party1,b1.size());
   };
   auto base=protocol_i_aav86_stream_dealer_generate(config,sink);
   for(const auto& item:{std::pair{party0_fd,&base.party0},
@@ -241,7 +249,199 @@ void protocol_i_aav86_stream_dealer_send(
     put(size.data(),at,bytes.size(),4);
     send_exact(item.first,size.data(),size.size());
     send_exact(item.first,bytes.data(),bytes.size());
+    auto& count=item.first==party0_fd?sent.party0:sent.party1;
+    count=add(count,add(size.size(),bytes.size()));
   }
+  return sent;
+}
+
+namespace {
+constexpr std::uint32_t kCliqueBaseMagic=UINT32_C(0x45323143); // E21C
+constexpr std::uint32_t kCliqueBaseVersion=1;
+constexpr std::uint32_t kScoreKeyBytes=24U*34U+57U;
+std::mutex clique_dealer_mutex;
+
+void append(std::vector<std::uint8_t>& out,std::uint64_t value,unsigned count) {
+  for(unsigned i=count;i>0;--i)
+    out.push_back(static_cast<std::uint8_t>(value>>(8U*(i-1U))));
+}
+std::uint64_t take(const std::vector<std::uint8_t>& in,std::size_t& at,
+                   unsigned count) {
+  check(count<=8&&at<=in.size()&&count<=in.size()-at,"E21 base truncated");
+  std::uint64_t value=0;
+  for(unsigned i=0;i<count;++i) value=(value<<8U)|in[at++];
+  return value;
+}
+std::vector<std::uint8_t> clique_base_encode(
+    const ProtocolIAav86SmallPartyMaterial& m) {
+  const auto d=padded(m.logical_n);
+  check(m.iterations==1&&m.padded_n==d&&m.party<2&&
+            m.node_mask_shares.size()==d&&m.edge_keys.empty()&&
+            m.forward_sigma.empty()&&m.forward_tau.empty()&&
+            m.inverse_sigma.empty()&&m.inverse_tau.empty()&&
+            m.forward_a.empty()&&m.forward_e.empty()&&
+            m.inverse_a.empty()&&m.inverse_e.empty()&&
+            m.pivot_seed_lo==0&&m.pivot_seed_hi==0,
+        "E21 base contains unexpected AAV86 state");
+  std::vector<std::uint8_t> out;
+  append(out,kCliqueBaseMagic,4);append(out,kCliqueBaseVersion,4);
+  append(out,m.session,8);append(out,m.fingerprint,8);
+  append(out,m.material_id,8);append(out,m.logical_n,4);
+  append(out,d,4);append(out,m.k,4);append(out,m.iterations,4);
+  append(out,m.comparison_bits,4);append(out,m.party,4);
+  append(out,d,4);
+  for(auto word:m.node_mask_shares) append(out,word,8);
+  for(std::uint32_t stage=1;stage<=2;++stage) {
+    const auto& items=stage==1?m.score_materials.carry_materials:
+                               m.score_materials.sign_materials;
+    check(items.size()==d,"E21 base score count");
+    append(out,d,4);
+    for(std::uint32_t slot=0;slot<d;++slot) {
+      const auto& item=items[slot];
+      check(item.slot==slot&&item.stage==stage&&
+                item.material.party_id()==m.party&&
+                item.material.comparison_bits()==34,"E21 base score shape");
+      const auto key=item.material.serialize();
+      check(key.size()==kScoreKeyBytes,"E21 score key length");
+      append(out,slot,4);append(out,stage,4);
+      append(out,item.left_mask_share,8);
+      append(out,item.right_mask_share,8);
+      out.insert(out.end(),key.begin(),key.end());
+    }
+  }
+  check(out.size()<=16U*1024U*1024U,"E21 base maximum");
+  return out;
+}
+ProtocolIAav86SmallPartyMaterial clique_base_decode(
+    const std::vector<std::uint8_t>& in,
+    const ProtocolIAav86SmallConfig& config) {
+  check(in.size()<=16U*1024U*1024U,"E21 base maximum");
+  std::size_t at=0;
+  check(take(in,at,4)==kCliqueBaseMagic&&
+            take(in,at,4)==kCliqueBaseVersion,"E21 base magic/version");
+  ProtocolIAav86SmallPartyMaterial m;
+  m.session=take(in,at,8);m.fingerprint=take(in,at,8);
+  m.material_id=take(in,at,8);m.logical_n=take(in,at,4);
+  m.padded_n=take(in,at,4);m.k=take(in,at,4);
+  m.iterations=take(in,at,4);
+  const auto received_bits=take(in,at,4),received_party=take(in,at,4);
+  check(received_bits<=UINT8_MAX&&received_party<=1,
+        "E21 base numeric binding");
+  m.comparison_bits=received_bits;m.party=received_party;
+  const auto d=padded(config.logical_n);
+  check(m.session==config.session&&m.fingerprint==config.fingerprint&&
+            m.material_id==config.material_id&&m.logical_n==config.logical_n&&
+            m.padded_n==d&&m.k==config.k&&m.iterations==1&&
+            config.iterations==1&&m.comparison_bits==bits_for(d)&&
+            m.party==config.party,"E21 base binding");
+  check(take(in,at,4)==d,"E21 node count");
+  m.node_mask_shares.reserve(d);
+  for(std::uint32_t a=0;a<d;++a) m.node_mask_shares.push_back(take(in,at,8));
+  auto& score=m.score_materials;
+  score.session=m.session;score.fingerprint=m.fingerprint;
+  score.party=m.party;score.n=d;score.k=m.k;
+  score.comparison_bits=m.comparison_bits;
+  for(std::uint32_t stage=1;stage<=2;++stage) {
+    check(take(in,at,4)==d,"E21 score count");
+    auto& items=stage==1?score.carry_materials:score.sign_materials;
+    for(std::uint32_t slot=0;slot<d;++slot) {
+      check(take(in,at,4)==slot&&take(in,at,4)==stage,
+            "E21 score slot/stage");
+      const auto left=take(in,at,8),right=take(in,at,8);
+      check(at<=in.size()&&kScoreKeyBytes<=in.size()-at,
+            "E21 score key truncated");
+      std::vector<std::uint8_t> raw(in.begin()+at,in.begin()+at+kScoreKeyBytes);
+      at+=kScoreKeyBytes;
+      auto key=ProtocolIUcmpPartyMaterial::deserialize(raw);
+      check(key.party_id()==m.party&&key.comparison_bits()==34,
+            "E21 score key binding");
+      items.emplace_back(slot,static_cast<std::uint8_t>(stage),
+                         left,right,std::move(key));
+    }
+  }
+  check(at==in.size(),"E21 base trailing data");
+  return m;
+}
+} // namespace
+
+ProtocolIStreamDeliveryBytes protocol_i_clique_minimal_dealer_send(
+    const ProtocolIAav86SmallConfig& config,int party0_fd,int party1_fd) {
+  check(config.iterations==1&&party0_fd>=0&&party1_fd>=0&&
+            party0_fd!=party1_fd,"E21 dealer shape/channels");
+  const auto h0=header_for(config,0,true),h1=header_for(config,1,true);
+  bound_socket(party0_fd,config.timeout_ms);
+  bound_socket(party1_fd,config.timeout_ms);
+  std::lock_guard<std::mutex> guard(clique_dealer_mutex);
+  std::array<std::uint64_t,2> seed{};
+  random_bytes(seed.data(),sizeof(seed));
+  FSSConfig::prngs[0].SetSeed(osuCrypto::toBlock(seed[0],seed[1]));
+  ProtocolIAav86SmallDealerOutput base;
+  const auto d=padded(config.logical_n),b=bits_for(d);
+  const auto mask=(UINT64_C(1)<<b)-1U;
+  auto init=[&](ProtocolIAav86SmallPartyMaterial& m,std::uint32_t party) {
+    m.session=config.session;m.fingerprint=config.fingerprint;
+    m.material_id=config.material_id;m.logical_n=config.logical_n;
+    m.padded_n=d;m.k=config.k;m.iterations=1;
+    m.comparison_bits=b;m.party=party;
+    m.score_materials.session=config.session;
+    m.score_materials.fingerprint=config.fingerprint;
+    m.score_materials.party=party;m.score_materials.n=d;
+    m.score_materials.k=config.k;m.score_materials.comparison_bits=b;
+    m.node_mask_shares.reserve(d);
+  };
+  init(base.party0,0);init(base.party1,1);
+  const auto score_mask=(UINT64_C(1)<<34)-1U;
+  for(std::uint32_t stage=1;stage<=2;++stage)
+    for(std::uint32_t slot=0;slot<d;++slot) {
+      std::array<std::uint64_t,4> words{};
+      random_bytes(words.data(),sizeof(words));
+      const auto left=words[0]&score_mask,right=words[1]&score_mask;
+      const auto left0=words[2]&score_mask,right0=words[3]&score_mask;
+      ProtocolIUcmpMaterial material(34,left,right);
+      auto k0=material.export_party_material(0);
+      auto k1=material.export_party_material(1);
+      auto& v0=stage==1?base.party0.score_materials.carry_materials:
+                        base.party0.score_materials.sign_materials;
+      auto& v1=stage==1?base.party1.score_materials.carry_materials:
+                        base.party1.score_materials.sign_materials;
+      v0.emplace_back(slot,stage,left0,right0,std::move(k0));
+      v1.emplace_back(slot,stage,(left-left0)&score_mask,
+                      (right-right0)&score_mask,std::move(k1));
+    }
+  std::vector<std::uint64_t> full(d);
+  for(std::uint32_t a=0;a<d;++a) {
+    random_bytes(&full[a],sizeof(full[a]));full[a]&=mask;
+    std::uint64_t share0=0;random_bytes(&share0,sizeof(share0));share0&=mask;
+    base.party0.node_mask_shares.push_back(share0);
+    base.party1.node_mask_shares.push_back((full[a]-share0)&mask);
+  }
+  send_exact(party0_fd,h0.data(),h0.size());
+  send_exact(party1_fd,h1.data(),h1.size());
+  ProtocolIStreamDeliveryBytes sent{h0.size(),h1.size()};
+  const auto key_bytes=24U*b+57U;
+  for(std::uint32_t a=0;a<d;++a)
+    for(std::uint32_t c=a+1;c<d;++c) {
+      ProtocolIUcmpMaterial material(b,full[a],full[c]);
+      const auto k0=material.export_party_material(0).serialize();
+      const auto k1=material.export_party_material(1).serialize();
+      check(k0.size()==key_bytes&&k1.size()==key_bytes,
+            "E21 edge key width");
+      send_exact(party0_fd,k0.data(),k0.size());
+      send_exact(party1_fd,k1.data(),k1.size());
+      sent.party0=add(sent.party0,k0.size());
+      sent.party1=add(sent.party1,k1.size());
+    }
+  for(const auto& item:{std::pair{party0_fd,&base.party0},
+                       std::pair{party1_fd,&base.party1}}) {
+    const auto bytes=clique_base_encode(*item.second);
+    std::array<std::uint8_t,4> size{};std::size_t at=0;
+    put(size.data(),at,bytes.size(),4);
+    send_exact(item.first,size.data(),size.size());
+    send_exact(item.first,bytes.data(),bytes.size());
+    auto& count=item.first==party0_fd?sent.party0:sent.party1;
+    count=add(count,add(size.size(),bytes.size()));
+  }
+  return sent;
 }
 
 ProtocolIAav86StreamedPartyMaterial::~ProtocolIAav86StreamedPartyMaterial() {
@@ -267,11 +467,12 @@ ProtocolIAav86StreamedPartyMaterial& ProtocolIAav86StreamedPartyMaterial::operat
   return *this;
 }
 
-ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
+ProtocolIAav86StreamedPartyMaterial protocol_i_stream_receive_impl(
     const ProtocolIAav86SmallConfig& config,int dealer_fd,
-    const std::string& private_directory) {
+    const std::string& private_directory,bool minimal) {
   check(dealer_fd>=0&&config.party<2,"E20 party delivery channel");
-  const auto expected=header_for(config,config.party);
+  check(!minimal||config.iterations==1,"E21 clique iteration");
+  const auto expected=header_for(config,config.party,minimal);
   bound_socket(dealer_fd,config.timeout_ms);
   Header received{};receive_exact(dealer_fd,received.data(),received.size());
   check(received==expected,"E20 delivery header binding");
@@ -283,7 +484,7 @@ ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
   check(file_bytes<=static_cast<std::uint64_t>(std::numeric_limits<off_t>::max()),
         "E20 file address range");
   const int directory=private_dir(private_directory);
-  const auto final=file_name(config),partial=final+".partial";
+  const auto final=file_name(config,minimal),partial=final+".partial";
   int fd=::openat(directory,partial.c_str(),
                   O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0600);
   if(fd<0) {::close(directory);throw std::runtime_error("E20 new material file");}
@@ -318,8 +519,8 @@ ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
     check(base_size>=64&&base_size<=16U*1024U*1024U,"E20 base package length");
     std::vector<std::uint8_t> base_bytes(base_size);
     receive_exact(dealer_fd,base_bytes.data(),base_bytes.size());
-    result.base=protocol_i_aav86_stream_deserialize_base(
-        base_bytes,config.party,config);
+    result.base=minimal?clique_base_decode(base_bytes,config):
+        protocol_i_aav86_stream_deserialize_base(base_bytes,config.party,config);
     struct stat actual{};
     check(::fstat(fd,&actual)==0&&actual.st_size==static_cast<off_t>(file_bytes),
           "E20 full material length");
@@ -331,7 +532,8 @@ ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
     result.path_=private_directory+"/"+final;
     result.disk_bytes_=file_bytes;
     result.plaintext_payload_bytes_=add(
-        add(mul(mul(2U,d),16U+840U),mul(d,48U+8U*config.iterations)),
+        add(mul(mul(2U,d),16U+840U),
+            mul(d,minimal?8U:48U+8U*config.iterations)),
         mul(slots,24U*b+24U));
     ::close(directory);
     return result;
@@ -340,6 +542,17 @@ ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
     ::close(directory);
     throw;
   }
+}
+
+ProtocolIAav86StreamedPartyMaterial protocol_i_aav86_stream_receive_party(
+    const ProtocolIAav86SmallConfig& config,int dealer_fd,
+    const std::string& private_directory) {
+  return protocol_i_stream_receive_impl(config,dealer_fd,private_directory,false);
+}
+ProtocolIAav86StreamedPartyMaterial protocol_i_clique_minimal_receive_party(
+    const ProtocolIAav86SmallConfig& config,int dealer_fd,
+    const std::string& private_directory) {
+  return protocol_i_stream_receive_impl(config,dealer_fd,private_directory,true);
 }
 
 ProtocolIUcmpPartyMaterial ProtocolIAav86StreamedPartyMaterial::read_edge(

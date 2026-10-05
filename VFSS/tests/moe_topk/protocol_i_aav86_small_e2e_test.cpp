@@ -320,14 +320,15 @@ int dealer_process(int argc,char** argv) {
         static_cast<std::uint32_t>(number(argv[7])),0,fd(argv[8]),""};
     if(streamed_mode()) {
       const auto started=std::chrono::steady_clock::now();
-      protocol_i_aav86_stream_dealer_send(c,fd(argv[9]),fd(argv[10]));
+      const auto wire=protocol_i_aav86_stream_dealer_send(
+          c,fd(argv[9]),fd(argv[10]));
       const auto finished=std::chrono::steady_clock::now();
       struct rusage usage{};
       require(::getrusage(RUSAGE_SELF,&usage)==0,"E20 T getrusage");
-      const std::array<std::uint64_t,4> telemetry{
+      const std::array<std::uint64_t,6> telemetry{
           static_cast<std::uint64_t>(std::chrono::duration_cast<
               std::chrono::nanoseconds>(finished-started).count()),0,0,
-          static_cast<std::uint64_t>(usage.ru_maxrss)};
+          static_cast<std::uint64_t>(usage.ru_maxrss),wire.party0,wire.party1};
       send_all(fd(argv[11]),telemetry.data(),sizeof(telemetry));
       return 0;
     }
@@ -349,9 +350,9 @@ int dealer_process(int argc,char** argv) {
     require(::getrusage(RUSAGE_SELF,&usage)==0,"T getrusage");
     const auto ns=[](auto a,auto b) { return static_cast<std::uint64_t>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(b-a).count()); };
-    const std::array<std::uint64_t,4> telemetry{
+    const std::array<std::uint64_t,6> telemetry{
         ns(started,generated),ns(generated,serialized),ns(serialized,distributed),
-        static_cast<std::uint64_t>(usage.ru_maxrss)};
+        static_cast<std::uint64_t>(usage.ru_maxrss),0,0};
     send_all(fd(argv[11]),telemetry.data(),sizeof(telemetry));
     return 0;
   } catch(const std::exception& e) {
@@ -440,7 +441,7 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   close_except(all,parent_keep);
   wait_ok(dealer,"T");
   const auto dealer_exited=std::chrono::steady_clock::now();
-  std::array<std::uint64_t,4> dealer_metrics{};
+  std::array<std::uint64_t,6> dealer_metrics{};
   receive_all(dealer_telemetry[0],dealer_metrics.data(),sizeof(dealer_metrics));
   char ready_byte=0;
   receive_all(ready[0][0],&ready_byte,1); require(ready_byte==1,"P0 offline ready");
@@ -545,6 +546,8 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" receive_barrier_ns="<<receive_barrier_ns
            <<" t_exit=0 p0_exit=0 p1_exit=0"
            <<" peak_t_kib="<<dealer_metrics[3]
+           <<" t_to_p0_bytes="<<dealer_metrics[4]
+           <<" t_to_p1_bytes="<<dealer_metrics[5]
            <<" online_max_elapsed_ns="<<std::max(a.online_ns,b.online_ns)
            <<" online_p0_ns="<<a.online_ns<<" online_p1_ns="<<b.online_ns
            <<" peak_party_kib="<<std::max(a.peak_kib,b.peak_kib)

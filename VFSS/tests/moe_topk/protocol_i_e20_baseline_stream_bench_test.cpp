@@ -47,6 +47,8 @@ std::uint64_t secure_random_u64() {
 }
 bool benchmark_mode(){return std::getenv("MOE_TOPK_M6A_E15_BENCH")!=nullptr;}
 bool stream_mode(){return std::getenv("MOE_TOPK_M6A_E20_BASELINE_STREAM")!=nullptr;}
+bool minimal_mode(){return std::getenv("MOE_TOPK_M6A_E21_CLIQUE_MINIMAL")!=nullptr;}
+bool sealed_mode(){return stream_mode()||minimal_mode();}
 ProtocolIAav86SmallConfig stream_config(const struct Case& t,int party);
 struct FreshRandom {std::uint64_t operator()() const {return secure_random_u64();}};
 std::uint64_t elapsed_ns(std::chrono::steady_clock::time_point from,
@@ -150,7 +152,7 @@ ProtocolIAav86SmallConfig stream_config(const Case& t,int party){
   return {t.session,t.fingerprint,t.seed+UINT64_C(1000000),t.logical_n,t.k,1,
           static_cast<std::uint8_t>(party),120000,dir?dir:""};
 }
-ProtocolIPriorityPipelineConfig config_for(const Case&t,int party){const auto l=protocol_i_make_input_layout(t.logical_n,t.k);return{t.session,t.fingerprint,l.logical_n,l.padded_n,t.k,l.minimum_comparison_bits,static_cast<std::uint8_t>(party),stream_mode()?120000:15000};}
+ProtocolIPriorityPipelineConfig config_for(const Case&t,int party){const auto l=protocol_i_make_input_layout(t.logical_n,t.k);return{t.session,t.fingerprint,l.logical_n,l.padded_n,t.k,l.minimum_comparison_bits,static_cast<std::uint8_t>(party),sealed_mode()?120000:15000};}
 std::pair<ProtocolIPartyPackage,ProtocolIPartyPackage> make_packages(const ProtocolIPriorityPipelineConfig&c,std::uint64_t seed){seed_fss();FreshRandom r;const auto ring=(UINT64_C(1)<<c.comparison_bits)-1U,score_ring=(UINT64_C(1)<<34)-1U;ProtocolIPartyPackage p0,p1;for(auto*p:{&p0,&p1}){p->session=c.session;p->fingerprint=c.fingerprint;p->n=c.padded_n;p->k=c.k;p->comparison_bits=c.comparison_bits;}p0.party=0;p1.party=1;p0.node_mask_shares.resize(c.padded_n);p1.node_mask_shares.resize(c.padded_n);std::vector<std::uint64_t>full(c.padded_n);for(std::size_t i=0;i<full.size();++i){full[i]=r()&ring;p0.node_mask_shares[i]=r()&ring;p1.node_mask_shares[i]=(full[i]-p0.node_mask_shares[i])&ring;}for(std::uint32_t a=0;a<c.padded_n;++a)for(std::uint32_t b=a+1;b<c.padded_n;++b){ProtocolIUcmpMaterial m(c.comparison_bits,full[a],full[b]);p0.edge_materials.emplace_back(a,b,m.export_party_material(0));p1.edge_materials.emplace_back(a,b,m.export_party_material(1));}auto score=[&](std::uint8_t stage){for(std::uint32_t slot=0;slot<c.padded_n;++slot){const auto left=r()&score_ring,right=r()&score_ring,l0=r()&score_ring,r0=r()&score_ring;ProtocolIUcmpMaterial m(34,left,right);ProtocolIScoreInputPartyMaterial a(slot,stage,l0,r0,m.export_party_material(0)),b(slot,stage,(left-l0)&score_ring,(right-r0)&score_ring,m.export_party_material(1));if(stage==1){p0.carry_materials.push_back(std::move(a));p1.carry_materials.push_back(std::move(b));}else{p0.sign_materials.push_back(std::move(a));p1.sign_materials.push_back(std::move(b));}}};score(1);score(2);return{std::move(p0),std::move(p1)};}
 ProtocolIPermutation permutation(std::uint32_t n,unsigned style,std::uint64_t seed){auto p=protocol_i_identity_permutation(n);if(style==1)std::reverse(p.begin(),p.end());else if(style==2)for(std::uint32_t i=0;i+1<n;i+=2)std::swap(p[i],p[i+1]);else if(style==3)std::rotate(p.begin(),p.begin()+1,p.end());else if(style==4)p=protocol_i_test_permutation(n,seed);else if(style==5)for(std::uint32_t remaining=n;remaining>1;--remaining){const auto limit=UINT64_MAX-(UINT64_MAX%remaining);std::uint64_t value;do value=secure_random_u64();while(value>=limit);std::swap(p[remaining-1],p[value%remaining]);}return p;}
 Bytes encode_words(const std::vector<std::uint64_t>&v){Bytes b;for(auto x:v)for(int s=56;s>=0;s-=8)b.push_back(x>>s);return b;}std::vector<std::uint64_t>decode_words(const Bytes&b){require(b.size()%8==0,"word encoding");std::vector<std::uint64_t>v(b.size()/8);for(std::size_t i=0;i<v.size();++i)for(int j=0;j<8;++j)v[i]=(v[i]<<8U)|b[8*i+j];return v;}
@@ -177,12 +179,15 @@ Bytes encode_result(const ProtocolIPriorityPipelineOutput&o,const ProtocolIScore
 int p2_main(const Case&t,int fd0,int fd1,int telemetry_fd){
   try{
     const auto started=std::chrono::steady_clock::now();
-    if(stream_mode()) {
-      protocol_i_aav86_stream_dealer_send(stream_config(t,0),fd0,fd1);
+    if(sealed_mode()) {
+      const auto wire=minimal_mode()
+          ? protocol_i_clique_minimal_dealer_send(stream_config(t,0),fd0,fd1)
+          : protocol_i_aav86_stream_dealer_send(stream_config(t,0),fd0,fd1);
       const auto finished=std::chrono::steady_clock::now();
       struct rusage usage{};require(::getrusage(RUSAGE_SELF,&usage)==0,"E20 baseline T RSS");
-      const std::array<std::uint64_t,4> metrics{
-          elapsed_ns(started,finished),0,0,static_cast<std::uint64_t>(usage.ru_maxrss)};
+      const std::array<std::uint64_t,6> metrics{
+          elapsed_ns(started,finished),0,0,static_cast<std::uint64_t>(usage.ru_maxrss),
+          wire.party0,wire.party1};
       send_exact(telemetry_fd,metrics.data(),sizeof(metrics));
       return 0;
     }
@@ -197,9 +202,9 @@ int p2_main(const Case&t,int fd0,int fd1,int telemetry_fd){
     protocol_i_send_framed_chunks(to1,bytes1);
     const auto distributed=std::chrono::steady_clock::now();
     struct rusage usage{};require(::getrusage(RUSAGE_SELF,&usage)==0,"E12 T RSS");
-    const std::array<std::uint64_t,4> metrics{
+    const std::array<std::uint64_t,6> metrics{
         elapsed_ns(started,generated),elapsed_ns(generated,serialized),
-        elapsed_ns(serialized,distributed),static_cast<std::uint64_t>(usage.ru_maxrss)};
+        elapsed_ns(serialized,distributed),static_cast<std::uint64_t>(usage.ru_maxrss),0,0};
     send_exact(telemetry_fd,metrics.data(),sizeof(metrics));
     return 0;
   }catch(const std::exception&e){std::cerr<<"P2: "<<e.what()<<'\n';return 1;}
@@ -213,10 +218,13 @@ int party_main(const Case&t,int who,const std::array<int,4>&offline,
     ProtocolIAav86StreamedPartyMaterial stored;
     ProtocolIPartyPackage package;
     std::uint64_t package_bytes=0,stream_payload=0;
-    if(stream_mode()) {
+    if(sealed_mode()) {
       const auto sc=stream_config(t,who);
-      stored=protocol_i_aav86_stream_receive_party(sc,package_fd,
-                                                    sc.durable_claim_directory);
+      stored=minimal_mode()
+          ? protocol_i_clique_minimal_receive_party(
+                sc,package_fd,sc.durable_claim_directory)
+          : protocol_i_aav86_stream_receive_party(
+                sc,package_fd,sc.durable_claim_directory);
       require(stored.base.iterations==1&&stored.base.padded_n==c.padded_n,
               "E20 clique store shape");
       package=std::move(stored.base.score_materials);
@@ -236,7 +244,7 @@ int party_main(const Case&t,int who,const std::array<int,4>&offline,
          static_cast<std::uint8_t>(who),c.timeout_ms},offline,
         permutation(c.padded_n,who?t.p1_style:t.p0_style,t.seed+who));
     test_only::MaterialPayload diagnostic;
-    if (!benchmark_mode()&&!stream_mode()) diagnostic=test_only::payload(package,material);
+    if (!benchmark_mode()&&!sealed_mode()) diagnostic=test_only::payload(package,material);
     ProtocolIFramedChannel ready(ready_fd,
         {t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,
          static_cast<std::uint8_t>(who),2,5,1},c.timeout_ms);
@@ -253,7 +261,7 @@ int party_main(const Case&t,int who,const std::array<int,4>&offline,
     }
     resetDCFOnlinePrgCalls();
     const auto online_started=std::chrono::steady_clock::now();
-    if(stream_mode()) stored.claim(stream_config(t,who));
+    if(sealed_mode()) stored.claim(stream_config(t,who));
     ProtocolIScoreInputMetrics score_metrics;
     const auto keys=protocol_i_raw_score_input_party(
         {t.session,t.fingerprint,c.logical_n,c.padded_n,t.k,
@@ -263,7 +271,7 @@ int party_main(const Case&t,int who,const std::array<int,4>&offline,
     const auto score_ended=std::chrono::steady_clock::now();
     const auto score_prg=readDCFOnlinePrgCalls();
     const auto stream_id=t.seed+UINT64_C(1000000);
-    const auto output=stream_mode()
+    const auto output=sealed_mode()
         ? protocol_i_priority_pipeline_party_stream(
               c,std::move(package),material,keys,forward,cmp_fd,rank_fd,reverse,
               [&](std::uint32_t left,std::uint32_t right) {
@@ -298,8 +306,8 @@ int party_main(const Case&t,int who,const std::array<int,4>&offline,
         material.reverse_do_second.counters.offline_ot.received_bytes;
     auto payload=test_only::payload_from_shape(
         c.padded_n,0,c.comparison_bits,false,ot_sent,ot_received);
-    if(stream_mode()) payload.t_package_payload_bytes=stream_payload;
-    if (!benchmark_mode()&&!stream_mode()) {
+    if(sealed_mode()) payload.t_package_payload_bytes=stream_payload;
+    if (!benchmark_mode()&&!sealed_mode()) {
       require(payload.t_package_payload_bytes==diagnostic.t_package_payload_bytes&&
               payload.local_shuffle_payload_bytes==diagnostic.local_shuffle_payload_bytes&&
               payload.local_shuffle_ot_sent_bytes==diagnostic.local_shuffle_ot_sent_bytes&&
@@ -376,7 +384,7 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   // Only party-to-party online edges traverse the shaped TCP qdisc.
   const auto transport_end=std::chrono::steady_clock::now();
   std::array<std::string,2> private_dirs;
-  if(stream_mode()){
+  if(sealed_mode()){
     require(::geteuid()==0,"E20 baseline isolated launcher requires root");
     for(int who=0;who<2;++who){
       auto pattern="/tmp/m6a20-clique-"+std::to_string(::getpid())+"-"+
@@ -409,9 +417,9 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   const std::vector<std::string>dealer{"p2",std::to_string(package0[0]),std::to_string(package1[0]),std::to_string(dealer_telemetry[1]),std::to_string(t.logical_n),std::to_string(t.k),std::to_string(t.session),std::to_string(t.fingerprint),std::to_string(t.seed),std::to_string(t.p0_style),std::to_string(t.p1_style),std::to_string(t.score_style)};
   const auto offline_start=std::chrono::steady_clock::now();
   const auto p0=launch(self,role_args(0),fds,party_fds(0),children,
-                       stream_mode()?20001:-1,private_dirs[0]);
+                       sealed_mode()?20001:-1,private_dirs[0]);
   const auto p1=launch(self,role_args(1),fds,party_fds(1),children,
-                       stream_mode()?20002:-1,private_dirs[1]);
+                       sealed_mode()?20002:-1,private_dirs[1]);
   const auto p2=launch(self,dealer,fds,{package0[0],package1[0],dealer_telemetry[1]},children);
   // The production framed transport rejects a terminal HUP even when the
   // final frame is readable.  Keep the controller aliases for this case so
@@ -419,7 +427,7 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   // the next case rather than accumulating them across the test matrix.
   children.wait_ok(p2);
   const auto dealer_exited=std::chrono::steady_clock::now();
-  std::array<std::uint64_t,4> dealer_metrics{};
+  std::array<std::uint64_t,6> dealer_metrics{};
   receive_exact(dealer_telemetry[0],dealer_metrics.data(),sizeof(dealer_metrics));
   ProtocolIFramedChannel ready_p0(ready0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,5,1},c.timeout_ms),ready_p1(ready1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,5,1},c.timeout_ms);
   require(ready_p0.receive()==Bytes{1}&&ready_p1.receive()==Bytes{1},"offline readiness");
@@ -435,7 +443,7 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   fds.close_all();
   children.wait_ok(p0);
   children.wait_ok(p1);
-  if(stream_mode()) for(const auto& dir:private_dirs) std::filesystem::remove_all(dir);
+  if(sealed_mode()) for(const auto& dir:private_dirs) std::filesystem::remove_all(dir);
   require(out0.size()==t.logical_n+29*8&&out1.size()==out0.size(),"result shape");
   const auto want=top_k_mask(scores,t.k);
   for(std::size_t i=0;i<t.logical_n;++i)require((out0[i]^out1[i])==want[i],"oracle mask");
@@ -473,6 +481,8 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
              <<" dealer_distribute_ns="<<dealer_metrics[2]
              <<" receive_barrier_ns="<<elapsed_ns(dealer_exited,offline_end)
              <<" peak_t_kib="<<dealer_metrics[3]
+             <<" t_to_p0_bytes="<<dealer_metrics[4]
+             <<" t_to_p1_bytes="<<dealer_metrics[5]
              <<" transport_setup_ns="<<transport_ns
              <<" online_p0_ns="<<m0[21]<<" online_p1_ns="<<m1[21]
              <<" online_max_ns="<<std::max(m0[21],m1[21])
@@ -519,4 +529,93 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
 }
 Case parse_case(int n,char**v,int at){require(n>=at+8,"case arguments");return{static_cast<std::uint32_t>(std::stoul(v[at])),static_cast<std::uint32_t>(std::stoul(v[at+1])),std::stoull(v[at+2]),std::stoull(v[at+3]),std::stoull(v[at+4]),static_cast<unsigned>(std::stoul(v[at+5])),static_cast<unsigned>(std::stoul(v[at+6])),static_cast<unsigned>(std::stoul(v[at+7]))};}int fd(const char*x){return std::stoi(x);}
 }
-int main(int argc,char**argv){try{if(argc>1&&std::string(argv[1])=="p2"){const auto t=parse_case(argc,argv,5);return p2_main(t,fd(argv[2]),fd(argv[3]),fd(argv[4]));}if(argc>1&&std::string(argv[1])=="party"){const int who=std::stoi(argv[2]);int at=3;std::array<int,4>o{};std::array<int,2>f{},r{},s{};for(auto&x:o)x=fd(argv[at++]);for(auto&x:f)x=fd(argv[at++]);for(auto&x:r)x=fd(argv[at++]);for(auto&x:s)x=fd(argv[at++]);const int package=fd(argv[at++]),ready=fd(argv[at++]),input=fd(argv[at++]),cmp=fd(argv[at++]),rank=fd(argv[at++]),result=fd(argv[at++]);return party_main(parse_case(argc,argv,at),who,o,f,r,s,package,ready,input,cmp,rank,result);}const auto self=executable(argv[0]);if(argc==6&&std::string(argv[1])=="bench-stream"){const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));const auto input_seed=std::stoull(argv[4]);const auto serial=std::stoull(argv[5]);require((n==128||n==256||n==1000)&&k==80,"E20 baseline stream shape");require(benchmark_mode()&&serial!=input_seed,"E20 baseline input seed isolation");require(::setenv("MOE_TOPK_M6A_E20_BASELINE_STREAM","1",1)==0,"E20 baseline stream env");run_case(self.c_str(),{n,k,0x120000+serial,0x220000+serial,serial,5,5,5},input_seed);return 0;}if(argc==6&&std::string(argv[1])=="bench"){const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));const auto input_seed=std::stoull(argv[4]);const auto serial=std::stoull(argv[5]);require((n==128||n==256)&&(k==2||k==8),"E16 baseline benchmark shape");require(benchmark_mode()&&serial!=input_seed,"E12 baseline input seed isolation");run_case(self.c_str(),{n,k,0x120000+serial,0x220000+serial,serial,5,5,5},input_seed);return 0;}if(const auto*n=std::getenv("MOE_TOPK_M2_E2E_N")){const auto logical=static_cast<std::uint32_t>(std::stoul(n));const auto*k=std::getenv("MOE_TOPK_M2_E2E_K");run_case(self.c_str(),{logical,k?static_cast<std::uint32_t>(std::stoul(k)):1,0x213888,0x313888,888,4,3,0});return 0;}const std::array<std::uint32_t,11>sizes{{1,2,3,4,5,7,8,11,16,17,31}};std::uint64_t serial=0;for(const auto n:sizes){std::vector<std::uint32_t>ks{1,n,static_cast<std::uint32_t>((n+1)/2)};std::sort(ks.begin(),ks.end());ks.erase(std::unique(ks.begin(),ks.end()),ks.end());for(const auto k:ks){run_case(self.c_str(),{n,k,0x213000+serial,0x313000+serial,100+serial,static_cast<unsigned>(serial%5),static_cast<unsigned>((serial+1)%5),static_cast<unsigned>(serial%5)});++serial;}}return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}
+int main(int argc,char** argv) {
+  try {
+    if(argc>1&&std::string(argv[1])=="p2") {
+      const auto t=parse_case(argc,argv,5);
+      return p2_main(t,fd(argv[2]),fd(argv[3]),fd(argv[4]));
+    }
+    if(argc>1&&std::string(argv[1])=="party") {
+      const int who=std::stoi(argv[2]);int at=3;
+      std::array<int,4> o{};std::array<int,2> f{},r{},s{};
+      for(auto& x:o)x=fd(argv[at++]);
+      for(auto& x:f)x=fd(argv[at++]);
+      for(auto& x:r)x=fd(argv[at++]);
+      for(auto& x:s)x=fd(argv[at++]);
+      const int package=fd(argv[at++]),ready=fd(argv[at++]);
+      const int input=fd(argv[at++]),cmp=fd(argv[at++]);
+      const int rank=fd(argv[at++]),result=fd(argv[at++]);
+      return party_main(parse_case(argc,argv,at),who,o,f,r,s,
+                        package,ready,input,cmp,rank,result);
+    }
+    const auto self=executable(argv[0]);
+    if(argc==6&&(std::string(argv[1])=="bench-stream"||
+                 std::string(argv[1])=="bench-minimal")) {
+      const bool minimal=std::string(argv[1])=="bench-minimal";
+      const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));
+      const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));
+      const auto input_seed=std::stoull(argv[4]);
+      const auto serial=std::stoull(argv[5]);
+      require((n==128||n==256||n==1000)&&
+                  (minimal?(k==2||k==8||k==80):k==80),
+              minimal?"E21 minimal benchmark shape":"E20 baseline stream shape");
+      require(benchmark_mode()&&serial!=input_seed,
+              "sealed baseline input seed isolation");
+      require(::setenv(minimal?"MOE_TOPK_M6A_E21_CLIQUE_MINIMAL":
+                              "MOE_TOPK_M6A_E20_BASELINE_STREAM","1",1)==0,
+              "sealed baseline environment");
+      run_case(self.c_str(),{n,k,0x120000+serial,0x220000+serial,
+                            serial,5,5,5},input_seed);
+      return 0;
+    }
+    if(argc==2&&std::string(argv[1])=="fixture-minimal") {
+      require(::setenv("MOE_TOPK_M6A_E21_CLIQUE_MINIMAL","1",1)==0,
+              "E21 fixture environment");
+      std::uint64_t serial=0;
+      for(const auto n:{1U,2U,3U,5U,7U,17U})
+        for(const auto k:{1U,n,static_cast<std::uint32_t>((n+1U)/2U)})
+          for(const auto style:{1U,2U,3U,4U})
+            run_case(self.c_str(),{n,k,0x310000+serial,0x320000+serial,
+                                   0x330000+serial,5,5,style},++serial);
+      std::cout<<"E21_CLIQUE_FROZEN_ORACLE_PASS cases="<<serial<<"\n";
+      return 0;
+    }
+    if(argc==6&&std::string(argv[1])=="bench") {
+      const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));
+      const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));
+      const auto input_seed=std::stoull(argv[4]);
+      const auto serial=std::stoull(argv[5]);
+      require((n==128||n==256)&&(k==2||k==8),
+              "E16 baseline benchmark shape");
+      require(benchmark_mode()&&serial!=input_seed,
+              "E12 baseline input seed isolation");
+      run_case(self.c_str(),{n,k,0x120000+serial,0x220000+serial,
+                            serial,5,5,5},input_seed);
+      return 0;
+    }
+    if(const auto* n=std::getenv("MOE_TOPK_M2_E2E_N")) {
+      const auto logical=static_cast<std::uint32_t>(std::stoul(n));
+      const auto* k=std::getenv("MOE_TOPK_M2_E2E_K");
+      run_case(self.c_str(),{logical,k?static_cast<std::uint32_t>(std::stoul(k)):1,
+                            0x213888,0x313888,888,4,3,0});
+      return 0;
+    }
+    const std::array<std::uint32_t,11> sizes{{1,2,3,4,5,7,8,11,16,17,31}};
+    std::uint64_t serial=0;
+    for(const auto n:sizes) {
+      std::vector<std::uint32_t> ks{1,n,static_cast<std::uint32_t>((n+1)/2)};
+      std::sort(ks.begin(),ks.end());
+      ks.erase(std::unique(ks.begin(),ks.end()),ks.end());
+      for(const auto k:ks) {
+        run_case(self.c_str(),{n,k,0x213000+serial,0x313000+serial,
+                              100+serial,static_cast<unsigned>(serial%5),
+                              static_cast<unsigned>((serial+1)%5),
+                              static_cast<unsigned>(serial%5)});
+        ++serial;
+      }
+    }
+    return 0;
+  } catch(const std::exception& e) {
+    std::cerr<<e.what()<<'\n';return 1;
+  }
+}
