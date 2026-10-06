@@ -75,17 +75,23 @@ PUBLIC
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
 
 if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto)
   target_sources(${PROJECT_NAME} PRIVATE
       src/moe_topk/experimental_bmw16_select_adapter.cpp
+      src/moe_topk/experimental_bmw16_material_bundle.cpp
       src/moe_topk/experimental_bmw16_select_party.cpp)
   target_compile_definitions(${PROJECT_NAME} PUBLIC
       MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER=1)
+  target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
 endif()
 
 if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
   add_executable(moe_topk_bmw16_experimental_party_test
       tests/moe_topk/experimental_bmw16_party_test.cpp)
   target_link_libraries(moe_topk_bmw16_experimental_party_test PRIVATE ${PROJECT_NAME})
+  add_executable(moe_topk_bmw16_experimental_3proc_test
+      tests/moe_topk/experimental_bmw16_3proc_test.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_3proc_test PRIVATE ${PROJECT_NAME})
 endif()
 
 

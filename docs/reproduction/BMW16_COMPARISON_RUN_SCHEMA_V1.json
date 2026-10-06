@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.moetopk.invalid/schemas/bmw16-comparison-run-v1.json",
+  "title": "Top-K comparison run record v1",
+  "description": "Shared run-record contract for Protocol I all-pairs, Protocol I+AAV86, and the PROJECT_DERIVED Protocol I+BMW16-derived Select+DCF candidate. A run includes failures and abort costs; NOT_MEASURED is not numeric zero.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "scheme",
+    "implementation_label",
+    "revision",
+    "run_id",
+    "input",
+    "result",
+    "metrics",
+    "counts",
+    "phases",
+    "environment"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "scheme": { "type": "string" },
+    "implementation_label": { "type": "string" },
+    "security_status": {
+      "enum": ["SECURE_REVIEWED", "EXPERIMENTAL", "TEST_ONLY", "BASELINE"]
+    },
+    "revision": { "type": "string" },
+    "run_id": { "type": "string" },
+    "input": {
+      "type": "object",
+      "required": ["n", "K", "score_encoding", "input_digest", "input_seed"],
+      "properties": {
+        "n": { "type": "integer", "minimum": 1 },
+        "K": { "type": "integer", "minimum": 1 },
+        "score_encoding": { "const": "signed-int32-Q20.12; score-desc; original_index-asc" },
+        "input_digest": { "type": "string", "description": "Digest of a canonical fixture; do not store shares or raw private scores." },
+        "input_seed": { "type": ["integer", "string"] },
+        "algorithm_randomness": { "type": "string", "description": "Record TEST_ONLY tape digest or the CSPRNG construction; do not pretend a fixture seed fixes secure randomness." },
+        "profile": { "type": "string" }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": ["status", "abort_class", "oracle_match", "mask_length", "mask_weight"],
+      "properties": {
+        "status": { "enum": ["SUCCESS", "ABORT_ALGORITHM_PROBABILITY", "ABORT_ALGORITHM_INVALID", "ABORT_MATERIAL", "ABORT_COMMUNICATION"] },
+        "abort_class": { "type": ["string", "null"] },
+        "abort_stage": { "type": ["string", "null"] },
+        "oracle_match": { "type": ["boolean", "string"], "description": "Boolean only for isolated TEST_ONLY differential; otherwise NOT_MEASURED." },
+        "mask_length": { "type": ["integer", "string"] },
+        "mask_weight": { "type": ["integer", "string"] },
+        "mask_digest": { "type": ["string", "null"], "description": "Optional TEST_ONLY reconstruction digest; never store the reconstructed mask in a party record." }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["offline_time_ms", "offline_material_total_bits", "online_time_ms", "online_comm_total_bits", "online_comm_per_party_bits", "online_rounds", "online_prg_calls_total", "comparison_edges_total", "total_time_ms"],
+      "properties": {
+        "offline_time_ms": { "$ref": "#/$defs/measure" },
+        "offline_material_total_bits": { "$ref": "#/$defs/measure" },
+        "online_time_ms": { "$ref": "#/$defs/measure" },
+        "online_comm_total_bits": { "$ref": "#/$defs/measure" },
+        "online_comm_per_party_bits": { "$ref": "#/$defs/measure" },
+        "online_rounds": { "$ref": "#/$defs/measure" },
+        "online_prg_calls_total": { "$ref": "#/$defs/measure" },
+        "comparison_edges_total": { "$ref": "#/$defs/measure" },
+        "total_time_ms": { "$ref": "#/$defs/measure" }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "select_logical_comparison_calls": { "$ref": "#/$defs/measure" },
+        "real_real_edges": { "$ref": "#/$defs/measure" },
+        "dummy_related_edges": { "$ref": "#/$defs/measure" },
+        "same_round_repeat_requests": { "$ref": "#/$defs/measure" },
+        "unique_ucmp_key_slots": { "$ref": "#/$defs/measure" },
+        "preprovisioned_key_slots": { "$ref": "#/$defs/measure" },
+        "consumed_key_slots": { "$ref": "#/$defs/measure" },
+        "unused_key_slots": { "$ref": "#/$defs/measure" },
+        "dcf_eval_per_party": { "$ref": "#/$defs/measure" },
+        "sampler_prf_words_per_party": { "$ref": "#/$defs/measure" },
+        "unused_shuffle_cmpagg_slots": { "$ref": "#/$defs/measure" },
+        "peak_rss_bytes": { "$ref": "#/$defs/measure" }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "causal_phase_count", "sent_bytes_p0", "sent_bytes_p1"],
+        "properties": {
+          "name": { "type": "string" },
+          "causal_phase_count": { "$ref": "#/$defs/measure" },
+          "online_time_ms": { "$ref": "#/$defs/measure" },
+          "sent_bytes_p0": { "$ref": "#/$defs/measure" },
+          "sent_bytes_p1": { "$ref": "#/$defs/measure" },
+          "comparison_calls": { "$ref": "#/$defs/measure" },
+          "material_slots": { "$ref": "#/$defs/measure" }
+        }
+      }
+    },
+    "failure_accounting": {
+      "type": "object",
+      "properties": {
+        "attempted_runs": { "type": "integer", "minimum": 0 },
+        "natural_probability_aborts": { "type": "integer", "minimum": 0 },
+        "injected_test_aborts": { "type": "integer", "minimum": 0 },
+        "material_aborts": { "type": "integer", "minimum": 0 },
+        "communication_aborts": { "type": "integer", "minimum": 0 },
+        "failure_cost_included": { "type": "boolean" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["os", "compiler", "build_type", "topology"],
+      "properties": {
+        "os": { "type": "string" },
+        "compiler": { "type": "string" },
+        "build_type": { "type": "string" },
+        "topology": { "type": "string" },
+        "network_profile": { "type": ["string", "null"] },
+        "command": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "measure": {
+      "oneOf": [
+        { "type": "number", "minimum": 0 },
+        { "const": "NOT_MEASURED" }
+      ]
+    }
+  }
+}

@@ -3,9 +3,12 @@
 #include <moe_topk/protocol_i_transport.h>
 #include <moe_topk/topk_oracle.h>
 
+#include <openssl/evp.h>
+
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstdint>
 #include <limits>
 #include <map>
@@ -25,6 +28,23 @@ using ItemId = std::uint32_t;
 using PairKey = std::pair<ItemId, ItemId>;
 using CacheKey = std::tuple<int, ItemId, ItemId>;
 
+std::uint64_t find_slot_id(const ProtocolIBmw16ExperimentalPartyMaterial& material,
+    ProtocolIBmw16MaterialStage stage, std::uint8_t task, std::uint8_t round,
+    std::uint32_t left, std::uint32_t right) {
+  const auto it = std::find_if(material.slot_manifest.begin(), material.slot_manifest.end(),
+      [&](const auto& s) { return s.stage==stage&&s.task==task&&s.round==round&&s.left==left&&s.right==right; });
+  if(it==material.slot_manifest.end())throw std::runtime_error("BMW16 slot not in authenticated manifest");
+  return it->id;
+}
+
+void claim_slot(ProtocolIBmw16ExperimentalPartyMaterial& material,
+    ProtocolIBmw16MaterialStage stage,std::uint8_t task,std::uint8_t round,
+    std::uint32_t left,std::uint32_t right,ProtocolIBmw16ExperimentalMetrics& metrics) {
+  if(!material.durable_slot_claim)return;
+  material.durable_slot_claim(find_slot_id(material,stage,task,round,left,right));
+  ++metrics.durable_slots_claimed;
+}
+
 struct Item {
   int category = 2;  // S4-derived public ordering class: low, sentinels, real, high.
   std::uint64_t serial = 0;
@@ -42,6 +62,8 @@ struct Task {
   std::size_t sample_size = 0, q_low = 0, q_high = 0, u_cap = 0, w_cap = 0;
   std::size_t gap = 0;
   std::string status = "PENDING", reason;
+  std::array<std::vector<std::pair<ItemId,ItemId>>,4> trace_edges;
+  std::array<std::vector<std::uint8_t>,4> trace_results;
 };
 
 struct Edge {
@@ -100,14 +122,19 @@ struct Runtime {
   std::string failure_reason;
   std::uint64_t ring_mask = 0;
   std::size_t low_pad = 0, median_size = 0, median_cut = 0;
-  std::array<std::array<std::uint64_t, 2>, 2> rng_state{};
+  std::array<std::uint8_t,32> sampler_seed{};
+  const ProtocolIBmw16TestOnlyRandomTape* test_tape = nullptr;
+  std::array<std::array<std::size_t,2>,2> tape_pos{};
   std::set<CacheKey> all_used_edges;
 
   Runtime(const ProtocolIBmw16ExperimentalPartyConfig& config,
           ProtocolIBmw16ExperimentalPartyMaterial& material,
           const std::vector<std::uint64_t>& public_z,
-          ProtocolIBmw16ExperimentalMetrics& output_metrics)
-      : c(config), m(material), z(public_z), metrics(output_metrics) {
+          ProtocolIBmw16ExperimentalMetrics& output_metrics,
+          const std::array<std::uint8_t,32>& seed,
+          const ProtocolIBmw16TestOnlyRandomTape* fixed_tape)
+      : c(config), m(material), z(public_z), metrics(output_metrics),
+        sampler_seed(seed), test_tape(fixed_tape) {
     if (c.n < 2 || c.n > 64 || c.k == 0 || c.k > c.n || z.size() != c.n)
       throw std::invalid_argument("BMW16 experimental finite domain");
     ring_mask = (UINT64_C(1) << c.comparison_bits) - 1U;
@@ -159,41 +186,51 @@ struct Runtime {
       task.u_cap = std::min<std::size_t>(M, ceil_scaled_three_quarter(M, 8U));
       task.gap = ceil_sqrt(4U * M);
       task.w_cap = 2U * task.gap + 1U;
-      for (int sample_domain = 0; sample_domain < 2; ++sample_domain)
-        rng_state[t][sample_domain] = mix64(c.public_algorithm_seed ^
-            (t == 0 ? UINT64_C(0x4c4f5753454c4543) : UINT64_C(0x4849474853454c45)) ^
-            (sample_domain == 0 ? UINT64_C(0x52315f53414d504c) : UINT64_C(0x52335f53414d504c)));
+    }
+    if(test_tape){
+      std::string line="PUBLIC_Z=";for(std::size_t i=0;i<z.size();++i){if(i)line+=',';line+=std::to_string(z[i]);}trace_line(line);
     }
   }
-
-  static std::uint64_t mix64(std::uint64_t x) {
-    x += UINT64_C(0x9e3779b97f4a7c15);
-    x = (x ^ (x >> 30U)) * UINT64_C(0xbf58476d1ce4e5b9);
-    x = (x ^ (x >> 27U)) * UINT64_C(0x94d049bb133111eb);
-    return x ^ (x >> 31U);
-  }
   std::uint64_t next_random(int task, int domain) {
-    auto& x = rng_state[task][domain];
-    x += UINT64_C(0x9e3779b97f4a7c15);
-    std::uint64_t z0 = x;
-    z0 = (z0 ^ (z0 >> 30U)) * UINT64_C(0xbf58476d1ce4e5b9);
-    z0 = (z0 ^ (z0 >> 27U)) * UINT64_C(0x94d049bb133111eb);
-    return z0 ^ (z0 >> 31U);
+    if (test_tape) {
+      const auto index=tape_pos[task][domain]++;
+      const auto& words=test_tape->words[task][domain];
+      if(index>=words.size())throw std::runtime_error("TEST_ONLY common random tape exhausted");
+      return words[index];
+    }
+    std::array<std::uint8_t,42> input{};
+    std::copy(sampler_seed.begin(),sampler_seed.end(),input.begin());
+    input[32]=static_cast<std::uint8_t>(task);
+    input[33]=static_cast<std::uint8_t>(domain);
+    auto counter=static_cast<std::uint64_t>(tape_pos[task][domain]++);
+    for(int i=0;i<8;++i)input[34+i]=static_cast<std::uint8_t>(counter>>(56U-8U*i));
+    std::array<std::uint8_t,32> digest{};unsigned int size=0;
+    if(EVP_Digest(input.data(),input.size(),digest.data(),&size,EVP_sha256(),nullptr)!=1||size!=digest.size())
+      throw std::runtime_error("BMW16 sampler PRF failure");
+    ++metrics.sampler_prf_words;
+    std::uint64_t word=0;for(int i=0;i<8;++i)word=(word<<8U)|digest[i];return word;
   }
   std::uint64_t bounded(int task, int domain, std::uint64_t bound) {
     if (bound == 0) throw std::logic_error("zero sample bound");
+    if (test_tape) {
+      const auto word = next_random(task, domain);
+      return static_cast<std::uint64_t>((static_cast<__uint128_t>(word) * bound) >> 64U);
+    }
     const auto threshold = static_cast<std::uint64_t>(-bound) % bound;
     for (;;) { const auto x = next_random(task, domain); if (x >= threshold) return x % bound; }
   }
   std::vector<ItemId> sample(int task, int domain, const std::vector<ItemId>& source, std::size_t count) {
     if (count > source.size()) throw std::logic_error("S4 sample exceeds source");
     auto pool = source;
+    std::vector<ItemId> selected; selected.reserve(count);
+    std::size_t remaining = pool.size();
     for (std::size_t i = 0; i < count; ++i) {
-      const auto j = i + bounded(task, domain, pool.size() - i);
-      std::swap(pool[i], pool[j]);
+      const auto j = static_cast<std::size_t>(bounded(task, domain, remaining));
+      selected.push_back(pool[j]);
+      pool[j] = pool[remaining - 1U];
+      --remaining;
     }
-    pool.resize(count);
-    return pool;
+    return selected;
   }
   static std::size_t ceil_sqrt(std::size_t x) {
     std::size_t lo = 0, hi = 1;
@@ -222,6 +259,12 @@ struct Runtime {
   bool public_less(ItemId a, ItemId b) const {
     if (items[a].category != items[b].category) return items[a].category < items[b].category;
     return items[a].serial < items[b].serial;
+  }
+  void trace_line(const std::string& line) const {
+    if(test_tape&&test_tape->trace_lines&&c.party==0)test_tape->trace_lines->push_back(line);
+  }
+  static std::string ids_text(const std::vector<ItemId>& ids) {
+    std::string out;for(std::size_t i=0;i<ids.size();++i){if(i)out+=',';out+=std::to_string(ids[i]);}return out;
   }
 
   std::vector<std::uint8_t> exchange(int fd, std::uint8_t phase,
@@ -269,13 +312,24 @@ struct Runtime {
     std::vector<std::pair<Batch*, std::size_t>> offsets;
     std::uint64_t plan_hash = UINT64_C(14695981039346656037);
     auto hash_byte = [&](std::uint8_t byte) { plan_hash = (plan_hash ^ byte) * UINT64_C(1099511628211); };
+    std::size_t frozen_offset=0;
     for (auto* batch : batches) {
-      offsets.push_back({batch, local.size()});
+      offsets.push_back({batch, frozen_offset});
+      frozen_offset+=batch->edges.size();
+      std::string plan="R"+std::to_string(round)+"_PLAN task="+std::to_string(batch->task)+" edges=";
       for (const auto& edge : batch->edges) {
         hash_byte(static_cast<std::uint8_t>(edge.task));
         for (int shift = 24; shift >= 0; shift -= 8) hash_byte(static_cast<std::uint8_t>(edge.left >> shift));
         for (int shift = 24; shift >= 0; shift -= 8) hash_byte(static_cast<std::uint8_t>(edge.right >> shift));
+        if(plan.back()!='=')plan+=',';
+        plan+=std::to_string(edge.left)+"-"+std::to_string(edge.right);
         ++metrics.logical_comparison_calls[round - 1];
+      }
+      trace_line(plan);
+    }
+    // All task edge lists have been frozen and traced before the first Eval.
+    for (auto* batch : batches) {
+      for (const auto& edge : batch->edges) {
         const auto& a = items.at(edge.left); const auto& b = items.at(edge.right);
         if (!a.real || !b.real) {
           ++metrics.dummy_related_calls[round - 1];
@@ -293,6 +347,8 @@ struct Runtime {
           auto& key = pool.at(slot);
           if (key.party_id() != c.party || key.comparison_bits() != c.comparison_bits)
             throw std::invalid_argument("Select offline key binding");
+          claim_slot(m, ProtocolIBmw16MaterialStage::Select,
+              static_cast<std::uint8_t>(batch->task), static_cast<std::uint8_t>(round), lo, hi, metrics);
           const auto offset = static_cast<std::uint64_t>(low_pad + 1U);
           const auto value = key.eval_strict_lt((z[lo] + offset) & ring_mask,
                                                 (z[hi] + offset) & ring_mask);
@@ -320,6 +376,9 @@ struct Runtime {
     }
     for (const auto& [batch, offset] : offsets) {
       batch->result.assign(opened.begin() + offset, opened.begin() + offset + batch->edges.size());
+      std::string result="R"+std::to_string(round)+"_RESULT task="+std::to_string(batch->task)+" bits=";
+      for(auto bit:batch->result)result.push_back(bit?'1':'0');
+      trace_line(result);
     }
     return opened;
   }
@@ -354,6 +413,9 @@ struct Runtime {
       if (!unique || !by_rank.count(state.q_low) || !by_rank.count(state.q_high) || state.q_low >= state.q_high) {
         state.status = "ABORT_ALGORITHM_INVALID"; state.reason = "R1_SAMPLE_RANK_NOT_UNIQUE";
       } else { state.pivot_low = by_rank.at(state.q_low); state.pivot_high = by_rank.at(state.q_high); }
+      trace_line("R1_STATE task="+std::to_string(t)+" sample="+ids_text(state.sample)+
+          " pivot_low="+std::to_string(state.pivot_low)+" pivot_high="+std::to_string(state.pivot_high)+
+          " status="+state.status+" reason="+state.reason);
     }
   }
 
@@ -389,6 +451,9 @@ struct Runtime {
       } else if (state.u.size() > state.u_cap) {
         state.status = "ABORT_ALGORITHM_PROBABILITY"; state.reason = "R2_U_OVERSIZE";
       } else state.status = "R2_READY";
+      trace_line("R2_STATE task="+std::to_string(t)+" prefix="+ids_text(state.prefix)+" suffix="+
+          ids_text(state.suffix)+" U="+ids_text(state.u)+" q="+std::to_string(state.q)+
+          " status="+state.status+" reason="+state.reason);
     }
   }
 
@@ -461,6 +526,10 @@ struct Runtime {
       } else if (state.w.size() > state.w_cap) {
         state.status = "ABORT_ALGORITHM_PROBABILITY"; state.reason = "R3_W_OVERSIZE";
       } else state.status = "R3_READY";
+      trace_line("R3_STATE task="+std::to_string(t)+" V="+ids_text(state.v)+" x="+
+          std::to_string(state.x)+" x_rank="+std::to_string(state.x_rank)+" y="+
+          std::to_string(state.y)+" y_rank="+std::to_string(state.y_rank)+" W="+
+          ids_text(state.w)+" qW="+std::to_string(state.q_w)+" status="+state.status+" reason="+state.reason);
     }
   }
 
@@ -510,6 +579,8 @@ struct Runtime {
           union_ids.size() != median_size || !disjoint) {
         state.status = "ABORT_ALGORITHM_INVALID"; state.reason = "R4_PARTITION_CARDINALITY";
       } else { state.status = "SUCCESS"; state.reason = "R4_EXACT_RANK"; }
+      trace_line("R4_STATE task="+std::to_string(t)+" reject="+ids_text(state.reject)+" accept="+
+          ids_text(state.accept)+" status="+state.status+" reason="+state.reason);
     }
   }
 
@@ -517,12 +588,14 @@ struct Runtime {
     round1(fds[0]); round2(fds[1]); round3(fds[2]); round4(fds[3]);
     for (const auto& state : tasks) if (state.status != "SUCCESS") {
       failure_reason = state.name + ":" + state.reason;
+      trace_line("SELECT_ABORT status="+state.status+" reason="+failure_reason);
       return {state.status == "ABORT_ALGORITHM_PROBABILITY" ? state.status : "ABORT_ALGORITHM_INVALID", 0};
     }
     std::set<ItemId> low_accept(tasks[0].accept.begin(), tasks[0].accept.end());
     std::vector<ItemId> candidate;
     for (auto id : tasks[1].reject) if (low_accept.count(id) && id < c.n) candidate.push_back(id);
-    if (candidate.size() != 1) { failure_reason = "TWO_PARTITION_INTERSECTION_NOT_UNIQUE"; return {"ABORT_ALGORITHM_INVALID", 0}; }
+    if (candidate.size() != 1) { failure_reason = "TWO_PARTITION_INTERSECTION_NOT_UNIQUE";trace_line("SELECT_ABORT status=ABORT_ALGORITHM_INVALID reason="+failure_reason);return {"ABORT_ALGORITHM_INVALID", 0}; }
+    trace_line("SELECTED handle="+std::to_string(candidate.front()));
     return {"SUCCESS", candidate.front()};
   }
 };
@@ -531,6 +604,15 @@ std::uint64_t random64() {
   std::uint64_t value = 0; auto* out = reinterpret_cast<std::uint8_t*>(&value); std::size_t left = sizeof(value);
   while (left) { const auto n = ::getrandom(out, left, 0); if (n < 0 && errno == EINTR) continue; if (n <= 0) throw std::runtime_error("BMW16 material entropy"); out += n; left -= static_cast<std::size_t>(n); }
   return value;
+}
+void random_bytes(std::uint8_t* out, std::size_t left) {
+  while (left) {
+    const auto n = ::getrandom(out, left, 0);
+    if (n < 0 && errno == EINTR) continue;
+    if (n <= 0) throw std::runtime_error("BMW16 OS entropy");
+    out += n;
+    left -= static_cast<std::size_t>(n);
+  }
 }
 std::uint64_t random_bounded(std::uint64_t bound) {
   if (!bound) throw std::invalid_argument("random bound");
@@ -661,9 +743,11 @@ ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_ge
     out.party0.membership_keys.push_back(key.export_party_material(0));
     out.party1.membership_keys.push_back(key.export_party_material(1));
   }
+  out.party0.slot_manifest = protocol_i_bmw16_enumerate_material_slots(c);
+  out.party1.slot_manifest = out.party0.slot_manifest;
   for (int party = 0; party < 2; ++party) {
     auto& p = party == 0 ? out.party0 : out.party1;
-    out.offline_material_slots_per_party[party] = 2U * c.padded_n + pair_count * 11U;
+    out.offline_material_slots_per_party[party] = 2U * c.padded_n + 2U + pair_count * 11U;
     std::uint64_t byte_count = 0;
     for (const auto& task : p.select_keys) for (const auto& round : task)
       for (const auto& key : round) byte_count += key.serialize().size();
@@ -679,7 +763,7 @@ ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_ge
   return out;
 }
 
-ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_mask_party(
+static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_mask_party_impl(
     const ProtocolIBmw16ExperimentalPartyConfig& c,
     ProtocolIBmw16ExperimentalPartyMaterial&& material,
     const std::vector<std::uint32_t>& raw_score_share,
@@ -687,10 +771,14 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
     const std::array<int, 2>& forward_shuffle_fds,
     const std::array<int, 4>& select_round_fds,
     const std::array<int, 2>& inverse_shuffle_fds,
-    int final_agreement_fd) {
+    int final_agreement_fd,
+    int sampling_coin_fd,
+    const ProtocolIBmw16TestOnlyRandomTape* test_only_tape) {
   if (c.party > 1 || c.n == 0 || c.k == 0 || c.k > c.n || c.timeout_ms <= 0 ||
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53 ||
-      raw_score_share.size() != c.n)
+      c.padded_n < 2 || (c.padded_n & (c.padded_n-1U)) != 0 ||
+      raw_score_share.size() != c.n || (c.n==1 && c.k!=1) ||
+      (c.n>64 || (c.n>1 && !test_only_tape && sampling_coin_fd<0)))
     throw std::invalid_argument("BMW16 experimental party configuration");
   ProtocolIBmw16ExperimentalPartyOutput output;
   if (c.n == 1) {
@@ -699,6 +787,12 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
     return output;
   }
   ProtocolIScoreInputMetrics score_metrics;
+  if (material.durable_slot_claim) {
+    for (std::uint32_t i=0;i<c.padded_n;++i) {
+      claim_slot(material,ProtocolIBmw16MaterialStage::RawCarry,0xff,0,i,i,output.metrics);
+      claim_slot(material,ProtocolIBmw16MaterialStage::RawSign,0xff,0,i,i,output.metrics);
+    }
+  }
   const auto stable_share = protocol_i_bmw16_experimental_select_key_party(
       {c.session, c.fingerprint, c.n, c.padded_n, c.k, c.index_bits,
        c.comparison_bits, c.party, c.timeout_ms}, material.score_input,
@@ -709,6 +803,7 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
 
   ProtocolIParallelShufflePartyConfig fcfg{c.session, c.fingerprint,
       material.forward_shuffle.material_id, c.n, c.k, c.comparison_bits, c.party, c.timeout_ms};
+  claim_slot(material,ProtocolIBmw16MaterialStage::ForwardShuffle,0xff,0,0,c.n-1U,output.metrics);
   ProtocolIParallelShuffleParty fwd(fcfg, std::move(material.forward_shuffle));
   auto r1 = fwd.prepare_round1(input);
   auto p1b = exchange_frame(forward_shuffle_fds[0], c.session, c.fingerprint, c.n, c.k,
@@ -724,7 +819,20 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
   std::vector<std::uint64_t> public_z(c.n);
   for (std::size_t i = 0; i < c.n; ++i) public_z[i] = shuffled.public_masked_records[i].word0;
 
-  Runtime select(c, material, public_z, output.metrics);
+  std::array<std::uint8_t,32> sampler_seed{};
+  if (test_only_tape) {
+    // Deterministic raw words are accepted only by this explicit TEST_ONLY parameter.
+  } else {
+    std::array<std::uint8_t,32> contribution{};random_bytes(contribution.data(),contribution.size());
+    std::vector<std::uint8_t> local(contribution.begin(),contribution.end());
+    const auto peer=exchange_frame(sampling_coin_fd,c.session,c.fingerprint,c.n,c.k,
+        c.comparison_bits,c.party,c.timeout_ms,19,local,
+        &output.metrics.online_bytes_sent,&output.metrics.online_bytes_received);
+    ++output.metrics.online_message_phases;
+    if(peer.size()!=contribution.size())throw std::runtime_error("BMW16 sampler coin payload length");
+    for(std::size_t i=0;i<sampler_seed.size();++i)sampler_seed[i]=contribution[i]^peer[i];
+  }
+  Runtime select(c, material, public_z, output.metrics, sampler_seed, test_only_tape);
   const auto selected = select.run(select_round_fds);
   std::string status = selected.first;
   if (c.test_only_force_probability_abort_after_select && status == "SUCCESS") {
@@ -741,6 +849,7 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
       auto& key = material.membership_keys.at(slot);
       if (key.party_id() != c.party || key.comparison_bits() != c.comparison_bits)
         throw std::invalid_argument("membership material binding");
+      claim_slot(material,ProtocolIBmw16MaterialStage::Membership,0xff,1,lo,hi,output.metrics);
       auto share = key.eval_strict_lt(public_z[lo], public_z[hi]);
       ++output.metrics.membership_slots_consumed;
       ++output.metrics.ucmp_party_evaluations; output.metrics.dcf_party_evaluations += 2U;
@@ -751,6 +860,7 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
     for (std::size_t i = 0; i < c.n; ++i) membership_records[i] = {membership[i], 0, 0};
     ProtocolIParallelShufflePartyConfig icfg{c.session, c.fingerprint,
         material.inverse_shuffle.material_id, c.n, c.k, c.comparison_bits, c.party, c.timeout_ms};
+    claim_slot(material,ProtocolIBmw16MaterialStage::InverseShuffle,0xff,0,0,c.n-1U,output.metrics);
     ProtocolIParallelShuffleParty inverse(icfg, std::move(material.inverse_shuffle));
     auto ir1 = inverse.prepare_round1(membership_records);
     auto ip1b = exchange_frame(inverse_shuffle_fds[0], c.session, c.fingerprint, c.n, c.k,
@@ -789,6 +899,37 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
   output.metrics.forward_shuffle_cmpagg_slots_unused = pairs;
   output.metrics.inverse_shuffle_cmpagg_slots_unused = pairs;
   return output;
+}
+
+ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_mask_party(
+    const ProtocolIBmw16ExperimentalPartyConfig& c,
+    ProtocolIBmw16ExperimentalPartyMaterial&& material,
+    const std::vector<std::uint32_t>& raw_score_share,
+    const std::array<int, 2>& score_fds,
+    const std::array<int, 2>& forward_shuffle_fds,
+    const std::array<int, 4>& select_round_fds,
+    const std::array<int, 2>& inverse_shuffle_fds,
+    int final_agreement_fd,
+    int sampling_coin_fd,
+    const ProtocolIBmw16TestOnlyRandomTape* test_only_tape) {
+  const auto start=std::chrono::steady_clock::now();
+  try {
+    auto out=protocol_i_bmw16_experimental_raw_score_mask_party_impl(c,std::move(material),raw_score_share,
+        score_fds,forward_shuffle_fds,select_round_fds,inverse_shuffle_fds,final_agreement_fd,
+        sampling_coin_fd,test_only_tape);
+    out.metrics.online_time_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now()-start).count());
+    return out;
+  } catch(const std::exception& error) {
+    ProtocolIBmw16ExperimentalPartyOutput out;
+    out.abort_reason=error.what();
+    out.metrics.online_time_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now()-start).count());
+    const std::string message=error.what();
+    out.status=(message.find("frame")!=std::string::npos||message.find("socket")!=std::string::npos||
+        message.find("transport")!=std::string::npos)?"ABORT_COMMUNICATION":"ABORT_MATERIAL";
+    return out;
+  }
 }
 
 }  // namespace moe_topk

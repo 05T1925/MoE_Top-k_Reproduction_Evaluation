@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -14,6 +15,27 @@
 
 namespace moe_topk {
 
+enum class ProtocolIBmw16MaterialStage : std::uint8_t {
+  RawCarry = 1, RawSign = 2, ForwardShuffle = 3, InverseShuffle = 4,
+  ForwardShuffleCmpAgg = 5, InverseShuffleCmpAgg = 6,
+  Select = 7, Membership = 8
+};
+
+struct ProtocolIBmw16MaterialSlot {
+  std::uint64_t id = 0;
+  ProtocolIBmw16MaterialStage stage = ProtocolIBmw16MaterialStage::RawCarry;
+  std::uint8_t task = 0xff, round = 0;
+  std::uint32_t left = 0, right = 0;
+};
+
+// TEST_ONLY common tape contains raw 64-bit words for [task][R1/R3]. Both
+// implementations use the same multiply-high bounded map and remaining-pool
+// sampling order; production sampling uses OS-CSPRNG rejection mapping.
+struct ProtocolIBmw16TestOnlyRandomTape {
+  std::array<std::array<std::vector<std::uint64_t>, 2>, 2> words;
+  std::vector<std::string>* trace_lines = nullptr;
+};
+
 // EXPERIMENTAL / PROJECT_DERIVED. Every material object is supplied by an
 // offline caller. This entry intentionally opens the Select comparison bits
 // and transcript; it is not a secure API and has no BMW16 Theorem 8 guarantee.
@@ -25,6 +47,9 @@ struct ProtocolIBmw16ExperimentalPartyMaterial {
   std::array<std::array<std::vector<ProtocolIUcmpPartyMaterial>, 4>, 2> select_keys;
   // Independent one-shot keys indexed by the canonical real pair.
   std::vector<ProtocolIUcmpPartyMaterial> membership_keys;
+  std::vector<ProtocolIBmw16MaterialSlot> slot_manifest;
+  std::function<void(std::uint64_t)> durable_slot_claim;
+  std::function<void(std::uint8_t, std::uint32_t)> durable_raw_slot_claim;
 
   ProtocolIBmw16ExperimentalPartyMaterial() = default;
   ProtocolIBmw16ExperimentalPartyMaterial(const ProtocolIBmw16ExperimentalPartyMaterial&) = delete;
@@ -38,8 +63,9 @@ struct ProtocolIBmw16ExperimentalPartyConfig {
   std::uint32_t n = 0, k = 0, padded_n = 0;
   std::uint8_t index_bits = 0, comparison_bits = 0, party = 0;
   int timeout_ms = 0;
-  // TEST_ONLY reproducibility input. Both parties must receive the same value.
-  std::uint64_t public_algorithm_seed = 0;
+  // Metadata only. Online party randomness comes from an OS-CSPRNG coin toss.
+  // Deterministic choices are accepted only through the explicit TEST_ONLY tape.
+  std::uint64_t test_only_algorithm_seed = 0;
   // This hook exists only in the opt-in experimental/test interface.
   bool test_only_force_probability_abort_after_select = false;
 };
@@ -55,6 +81,9 @@ struct ProtocolIBmw16ExperimentalMetrics {
   std::uint64_t dcf_party_evaluations = 0;
   std::uint64_t online_message_phases = 0;
   std::uint64_t online_bytes_sent = 0, online_bytes_received = 0;
+  std::uint64_t online_time_us = 0;
+  std::uint64_t sampler_prf_words = 0;
+  std::uint64_t durable_slots_claimed = 0;
   std::uint64_t forward_shuffle_cmpagg_slots_unused = 0;
   std::uint64_t inverse_shuffle_cmpagg_slots_unused = 0;
 };
@@ -76,6 +105,9 @@ struct ProtocolIBmw16ExperimentalMaterialPair {
   std::array<std::uint64_t, 2> primitive_key_and_shuffle_bytes_per_party{};
 };
 
+std::vector<ProtocolIBmw16MaterialSlot> protocol_i_bmw16_enumerate_material_slots(
+    const ProtocolIBmw16ExperimentalPartyConfig& config);
+
 // Trusted-offline experimental generator. It consumes public parameters only.
 ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_generate(
     const ProtocolIBmw16ExperimentalPartyConfig& public_config);
@@ -92,6 +124,8 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
     const std::array<int, 2>& forward_shuffle_fds,
     const std::array<int, 4>& select_round_fds,
     const std::array<int, 2>& inverse_shuffle_fds,
-    int final_agreement_fd);
+    int final_agreement_fd,
+    int sampling_coin_fd = -1,
+    const ProtocolIBmw16TestOnlyRandomTape* test_only_tape = nullptr);
 
 }  // namespace moe_topk
