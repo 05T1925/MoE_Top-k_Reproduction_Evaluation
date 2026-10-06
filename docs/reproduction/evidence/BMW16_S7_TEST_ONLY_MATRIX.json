@@ -1,0 +1,4040 @@
+{
+  "all_rows_retained": true,
+  "cases": [
+    {
+      "FSS_PRNG_seed": 9000,
+      "K": 1,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 0,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 3,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "singleton_min_k1",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -2147483648
+      ],
+      "input_seed": 100,
+      "input_sha256": "9e8187b2659fff5d7010dd546919ac46ddfa7119ec20cf1269eec81c1aaf05b5",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1
+      ],
+      "mask_xor_share_P1": [
+        0
+      ],
+      "membership_logical_calls": 1,
+      "membership_two_party_DCF_Eval_count": 4,
+      "membership_uCMP_material_slots": 1,
+      "n": 1,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        1
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        0
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 2,
+          "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 0,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "2": {
+          "comparison_calls": 4,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 4,
+          "edge_sha256": "b7291f40d91f52ed83504b6dddc2bdd1735b74503147b3db8ddd5ba6ec689e6f",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 4,
+          "real_real_calls": 0,
+          "reverse_share_complements": 2,
+          "same_round_duplicate_calls": 2,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 2
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 2,
+          "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 0,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 2,
+          "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 0,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 1,
+        "algorithm_seed": 3,
+        "candidate_original_indices": [
+          0
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 2,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 100,
+        "input_sha256": "9e8187b2659fff5d7010dd546919ac46ddfa7119ec20cf1269eec81c1aaf05b5",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 1,
+        "n": 1,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 2,
+            "R1_qH": 2,
+            "R1_qL": 1,
+            "R1_sample_size": 2,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 2,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 7,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 1,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 2,
+            "R1_qH": 2,
+            "R1_qL": 1,
+            "R1_sample_size": 2,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 2,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 7,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 1,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 0,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 8,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 0,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "2": {
+            "comparison_calls": 4,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 4,
+            "edge_sha256": "b7291f40d91f52ed83504b6dddc2bdd1735b74503147b3db8ddd5ba6ec689e6f",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 4,
+            "real_real_calls": 0,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 2,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 2
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 0,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 0,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 0,
+        "status": "SUCCESS",
+        "total_comparison_calls": 10,
+        "unique_unordered_edges_all_rounds": 2
+      },
+      "select_logical_comparison_calls": 10,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 32,
+      "select_unique_one_shot_uCMP_material_slots": 8,
+      "selected_original_index": 0,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 0,
+      "shuffle_cmpagg_key_slots_generated_unused": 0,
+      "shuffle_request_seed": 700,
+      "stable_key_comparison_bits": 35,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9001,
+      "K": 1,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 5,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n2_extremes_k1",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -2147483648,
+        2147483647
+      ],
+      "input_seed": 101,
+      "input_sha256": "94b283f7702a3d54e13db0b182a5138eee3514b2016efce9e9f8529f7d2878b0",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1,
+        1
+      ],
+      "mask_xor_share_P1": [
+        1,
+        0
+      ],
+      "membership_logical_calls": 2,
+      "membership_two_party_DCF_Eval_count": 8,
+      "membership_uCMP_material_slots": 2,
+      "n": 2,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        0,
+        1
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        1,
+        0
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 12,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 10,
+          "edge_sha256": "5f733b6b73d06127215f0decad5b22f7a4c461a6e682ac7470047f8296032f3b",
+          "fss_material_slots": 12,
+          "fss_party_dcf_evals": 24,
+          "fss_two_party_dcf_evals": 48,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 2,
+          "reverse_share_complements": 6,
+          "same_round_duplicate_calls": 1,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 11
+        },
+        "2": {
+          "comparison_calls": 12,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 9,
+          "edge_sha256": "fd76533681b7ff00348090406cab038dee61449c7a548775d35f004b6b62c014",
+          "fss_material_slots": 10,
+          "fss_party_dcf_evals": 20,
+          "fss_two_party_dcf_evals": 40,
+          "prior_round_repeat_calls": 12,
+          "real_real_calls": 3,
+          "reverse_share_complements": 9,
+          "same_round_duplicate_calls": 3,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 9
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "305e00e5aaa7a17a85f3e8c58f0f0dca89fbfee867421bd47e303c1055adb0fa",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "305e00e5aaa7a17a85f3e8c58f0f0dca89fbfee867421bd47e303c1055adb0fa",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 1,
+        "algorithm_seed": 5,
+        "candidate_original_indices": [
+          1
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 4,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 101,
+        "input_sha256": "f9f81bbc12fd45c1cba7e526305e3519a6cbef8d5b58919c8df3fbb65cea7840",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 2,
+        "n": 2,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 4,
+            "R1_qH": 3,
+            "R1_qL": 2,
+            "R1_sample_size": 4,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 4,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 9,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 2,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 4,
+            "R1_qH": 3,
+            "R1_qL": 2,
+            "R1_sample_size": 4,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 4,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 9,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 2,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 1,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 17,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 10,
+            "edge_sha256": "5f733b6b73d06127215f0decad5b22f7a4c461a6e682ac7470047f8296032f3b",
+            "fss_material_slots": 12,
+            "fss_party_dcf_evals": 24,
+            "fss_two_party_dcf_evals": 48,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 2,
+            "reverse_share_complements": 6,
+            "same_round_duplicate_calls": 1,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 11
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 9,
+            "edge_sha256": "fd76533681b7ff00348090406cab038dee61449c7a548775d35f004b6b62c014",
+            "fss_material_slots": 10,
+            "fss_party_dcf_evals": 20,
+            "fss_two_party_dcf_evals": 40,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 3,
+            "reverse_share_complements": 9,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 9
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "305e00e5aaa7a17a85f3e8c58f0f0dca89fbfee867421bd47e303c1055adb0fa",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "305e00e5aaa7a17a85f3e8c58f0f0dca89fbfee867421bd47e303c1055adb0fa",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 1,
+        "status": "SUCCESS",
+        "total_comparison_calls": 28,
+        "unique_unordered_edges_all_rounds": 11
+      },
+      "select_logical_comparison_calls": 28,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 104,
+      "select_unique_one_shot_uCMP_material_slots": 26,
+      "selected_original_index": 1,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 2178,
+      "shuffle_cmpagg_key_slots_generated_unused": 1,
+      "shuffle_request_seed": 701,
+      "stable_key_comparison_bits": 35,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9002,
+      "K": 2,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 7,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n2_extremes_k2",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        2147483647,
+        -2147483648
+      ],
+      "input_seed": 102,
+      "input_sha256": "f9f81bbc12fd45c1cba7e526305e3519a6cbef8d5b58919c8df3fbb65cea7840",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1,
+        1
+      ],
+      "mask_xor_share_P1": [
+        0,
+        0
+      ],
+      "membership_logical_calls": 2,
+      "membership_two_party_DCF_Eval_count": 8,
+      "membership_uCMP_material_slots": 2,
+      "n": 2,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        1,
+        1
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        0,
+        1
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 12,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 10,
+          "edge_sha256": "f2abfe4a8c38d45902a104a7ff9c56292496e126e6cf60d99494f61f22bb25e5",
+          "fss_material_slots": 12,
+          "fss_party_dcf_evals": 24,
+          "fss_two_party_dcf_evals": 48,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 2,
+          "reverse_share_complements": 7,
+          "same_round_duplicate_calls": 1,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 11
+        },
+        "2": {
+          "comparison_calls": 12,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 9,
+          "edge_sha256": "97da0ad7d2b679416c6fb480caf7b3d9c931f81e1ba0d5b1864a659d3a34007d",
+          "fss_material_slots": 10,
+          "fss_party_dcf_evals": 20,
+          "fss_two_party_dcf_evals": 40,
+          "prior_round_repeat_calls": 12,
+          "real_real_calls": 3,
+          "reverse_share_complements": 7,
+          "same_round_duplicate_calls": 3,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 9
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "5cff7630f9370f30373f536428469ac9822b407e6a1f9ebce778d0926fa66421",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "5cff7630f9370f30373f536428469ac9822b407e6a1f9ebce778d0926fa66421",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 2,
+        "algorithm_seed": 7,
+        "candidate_original_indices": [
+          1
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 4,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 102,
+        "input_sha256": "f9f81bbc12fd45c1cba7e526305e3519a6cbef8d5b58919c8df3fbb65cea7840",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 2,
+        "n": 2,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 4,
+            "R1_qH": 3,
+            "R1_qL": 2,
+            "R1_sample_size": 4,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 4,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 9,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 2,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 4,
+            "R1_qH": 3,
+            "R1_qL": 2,
+            "R1_sample_size": 4,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 4,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 9,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 2,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 0,
+        "rank_padding_low": 1,
+        "repeated_total_calls": 17,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 10,
+            "edge_sha256": "f2abfe4a8c38d45902a104a7ff9c56292496e126e6cf60d99494f61f22bb25e5",
+            "fss_material_slots": 12,
+            "fss_party_dcf_evals": 24,
+            "fss_two_party_dcf_evals": 48,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 2,
+            "reverse_share_complements": 7,
+            "same_round_duplicate_calls": 1,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 11
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 9,
+            "edge_sha256": "97da0ad7d2b679416c6fb480caf7b3d9c931f81e1ba0d5b1864a659d3a34007d",
+            "fss_material_slots": 10,
+            "fss_party_dcf_evals": 20,
+            "fss_two_party_dcf_evals": 40,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 3,
+            "reverse_share_complements": 7,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 9
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "5cff7630f9370f30373f536428469ac9822b407e6a1f9ebce778d0926fa66421",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "5cff7630f9370f30373f536428469ac9822b407e6a1f9ebce778d0926fa66421",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 1,
+        "status": "SUCCESS",
+        "total_comparison_calls": 28,
+        "unique_unordered_edges_all_rounds": 11
+      },
+      "select_logical_comparison_calls": 28,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 104,
+      "select_unique_one_shot_uCMP_material_slots": 26,
+      "selected_original_index": 1,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 2178,
+      "shuffle_cmpagg_key_slots_generated_unused": 1,
+      "shuffle_request_seed": 702,
+      "stable_key_comparison_bits": 35,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9003,
+      "K": 2,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 11,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n3_all_equal_k2",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        9,
+        9,
+        9
+      ],
+      "input_seed": 103,
+      "input_sha256": "9dab4287291dbcd9088293644588d4ec0ee841dced51d764ce859aad09ff95f6",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1,
+        1,
+        1
+      ],
+      "mask_xor_share_P1": [
+        0,
+        0,
+        1
+      ],
+      "membership_logical_calls": 3,
+      "membership_two_party_DCF_Eval_count": 12,
+      "membership_uCMP_material_slots": 3,
+      "n": 3,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        1,
+        1,
+        0
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        2,
+        1,
+        0
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 12,
+          "cross_task_repeat_calls_same_round": 3,
+          "dummy_related_calls": 6,
+          "edge_sha256": "59031f5b444b09a9ab609cdf60b69dc2b333cd393e6b3f48b173373896cb2838",
+          "fss_material_slots": 12,
+          "fss_party_dcf_evals": 24,
+          "fss_two_party_dcf_evals": 48,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 6,
+          "reverse_share_complements": 7,
+          "same_round_duplicate_calls": 3,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 9
+        },
+        "2": {
+          "comparison_calls": 12,
+          "cross_task_repeat_calls_same_round": 3,
+          "dummy_related_calls": 4,
+          "edge_sha256": "832db2df4331cd6a97c6ed829b8e14f935a8f9e8183b7ae48661f5b891147f97",
+          "fss_material_slots": 10,
+          "fss_party_dcf_evals": 20,
+          "fss_two_party_dcf_evals": 40,
+          "prior_round_repeat_calls": 12,
+          "real_real_calls": 8,
+          "reverse_share_complements": 8,
+          "same_round_duplicate_calls": 5,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 7
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "f75a605a1fcbaea023eb618377547dbff016670bd1b0aeafce56232d837e0d71",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 2,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "f75a605a1fcbaea023eb618377547dbff016670bd1b0aeafce56232d837e0d71",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 2,
+        "algorithm_seed": 11,
+        "candidate_original_indices": [
+          1
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 4,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 103,
+        "input_sha256": "9dab4287291dbcd9088293644588d4ec0ee841dced51d764ce859aad09ff95f6",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 2,
+        "n": 3,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 4,
+            "R1_qH": 3,
+            "R1_qL": 2,
+            "R1_sample_size": 4,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 4,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 9,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 2,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 4,
+            "R1_qH": 3,
+            "R1_qL": 2,
+            "R1_sample_size": 4,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 4,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 9,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 2,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 0,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 19,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 3,
+            "dummy_related_calls": 6,
+            "edge_sha256": "59031f5b444b09a9ab609cdf60b69dc2b333cd393e6b3f48b173373896cb2838",
+            "fss_material_slots": 12,
+            "fss_party_dcf_evals": 24,
+            "fss_two_party_dcf_evals": 48,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 6,
+            "reverse_share_complements": 7,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 9
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 3,
+            "dummy_related_calls": 4,
+            "edge_sha256": "832db2df4331cd6a97c6ed829b8e14f935a8f9e8183b7ae48661f5b891147f97",
+            "fss_material_slots": 10,
+            "fss_party_dcf_evals": 20,
+            "fss_two_party_dcf_evals": 40,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 8,
+            "reverse_share_complements": 8,
+            "same_round_duplicate_calls": 5,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 7
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "f75a605a1fcbaea023eb618377547dbff016670bd1b0aeafce56232d837e0d71",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "f75a605a1fcbaea023eb618377547dbff016670bd1b0aeafce56232d837e0d71",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 1,
+        "status": "SUCCESS",
+        "total_comparison_calls": 28,
+        "unique_unordered_edges_all_rounds": 9
+      },
+      "select_logical_comparison_calls": 28,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 104,
+      "select_unique_one_shot_uCMP_material_slots": 26,
+      "selected_original_index": 1,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 6534,
+      "shuffle_cmpagg_key_slots_generated_unused": 3,
+      "shuffle_request_seed": 703,
+      "stable_key_comparison_bits": 36,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9004,
+      "K": 1,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 13,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n5_mixed_k1",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -2147483648,
+        0,
+        2147483647,
+        0,
+        -1
+      ],
+      "input_seed": 104,
+      "input_sha256": "993a4e47cc60bde5d9abe4d58e4163476bcd40cfdbfc7616ff6a4033c3324496",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ],
+      "mask_xor_share_P1": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "membership_logical_calls": 5,
+      "membership_two_party_DCF_Eval_count": 20,
+      "membership_uCMP_material_slots": 5,
+      "n": 5,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        1,
+        0,
+        3,
+        2,
+        4
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 90,
+          "cross_task_repeat_calls_same_round": 10,
+          "dummy_related_calls": 70,
+          "edge_sha256": "b05e6c3412939307b82488045bc2e790f86b8f68a6fb563cc04d3a4f3b8bf858",
+          "fss_material_slots": 90,
+          "fss_party_dcf_evals": 180,
+          "fss_two_party_dcf_evals": 360,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 20,
+          "reverse_share_complements": 44,
+          "same_round_duplicate_calls": 10,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 80
+        },
+        "2": {
+          "comparison_calls": 36,
+          "cross_task_repeat_calls_same_round": 4,
+          "dummy_related_calls": 24,
+          "edge_sha256": "adf74a10f6a36530a5796ebc92c5e19e5e745aa22c6b4e7b8ce7b59f04f172eb",
+          "fss_material_slots": 34,
+          "fss_party_dcf_evals": 68,
+          "fss_two_party_dcf_evals": 136,
+          "prior_round_repeat_calls": 36,
+          "real_real_calls": 12,
+          "reverse_share_complements": 25,
+          "same_round_duplicate_calls": 6,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 30
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "5c31a9834aee81fa828d9adca60e67c19ba61337dbfe734fc50f260036ee998b",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "5c31a9834aee81fa828d9adca60e67c19ba61337dbfe734fc50f260036ee998b",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 1,
+        "algorithm_seed": 13,
+        "candidate_original_indices": [
+          2
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 10,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 104,
+        "input_sha256": "8cba57c24c7fb48abea51feb1f290c5ab7baedd5b2b286911ec5abe39103b91c",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 5,
+        "n": 5,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 4,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 50,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 70,
+            "edge_sha256": "b05e6c3412939307b82488045bc2e790f86b8f68a6fb563cc04d3a4f3b8bf858",
+            "fss_material_slots": 90,
+            "fss_party_dcf_evals": 180,
+            "fss_two_party_dcf_evals": 360,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 44,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 80
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 4,
+            "dummy_related_calls": 24,
+            "edge_sha256": "adf74a10f6a36530a5796ebc92c5e19e5e745aa22c6b4e7b8ce7b59f04f172eb",
+            "fss_material_slots": 34,
+            "fss_party_dcf_evals": 68,
+            "fss_two_party_dcf_evals": 136,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 12,
+            "reverse_share_complements": 25,
+            "same_round_duplicate_calls": 6,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 30
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "5c31a9834aee81fa828d9adca60e67c19ba61337dbfe734fc50f260036ee998b",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "5c31a9834aee81fa828d9adca60e67c19ba61337dbfe734fc50f260036ee998b",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 2,
+        "status": "SUCCESS",
+        "total_comparison_calls": 130,
+        "unique_unordered_edges_all_rounds": 80
+      },
+      "select_logical_comparison_calls": 130,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 512,
+      "select_unique_one_shot_uCMP_material_slots": 128,
+      "selected_original_index": 2,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 21780,
+      "shuffle_cmpagg_key_slots_generated_unused": 10,
+      "shuffle_request_seed": 704,
+      "stable_key_comparison_bits": 37,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9005,
+      "K": 5,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 17,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n5_mixed_kn",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -2147483648,
+        0,
+        2147483647,
+        0,
+        -1
+      ],
+      "input_seed": 105,
+      "input_sha256": "993a4e47cc60bde5d9abe4d58e4163476bcd40cfdbfc7616ff6a4033c3324496",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "mask_xor_share_P1": [
+        0,
+        0,
+        1,
+        1,
+        1
+      ],
+      "membership_logical_calls": 5,
+      "membership_two_party_DCF_Eval_count": 20,
+      "membership_uCMP_material_slots": 5,
+      "n": 5,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        0,
+        3,
+        4,
+        1,
+        2
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 90,
+          "cross_task_repeat_calls_same_round": 10,
+          "dummy_related_calls": 70,
+          "edge_sha256": "9d8b2785bcf166657d57683bdb534e08d7b49a1f4517ba6dbfca4aac06683bf1",
+          "fss_material_slots": 90,
+          "fss_party_dcf_evals": 180,
+          "fss_two_party_dcf_evals": 360,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 20,
+          "reverse_share_complements": 40,
+          "same_round_duplicate_calls": 10,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 80
+        },
+        "2": {
+          "comparison_calls": 36,
+          "cross_task_repeat_calls_same_round": 4,
+          "dummy_related_calls": 24,
+          "edge_sha256": "2dfe0a18ccfd001bf29ed5f62fece01c0046fe73b6dab36727e06fcf31f850d0",
+          "fss_material_slots": 34,
+          "fss_party_dcf_evals": 68,
+          "fss_two_party_dcf_evals": 136,
+          "prior_round_repeat_calls": 36,
+          "real_real_calls": 12,
+          "reverse_share_complements": 25,
+          "same_round_duplicate_calls": 6,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 30
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 1,
+          "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 1,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 5,
+        "algorithm_seed": 17,
+        "candidate_original_indices": [
+          0
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 10,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 105,
+        "input_sha256": "6249d69d9a9fc744fea28f7b50784e6d708f42cdb3b9c87f821c00928efe5167",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 5,
+        "n": 5,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 0,
+        "rank_padding_low": 4,
+        "repeated_total_calls": 50,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 70,
+            "edge_sha256": "9d8b2785bcf166657d57683bdb534e08d7b49a1f4517ba6dbfca4aac06683bf1",
+            "fss_material_slots": 90,
+            "fss_party_dcf_evals": 180,
+            "fss_two_party_dcf_evals": 360,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 40,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 80
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 4,
+            "dummy_related_calls": 24,
+            "edge_sha256": "2dfe0a18ccfd001bf29ed5f62fece01c0046fe73b6dab36727e06fcf31f850d0",
+            "fss_material_slots": 34,
+            "fss_party_dcf_evals": 68,
+            "fss_two_party_dcf_evals": 136,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 12,
+            "reverse_share_complements": 25,
+            "same_round_duplicate_calls": 6,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 30
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 0,
+        "status": "SUCCESS",
+        "total_comparison_calls": 130,
+        "unique_unordered_edges_all_rounds": 80
+      },
+      "select_logical_comparison_calls": 130,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 512,
+      "select_unique_one_shot_uCMP_material_slots": 128,
+      "selected_original_index": 0,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 21780,
+      "shuffle_cmpagg_key_slots_generated_unused": 10,
+      "shuffle_request_seed": 705,
+      "stable_key_comparison_bits": 37,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9006,
+      "K": 3,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 19,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n7_repeated_k3",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -7,
+        4,
+        4,
+        -2147483648,
+        2147483647,
+        0,
+        4
+      ],
+      "input_seed": 106,
+      "input_sha256": "9655225a765ded45a4d1f946c24309218c9e63ed939f03872614865cdba0bab6",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      "mask_xor_share_P1": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "membership_logical_calls": 7,
+      "membership_two_party_DCF_Eval_count": 28,
+      "membership_uCMP_material_slots": 7,
+      "n": 7,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        1,
+        5,
+        3,
+        6,
+        2,
+        0,
+        4
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 90,
+          "cross_task_repeat_calls_same_round": 21,
+          "dummy_related_calls": 48,
+          "edge_sha256": "701465fe6b14223354f36f9520370610a2efa950315235295101605bf50613c7",
+          "fss_material_slots": 90,
+          "fss_party_dcf_evals": 180,
+          "fss_two_party_dcf_evals": 360,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 42,
+          "reverse_share_complements": 44,
+          "same_round_duplicate_calls": 21,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 69
+        },
+        "2": {
+          "comparison_calls": 36,
+          "cross_task_repeat_calls_same_round": 7,
+          "dummy_related_calls": 12,
+          "edge_sha256": "98baec9cf7b8a9e0842702aad263a1898cfff919c56731876e09746988414fad",
+          "fss_material_slots": 34,
+          "fss_party_dcf_evals": 68,
+          "fss_two_party_dcf_evals": 136,
+          "prior_round_repeat_calls": 36,
+          "real_real_calls": 24,
+          "reverse_share_complements": 25,
+          "same_round_duplicate_calls": 9,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 27
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "b6cabac59c4b55e23243c96c54dd11cb774d81f267e23a1d4aaa7ea3a74200b8",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 2,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "b6cabac59c4b55e23243c96c54dd11cb774d81f267e23a1d4aaa7ea3a74200b8",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 3,
+        "algorithm_seed": 19,
+        "candidate_original_indices": [
+          2
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 10,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 106,
+        "input_sha256": "d4377eca70070bc837f3bcdb9fdb74a18c9be604898268689fdd362f0e57a21e",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 5,
+        "n": 7,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 2,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 61,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 21,
+            "dummy_related_calls": 48,
+            "edge_sha256": "701465fe6b14223354f36f9520370610a2efa950315235295101605bf50613c7",
+            "fss_material_slots": 90,
+            "fss_party_dcf_evals": 180,
+            "fss_two_party_dcf_evals": 360,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 42,
+            "reverse_share_complements": 44,
+            "same_round_duplicate_calls": 21,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 69
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 7,
+            "dummy_related_calls": 12,
+            "edge_sha256": "98baec9cf7b8a9e0842702aad263a1898cfff919c56731876e09746988414fad",
+            "fss_material_slots": 34,
+            "fss_party_dcf_evals": 68,
+            "fss_two_party_dcf_evals": 136,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 24,
+            "reverse_share_complements": 25,
+            "same_round_duplicate_calls": 9,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 27
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "b6cabac59c4b55e23243c96c54dd11cb774d81f267e23a1d4aaa7ea3a74200b8",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "b6cabac59c4b55e23243c96c54dd11cb774d81f267e23a1d4aaa7ea3a74200b8",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 2,
+        "status": "SUCCESS",
+        "total_comparison_calls": 130,
+        "unique_unordered_edges_all_rounds": 69
+      },
+      "select_logical_comparison_calls": 130,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 512,
+      "select_unique_one_shot_uCMP_material_slots": 128,
+      "selected_original_index": 2,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 45738,
+      "shuffle_cmpagg_key_slots_generated_unused": 21,
+      "shuffle_request_seed": 706,
+      "stable_key_comparison_bits": 37,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9007,
+      "K": 3,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 42,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n8_mixed_k3",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -2147483648,
+        2147483647,
+        0,
+        -1,
+        0,
+        2147483647,
+        -2147483648,
+        7
+      ],
+      "input_seed": 107,
+      "input_sha256": "e7cb437f52239b20e84be4e5bfc701a441cf1af5293ad235d72adcee9aa8c3d4",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "mask_xor_share_P1": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "membership_logical_calls": 8,
+      "membership_two_party_DCF_Eval_count": 32,
+      "membership_uCMP_material_slots": 8,
+      "n": 8,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        4,
+        0,
+        5,
+        1,
+        6,
+        7,
+        3,
+        2
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 132,
+          "cross_task_repeat_calls_same_round": 28,
+          "dummy_related_calls": 76,
+          "edge_sha256": "b46a044fe1a6ca6734c65a6015b7deff4e7f4cb8ca339395ff520348f2bae574",
+          "fss_material_slots": 132,
+          "fss_party_dcf_evals": 264,
+          "fss_two_party_dcf_evals": 528,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 56,
+          "reverse_share_complements": 71,
+          "same_round_duplicate_calls": 28,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 104
+        },
+        "2": {
+          "comparison_calls": 44,
+          "cross_task_repeat_calls_same_round": 8,
+          "dummy_related_calls": 16,
+          "edge_sha256": "9663d97dd4e42c48b80a2c4341aee2e4e0d7f8f884cc26c6bcfb7b2ca66ba40f",
+          "fss_material_slots": 42,
+          "fss_party_dcf_evals": 84,
+          "fss_two_party_dcf_evals": 168,
+          "prior_round_repeat_calls": 44,
+          "real_real_calls": 28,
+          "reverse_share_complements": 25,
+          "same_round_duplicate_calls": 10,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 34
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "663a234d17dff0f74e2281320376778c206cdf3957ae0128b1b45eb172f24d2d",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "663a234d17dff0f74e2281320376778c206cdf3957ae0128b1b45eb172f24d2d",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 3,
+        "algorithm_seed": 42,
+        "candidate_original_indices": [
+          7
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 12,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 107,
+        "input_sha256": "297b17be1239e7d0daf70e304686fcbbb08680d3103e6cdc92aa11d6c2bbb61d",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 6,
+        "n": 8,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 12,
+            "R1_qH": 7,
+            "R1_qL": 6,
+            "R1_sample_size": 12,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 12,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 6,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 12,
+            "R1_qH": 7,
+            "R1_qL": 6,
+            "R1_sample_size": 12,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 12,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 6,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 3,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 76,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 132,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 76,
+            "edge_sha256": "b46a044fe1a6ca6734c65a6015b7deff4e7f4cb8ca339395ff520348f2bae574",
+            "fss_material_slots": 132,
+            "fss_party_dcf_evals": 264,
+            "fss_two_party_dcf_evals": 528,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 71,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 104
+          },
+          "2": {
+            "comparison_calls": 44,
+            "cross_task_repeat_calls_same_round": 8,
+            "dummy_related_calls": 16,
+            "edge_sha256": "9663d97dd4e42c48b80a2c4341aee2e4e0d7f8f884cc26c6bcfb7b2ca66ba40f",
+            "fss_material_slots": 42,
+            "fss_party_dcf_evals": 84,
+            "fss_two_party_dcf_evals": 168,
+            "prior_round_repeat_calls": 44,
+            "real_real_calls": 28,
+            "reverse_share_complements": 25,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 34
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "663a234d17dff0f74e2281320376778c206cdf3957ae0128b1b45eb172f24d2d",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "663a234d17dff0f74e2281320376778c206cdf3957ae0128b1b45eb172f24d2d",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 7,
+        "status": "SUCCESS",
+        "total_comparison_calls": 180,
+        "trace": {
+          "events": [
+            {
+              "edge_count": 132,
+              "edge_sha256": "b46a044fe1a6ca6734c65a6015b7deff4e7f4cb8ca339395ff520348f2bae574",
+              "edges": [
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  10
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  1
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  6
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  3
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  1
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  6
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  3
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  1
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  6
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  3
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  6
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  3
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  6
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  3
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  3
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  4
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  4,
+                  8
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  4,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  4,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  4,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  8,
+                  0
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  8,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  8,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  0,
+                  2
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  0,
+                  11
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  2,
+                  11
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  7
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  1
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  12
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  0
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  7
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  1
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  12
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  0
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  1
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  12
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  0
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  12
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  0
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  0
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  0
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  4
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  4,
+                  6
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  4,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  4,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  4,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  6,
+                  15
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  6,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  6,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  15,
+                  3
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  15,
+                  14
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  3,
+                  14
+                ]
+              ],
+              "event": "ROUND_PLAN_FROZEN",
+              "requires_results_through_round": 0,
+              "round": 1,
+              "tasks": [
+                {
+                  "phase": "R1_SAMPLE_ALL_PAIRS",
+                  "qH": 7,
+                  "qL": 6,
+                  "requires_results_through_round": 0,
+                  "sample_ids": [
+                    9,
+                    10,
+                    7,
+                    1,
+                    5,
+                    6,
+                    3,
+                    4,
+                    8,
+                    0,
+                    2,
+                    11
+                  ],
+                  "sample_size": 12,
+                  "task": "SELECT_LOW_SENTINEL"
+                },
+                {
+                  "phase": "R1_SAMPLE_ALL_PAIRS",
+                  "qH": 7,
+                  "qL": 6,
+                  "requires_results_through_round": 0,
+                  "sample_ids": [
+                    13,
+                    5,
+                    7,
+                    1,
+                    12,
+                    2,
+                    0,
+                    4,
+                    6,
+                    15,
+                    3,
+                    14
+                  ],
+                  "sample_size": 12,
+                  "task": "SELECT_HIGH_SENTINEL"
+                }
+              ]
+            },
+            {
+              "event": "ROUND_RESULTS",
+              "outcome_count": 132,
+              "outcome_sha256": "de07e84a6f287289045ee58525f7286a5e9946b5819a3f85c66f90beea06d352",
+              "round": 1
+            },
+            {
+              "event": "R1_DERIVED_STATE",
+              "partitions": [
+                {
+                  "pivot_high": 5,
+                  "pivot_low": 7,
+                  "reason": null,
+                  "status": "PENDING",
+                  "task": "SELECT_LOW_SENTINEL"
+                },
+                {
+                  "pivot_high": 2,
+                  "pivot_low": 5,
+                  "reason": null,
+                  "status": "PENDING",
+                  "task": "SELECT_HIGH_SENTINEL"
+                }
+              ]
+            },
+            {
+              "edge_count": 44,
+              "edge_sha256": "9663d97dd4e42c48b80a2c4341aee2e4e0d7f8f884cc26c6bcfb7b2ca66ba40f",
+              "edges": [
+                [
+                  "SELECT_LOW_SENTINEL",
+                  8,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  0,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  2,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  4,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  11,
+                  7
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  8,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  0,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  1,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  2,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  3,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  4,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  6,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  7,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  9,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  10,
+                  5
+                ],
+                [
+                  "SELECT_LOW_SENTINEL",
+                  11,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  3,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  4,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  6,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  14,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  15,
+                  5
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  0,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  1,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  3,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  4,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  6,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  7,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  12,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  13,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  14,
+                  2
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  15,
+                  2
+                ]
+              ],
+              "event": "ROUND_PLAN_FROZEN",
+              "requires_results_through_round": 1,
+              "round": 2,
+              "tasks": [
+                {
+                  "input_ids": [
+                    8,
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    9,
+                    10,
+                    11
+                  ],
+                  "phase": "R2_INPUT_TO_TWO_PIVOTS",
+                  "pivot_high": 5,
+                  "pivot_low": 7,
+                  "requires_results_through_round": 1,
+                  "task": "SELECT_LOW_SENTINEL"
+                },
+                {
+                  "input_ids": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    12,
+                    13,
+                    14,
+                    15
+                  ],
+                  "phase": "R2_INPUT_TO_TWO_PIVOTS",
+                  "pivot_high": 2,
+                  "pivot_low": 5,
+                  "requires_results_through_round": 1,
+                  "task": "SELECT_HIGH_SENTINEL"
+                }
+              ]
+            },
+            {
+              "event": "ROUND_RESULTS",
+              "outcome_count": 44,
+              "outcome_sha256": "180caebcf0606ff8f4befe6667f23c4b243daa8fff95d91daf27900f6f621a95",
+              "round": 2
+            },
+            {
+              "U_ids": [
+                5,
+                7
+              ],
+              "event": "R2_DERIVED_STATE",
+              "prefix_ids": [
+                8,
+                0,
+                1,
+                4,
+                6
+              ],
+              "q": 1,
+              "reason": null,
+              "status": "R2_READY",
+              "suffix_ids": [
+                2,
+                3,
+                9,
+                10,
+                11
+              ],
+              "task": "SELECT_LOW_SENTINEL"
+            },
+            {
+              "U_ids": [
+                2,
+                5
+              ],
+              "event": "R2_DERIVED_STATE",
+              "prefix_ids": [
+                0,
+                1,
+                4,
+                6,
+                7
+              ],
+              "q": 1,
+              "reason": null,
+              "status": "R2_READY",
+              "suffix_ids": [
+                3,
+                12,
+                13,
+                14,
+                15
+              ],
+              "task": "SELECT_HIGH_SENTINEL"
+            },
+            {
+              "edge_count": 2,
+              "edge_sha256": "663a234d17dff0f74e2281320376778c206cdf3957ae0128b1b45eb172f24d2d",
+              "edges": [
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  7
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  5,
+                  2
+                ]
+              ],
+              "event": "ROUND_PLAN_FROZEN",
+              "requires_results_through_round": 2,
+              "round": 3,
+              "tasks": [
+                {
+                  "U_ids": [
+                    5,
+                    7
+                  ],
+                  "V_ids": [
+                    5,
+                    7
+                  ],
+                  "phase": "R3_SAMPLE_CROSS_U",
+                  "q": 1,
+                  "requires_results_through_round": 2,
+                  "task": "SELECT_LOW_SENTINEL"
+                },
+                {
+                  "U_ids": [
+                    2,
+                    5
+                  ],
+                  "V_ids": [
+                    5,
+                    2
+                  ],
+                  "phase": "R3_SAMPLE_CROSS_U",
+                  "q": 1,
+                  "requires_results_through_round": 2,
+                  "task": "SELECT_HIGH_SENTINEL"
+                }
+              ]
+            },
+            {
+              "event": "ROUND_RESULTS",
+              "outcome_count": 2,
+              "outcome_sha256": "b413f47d13ee2fe6c845b2ee141af81de858df4ec549a58b7970bb96645bc8d2",
+              "round": 3
+            },
+            {
+              "W_ids": [
+                5,
+                7
+              ],
+              "event": "R3_DERIVED_STATE",
+              "qW": 1,
+              "reason": null,
+              "sample_ranks": {
+                "5": 2,
+                "7": 1
+              },
+              "status": "R3_READY",
+              "task": "SELECT_LOW_SENTINEL",
+              "x_id": 7,
+              "x_rank": 1,
+              "y_id": 5,
+              "y_rank": 2
+            },
+            {
+              "W_ids": [
+                2,
+                5
+              ],
+              "event": "R3_DERIVED_STATE",
+              "qW": 1,
+              "reason": null,
+              "sample_ranks": {
+                "2": 2,
+                "5": 1
+              },
+              "status": "R3_READY",
+              "task": "SELECT_HIGH_SENTINEL",
+              "x_id": 5,
+              "x_rank": 1,
+              "y_id": 2,
+              "y_rank": 2
+            },
+            {
+              "edge_count": 2,
+              "edge_sha256": "663a234d17dff0f74e2281320376778c206cdf3957ae0128b1b45eb172f24d2d",
+              "edges": [
+                [
+                  "SELECT_LOW_SENTINEL",
+                  5,
+                  7
+                ],
+                [
+                  "SELECT_HIGH_SENTINEL",
+                  2,
+                  5
+                ]
+              ],
+              "event": "ROUND_PLAN_FROZEN",
+              "requires_results_through_round": 3,
+              "round": 4,
+              "tasks": [
+                {
+                  "W_ids": [
+                    5,
+                    7
+                  ],
+                  "phase": "R4_W_ALL_PAIRS",
+                  "qW": 1,
+                  "requires_results_through_round": 3,
+                  "task": "SELECT_LOW_SENTINEL"
+                },
+                {
+                  "W_ids": [
+                    2,
+                    5
+                  ],
+                  "phase": "R4_W_ALL_PAIRS",
+                  "qW": 1,
+                  "requires_results_through_round": 3,
+                  "task": "SELECT_HIGH_SENTINEL"
+                }
+              ]
+            },
+            {
+              "event": "ROUND_RESULTS",
+              "outcome_count": 2,
+              "outcome_sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7",
+              "round": 4
+            }
+          ],
+          "items": [
+            {
+              "category": 2,
+              "id": 0,
+              "label": "real:0",
+              "original_index": 4,
+              "score": 0,
+              "serial": 0
+            },
+            {
+              "category": 2,
+              "id": 1,
+              "label": "real:1",
+              "original_index": 0,
+              "score": -2147483648,
+              "serial": 1
+            },
+            {
+              "category": 2,
+              "id": 2,
+              "label": "real:2",
+              "original_index": 5,
+              "score": 2147483647,
+              "serial": 2
+            },
+            {
+              "category": 2,
+              "id": 3,
+              "label": "real:3",
+              "original_index": 1,
+              "score": 2147483647,
+              "serial": 3
+            },
+            {
+              "category": 2,
+              "id": 4,
+              "label": "real:4",
+              "original_index": 6,
+              "score": -2147483648,
+              "serial": 4
+            },
+            {
+              "category": 2,
+              "id": 5,
+              "label": "real:5",
+              "original_index": 7,
+              "score": 7,
+              "serial": 5
+            },
+            {
+              "category": 2,
+              "id": 6,
+              "label": "real:6",
+              "original_index": 3,
+              "score": -1,
+              "serial": 6
+            },
+            {
+              "category": 2,
+              "id": 7,
+              "label": "real:7",
+              "original_index": 2,
+              "score": 0,
+              "serial": 7
+            },
+            {
+              "category": 1,
+              "id": 8,
+              "label": "SELECT_LOW_SENTINEL:select-low",
+              "original_index": null,
+              "score": null,
+              "serial": 8
+            },
+            {
+              "category": 4,
+              "id": 9,
+              "label": "SELECT_LOW_SENTINEL:rank-high:0",
+              "original_index": null,
+              "score": null,
+              "serial": 9
+            },
+            {
+              "category": 4,
+              "id": 10,
+              "label": "SELECT_LOW_SENTINEL:rank-high:1",
+              "original_index": null,
+              "score": null,
+              "serial": 10
+            },
+            {
+              "category": 4,
+              "id": 11,
+              "label": "SELECT_LOW_SENTINEL:rank-high:2",
+              "original_index": null,
+              "score": null,
+              "serial": 11
+            },
+            {
+              "category": 3,
+              "id": 12,
+              "label": "SELECT_HIGH_SENTINEL:select-high",
+              "original_index": null,
+              "score": null,
+              "serial": 12
+            },
+            {
+              "category": 4,
+              "id": 13,
+              "label": "SELECT_HIGH_SENTINEL:rank-high:0",
+              "original_index": null,
+              "score": null,
+              "serial": 13
+            },
+            {
+              "category": 4,
+              "id": 14,
+              "label": "SELECT_HIGH_SENTINEL:rank-high:1",
+              "original_index": null,
+              "score": null,
+              "serial": 14
+            },
+            {
+              "category": 4,
+              "id": 15,
+              "label": "SELECT_HIGH_SENTINEL:rank-high:2",
+              "original_index": null,
+              "score": null,
+              "serial": 15
+            }
+          ]
+        },
+        "unique_unordered_edges_all_rounds": 104
+      },
+      "select_logical_comparison_calls": 180,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 712,
+      "select_unique_one_shot_uCMP_material_slots": 178,
+      "selected_original_index": 7,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 60984,
+      "shuffle_cmpagg_key_slots_generated_unused": 28,
+      "shuffle_request_seed": 707,
+      "stable_key_comparison_bits": 37,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9008,
+      "K": 4,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 123,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n8_all_equal_k4",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "input_seed": 108,
+      "input_sha256": "ec8dc8a32eb437327dff212ee647500ca14ed020df08c112a31b3b4b21adb9c4",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1
+      ],
+      "mask_xor_share_P1": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      "membership_logical_calls": 8,
+      "membership_two_party_DCF_Eval_count": 32,
+      "membership_uCMP_material_slots": 8,
+      "n": 8,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        0,
+        7,
+        5,
+        3,
+        6,
+        1,
+        2,
+        4
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 90,
+          "cross_task_repeat_calls_same_round": 28,
+          "dummy_related_calls": 34,
+          "edge_sha256": "6bd18565d01b58b922e0c6a218f345b8221a19dba722b4ed908ab36dddafa5aa",
+          "fss_material_slots": 90,
+          "fss_party_dcf_evals": 180,
+          "fss_two_party_dcf_evals": 360,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 56,
+          "reverse_share_complements": 46,
+          "same_round_duplicate_calls": 28,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 62
+        },
+        "2": {
+          "comparison_calls": 36,
+          "cross_task_repeat_calls_same_round": 8,
+          "dummy_related_calls": 8,
+          "edge_sha256": "3e397abab1ff18a60a93b3e6f7791bb0489f0070f739eaec30800556f04ca5d7",
+          "fss_material_slots": 34,
+          "fss_party_dcf_evals": 68,
+          "fss_two_party_dcf_evals": 136,
+          "prior_round_repeat_calls": 36,
+          "real_real_calls": 28,
+          "reverse_share_complements": 17,
+          "same_round_duplicate_calls": 10,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 26
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "264531745e45cfa3d1081e8665f9e340c151dbe74c61c5b9e2ac8fbdf23ab240",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 1,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "264531745e45cfa3d1081e8665f9e340c151dbe74c61c5b9e2ac8fbdf23ab240",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 4,
+        "algorithm_seed": 123,
+        "candidate_original_indices": [
+          3
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 10,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 108,
+        "input_sha256": "ec8dc8a32eb437327dff212ee647500ca14ed020df08c112a31b3b4b21adb9c4",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 5,
+        "n": 8,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 10,
+            "R1_qH": 6,
+            "R1_qL": 5,
+            "R1_sample_size": 10,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 10,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 15,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 5,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 1,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 68,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 34,
+            "edge_sha256": "6bd18565d01b58b922e0c6a218f345b8221a19dba722b4ed908ab36dddafa5aa",
+            "fss_material_slots": 90,
+            "fss_party_dcf_evals": 180,
+            "fss_two_party_dcf_evals": 360,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 46,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 62
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 8,
+            "dummy_related_calls": 8,
+            "edge_sha256": "3e397abab1ff18a60a93b3e6f7791bb0489f0070f739eaec30800556f04ca5d7",
+            "fss_material_slots": 34,
+            "fss_party_dcf_evals": 68,
+            "fss_two_party_dcf_evals": 136,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 28,
+            "reverse_share_complements": 17,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 26
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "264531745e45cfa3d1081e8665f9e340c151dbe74c61c5b9e2ac8fbdf23ab240",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "264531745e45cfa3d1081e8665f9e340c151dbe74c61c5b9e2ac8fbdf23ab240",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 3,
+        "status": "SUCCESS",
+        "total_comparison_calls": 130,
+        "unique_unordered_edges_all_rounds": 62
+      },
+      "select_logical_comparison_calls": 130,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 512,
+      "select_unique_one_shot_uCMP_material_slots": 128,
+      "selected_original_index": 3,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 60984,
+      "shuffle_cmpagg_key_slots_generated_unused": 28,
+      "shuffle_request_seed": 708,
+      "stable_key_comparison_bits": 37,
+      "status": "SUCCESS"
+    },
+    {
+      "FSS_PRNG_seed": 9009,
+      "K": 8,
+      "actual_OS_shuffle_randomness": "getrandom(2) inside repository primitive; shuffle_request_seed is only a transcript label",
+      "actual_forward_shuffle_online_rounds_in_primitive": 2,
+      "actual_select_comparator": "VFSS/src/moe_topk/protocol_i_ucmp.cpp ProtocolIUcmpMaterial; DCF keys generated per TEST_ONLY request",
+      "actual_shuffle_primitive": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp; both party state machines centralized in harness",
+      "algorithm_seed": 1024,
+      "candidate_mask_opened_for_test_diagnostic": null,
+      "case_name": "n16_boundary_k8",
+      "classification": "TEST_ONLY_CENTRAL_CONTROLLER_OPENS_SHUFFLE_AND_COMPARISON_SHARES",
+      "input_scores_signed_int32": [
+        -2147483648,
+        2147483647,
+        0,
+        -1,
+        0,
+        2147483647,
+        -2147483648,
+        7,
+        -2147483648,
+        2147483647,
+        0,
+        -1,
+        0,
+        2147483647,
+        -2147483648,
+        7
+      ],
+      "input_seed": 109,
+      "input_sha256": "a165aa4e4c6b559dda830ae480f2849c8725c119072a6729075c61ed23fd7c77",
+      "inverse_route": "central TEST_ONLY scatter using opened shuffled-to-original index map; no secure inverse shuffle is composed",
+      "label": "Protocol_I_BMW16_DERIVED_Select_DCF_TEST_ONLY_CENTRAL_OPEN",
+      "mask_delivered_on_failure": false,
+      "mask_xor_share_P0": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "mask_xor_share_P1": [
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "membership_logical_calls": 16,
+      "membership_two_party_DCF_Eval_count": 64,
+      "membership_uCMP_material_slots": 16,
+      "n": 16,
+      "oracle_differential": "PASS",
+      "oracle_mask_from_frozen_cpp_topk_oracle": [
+        0,
+        1,
+        1,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "partition_statuses": {
+        "SELECT_HIGH_SENTINEL": "SUCCESS",
+        "SELECT_LOW_SENTINEL": "SUCCESS"
+      },
+      "revealed_shuffled_to_original_index_map": [
+        8,
+        5,
+        13,
+        6,
+        9,
+        15,
+        10,
+        4,
+        12,
+        0,
+        7,
+        1,
+        3,
+        11,
+        14,
+        2
+      ],
+      "round_metrics": {
+        "1": {
+          "comparison_calls": 306,
+          "cross_task_repeat_calls_same_round": 120,
+          "dummy_related_calls": 66,
+          "edge_sha256": "b526dfd10b3496831bf4dbd929c031ce8b59eeb62a38d64e17ebeec39a7fd529",
+          "fss_material_slots": 306,
+          "fss_party_dcf_evals": 612,
+          "fss_two_party_dcf_evals": 1224,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 240,
+          "reverse_share_complements": 160,
+          "same_round_duplicate_calls": 120,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 186
+        },
+        "2": {
+          "comparison_calls": 68,
+          "cross_task_repeat_calls_same_round": 16,
+          "dummy_related_calls": 8,
+          "edge_sha256": "d0d4cc2486b302cea1f77b88ada7f1df46410badb55148e38f0a31a1fbd6cf62",
+          "fss_material_slots": 66,
+          "fss_party_dcf_evals": 132,
+          "fss_two_party_dcf_evals": 264,
+          "prior_round_repeat_calls": 68,
+          "real_real_calls": 60,
+          "reverse_share_complements": 33,
+          "same_round_duplicate_calls": 18,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 50
+        },
+        "3": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "9f22ded08df71a57f16b947d1cde0161bbf9d7dc729a21a60d106c8de34c9b81",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 2,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        },
+        "4": {
+          "comparison_calls": 2,
+          "cross_task_repeat_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "edge_sha256": "9f22ded08df71a57f16b947d1cde0161bbf9d7dc729a21a60d106c8de34c9b81",
+          "fss_material_slots": 2,
+          "fss_party_dcf_evals": 4,
+          "fss_two_party_dcf_evals": 8,
+          "prior_round_repeat_calls": 2,
+          "real_real_calls": 2,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 0,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 2
+        }
+      },
+      "run_select": {
+        "K": 8,
+        "algorithm_seed": 1024,
+        "candidate_original_indices": [
+          4
+        ],
+        "comparison_rounds_max": 4,
+        "effective_median_size_M": 18,
+        "epsilon": "not-used (finite sample-bracket construction)",
+        "input_seed": 109,
+        "input_sha256": "68fb3ccbe9fb6b384b5f1c4e03e4d7d26afbc181af33fe4b77bd21310eba36ab",
+        "label": "BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY",
+        "median_reject_count_h": 9,
+        "n": 16,
+        "partition_statuses": {
+          "SELECT_HIGH_SENTINEL": "SUCCESS",
+          "SELECT_LOW_SENTINEL": "SUCCESS"
+        },
+        "partitions": {
+          "SELECT_HIGH_SENTINEL": {
+            "M": 18,
+            "R1_qH": 10,
+            "R1_qL": 9,
+            "R1_sample_size": 18,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 18,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 19,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 9,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          },
+          "SELECT_LOW_SENTINEL": {
+            "M": 18,
+            "R1_qH": 10,
+            "R1_qL": 9,
+            "R1_sample_size": 18,
+            "R3_sample_ranks": {
+              "qW": 1,
+              "x": 1,
+              "y": 2
+            },
+            "U_cap": 18,
+            "U_size": 2,
+            "V_size": 2,
+            "W_cap": 19,
+            "W_size": 2,
+            "failure_reason": null,
+            "h": 9,
+            "reason": "R4_EXACT_RESIDUAL_RANK_INCLUDES_BOUNDARY_ELEMENT",
+            "status": "SUCCESS"
+          }
+        },
+        "rank_padding_high": 1,
+        "rank_padding_low": 0,
+        "repeated_total_calls": 192,
+        "result_class": "SUCCESS",
+        "round_metrics": {
+          "1": {
+            "comparison_calls": 306,
+            "cross_task_repeat_calls_same_round": 120,
+            "dummy_related_calls": 66,
+            "edge_sha256": "b526dfd10b3496831bf4dbd929c031ce8b59eeb62a38d64e17ebeec39a7fd529",
+            "fss_material_slots": 306,
+            "fss_party_dcf_evals": 612,
+            "fss_two_party_dcf_evals": 1224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 240,
+            "reverse_share_complements": 160,
+            "same_round_duplicate_calls": 120,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 186
+          },
+          "2": {
+            "comparison_calls": 68,
+            "cross_task_repeat_calls_same_round": 16,
+            "dummy_related_calls": 8,
+            "edge_sha256": "d0d4cc2486b302cea1f77b88ada7f1df46410badb55148e38f0a31a1fbd6cf62",
+            "fss_material_slots": 66,
+            "fss_party_dcf_evals": 132,
+            "fss_two_party_dcf_evals": 264,
+            "prior_round_repeat_calls": 68,
+            "real_real_calls": 60,
+            "reverse_share_complements": 33,
+            "same_round_duplicate_calls": 18,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 50
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "9f22ded08df71a57f16b947d1cde0161bbf9d7dc729a21a60d106c8de34c9b81",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "9f22ded08df71a57f16b947d1cde0161bbf9d7dc729a21a60d106c8de34c9b81",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "selected_original_index": 4,
+        "status": "SUCCESS",
+        "total_comparison_calls": 378,
+        "unique_unordered_edges_all_rounds": 186
+      },
+      "select_logical_comparison_calls": 378,
+      "select_result_class": "SUCCESS",
+      "select_two_party_DCF_Eval_count": 1504,
+      "select_unique_one_shot_uCMP_material_slots": 376,
+      "selected_original_index": 4,
+      "shuffle_cmpagg_DCF_Evals": 0,
+      "shuffle_cmpagg_combined_party_key_wire_bytes_generated_unused": 261360,
+      "shuffle_cmpagg_key_slots_generated_unused": 120,
+      "shuffle_request_seed": 709,
+      "stable_key_comparison_bits": 38,
+      "status": "SUCCESS"
+    }
+  ],
+  "cases_requested": 10,
+  "cases_retained": 10,
+  "completed_wrong_or_other": 0,
+  "interpretation": "Finite functional evidence only; not a probability estimate, theorem, independent-process E2E, or security proof.",
+  "label": "BMW16_S7_REAL_UCMP_DCF_AND_SHUFFLE_TEST_ONLY_MATRIX",
+  "paper_random_failure_paths": 0,
+  "successes": 10
+}

@@ -140,10 +140,16 @@ Agarwal 会议版提及 BB90 选择路线，不等于已完整给出本项目所
 | 具体 CA 图实现 | 需映射到来源及独立验证 |
 | 稳定第 K 大阈值表示 | 项目语义适配 |
 | 阈值与 DCF 的安全衔接 | 项目组合设计 |
-| Protocol I/III 两种 BB90+DCF 路线 | 项目组合扩展 |
+| Protocol III BB90+DCF 路线 | 项目组合扩展；Protocol I 当前候选见 4.5 |
 | 原顺序秘密共享 Top-K mask | 项目统一输出适配 |
 
 不能把完整 BB90+DCF Top-K 组合直接表述为 BB90 原论文已经提供的安全协议。
+
+### 4.5 2026-10-06 Protocol I 候选来源补充
+
+用户已把 Protocol I 选择升级的当前候选指定为 **Protocol I + BMW16-derived Select + DCF**，标签 `PROJECT_DERIVED`。主要算法资料为本地 `Papers/1603.04941v1.pdf`，SHA-256 `F46F83CBA279F37E9E3AAA0D64B145FDFCFBC52C0C9C8B79BACEC1259CA9CA23`（44 页，来源身份在 S7 报告登记）；`Papers/017.pdf` SHA-256 `3EAE3A93F12AB71EEA8C040167F21351FCF3FF54DC423985A04087E3E90CB15`（249 页）仅作相关材料交叉核对，不构成独立算法证明。PDF 均为本地只读文件，不进入 Git。
+
+S4/S5 固定的 `BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY` 是项目衍生样本括区程序；它不等于论文 Algorithm 7 的原样实现，也不继承 BMW16 Theorem 8 的定理概率或比较常数。S7 只复用其明文边计划作为集中式测试组合中的一部分。其 FSS Eval、可见比较 transcript 和输出均为 TEST_ONLY 证据，不是安全 Protocol I 结论。原始 BB90 文献条目及既有结果仍按历史记录保留。
 
 ## 5. BB90 代码来源与登记规则
 
