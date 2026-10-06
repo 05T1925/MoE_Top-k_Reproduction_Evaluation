@@ -85,7 +85,7 @@ Digest sha256(const std::vector<std::uint8_t>& bytes) {
 }
 
 std::uint32_t expected_padded(std::uint32_t n) {
-  if(n==0||n>128)throw std::invalid_argument("BMW16 bundle n outside S14 bounded domain");
+  if(n==0||n>256)throw std::invalid_argument("BMW16 bundle n outside S15 bounded domain");
   std::uint32_t p=2; while(p<n)p<<=1U; return p;
 }
 

@@ -3,10 +3,38 @@
 #include <FSS/assert.h>
 
 #include <array>
+#include <atomic>
 #include <cstdint>
 
 using namespace osuCrypto;
-// uint64_t aes_evals_count = 0;
+namespace {
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+std::atomic<std::uint64_t> g_dcf_keygen_calls{0};
+std::atomic<std::uint64_t> g_dcf_keygen_node_expansions{0};
+std::atomic<std::uint64_t> g_dcf_eval_calls{0};
+std::atomic<std::uint64_t> g_dcf_eval_node_expansions{0};
+#endif
+}
+
+void resetDcfPrgCallCounts() {
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+    g_dcf_keygen_calls.store(0, std::memory_order_relaxed);
+    g_dcf_keygen_node_expansions.store(0, std::memory_order_relaxed);
+    g_dcf_eval_calls.store(0, std::memory_order_relaxed);
+    g_dcf_eval_node_expansions.store(0, std::memory_order_relaxed);
+#endif
+}
+
+DcfPrgCallCounts getDcfPrgCallCounts() {
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+    return {true, g_dcf_keygen_calls.load(std::memory_order_relaxed),
+            g_dcf_keygen_node_expansions.load(std::memory_order_relaxed),
+            g_dcf_eval_calls.load(std::memory_order_relaxed),
+            g_dcf_eval_node_expansions.load(std::memory_order_relaxed)};
+#else
+    return {};
+#endif
+}
 
 #define SERVER0 0
 #define SERVER1 1
@@ -82,6 +110,9 @@ block traverseOneDCF(int Bin, int Bout, int groupSize, int party,
     auto ss = s & notThreeBlock;
 
     AES ak(ss);
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+    g_dcf_eval_node_expansions.fetch_add(1, std::memory_order_relaxed);
+#endif
     ak.ecbEncTwoBlocks(blocks + 2 * keep, ct);
 
     stcw = ((scw ^ ds[keep]) & mask) ^ ct[0];
@@ -122,6 +153,9 @@ std::pair<DCFKeyPack, DCFKeyPack> keyGenDCF(int Bin, int Bout, int groupSize,
                 GroupElement idx, GroupElement* payload)
 {
     // idx: bitsize Bin, payload: bitsize Bout & size groupSize
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+    g_dcf_keygen_calls.fetch_add(1, std::memory_order_relaxed);
+#endif
     bool greaterThan = false;
 
     static const block notOneBlock = toBlock(~0, ~1);
@@ -161,11 +195,17 @@ std::pair<DCFKeyPack, DCFKeyPack> keyGenDCF(int Bin, int Bout, int groupSize,
 
         AES ak0(ss0);
         AES ak1(ss1);
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+        g_dcf_keygen_node_expansions.fetch_add(1, std::memory_order_relaxed);
+#endif
         ak0.ecbEncFourBlocks(pt, ct);
         si[0][0] = ct[0];
         si[0][1] = ct[1];
         vi[0][0] = ct[2];
         vi[0][1] = ct[3];
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+        g_dcf_keygen_node_expansions.fetch_add(1, std::memory_order_relaxed);
+#endif
         ak1.ecbEncFourBlocks(pt, ct);
         si[1][0] = ct[0];
         si[1][1] = ct[1];
@@ -260,6 +300,9 @@ void evalDCF(int Bin, int Bout, int groupSize,
                 bool geq /*= false*/, int evalGroupIdxStart /*= 0*/,
                 int evalGroupIdxLen /*= -1*/)
 {
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+    g_dcf_eval_calls.fetch_add(1, std::memory_order_relaxed);
+#endif
     if (evalGroupIdxLen == 0)
     {
         return;

@@ -23,15 +23,23 @@ find_package(OpenMP COMPONENTS CXX REQUIRED)
 option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
 option(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER
     "Build opt-in EXPERIMENTAL BMW16-derived Select adapter and party composition (not secure)" OFF)
+option(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS
+    "Instrument ordinary DCF KeyGen/Eval AES expansion call sites for research measurements" OFF)
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
 add_subdirectory(ext/bitpack)
 add_subdirectory(ext/FSS)
+if(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+  target_compile_definitions(FSS PUBLIC MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS=1)
+endif()
 # add_subdirectory(ext/sci)
 # add_subdirectory(../SCI ext/sci)
 
 add_library(${PROJECT_NAME} STATIC)
+if(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS=1)
+endif()
 target_sources(${PROJECT_NAME} 
 PRIVATE
     src/random.cpp

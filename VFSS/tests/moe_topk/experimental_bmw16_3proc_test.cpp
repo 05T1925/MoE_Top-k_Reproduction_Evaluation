@@ -2,6 +2,7 @@
 #include <moe_topk/experimental_bmw16_select_party.h>
 #include <moe_topk/protocol_i_transport.h>
 #include <moe_topk/topk_oracle.h>
+#include <FSS/dcf.h>
 
 #include <algorithm>
 #include <array>
@@ -166,6 +167,18 @@ void run_material_negative_tests() {
     ProtocolIBmw16PersistentClaimStore store(claimdir.string(),cfg0.session,0);store.claim_bundle(st.manifest_sha256);
     expect_reject("duplicate_bundle_claim",[&]{store.claim_bundle(st.manifest_sha256);});
   }
+  const auto copied_dir=fs::path("/tmp")/("bmw16-s15-copied-bundle-"+std::to_string(::getpid()));
+  require(::mkdir(copied_dir.c_str(),0700)==0,"copied bundle directory mkdir");
+  require(::mkdir((copied_dir/"claims").c_str(),0700)==0,"copied bundle claim directory mkdir");
+  protocol_i_bmw16_bundle_write_atomic((copied_dir/"material.bundle").string(),b0);
+  {
+    // The one-shot guarantee is intentionally scoped to a shared protected
+    // claim root; an independent empty root is not a machine-wide replay ledger.
+    ProtocolIBmw16PersistentClaimStore independent((copied_dir/"claims").string(),cfg0.session,0);
+    independent.claim_bundle(st.manifest_sha256);
+  }
+  std::error_code copied_ec;fs::remove_all(copied_dir,copied_ec);
+  std::cout<<"one_shot_store_scope=LOCAL_PROTECTED_ROOT_ONLY\n";
   ProtocolIBmw16ProcessSlotClaimSet process_slots;
   process_slots.claim_once(7);
   expect_reject("duplicate_in_process_slot_claim",[&]{process_slots.claim_once(7);});
@@ -220,8 +233,10 @@ int run_dealer(int argc,char** argv) {
   t.scores.resize(static_cast<std::size_t>(std::stoul(argv[3])));std::array<ProtocolIBmw16ExperimentalPartyConfig,2> c{config_for(t,0),config_for(t,1)};
   if(c[0].n==1){std::ofstream report(root/"dealer.metrics",std::ios::trunc);report<<"singleton_no_material=true\ngeneration_us=0\nseal_us=0\ndelivery_us=0\noffline_total_us=0\npeak_rss_kb="<<peak_rss_kb()<<"\n";return 0;}
   const auto start=std::chrono::steady_clock::now();
+  resetDcfPrgCallCounts();
   const auto generation_start=std::chrono::steady_clock::now();
   auto pair=protocol_i_bmw16_experimental_material_generate(c[0]);ProtocolIBmw16BundleStats st0,st1;
+  const auto dcf_generation=getDcfPrgCallCounts();
   const auto generation_us=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-generation_start).count();
   const auto seal_start=std::chrono::steady_clock::now();
   const auto p0=protocol_i_bmw16_bundle_seal_party(c[0],0,pair.party0,key_from(root/"p0"/"aead.key"),&st0);
@@ -240,7 +255,12 @@ int run_dealer(int argc,char** argv) {
         <<"\nparty0_ciphertext_bytes="<<st0.ciphertext_bytes<<"\nparty1_ciphertext_bytes="<<st1.ciphertext_bytes
         <<"\nslots_per_party="<<st0.slot_count<<"\naead_metadata_bytes_per_party="<<st0.authenticated_metadata_bytes
         <<"\ngeneration_us="<<generation_us<<"\nseal_us="<<seal_us<<"\ndelivery_us="<<delivery_us
-        <<"\noffline_total_us="<<offline_total_us<<"\npeak_rss_kb="<<peak_rss_kb()<<"\n";
+         <<"\noffline_total_us="<<offline_total_us<<"\npeak_rss_kb="<<peak_rss_kb()<<"\n";
+  report<<"dcf_keygen_calls="<<dcf_generation.keygen_calls
+        <<"\ndcf_counters_enabled="<<(dcf_generation.enabled?1:0)
+        <<"\ndcf_keygen_node_expansions="<<dcf_generation.keygen_node_expansions
+        <<"\ndcf_eval_calls_during_generation="<<dcf_generation.eval_calls
+        <<"\ndcf_eval_node_expansions_during_generation="<<dcf_generation.eval_node_expansions<<"\n";
   report.close();
   return 0;
 }
@@ -288,19 +308,25 @@ int run_party(int argc,char** argv) {
   const std::array<int,2> score{fd[0],fd[1]},fwd{fd[2],fd[3]},inv{fd[8],fd[9]};
   const std::array<int,4> select{fd[4],fd[5],fd[6],fd[7]};
   ProtocolIBmw16ExperimentalPartyOutput out;
+  resetDcfPrgCallCounts();
   try {
     out=protocol_i_bmw16_experimental_raw_score_mask_party(c,std::move(material),share,score,fwd,select,inv,fd[10],fd[11],nullptr);
   } catch(...) {
+    const auto dcf_counts=getDcfPrgCallCounts();
     if(process_slots) {
       const auto summary=persist_slot_audit(dir,process_slots);
       std::ofstream partial(dir/"result.metrics",std::ios::trunc);
       partial<<"claimed_slots="<<summary.first<<"\nprocess_slot_claim_us=NOT_MEASURED\n"
-             <<"slot_lookup_us=NOT_MEASURED\n";
+             <<"slot_lookup_us=NOT_MEASURED\ndcf_keygen_calls="<<dcf_counts.keygen_calls
+             <<"\ndcf_keygen_node_expansions="<<dcf_counts.keygen_node_expansions
+             <<"\ndcf_eval_calls="<<dcf_counts.eval_calls
+             <<"\ndcf_eval_node_expansions="<<dcf_counts.eval_node_expansions<<"\n";
       partial.close();require(static_cast<bool>(partial),"write exceptional partial metrics");
     }
     throw;
   }
   const int exit_code=output_exit_code(out);
+  const auto dcf_counts=getDcfPrgCallCounts();
   std::ofstream report(dir/"result.metrics",std::ios::trunc);report<<"status="<<out.status<<"\nscope="<<out.abort_scope
       <<"\nstate="<<(exit_code==kExitSuccess?"SUCCESS":exit_code==kExitAlgorithmAbort?"AGREED_ALGORITHM_ABORT":
           exit_code==kExitMaterialAbort?"LOCAL_MATERIAL_ABORT":exit_code==kExitCommunicationAbort?"LOCAL_COMMUNICATION_ABORT":"ALGORITHM_INVARIANT_ERROR")
@@ -312,7 +338,12 @@ int run_party(int argc,char** argv) {
       <<"\nmessage_phases="<<m.online_message_phases<<"\nsent="<<m.online_bytes_sent<<"\nrecv="<<m.online_bytes_received
       <<"\nclaimed_slots="<<m.process_slots_claimed<<"\nsampler_prf_words="<<m.sampler_prf_words
       <<"\nonline_time_us="<<m.online_time_us<<"\nunused_cmpagg="<<m.forward_shuffle_cmpagg_slots_unused+m.inverse_shuffle_cmpagg_slots_unused
-      <<"\nomitted_cmpagg="<<m.shuffle_cmpagg_slots_omitted<<"\n";
+       <<"\nomitted_cmpagg="<<m.shuffle_cmpagg_slots_omitted<<"\n";
+  report<<"dcf_keygen_calls="<<dcf_counts.keygen_calls
+       <<"\ndcf_counters_enabled="<<(dcf_counts.enabled?1:0)
+       <<"\ndcf_keygen_node_expansions="<<dcf_counts.keygen_node_expansions
+       <<"\ndcf_eval_calls="<<dcf_counts.eval_calls
+       <<"\ndcf_eval_node_expansions="<<dcf_counts.eval_node_expansions<<"\n";
   report<<"bundle_open_us="<<bundle_open_us<<"\nbundle_claim_us="<<bundle_claim_us
       <<"\nraw_share_read_us="<<raw_share_read_us<<"\nraw_adapter_us="<<m.raw_adapter_time_us
       <<"\nraw_adapter_eval_us="<<m.raw_adapter_eval_time_us<<"\nraw_adapter_exchange_us="<<m.raw_adapter_exchange_time_us
@@ -323,7 +354,7 @@ int run_party(int argc,char** argv) {
       <<"\ninverse_shuffle_exchange_us="<<m.inverse_shuffle_exchange_time_us
       <<"\nstatus_coordination_us="<<m.status_coordination_time_us<<"\nprocess_slot_claim_us="<<m.process_slot_claim_time_us
       <<"\nslot_lookup_us="<<m.slot_lookup_time_us
-      <<"\npeak_rss_kb="<<peak_rss_kb()<<"\ninternal_fss_prg_calls=NOT_MEASURED\n";
+       <<"\npeak_rss_kb="<<peak_rss_kb()<<"\n";
   for(std::size_t r=0;r<4;++r)report<<"round"<<(r+1)<<"_time_us="<<m.select_round_time_us[r]
       <<"\nround"<<(r+1)<<"_eval_us="<<m.select_eval_time_us[r]
       <<"\nround"<<(r+1)<<"_exchange_us="<<m.select_exchange_time_us[r]<<"\n";
@@ -359,7 +390,7 @@ void root_write_owned(const fs::path& path,const std::vector<std::uint8_t>& b,ui
 
 void run_case(const Case& test,const std::string& exe,const std::string& fault="none") {
   require(::geteuid()==0,"three-process E2E must run under WSL root to drop distinct UIDs");
-  const auto root=fs::path("/tmp")/("bmw16-s14-"+std::to_string(::getpid())+"-"+std::to_string(test.seed));
+  const auto root=fs::path("/tmp")/("bmw16-s15-"+std::to_string(::getpid())+"-"+std::to_string(test.seed));
   if(::mkdir(root.c_str(),0700)!=0)throw std::runtime_error("create root fixture dir");
   auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){std::error_code ec;fs::remove_all(root,ec);});
   if(::chmod(root.c_str(),0711)!=0)throw std::runtime_error("open fixture parent traversal");
@@ -457,6 +488,17 @@ void run_case(const Case& test,const std::string& exe,const std::string& fault="
     require(number_field(metrics0,"claimed_slots")==expected_claims,"process slot accounting identity");
     const auto dslots=number_field(dealer_metrics,"slots_per_party");
     require(dslots==2U*config_for(test,0).padded_n+2U+9U*pair_count,"bundle slot coverage identity");
+    if(number_field(dealer_metrics,"dcf_counters_enabled")!=0){
+      require(number_field(dealer_metrics,"dcf_eval_calls_during_generation")==0 &&
+              number_field(dealer_metrics,"dcf_eval_node_expansions_during_generation")==0,
+              "dealer generation unexpectedly evaluated a DCF key");
+      require(number_field(metrics0,"dcf_keygen_calls")==0 &&
+              number_field(metrics1,"dcf_keygen_calls")==0,
+              "party performed online DCF key generation");
+      require(number_field(metrics0,"dcf_eval_calls")==number_field(metrics0,"dcf_eval") &&
+              number_field(metrics1,"dcf_eval_calls")==number_field(metrics1,"dcf_eval"),
+              "instrumented DCF Eval call count mismatch");
+    }
   }
   const bool mask0=fs::exists(p0/"mask.share"),mask1=fs::exists(p1/"mask.share");
   if(status0=="SUCCESS"){
@@ -517,8 +559,14 @@ int main(int argc,char** argv) {
         std::mt19937_64 rng(UINT64_C(128080));
         for(int i=0;i<128;++i)scores.push_back(static_cast<std::int32_t>(rng()%2001U)-1000);
         scores[0]=INT32_MIN;scores[127]=INT32_MAX;
+      } else if(n==256&&seed==256002){
+        for(int i=0;i<256;++i)scores.push_back((i*71)%257-128);
+        scores[0]=INT32_MIN;scores[255]=INT32_MAX;
+      } else if(n==256&&seed==256008){
+        for(int i=0;i<256;++i)scores.push_back((i*17)%23-11);
+        scores[1]=INT32_MAX;scores[254]=INT32_MIN;
       } else throw std::invalid_argument("pilot input is not a frozen S14 profile");
-      require((n==64&&k==8)||(n==128&&k==80),"pilot profile n/K mismatch");
+      require((n==64&&k==8)||(n==128&&k==80)||(n==256&&(k==2||k==8)),"pilot profile n/K mismatch");
       run_case({std::move(scores),k,seed,false},self_path());
       return 0;
     }
@@ -551,6 +599,12 @@ int main(int argc,char** argv) {
     for(int i=0;i<128;++i)scores128_k80.push_back(static_cast<std::int32_t>(rng128()%2001U)-1000);
     scores128_k80[0]=INT32_MIN;scores128_k80[127]=INT32_MAX;
     run_case({scores128_k80,80,128080,false},exe);
+    std::vector<std::int32_t> scores256_k2;for(int i=0;i<256;++i)scores256_k2.push_back((i*71)%257-128);
+    scores256_k2[0]=INT32_MIN;scores256_k2[255]=INT32_MAX;
+    run_case({scores256_k2,2,256002,false},exe);
+    std::vector<std::int32_t> scores256_k8;for(int i=0;i<256;++i)scores256_k8.push_back((i*17)%23-11);
+    scores256_k8[1]=INT32_MAX;scores256_k8[254]=INT32_MIN;
+    run_case({scores256_k8,8,256008,false},exe);
     run_case({{12,1,9,-4,2},2,1207,true},exe);
     run_case({{12,1,9,-4,2},2,1219,false},exe,"corrupt_bundle");
     run_case({{12,1,9,-4,2},2,1220,false},exe,"unexpected_api");

@@ -149,7 +149,7 @@ struct Runtime {
           const ProtocolIBmw16TestOnlyRandomTape* fixed_tape)
       : c(config), m(material), z(public_z), metrics(output_metrics),
         sampler_seed(seed), test_tape(fixed_tape) {
-    if (c.n < 2 || c.n > 128 || c.k == 0 || c.k > c.n || z.size() != c.n)
+    if (c.n < 2 || c.n > 256 || c.k == 0 || c.k > c.n || z.size() != c.n)
       throw std::invalid_argument("BMW16 experimental finite domain");
     ring_mask = (UINT64_C(1) << c.comparison_bits) - 1U;
     items.reserve(static_cast<std::size_t>(c.n) * 3U + 8U);
@@ -729,7 +729,7 @@ void configure_score_packages(const ProtocolIBmw16ExperimentalPartyConfig& c,
 
 ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_generate(
     const ProtocolIBmw16ExperimentalPartyConfig& c) {
-  if (c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > 128 || c.k == 0 || c.k > c.n ||
+  if (c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > 256 || c.k == 0 || c.k > c.n ||
       c.padded_n < c.n || (c.padded_n & (c.padded_n - 1U)) != 0 ||
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53)
     throw std::invalid_argument("BMW16 offline generator configuration");
@@ -804,7 +804,7 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53 ||
       c.padded_n < 2 || (c.padded_n & (c.padded_n-1U)) != 0 ||
       raw_score_share.size() != c.n || (c.n==1 && c.k!=1) ||
-      (c.n>128 || (c.n>1 && !test_only_tape && sampling_coin_fd<0)))
+      (c.n>256 || (c.n>1 && !test_only_tape && sampling_coin_fd<0)))
     throw std::invalid_argument("BMW16 experimental party configuration");
   if (c.n > 1 && !material.process_slot_claim_once)
     throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,

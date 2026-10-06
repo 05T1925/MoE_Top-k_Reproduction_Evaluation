@@ -1,6 +1,8 @@
 #include <moe_topk/experimental_bmw16_select_party.h>
 #include <moe_topk/experimental_bmw16_material_bundle.h>
 #include <moe_topk/topk_oracle.h>
+#include <FSS/dcf.h>
+#include <FSS/prng.h>
 
 #include <array>
 #include <cstdint>
@@ -24,6 +26,28 @@ namespace {
 using namespace moe_topk;
 
 void require(bool value, const char* message) { if (!value) throw std::runtime_error(message); }
+
+void verify_dcf_prg_counter_contract() {
+#if defined(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+  constexpr int bin = 7;
+  FSSConfig::prngs[0].SetSeed(osuCrypto::toBlock(0, UINT64_C(0x53463135)));
+  resetDcfPrgCallCounts();
+  auto keys = keyGenDCF(bin, 1, UINT64_C(3), UINT64_C(1));
+  auto after_keygen = getDcfPrgCallCounts();
+  require(after_keygen.keygen_calls == 1, "DCF keygen call counter");
+  require(after_keygen.keygen_node_expansions == 2U * bin, "DCF keygen node expansion counter");
+  require(after_keygen.eval_calls == 0 && after_keygen.eval_node_expansions == 0,
+          "DCF keygen must not count Eval expansions");
+  GroupElement out0 = 0, out1 = 0;
+  evalDCF(0, &out0, 0, keys.first);
+  evalDCF(1, &out1, 0, keys.second);
+  const auto counts = getDcfPrgCallCounts();
+  require(counts.keygen_calls == 1 && counts.keygen_node_expansions == 2U * bin,
+          "DCF counter keygen fields changed during Eval");
+  require(counts.eval_calls == 2 && counts.eval_node_expansions == 2U * bin,
+          "DCF Eval node expansion counter");
+#endif
+}
 
 struct Case { std::vector<std::int32_t> scores; std::uint32_t k; std::uint64_t seed; bool force_abort = false; };
 
@@ -247,6 +271,7 @@ void run_missing_process_slot_guard() {
 
 int main(int argc,char** argv) {
   try {
+    verify_dcf_prg_counter_contract();
     if(argc>=8&&std::string(argv[1])=="--trace-case-tape"){
       const auto n=static_cast<std::size_t>(std::stoul(argv[4]));
       const auto k=static_cast<std::uint32_t>(std::stoul(argv[5]));
