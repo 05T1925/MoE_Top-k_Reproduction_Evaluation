@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED；S12 有 opt-in VFSS C++ 三进程 EXPERIMENTAL 全链路径、逐方 AEAD bundle 和有限 oracle E2E；生产认证发材及完整联合视图仍 NO-GO，无 secure runtime |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED；S13 在 S12 opt-in VFSS C++ 三进程全链上修正状态/退出码和分项计量；完整联合视图与生产认证发材仍 NO-GO，无 secure runtime |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -32,7 +32,7 @@
 - 保留 M2、M3、M5 的编号、既有实现和历史验收记录。
 - M2 增加 Protocol I 精确核心完成后的通信核验与接口交接。
 - M5 增加 Protocol III 精确核心完成后的通信核验。
-- M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 当前候选为 BMW16-derived Select，Protocol III 保留 BB90+DCF 研究目标。S12 已增加默认关闭的 VFSS C++ EXPERIMENTAL 三进程全链路径、本机逐方 AEAD bundle 和耐久领取测试；生产认证发材、完整单方联合视图、安全入口与全部统一指标性能验收仍未完成。
+- M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 当前候选为 BMW16-derived Select，Protocol III 保留 BB90+DCF 研究目标。S12 增加默认关闭的 VFSS C++ EXPERIMENTAL 三进程全链路径，S13 独立接收并修正状态合同、计量与证据归档；生产认证发材、完整单方联合视图、安全入口与全部统一指标性能验收仍未完成。
 - M7 保留为最终统一汇总与横向报告，不把 M6A、M6B 的性能测试全部推迟到 M7。
 - CryptoMoE 保留为 M7 之后的独立工作负载方向，不属于本轮六种方案的完成条件。
 - 历史 `Direct Top-K` 原型保留其原有身份，不直接改名为 BB90+DCF，也不自动成为额外实施任务。
@@ -120,7 +120,9 @@ S10（2026-10-06）按用户明确授权，在 V3 完成前推进了隔离研究
 
 S11（2026-10-06）在 S10 上新增默认关闭的 VFSS C++ `EXPERIMENTAL` party API：正式 raw-score adapter → 前向 shuffle → 两实例 C++ 四层 Select → membership → 逆路由 → XOR mask share；本轮固定 n=1/2/3/5/8/64 的并发线程测试并通过冻结 C++ oracle，强制 abort 无 mask。它不是独立 OS 进程验证；T generator 仍在内存中同时返回双方材料，没有 party-only AEAD bundle/持久 one-shot 发材。匿名 transcript 的输入顺序等变性有理想均匀置换下的模拟方向，但实际 shuffle、全相关 uCMP/DCF pool 和输出 share 的联合 hybrid 未完成；因此完整安全门 NO-GO，代码继续标记 EXPERIMENTAL，V3/V4 与六方案性能验收未完成，V4 正式矩阵未启动。详见 [S11 决策](docs/decisions/BMW16_S11_VFSS_EXPERIMENTAL_COMPOSITION_AND_SECURITY_GATE_2026-10-06.md) 与 [S11 验证报告](docs/reproduction/BMW16_S11_CPP_EXPERIMENTAL_COMPOSITION_VALIDATION_2026-10-06.md)。
 
-S12（2026-10-06）接收 S11 C++ party API，在原实现上增加版本化逐方 bundle、AES-256-GCM/AAD、本地原子写入与持久 bundle/slot claim，并由独立 T、P0、P1 进程以不同 Linux UID 调用同一 VFSS C++ party API。n=1..8 的全部 K、重复/极值输入和 n=64 样本共 52 次 SUCCESS 对冻结 oracle 逐位一致；另有 1 次注入 probability abort 一致且无 mask。外部 TEST_ONLY 随机 tape 将 S4 Python 与 C++ 的全部 n=2..8/K 控制轨迹 35 例逐层对齐。该本机 harness 不是生产 T 身份凭据/认证传输服务；实际 shuffle 与相关多 key/uCMP/DCF pool、公开自适应 transcript 和输出 share 的联合 simulator 仍未证明，故安全门 NO-GO，保持 EXPERIMENTAL，不创建 secure API，不启动 V4 正式 LAN/WAN 矩阵。详见 [S12 决策](docs/decisions/BMW16_S12_THREE_PROCESS_MATERIAL_AND_PARTY_VIEW_GATE_2026-10-06.md)、[S12 验证报告](docs/reproduction/BMW16_S12_IMPLEMENTATION_AND_VALIDATION_2026-10-06.md) 及 [S12 原始 E2E 计数](docs/reproduction/evidence/BMW16_S12_TP0P1_E2E_2026-10-06.txt)。
+S12（2026-10-06）接收 S11 C++ party API，在原实现上增加版本化逐方 bundle、AES-256-GCM/AAD、本地原子写入与持久 bundle/slot claim，并由独立 T、P0、P1 进程以不同 Linux UID 调用同一 VFSS C++ party API。n=1..8 的全部 K、重复/极值输入和 n=64 样本共 52 次 SUCCESS 对冻结 oracle 逐位一致；另有 1 次注入 probability abort 一致且无 mask。外部 TEST_ONLY 随机 tape 将 S4 Python 与 C++ 的全部 n=2..8/K 控制轨迹 35 例逐层对齐。该本机 harness 不是生产 T 身份凭据/认证传输服务；实际 shuffle 与相关多 key/uCMP/DCF pool、公开自适应 transcript 和输出 share 的联合 simulator 仍未证明，故安全门 NO-GO，保持 EXPERIMENTAL，不创建 secure API，不启动 V4 正式 LAN/WAN 矩阵。详见 [S12 决策](docs/decisions/BMW16_S12_THREE_PROCESS_MATERIAL_AND_PARTY_VIEW_GATE_2026-10-06.md)、[S12 验证报告](docs/reproduction/BMW16_S12_IMPLEMENTATION_AND_VALIDATION_2026-10-06.md)；逐次原始证据已按 [S12/S13 archive index](docs/reproduction/evidence/BMW16_S12_S13_ARCHIVE_INDEX_2026-10-06.md) 外存归档。
+
+S13（2026-10-06）从 S12 提交 `646f71c` 独立重建并复跑其 52 SUCCESS/1 注入 abort 和 39 common-tape traces；修正 party API 的异常吞错、transport/material 分类和三进程 runner 的退出码合同。本轮三进程 56 配置包括 52 SUCCESS、1 注入 algorithm abort、1 bundle 篡改材料 abort、1 意外 API 异常 exit 70、1 peer-close communication abort；没有自然 abort 样本。n=64 单样本计时发现持久 claim callback（文件及目录同步）约占在线 API 时间 98.7%，计量/容量数据只作 EXPERIMENTAL 工程诊断。完整 shuffle + 相关整池 DCF 自适应 Eval 联合模拟 H0→H1 仍缺，生产凭据/私有认证发材未实现；故仍为 `NO-GO / EXPERIMENTAL`，n=128 和 V4 正式矩阵未运行。详见 [S13 决策](docs/decisions/BMW16_S13_RECEIVE_EXECUTION_EVIDENCE_SECURITY_CAPACITY_GATE_2026-10-06.md)、[S13 验证](docs/reproduction/BMW16_S13_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
 
 ### 4.1 Agarwal 四个协议名称
 
@@ -241,7 +243,7 @@ Protocol III + AAV86 的 `2r` 保留为团队组合目标；实现前必须补�
 
 M6B 在 M6A 两种升级实现及完整性能验收完成后推进，分别交付：
 
-1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S12 party-view/生产发材门 `NO-GO`；存在 opt-in EXPERIMENTAL VFSS C++ 三进程全链测试路径，不是 secure 入口）。
+1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S13 party-view/生产发材门 `NO-GO`；存在 opt-in EXPERIMENTAL VFSS C++ 三进程全链测试路径，不是 secure 入口）。
 2. Protocol III + BB90+DCF。
 
 以下 BB90 原文和比较图要求只适用于 Protocol III 路线。Protocol I 候选来源、TEST_ONLY 功能证据和安全阻塞见 S7 决策与验证报告；不得继承 BMW16 Theorem 8 的失败概率或比较常数。

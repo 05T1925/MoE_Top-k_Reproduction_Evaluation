@@ -75,7 +75,7 @@ std::array<std::uint8_t, kWireHeaderBytes> encode(const WireHeader& header) {
 
 WireHeader decode(const std::array<std::uint8_t, kWireHeaderBytes>& bytes) {
   if (get_u32(bytes, 0) != kMagic || bytes[4] != kVersion || bytes[10] != 0 || bytes[11] != 0) {
-    throw std::runtime_error("frame header magic/version");
+    throw ProtocolITransportError("frame header magic/version");
   }
   WireHeader header;
   header.bits = bytes[5];
@@ -119,7 +119,7 @@ void ProtocolIFramedChannel::exact(void* data, std::size_t size, bool writing,
   while (size != 0) {
     const auto now = Clock::now();
     if (now >= deadline) {
-      throw std::runtime_error("frame timeout");
+      throw ProtocolITransportError("frame timeout");
     }
     const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now);
     const int wait_ms = remaining.count() <= 0
@@ -130,19 +130,19 @@ void ProtocolIFramedChannel::exact(void* data, std::size_t size, bool writing,
     pollfd descriptor{fd_, static_cast<short>(writing ? POLLOUT : POLLIN), 0};
     const int wait = ::poll(&descriptor, 1, wait_ms);
     if (wait == 0) {
-      throw std::runtime_error("frame timeout");
+      throw ProtocolITransportError("frame timeout");
     }
     if (wait < 0) {
       if (errno == EINTR) {
         continue;
       }
-      throw std::runtime_error("frame poll failed");
+      throw ProtocolITransportError("frame poll failed");
     }
     // A peer may close immediately after its final write. poll then legally
     // reports POLLIN|POLLHUP while the final framed bytes remain readable.
     if ((descriptor.revents & (POLLERR | POLLNVAL)) != 0 ||
         ((descriptor.revents & POLLHUP) != 0 && (writing || (descriptor.revents & POLLIN) == 0))) {
-      throw std::runtime_error("frame poll error");
+      throw ProtocolITransportError("frame poll error");
     }
     const auto chunk = std::min(size, max_io_chunk_);
     const auto count = writing ? ::write(fd_, cursor, chunk) : ::read(fd_, cursor, chunk);
@@ -150,10 +150,10 @@ void ProtocolIFramedChannel::exact(void* data, std::size_t size, bool writing,
       continue;
     }
     if (count < 0) {
-      throw std::runtime_error("frame I/O failed");
+      throw ProtocolITransportError("frame I/O failed");
     }
     if (count == 0) {
-      throw std::runtime_error("frame EOF");
+      throw ProtocolITransportError("frame EOF");
     }
     if (writing) {
       sent_ += static_cast<std::uint64_t>(count);
@@ -198,7 +198,7 @@ std::vector<std::uint8_t> ProtocolIFramedChannel::receive() {
       header.fingerprint != c_.fingerprint || header.sequence != in_ ||
       header.bits != c_.bits || header.sender != c_.receiver || header.receiver != c_.sender ||
       header.phase != c_.phase || header.type != c_.type || header.length > kMaxPayload) {
-    throw std::runtime_error("frame header");
+    throw ProtocolITransportError("frame header");
   }
   std::vector<std::uint8_t> payload(header.length);
   if (!payload.empty()) {
@@ -236,14 +236,14 @@ std::vector<std::uint8_t> protocol_i_receive_framed_chunks(ProtocolIFramedChanne
   for (;;) {
     const auto chunk = channel.receive();
     if (chunk.size() < kChunkEnvelopeBytes) {
-      throw std::runtime_error("chunked frame envelope");
+      throw ProtocolITransportError("chunked frame envelope");
     }
     std::uint64_t total = 0, offset = 0;
     for (int index = 0; index < 8; ++index) total = (total << 8U) | chunk[index];
     for (int index = 0; index < 8; ++index) offset = (offset << 8U) | chunk[8 + index];
     if (total == 0 || total > max_message_bytes || total > std::numeric_limits<std::size_t>::max() ||
         offset != expected || offset > total || chunk.size() - kChunkEnvelopeBytes > total - offset) {
-      throw std::runtime_error("chunked frame bounds");
+      throw ProtocolITransportError("chunked frame bounds");
     }
     if (message.empty()) message.reserve(static_cast<std::size_t>(total));
     message.insert(message.end(), chunk.begin() + kChunkEnvelopeBytes, chunk.end());

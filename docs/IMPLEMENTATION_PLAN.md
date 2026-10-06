@@ -79,13 +79,15 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 
 **2026-10-06 S12 补充：**用户继续授权在 V3 前做有界组合研发。S12 复用 S11 VFSS C++ party API，加入默认关闭的 `EXPERIMENTAL / TEST_ONLY` 三进程 T/P0/P1 runner、逐方 AES-GCM bundle、本地不同 UID 隔离与持久 one-shot claims；raw-score→shuffle→两任务四层 Select→membership→同置换逆路由→原序 mask shares 已在 52 个成功样本对照冻结 oracle，1 个注入算法 abort 双方一致且不发 mask。S4/C++ 使用外部共同随机 tape 的 n=2..8 全 K 轨迹 35 例通过。此实现仍缺生产认证材料传输与完整 shuffle+相关多 key FSS party-view simulator；不得升级 secure，不得开始 V4 正式 LAN/WAN 或声称 V3/V4/M7 已完成。详见 [S12 决策](decisions/BMW16_S12_THREE_PROCESS_MATERIAL_AND_PARTY_VIEW_GATE_2026-10-06.md)、[S12 报告](reproduction/BMW16_S12_IMPLEMENTATION_AND_VALIDATION_2026-10-06.md)。
 
+**2026-10-06 S13 补充：**独立从 S12 `646f71c` 重建并复跑 52 SUCCESS + 1 注入 abort、39 条 common-tape differential。修正异常分类/退出码合同与 S12 工作树哈希换行不可移植问题；当前 runner 能分别验证算法 abort、材料 abort、通信本地 abort、未预期异常 exit 70 和 mask 不存在。n=64 有界实验加入阶段/claim/Eval/网络计量并完成 n≤1e6 全池容量算术预检。S13 E2E 观察为 52 SUCCESS、1 注入算法 abort、1 篡改材料 abort、1 意外 API 参数异常、1 peer close；0 自然 probability abort。安全首个阻塞为相关节点 mask 的整池 DCF party view（含未用 key）与 shuffle 辅助状态的 H0→H1 联合模拟；生产 T 凭据/认证私有交付也未实现，故保持 `PROJECT_DERIVED / EXPERIMENTAL`，不升级 secure，不运行 n=128 或 V4 正式矩阵。详见 [S13 决策](decisions/BMW16_S13_RECEIVE_EXECUTION_EVIDENCE_SECURITY_CAPACITY_GATE_2026-10-06.md)、[S13 报告](reproduction/BMW16_S13_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)、[归档索引](reproduction/evidence/BMW16_S12_S13_ARCHIVE_INDEX_2026-10-06.md)。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S12 opt-in EXPERIMENTAL VFSS C++ 三进程全链 oracle E2E 已运行；生产 private-material/party-view secure gate NO-GO）。
+5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S13 修正状态合同的 opt-in EXPERIMENTAL VFSS C++ 三进程全链；party-view/生产凭据发材仍 NO-GO；非正式性能数据）。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
@@ -741,6 +743,8 @@ S10 在不同 Linux UID 的本地 WSL 环境独立复跑 S9，并新增默认关
 S11 在 S10 后新增 C++ `EXPERIMENTAL` 全链 party 函数与 T 的输入无关内存发材生成器，使用实际 uCMP/DCF 与 Protocol I shuffle state machine，party selection control 已从 S10 Python runner 移入 VFSS C++。固定 n=1/2/3/5/8/64 矩阵与强制 abort 通过 TEST_ONLY frozen oracle；n64 实际走非全量抽样分支。测试由一个进程中的两条 C++ party 线程执行，不能当作独立 OS process E2E。T→party 包未实现认证保密交付/耐久消费；实际 shuffle + 相关多 key FSS pool + adaptive transcript + local shuffle state + output shares 的 simulator 未证明。方案保持 `EXPERIMENTAL`，只记有界功能通过，不进入 secure API 或正式性能表。详见 [S11 决策](decisions/BMW16_S11_VFSS_EXPERIMENTAL_COMPOSITION_AND_SECURITY_GATE_2026-10-06.md) 和 [S11 验证报告](reproduction/BMW16_S11_CPP_EXPERIMENTAL_COMPOSITION_VALIDATION_2026-10-06.md)。
 
 S12 在 S11 原 C++ party API 上完成本机三进程实验路径：T 使用公开参数预发 party-only AES-GCM bundles 并在 raw input shares 产生前退出；P0/P1 以 UID 22012/22013 运行，使用正式 raw adapter、真实 Protocol I shuffle/uCMP/DCF、C++ 四层控制、membership、逆路由和 mask shares。52/53 次 E2E 为成功并通过 oracle；失败的 1/53 是显式注入 abort，不观察到自然 abort。外部共同 tape 对 n=2..8 所有 K 共 35 条 C++/S4 控制轨迹通过。bundle 与 slot claim 通过本地测试负例，但 recipient credential provisioning 与跨主机认证交付未实现；实际 shuffle 与相关整池 FSS/DCF 自适应联合模拟仍 NO-GO。完整源码仍 opt-in 且明确 `EXPERIMENTAL`，无 secure API；此提前研发不改变 V3→V4 正式验收顺序，也不启动性能矩阵。见 [S12 决策](decisions/BMW16_S12_THREE_PROCESS_MATERIAL_AND_PARTY_VIEW_GATE_2026-10-06.md)、[S12 实施/验证报告](reproduction/BMW16_S12_IMPLEMENTATION_AND_VALIDATION_2026-10-06.md)。
+
+S13 独立接收 S12 `646f71c`，修正 party API 对意外异常的宽泛吞错、transport/material 字符串分类和 runner 的 `return 0` abort 问题；结构化状态与 exit code 对齐，启动器验证退出码、双方报告、状态 scope 和 mask 文件。独立复建 S12 的 52 SUCCESS/1 注入 abort 与 39 tape matrix 均复现；本轮加双 bundle 篡改、错误 API 输入、peer close 负例。实验计量显示 n=64 单次约 8.95 s API 时间主要由 5,935 次持久 slot claim callback 的 fdatasync/目录 fsync 路径占用；FSS Eval 和网络交换均为毫秒级。本次另给 n=64..1e6 checked-arithmetic 全池下界，n=128 仍因当前硬 cap 和缺少完整验证未运行。复合联合安全第一个失败步骤是共享节点 mask 相关的完整 DCF key pool（含未用槽）、shuffle 辅助状态与自适应 Eval transcript 的 H0→H1 simulator 缺失；当前仍 NO-GO、EXPERIMENTAL、不开始 V4。见 [S13 决策](decisions/BMW16_S13_RECEIVE_EXECUTION_EVIDENCE_SECURITY_CAPACITY_GATE_2026-10-06.md) 与 [S13 报告](reproduction/BMW16_S13_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
 
 #### 前置条件
 

@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -14,6 +15,19 @@
 #endif
 
 namespace moe_topk {
+
+enum class ProtocolIBmw16ExpectedFailureKind : std::uint8_t { Material = 1 };
+
+class ProtocolIBmw16ExpectedFailure : public std::runtime_error {
+ public:
+  ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind kind,
+                                const std::string& message)
+      : std::runtime_error(message), kind_(kind) {}
+  ProtocolIBmw16ExpectedFailureKind kind() const noexcept { return kind_; }
+
+ private:
+  ProtocolIBmw16ExpectedFailureKind kind_;
+};
 
 enum class ProtocolIBmw16MaterialStage : std::uint8_t {
   RawCarry = 1, RawSign = 2, ForwardShuffle = 3, InverseShuffle = 4,
@@ -82,6 +96,25 @@ struct ProtocolIBmw16ExperimentalMetrics {
   std::uint64_t online_message_phases = 0;
   std::uint64_t online_bytes_sent = 0, online_bytes_received = 0;
   std::uint64_t online_time_us = 0;
+  // Inclusive stage timings for the EXPERIMENTAL path. FSS timing excludes
+  // serialization/transport; round elapsed includes planning, eval, and exchange.
+  std::uint64_t raw_adapter_time_us = 0;
+  std::uint64_t raw_adapter_eval_time_us = 0;
+  std::uint64_t raw_adapter_exchange_time_us = 0;
+  std::uint64_t forward_shuffle_time_us = 0;
+  std::uint64_t forward_shuffle_exchange_time_us = 0;
+  std::uint64_t sampling_coin_exchange_time_us = 0;
+  std::array<std::uint64_t, 4> select_round_time_us{};
+  std::array<std::uint64_t, 4> select_eval_time_us{};
+  std::array<std::uint64_t, 4> select_exchange_time_us{};
+  std::uint64_t membership_time_us = 0;
+  std::uint64_t membership_eval_time_us = 0;
+  std::uint64_t inverse_shuffle_time_us = 0;
+  std::uint64_t inverse_shuffle_exchange_time_us = 0;
+  std::uint64_t status_coordination_time_us = 0;
+  std::uint64_t durable_claim_time_us = 0;
+  std::uint64_t slot_lookup_time_us = 0;
+  std::uint64_t durable_claim_io_time_us = 0;
   std::uint64_t sampler_prf_words = 0;
   std::uint64_t durable_slots_claimed = 0;
   std::uint64_t forward_shuffle_cmpagg_slots_unused = 0;
@@ -92,6 +125,9 @@ struct ProtocolIBmw16ExperimentalPartyOutput {
   // SUCCESS, ABORT_ALGORITHM_PROBABILITY, ABORT_ALGORITHM_INVALID,
   // ABORT_MATERIAL, or ABORT_COMMUNICATION.
   const char* status = "ABORT_MATERIAL";
+  // NONE, PEER_AGREED (algorithm status exchanged), or LOCAL_ONLY (no
+  // acknowledgement; caller must not claim a bilateral abort).
+  const char* abort_scope = "LOCAL_ONLY";
   std::string abort_reason;
   std::vector<std::uint8_t> xor_mask_share;
   ProtocolIBmw16ExperimentalMetrics metrics;

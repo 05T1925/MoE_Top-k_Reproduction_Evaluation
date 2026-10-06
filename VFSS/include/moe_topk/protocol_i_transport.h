@@ -3,9 +3,20 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace moe_topk {
+
+// Stable classification for failures at the framed I/O boundary. Callers may
+// treat this as a local communication abort; malformed local configuration
+// remains an ordinary argument/programming error.
+class ProtocolITransportError : public std::runtime_error {
+ public:
+  explicit ProtocolITransportError(const std::string& message)
+      : std::runtime_error(message) {}
+};
 
 struct ProtocolIFrameConfig {
   std::uint64_t session, fingerprint;

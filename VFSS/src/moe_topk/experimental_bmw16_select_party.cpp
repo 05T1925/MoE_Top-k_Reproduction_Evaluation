@@ -27,13 +27,19 @@ namespace {
 using ItemId = std::uint32_t;
 using PairKey = std::pair<ItemId, ItemId>;
 using CacheKey = std::tuple<int, ItemId, ItemId>;
+using SteadyClock = std::chrono::steady_clock;
+std::uint64_t elapsed_us(SteadyClock::time_point start) {
+  return static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+      SteadyClock::now() - start).count());
+}
 
 std::uint64_t find_slot_id(const ProtocolIBmw16ExperimentalPartyMaterial& material,
     ProtocolIBmw16MaterialStage stage, std::uint8_t task, std::uint8_t round,
     std::uint32_t left, std::uint32_t right) {
   const auto it = std::find_if(material.slot_manifest.begin(), material.slot_manifest.end(),
       [&](const auto& s) { return s.stage==stage&&s.task==task&&s.round==round&&s.left==left&&s.right==right; });
-  if(it==material.slot_manifest.end())throw std::runtime_error("BMW16 slot not in authenticated manifest");
+  if(it==material.slot_manifest.end())throw ProtocolIBmw16ExpectedFailure(
+      ProtocolIBmw16ExpectedFailureKind::Material,"BMW16 slot not in authenticated manifest");
   return it->id;
 }
 
@@ -41,7 +47,13 @@ void claim_slot(ProtocolIBmw16ExperimentalPartyMaterial& material,
     ProtocolIBmw16MaterialStage stage,std::uint8_t task,std::uint8_t round,
     std::uint32_t left,std::uint32_t right,ProtocolIBmw16ExperimentalMetrics& metrics) {
   if(!material.durable_slot_claim)return;
-  material.durable_slot_claim(find_slot_id(material,stage,task,round,left,right));
+  const auto lookup_start=SteadyClock::now();
+  const auto slot=find_slot_id(material,stage,task,round,left,right);
+  metrics.slot_lookup_time_us+=elapsed_us(lookup_start);
+  const auto io_start=SteadyClock::now();
+  material.durable_slot_claim(slot);
+  metrics.durable_claim_io_time_us+=elapsed_us(io_start);
+  metrics.durable_claim_time_us+=elapsed_us(lookup_start);
   ++metrics.durable_slots_claimed;
 }
 
@@ -95,7 +107,9 @@ std::vector<ProtocolIBlock192> decode_records(const std::vector<std::uint8_t>& i
 std::vector<std::uint8_t> exchange_frame(int fd, std::uint64_t session,
     std::uint64_t fingerprint, std::uint32_t n, std::uint32_t k, std::uint8_t bits,
     std::uint8_t party, int timeout_ms, std::uint8_t phase,
-    const std::vector<std::uint8_t>& payload, std::uint64_t* sent, std::uint64_t* received) {
+    const std::vector<std::uint8_t>& payload, std::uint64_t* sent, std::uint64_t* received,
+    std::uint64_t* elapsed) {
+  const auto started=SteadyClock::now();
   ProtocolIFramedChannel channel(fd, {session, fingerprint, n, k, bits, party,
       static_cast<std::uint8_t>(1U - party), phase, 9}, timeout_ms);
   std::vector<std::uint8_t> incoming;
@@ -103,6 +117,7 @@ std::vector<std::uint8_t> exchange_frame(int fd, std::uint64_t session,
   else { incoming = channel.receive(); channel.send(payload); }
   if (sent) *sent += channel.sent_bytes();
   if (received) *received += channel.received_bytes();
+  if(elapsed)*elapsed+=elapsed_us(started);
   return incoming;
 }
 std::vector<std::uint8_t> encode_word_vector(const std::vector<std::uint64_t>& values) {
@@ -307,6 +322,7 @@ struct Runtime {
 
   std::vector<std::uint8_t> compare_round(int round, const std::vector<Batch*>& batches,
       int fd) {
+    const auto round_start=SteadyClock::now();
     std::vector<std::uint64_t> local;
     std::map<CacheKey, std::uint64_t> cache;
     std::vector<std::pair<Batch*, std::size_t>> offsets;
@@ -343,15 +359,19 @@ struct Runtime {
           const auto slot = pair_index(c.n, lo, hi);
           auto& pool = m.select_keys[batch->task][round - 1];
           if (pool.size() != static_cast<std::size_t>(c.n) * (c.n - 1U) / 2U)
-            throw std::invalid_argument("Select offline pool coverage");
+            throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                                "Select offline pool coverage");
           auto& key = pool.at(slot);
           if (key.party_id() != c.party || key.comparison_bits() != c.comparison_bits)
-            throw std::invalid_argument("Select offline key binding");
+            throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                                "Select offline key binding");
           claim_slot(m, ProtocolIBmw16MaterialStage::Select,
               static_cast<std::uint8_t>(batch->task), static_cast<std::uint8_t>(round), lo, hi, metrics);
           const auto offset = static_cast<std::uint64_t>(low_pad + 1U);
+          const auto eval_start=SteadyClock::now();
           const auto value = key.eval_strict_lt((z[lo] + offset) & ring_mask,
                                                 (z[hi] + offset) & ring_mask);
+          metrics.select_eval_time_us[round-1]+=elapsed_us(eval_start);
           it = cache.emplace(ck, value).first;
           ++metrics.unique_select_slots_consumed[round - 1];
           ++metrics.ucmp_party_evaluations;
@@ -364,8 +384,10 @@ struct Runtime {
       }
     }
     metrics.edge_plan_fnv64[round - 1] = plan_hash;
+    const auto exchange_start=SteadyClock::now();
     const auto inbound = exchange(fd, static_cast<std::uint8_t>(20 + round), encode_word_vector(local),
                                   &metrics.online_bytes_sent, &metrics.online_bytes_received);
+    metrics.select_exchange_time_us[round-1]+=elapsed_us(exchange_start);
     ++metrics.online_message_phases;
     const auto peer = decode_words(inbound, local.size());
     std::vector<std::uint8_t> opened(local.size());
@@ -380,6 +402,7 @@ struct Runtime {
       for(auto bit:batch->result)result.push_back(bit?'1':'0');
       trace_line(result);
     }
+    metrics.select_round_time_us[round-1]+=elapsed_us(round_start);
     return opened;
   }
 
@@ -783,6 +806,7 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
   ProtocolIBmw16ExperimentalPartyOutput output;
   if (c.n == 1) {
     output.status = "SUCCESS";
+    output.abort_scope = "NONE";
     output.xor_mask_share = {static_cast<std::uint8_t>(c.party == 0)};
     return output;
   }
@@ -793,31 +817,39 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
       claim_slot(material,ProtocolIBmw16MaterialStage::RawSign,0xff,0,i,i,output.metrics);
     }
   }
+  const auto raw_start=SteadyClock::now();
   const auto stable_share = protocol_i_bmw16_experimental_select_key_party(
       {c.session, c.fingerprint, c.n, c.padded_n, c.k, c.index_bits,
        c.comparison_bits, c.party, c.timeout_ms}, material.score_input,
       raw_score_share, score_fds, &score_metrics);
+  output.metrics.raw_adapter_time_us=elapsed_us(raw_start);
+  output.metrics.raw_adapter_eval_time_us=score_metrics.ucmp_eval_time_us;
+  output.metrics.raw_adapter_exchange_time_us=score_metrics.carry_exchange_time_us+score_metrics.sign_exchange_time_us;
   const auto ring = (UINT64_C(1) << c.comparison_bits) - 1U;
   std::vector<ProtocolIBlock192> input(c.n);
   for (std::size_t i = 0; i < input.size(); ++i) input[i] = {stable_share[i] & ring, 0, 0};
 
   ProtocolIParallelShufflePartyConfig fcfg{c.session, c.fingerprint,
       material.forward_shuffle.material_id, c.n, c.k, c.comparison_bits, c.party, c.timeout_ms};
+  const auto forward_start=SteadyClock::now();
   claim_slot(material,ProtocolIBmw16MaterialStage::ForwardShuffle,0xff,0,0,c.n-1U,output.metrics);
   ProtocolIParallelShuffleParty fwd(fcfg, std::move(material.forward_shuffle));
   auto r1 = fwd.prepare_round1(input);
   auto p1b = exchange_frame(forward_shuffle_fds[0], c.session, c.fingerprint, c.n, c.k,
       c.comparison_bits, c.party, c.timeout_ms, 10, encode_records(r1),
-      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received);
+      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+      &output.metrics.forward_shuffle_exchange_time_us);
   ++output.metrics.online_message_phases;
   auto r2 = fwd.receive_round1_prepare_round2(decode_records(p1b, c.n));
   auto p2b = exchange_frame(forward_shuffle_fds[1], c.session, c.fingerprint, c.n, c.k,
       c.comparison_bits, c.party, c.timeout_ms, 11, encode_records(r2),
-      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received);
+      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+      &output.metrics.forward_shuffle_exchange_time_us);
   ++output.metrics.online_message_phases;
   auto shuffled = fwd.receive_round2(decode_records(p2b, c.n));
   std::vector<std::uint64_t> public_z(c.n);
   for (std::size_t i = 0; i < c.n; ++i) public_z[i] = shuffled.public_masked_records[i].word0;
+  output.metrics.forward_shuffle_time_us=elapsed_us(forward_start);
 
   std::array<std::uint8_t,32> sampler_seed{};
   if (test_only_tape) {
@@ -827,7 +859,8 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
     std::vector<std::uint8_t> local(contribution.begin(),contribution.end());
     const auto peer=exchange_frame(sampling_coin_fd,c.session,c.fingerprint,c.n,c.k,
         c.comparison_bits,c.party,c.timeout_ms,19,local,
-        &output.metrics.online_bytes_sent,&output.metrics.online_bytes_received);
+        &output.metrics.online_bytes_sent,&output.metrics.online_bytes_received,
+        &output.metrics.sampling_coin_exchange_time_us);
     ++output.metrics.online_message_phases;
     if(peer.size()!=contribution.size())throw std::runtime_error("BMW16 sampler coin payload length");
     for(std::size_t i=0;i<sampler_seed.size();++i)sampler_seed[i]=contribution[i]^peer[i];
@@ -840,17 +873,23 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
     select.failure_reason = "TEST_ONLY_FORCED_ABORT_AFTER_SELECT";
   }
   if (status == "SUCCESS") {
+    const auto membership_start=SteadyClock::now();
     std::vector<std::uint64_t> membership(c.n);
     const auto chosen = selected.second;
     for (std::uint32_t i = 0; i < c.n; ++i) {
       if (i == chosen) { membership[i] = c.party == 0 ? 1U : 0U; continue; }
       const auto lo = std::min<ItemId>(i, chosen), hi = std::max<ItemId>(i, chosen);
       const auto slot = Runtime::pair_index(c.n, lo, hi);
-      auto& key = material.membership_keys.at(slot);
+      if(slot>=material.membership_keys.size())throw ProtocolIBmw16ExpectedFailure(
+          ProtocolIBmw16ExpectedFailureKind::Material,"membership offline pool coverage");
+      auto& key = material.membership_keys[slot];
       if (key.party_id() != c.party || key.comparison_bits() != c.comparison_bits)
-        throw std::invalid_argument("membership material binding");
+        throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                            "membership material binding");
       claim_slot(material,ProtocolIBmw16MaterialStage::Membership,0xff,1,lo,hi,output.metrics);
+      const auto eval_start=SteadyClock::now();
       auto share = key.eval_strict_lt(public_z[lo], public_z[hi]);
+      output.metrics.membership_eval_time_us+=elapsed_us(eval_start);
       ++output.metrics.membership_slots_consumed;
       ++output.metrics.ucmp_party_evaluations; output.metrics.dcf_party_evaluations += 2U;
       if (i == lo) share = c.party == 0 ? UINT64_C(1) - share : UINT64_C(0) - share;
@@ -858,6 +897,8 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
     }
     std::vector<ProtocolIBlock192> membership_records(c.n);
     for (std::size_t i = 0; i < c.n; ++i) membership_records[i] = {membership[i], 0, 0};
+    output.metrics.membership_time_us=elapsed_us(membership_start);
+    const auto inverse_start=SteadyClock::now();
     ProtocolIParallelShufflePartyConfig icfg{c.session, c.fingerprint,
         material.inverse_shuffle.material_id, c.n, c.k, c.comparison_bits, c.party, c.timeout_ms};
     claim_slot(material,ProtocolIBmw16MaterialStage::InverseShuffle,0xff,0,0,c.n-1U,output.metrics);
@@ -865,31 +906,40 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
     auto ir1 = inverse.prepare_round1(membership_records);
     auto ip1b = exchange_frame(inverse_shuffle_fds[0], c.session, c.fingerprint, c.n, c.k,
         c.comparison_bits, c.party, c.timeout_ms, 31, encode_records(ir1),
-        &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received);
+        &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+        &output.metrics.inverse_shuffle_exchange_time_us);
     ++output.metrics.online_message_phases;
     auto ir2 = inverse.receive_round1_prepare_round2(decode_records(ip1b, c.n));
     auto ip2b = exchange_frame(inverse_shuffle_fds[1], c.session, c.fingerprint, c.n, c.k,
         c.comparison_bits, c.party, c.timeout_ms, 32, encode_records(ir2),
-        &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received);
+        &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+        &output.metrics.inverse_shuffle_exchange_time_us);
     ++output.metrics.online_message_phases;
     auto mask_records = inverse.receive_round2(decode_records(ip2b, c.n));
     output.xor_mask_share.resize(c.n);
     for (std::size_t i = 0; i < c.n; ++i)
       output.xor_mask_share[i] = static_cast<std::uint8_t>(mask_records.shuffled_share[i].word0 & 1U);
+    output.metrics.inverse_shuffle_time_us=elapsed_us(inverse_start);
   }
 
   const std::uint8_t status_code = status == "SUCCESS" ? 0U :
       status == "ABORT_ALGORITHM_PROBABILITY" ? 1U : 2U;
+  const auto status_start=SteadyClock::now();
   const auto remote_status = exchange_frame(final_agreement_fd, c.session, c.fingerprint,
       c.n, c.k, c.comparison_bits, c.party, c.timeout_ms, 40, {status_code},
-      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received);
+      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+      &output.metrics.status_coordination_time_us);
   ++output.metrics.online_message_phases;
+  output.metrics.status_coordination_time_us=elapsed_us(status_start);
   if (remote_status != std::vector<std::uint8_t>{status_code}) {
-    output.status = "ABORT_MATERIAL"; output.abort_reason = "FINAL_STATUS_MISMATCH"; output.xor_mask_share.clear();
-  } else if (status == "SUCCESS") output.status = "SUCCESS";
+    output.status = "ABORT_MATERIAL"; output.abort_scope = "LOCAL_ONLY";
+    output.abort_reason = "FINAL_STATUS_MISMATCH"; output.xor_mask_share.clear();
+  } else if (status == "SUCCESS") { output.status = "SUCCESS"; output.abort_scope = "NONE"; }
   else if (status == "ABORT_ALGORITHM_PROBABILITY") {
-    output.status = "ABORT_ALGORITHM_PROBABILITY"; output.abort_reason = select.failure_reason;
-  } else { output.status = "ABORT_ALGORITHM_INVALID"; output.abort_reason = select.failure_reason; output.xor_mask_share.clear(); }
+    output.status = "ABORT_ALGORITHM_PROBABILITY"; output.abort_scope = "PEER_AGREED";
+    output.abort_reason = select.failure_reason;
+  } else { output.status = "ABORT_ALGORITHM_INVALID"; output.abort_scope = "PEER_AGREED";
+    output.abort_reason = select.failure_reason; output.xor_mask_share.clear(); }
   output.metrics.online_bytes_sent += score_metrics.carry_sent_bytes + score_metrics.sign_sent_bytes;
   output.metrics.online_bytes_received += score_metrics.carry_received_bytes + score_metrics.sign_received_bytes;
   output.metrics.online_message_phases += 2U;
@@ -920,14 +970,25 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
     out.metrics.online_time_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now()-start).count());
     return out;
-  } catch(const std::exception& error) {
+  } catch(const ProtocolITransportError& error) {
     ProtocolIBmw16ExperimentalPartyOutput out;
+    out.status = "ABORT_COMMUNICATION";
+    out.abort_scope = "LOCAL_ONLY";
     out.abort_reason=error.what();
     out.metrics.online_time_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now()-start).count());
-    const std::string message=error.what();
-    out.status=(message.find("frame")!=std::string::npos||message.find("socket")!=std::string::npos||
-        message.find("transport")!=std::string::npos)?"ABORT_COMMUNICATION":"ABORT_MATERIAL";
+    return out;
+  } catch(const ProtocolIBmw16ExpectedFailure& error) {
+    ProtocolIBmw16ExperimentalPartyOutput out;
+    switch (error.kind()) {
+      case ProtocolIBmw16ExpectedFailureKind::Material:
+        out.status = "ABORT_MATERIAL";
+        break;
+    }
+    out.abort_scope = "LOCAL_ONLY";
+    out.abort_reason=error.what();
+    out.metrics.online_time_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now()-start).count());
     return out;
   }
 }

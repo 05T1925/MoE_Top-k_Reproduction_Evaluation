@@ -21,6 +21,8 @@ struct ProtocolIScoreInputMetrics {
   std::uint64_t carry_sent_bytes = 0, carry_received_bytes = 0;
   std::uint64_t sign_sent_bytes = 0, sign_received_bytes = 0;
   std::uint64_t ucmp_calls = 0, raw_dcf_calls = 0;
+  std::uint64_t carry_exchange_time_us = 0, sign_exchange_time_us = 0;
+  std::uint64_t ucmp_eval_time_us = 0;
   std::uint64_t rounds = 2;
 };
 
