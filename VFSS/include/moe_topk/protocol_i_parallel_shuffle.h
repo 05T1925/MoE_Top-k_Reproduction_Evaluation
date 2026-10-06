@@ -17,6 +17,9 @@ struct ProtocolIParallelShuffleDealerConfig {
   std::uint64_t session = 0, fingerprint = 0, material_id = 0;
   std::uint32_t n = 0, k = 0;
   std::uint8_t comparison_bits = 0;
+  // Full Protocol I keeps its default all-pair CmpAgg pool. Project-specific
+  // shuffle-only callers may omit that unused stage explicitly.
+  bool include_cmpagg_material = true;
 };
 
 struct ProtocolIParallelShufflePartyConfig {
@@ -30,6 +33,7 @@ struct ProtocolIParallelShufflePartyMaterial {
   std::uint64_t session = 0, fingerprint = 0, material_id = 0;
   std::uint32_t n = 0, k = 0;
   std::uint8_t comparison_bits = 0, party = 0;
+  bool has_cmpagg_material = true;
   ProtocolIPermutation sigma, tau;
   std::vector<ProtocolIBlock192> a, e, r_share;
   std::vector<ProtocolIUcmpPartyMaterial> edge_materials;

@@ -4,6 +4,8 @@
 
 #include <array>
 #include <cstdint>
+#include <mutex>
+#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -19,7 +21,7 @@ struct ProtocolIBmw16BundleStats {
   std::array<std::uint8_t, 32> manifest_sha256{};
 };
 
-// EXPERIMENTAL bundle v1: whole-party payload sealed with AES-256-GCM.
+// EXPERIMENTAL bundle v2 (S14 shuffle-only profile): whole-party payload sealed with AES-256-GCM.
 // Recipient keys must be provisioned out of band; this API does not implement PKI.
 std::vector<std::uint8_t> protocol_i_bmw16_bundle_seal_party(
     const ProtocolIBmw16ExperimentalPartyConfig& config, std::uint8_t party,
@@ -50,13 +52,29 @@ class ProtocolIBmw16PersistentClaimStore {
 
   // Claiming the bundle invalidates every contained slot, including after a crash.
   void claim_bundle(const std::array<std::uint8_t, 32>& manifest_digest);
-  // Per-slot O_EXCL + fsync claims are durable before the caller evaluates a key.
-  void claim_slot(std::uint64_t slot_id);
 
  private:
   int directory_fd_ = -1;
   std::uint64_t session_ = 0;
   std::uint8_t party_ = 0;
+};
+
+// EXPERIMENTAL runtime guard. It detects duplicate slot use while this process
+// is alive. Crash/restart safety comes from the durable bundle claim above:
+// after claiming any bundle, the complete bundle is invalidated permanently.
+class ProtocolIBmw16ProcessSlotClaimSet {
+ public:
+  ProtocolIBmw16ProcessSlotClaimSet();
+  ProtocolIBmw16ProcessSlotClaimSet(const ProtocolIBmw16ProcessSlotClaimSet&) = delete;
+  ProtocolIBmw16ProcessSlotClaimSet& operator=(const ProtocolIBmw16ProcessSlotClaimSet&) = delete;
+
+  void claim_once(std::uint64_t slot_id);
+  std::vector<std::uint64_t> snapshot() const;
+
+ private:
+  mutable std::mutex mutex_;
+  std::uint64_t owner_process_id_ = 0;
+  std::unordered_set<std::uint64_t> claimed_;
 };
 
 }  // namespace moe_topk

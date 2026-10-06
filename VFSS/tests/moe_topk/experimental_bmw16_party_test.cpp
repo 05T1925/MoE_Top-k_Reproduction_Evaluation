@@ -1,4 +1,5 @@
 #include <moe_topk/experimental_bmw16_select_party.h>
+#include <moe_topk/experimental_bmw16_material_bundle.h>
 #include <moe_topk/topk_oracle.h>
 
 #include <array>
@@ -8,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <random>
 #include <stdexcept>
@@ -109,6 +111,10 @@ void run_case(const Case& test,int tape_pattern=0,
         std::array<int, 4> select_fds{}; for (int i = 0; i < 4; ++i) select_fds[i] = select[i][party];
         const std::array<int, 2> inverse_fds{inverse[0][party], inverse[1][party]};
         auto party_material = party == 0 ? std::move(materials.party0) : std::move(materials.party1);
+        auto process_slots = std::make_shared<ProtocolIBmw16ProcessSlotClaimSet>();
+        party_material.process_slot_claim_once = [process_slots](std::uint64_t id) {
+          process_slots->claim_once(id);
+        };
         result[party] = protocol_i_bmw16_experimental_raw_score_mask_party(
             configs[party], std::move(party_material), shares[party], score_fds,
             forward_fds, select_fds, inverse_fds, final[party], -1, &tape);
@@ -148,9 +154,14 @@ void run_case(const Case& test,int tape_pattern=0,
           "uCMP slot accounting identity");
   require(result[0].metrics.dcf_party_evaluations == 2U * expected_total_ucmp,
           "DCF Eval accounting identity");
+  const auto expected_process_claims = 2U * configs[0].padded_n + 1U + select_slots +
+      (std::string(result[0].status) == "SUCCESS" ? n : 0U);
+  require(result[0].metrics.process_slots_claimed == expected_process_claims,
+          "process-local one-shot claim accounting");
   const auto pair_count = static_cast<std::uint64_t>(n) * (n - 1U) / 2U;
-  require(result[0].metrics.forward_shuffle_cmpagg_slots_unused == pair_count &&
-          result[0].metrics.inverse_shuffle_cmpagg_slots_unused == pair_count,
+  require(result[0].metrics.forward_shuffle_cmpagg_slots_unused == 0 &&
+          result[0].metrics.inverse_shuffle_cmpagg_slots_unused == 0 &&
+          result[0].metrics.shuffle_cmpagg_slots_omitted == 2U * pair_count,
           "unused shuffle CmpAgg slot accounting");
   std::cout << "case n=" << n << " K=" << test.k << " seed=" << test.seed
             << " raw_share_seed=" << (test.seed ^ UINT64_C(0x7261777368617265))
@@ -183,7 +194,8 @@ void run_case(const Case& test,int tape_pattern=0,
             << " offline_key_slots_per_party=" << materials.offline_material_slots_per_party[0]
             << " primitive_key_and_shuffle_bytes_per_party=" << materials.primitive_key_and_shuffle_bytes_per_party[0]
             << " unused_shuffle_cmpagg=" << result[0].metrics.forward_shuffle_cmpagg_slots_unused +
-                                                   result[0].metrics.inverse_shuffle_cmpagg_slots_unused << '\n';
+                                                   result[0].metrics.inverse_shuffle_cmpagg_slots_unused
+            << " omitted_shuffle_cmpagg=" << result[0].metrics.shuffle_cmpagg_slots_omitted << '\n';
   if(const char* dir=std::getenv("BMW16_COMMON_TAPE_TRACE_DIR")){
     std::filesystem::create_directories(dir);
     std::ofstream tape_out(std::filesystem::path(dir)/"common_tape.json",std::ios::trunc);
@@ -216,6 +228,19 @@ void run_singleton() {
     require((result.xor_mask_share[0] == 1U) == (party == 0), "singleton xor share");
   }
   std::cout << "case n=1 K=1 status=SUCCESS singleton=true\n";
+}
+
+void run_missing_process_slot_guard() {
+  const ProtocolIBmw16ExperimentalPartyConfig config{
+      UINT64_C(0x5331340000000001), UINT64_C(0x5331348000000001),
+      2, 1, 2, 1, 34, 0, 1000, 7, false};
+  auto pair=protocol_i_bmw16_experimental_material_generate(config);
+  ProtocolIBmw16TestOnlyRandomTape tape;
+  const auto result=protocol_i_bmw16_experimental_raw_score_mask_party(
+      config,std::move(pair.party0),{0,0},{-1,-1},{-1,-1},{-1,-1,-1,-1},{-1,-1},-1,-1,&tape);
+  require(std::string(result.status)=="ABORT_MATERIAL"&&
+          std::string(result.abort_scope)=="LOCAL_ONLY"&&result.xor_mask_share.empty(),
+          "missing process-local one-shot guard must fail closed");
 }
 
 }  // namespace
@@ -251,6 +276,7 @@ int main(int argc,char** argv) {
       return 0;
     }
     require(argc==1,"unexpected test args");
+    run_missing_process_slot_guard();
     run_singleton();
     run_case({{INT32_MIN, INT32_MAX, 0, -1, INT32_MAX}, 1, UINT64_C(0x1101)});
     run_case({{INT32_MIN, INT32_MAX, 0, -1, INT32_MAX}, 3, UINT64_C(0x1102)});

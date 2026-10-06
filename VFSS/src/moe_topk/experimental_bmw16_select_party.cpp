@@ -46,15 +46,14 @@ std::uint64_t find_slot_id(const ProtocolIBmw16ExperimentalPartyMaterial& materi
 void claim_slot(ProtocolIBmw16ExperimentalPartyMaterial& material,
     ProtocolIBmw16MaterialStage stage,std::uint8_t task,std::uint8_t round,
     std::uint32_t left,std::uint32_t right,ProtocolIBmw16ExperimentalMetrics& metrics) {
-  if(!material.durable_slot_claim)return;
+  if(!material.process_slot_claim_once)return;
   const auto lookup_start=SteadyClock::now();
   const auto slot=find_slot_id(material,stage,task,round,left,right);
   metrics.slot_lookup_time_us+=elapsed_us(lookup_start);
-  const auto io_start=SteadyClock::now();
-  material.durable_slot_claim(slot);
-  metrics.durable_claim_io_time_us+=elapsed_us(io_start);
-  metrics.durable_claim_time_us+=elapsed_us(lookup_start);
-  ++metrics.durable_slots_claimed;
+  const auto claim_start=SteadyClock::now();
+  material.process_slot_claim_once(slot);
+  metrics.process_slot_claim_time_us+=elapsed_us(claim_start);
+  ++metrics.process_slots_claimed;
 }
 
 struct Item {
@@ -150,7 +149,7 @@ struct Runtime {
           const ProtocolIBmw16TestOnlyRandomTape* fixed_tape)
       : c(config), m(material), z(public_z), metrics(output_metrics),
         sampler_seed(seed), test_tape(fixed_tape) {
-    if (c.n < 2 || c.n > 64 || c.k == 0 || c.k > c.n || z.size() != c.n)
+    if (c.n < 2 || c.n > 128 || c.k == 0 || c.k > c.n || z.size() != c.n)
       throw std::invalid_argument("BMW16 experimental finite domain");
     ring_mask = (UINT64_C(1) << c.comparison_bits) - 1U;
     items.reserve(static_cast<std::size_t>(c.n) * 3U + 8U);
@@ -683,14 +682,17 @@ ProtocolIParallelShuffleDealerOutput make_inverse_shuffle(
       const std::vector<ProtocolIBlock192>& e, const std::vector<ProtocolIBlock192>& r) {
     m.session = cfg.session; m.fingerprint = cfg.fingerprint; m.material_id = cfg.material_id;
     m.n = cfg.n; m.k = cfg.k; m.comparison_bits = cfg.comparison_bits; m.party = party;
+    m.has_cmpagg_material = cfg.include_cmpagg_material;
     m.sigma = s; m.tau = t; m.a = a; m.e = e; m.r_share = r;
   };
   init(out.party0, 0, sigma0, tau0, a0, e0, r0); init(out.party1, 1, sigma1, tau1, a1, e1, r1);
-  const auto full_r = add_vectors(cfg.comparison_bits, r0, r1);
-  for (std::uint32_t lo = 0; lo < cfg.n; ++lo) for (std::uint32_t hi = lo + 1U; hi < cfg.n; ++hi) {
-    ProtocolIUcmpMaterial key(cfg.comparison_bits, full_r[lo].word0, full_r[hi].word0);
-    out.party0.edge_materials.push_back(key.export_party_material(0));
-    out.party1.edge_materials.push_back(key.export_party_material(1));
+  if (cfg.include_cmpagg_material) {
+    const auto full_r = add_vectors(cfg.comparison_bits, r0, r1);
+    for (std::uint32_t lo = 0; lo < cfg.n; ++lo) for (std::uint32_t hi = lo + 1U; hi < cfg.n; ++hi) {
+      ProtocolIUcmpMaterial key(cfg.comparison_bits, full_r[lo].word0, full_r[hi].word0);
+      out.party0.edge_materials.push_back(key.export_party_material(0));
+      out.party1.edge_materials.push_back(key.export_party_material(1));
+    }
   }
   return out;
 }
@@ -727,12 +729,12 @@ void configure_score_packages(const ProtocolIBmw16ExperimentalPartyConfig& c,
 
 ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_generate(
     const ProtocolIBmw16ExperimentalPartyConfig& c) {
-  if (c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > 64 || c.k == 0 || c.k > c.n ||
+  if (c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > 128 || c.k == 0 || c.k > c.n ||
       c.padded_n < c.n || (c.padded_n & (c.padded_n - 1U)) != 0 ||
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53)
     throw std::invalid_argument("BMW16 offline generator configuration");
   const ProtocolIParallelShuffleDealerConfig fcfg{c.session, c.fingerprint,
-      c.session ^ UINT64_C(0x8100000000000001), c.n, c.k, c.comparison_bits};
+      c.session ^ UINT64_C(0x8100000000000001), c.n, c.k, c.comparison_bits, false};
   auto forward = protocol_i_parallel_shuffle_dealer_generate(fcfg);
   const auto pi = protocol_i_compose_permutation(forward.party0.tau, forward.party1.sigma);
   auto icfg = fcfg; icfg.material_id = c.session ^ UINT64_C(0x8200000000000001);
@@ -770,7 +772,7 @@ ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_ge
   out.party1.slot_manifest = out.party0.slot_manifest;
   for (int party = 0; party < 2; ++party) {
     auto& p = party == 0 ? out.party0 : out.party1;
-    out.offline_material_slots_per_party[party] = 2U * c.padded_n + 2U + pair_count * 11U;
+    out.offline_material_slots_per_party[party] = 2U * c.padded_n + 2U + pair_count * 9U;
     std::uint64_t byte_count = 0;
     for (const auto& task : p.select_keys) for (const auto& round : task)
       for (const auto& key : round) byte_count += key.serialize().size();
@@ -786,7 +788,8 @@ ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_ge
   return out;
 }
 
-static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_mask_party_impl(
+static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
+    ProtocolIBmw16ExperimentalPartyOutput& output,
     const ProtocolIBmw16ExperimentalPartyConfig& c,
     ProtocolIBmw16ExperimentalPartyMaterial&& material,
     const std::vector<std::uint32_t>& raw_score_share,
@@ -801,17 +804,19 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53 ||
       c.padded_n < 2 || (c.padded_n & (c.padded_n-1U)) != 0 ||
       raw_score_share.size() != c.n || (c.n==1 && c.k!=1) ||
-      (c.n>64 || (c.n>1 && !test_only_tape && sampling_coin_fd<0)))
+      (c.n>128 || (c.n>1 && !test_only_tape && sampling_coin_fd<0)))
     throw std::invalid_argument("BMW16 experimental party configuration");
-  ProtocolIBmw16ExperimentalPartyOutput output;
+  if (c.n > 1 && !material.process_slot_claim_once)
+    throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                        "missing in-process one-shot slot guard");
   if (c.n == 1) {
     output.status = "SUCCESS";
     output.abort_scope = "NONE";
     output.xor_mask_share = {static_cast<std::uint8_t>(c.party == 0)};
-    return output;
+    return;
   }
   ProtocolIScoreInputMetrics score_metrics;
-  if (material.durable_slot_claim) {
+  if (material.process_slot_claim_once) {
     for (std::uint32_t i=0;i<c.padded_n;++i) {
       claim_slot(material,ProtocolIBmw16MaterialStage::RawCarry,0xff,0,i,i,output.metrics);
       claim_slot(material,ProtocolIBmw16MaterialStage::RawSign,0xff,0,i,i,output.metrics);
@@ -946,9 +951,9 @@ static ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_s
   output.metrics.ucmp_party_evaluations += score_metrics.ucmp_calls;
   output.metrics.dcf_party_evaluations += score_metrics.raw_dcf_calls;
   const auto pairs = static_cast<std::uint64_t>(c.n) * (c.n - 1U) / 2U;
-  output.metrics.forward_shuffle_cmpagg_slots_unused = pairs;
-  output.metrics.inverse_shuffle_cmpagg_slots_unused = pairs;
-  return output;
+  output.metrics.forward_shuffle_cmpagg_slots_unused = 0;
+  output.metrics.inverse_shuffle_cmpagg_slots_unused = 0;
+  output.metrics.shuffle_cmpagg_slots_omitted = 2U * pairs;
 }
 
 ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_mask_party(
@@ -963,15 +968,15 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
     int sampling_coin_fd,
     const ProtocolIBmw16TestOnlyRandomTape* test_only_tape) {
   const auto start=std::chrono::steady_clock::now();
+  ProtocolIBmw16ExperimentalPartyOutput out;
   try {
-    auto out=protocol_i_bmw16_experimental_raw_score_mask_party_impl(c,std::move(material),raw_score_share,
+    protocol_i_bmw16_experimental_raw_score_mask_party_impl(out,c,std::move(material),raw_score_share,
         score_fds,forward_shuffle_fds,select_round_fds,inverse_shuffle_fds,final_agreement_fd,
         sampling_coin_fd,test_only_tape);
     out.metrics.online_time_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::steady_clock::now()-start).count());
     return out;
   } catch(const ProtocolITransportError& error) {
-    ProtocolIBmw16ExperimentalPartyOutput out;
     out.status = "ABORT_COMMUNICATION";
     out.abort_scope = "LOCAL_ONLY";
     out.abort_reason=error.what();
@@ -979,7 +984,6 @@ ProtocolIBmw16ExperimentalPartyOutput protocol_i_bmw16_experimental_raw_score_ma
         std::chrono::steady_clock::now()-start).count());
     return out;
   } catch(const ProtocolIBmw16ExpectedFailure& error) {
-    ProtocolIBmw16ExperimentalPartyOutput out;
     switch (error.kind()) {
       case ProtocolIBmw16ExpectedFailureKind::Material:
         out.status = "ABORT_MATERIAL";

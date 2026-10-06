@@ -62,8 +62,9 @@ struct ProtocolIBmw16ExperimentalPartyMaterial {
   // Independent one-shot keys indexed by the canonical real pair.
   std::vector<ProtocolIUcmpPartyMaterial> membership_keys;
   std::vector<ProtocolIBmw16MaterialSlot> slot_manifest;
-  std::function<void(std::uint64_t)> durable_slot_claim;
-  std::function<void(std::uint8_t, std::uint32_t)> durable_raw_slot_claim;
+  // Process-local duplicate guard. The durable one-shot boundary is the
+  // manifest-bound bundle claim performed before entering this API.
+  std::function<void(std::uint64_t)> process_slot_claim_once;
 
   ProtocolIBmw16ExperimentalPartyMaterial() = default;
   ProtocolIBmw16ExperimentalPartyMaterial(const ProtocolIBmw16ExperimentalPartyMaterial&) = delete;
@@ -112,13 +113,13 @@ struct ProtocolIBmw16ExperimentalMetrics {
   std::uint64_t inverse_shuffle_time_us = 0;
   std::uint64_t inverse_shuffle_exchange_time_us = 0;
   std::uint64_t status_coordination_time_us = 0;
-  std::uint64_t durable_claim_time_us = 0;
   std::uint64_t slot_lookup_time_us = 0;
-  std::uint64_t durable_claim_io_time_us = 0;
+  std::uint64_t process_slot_claim_time_us = 0;
   std::uint64_t sampler_prf_words = 0;
-  std::uint64_t durable_slots_claimed = 0;
+  std::uint64_t process_slots_claimed = 0;
   std::uint64_t forward_shuffle_cmpagg_slots_unused = 0;
   std::uint64_t inverse_shuffle_cmpagg_slots_unused = 0;
+  std::uint64_t shuffle_cmpagg_slots_omitted = 0;
 };
 
 struct ProtocolIBmw16ExperimentalPartyOutput {

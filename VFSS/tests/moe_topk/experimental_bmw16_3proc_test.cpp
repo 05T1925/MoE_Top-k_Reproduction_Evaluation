@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
@@ -28,6 +29,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -103,6 +105,27 @@ std::string self_path() {
 int wait_ok(pid_t pid) { int status=0;if(::waitpid(pid,&status,0)<0)throw std::runtime_error("waitpid");return WIFEXITED(status)?WEXITSTATUS(status):128; }
 std::string text_field(const std::string& text,const std::string& key){std::istringstream in(text);std::string line;while(std::getline(in,line)){const auto p=line.find('=');if(p!=std::string::npos&&line.substr(0,p)==key)return line.substr(p+1);}return {};}
 std::uint64_t number_field(const std::string& text,const std::string& key){const auto value=text_field(text,key);if(value.empty())throw std::runtime_error("missing metric: "+key);return std::stoull(value,nullptr,0);}
+std::uint64_t fnv64_slot_ids(const std::vector<std::uint64_t>& ids) {
+  std::uint64_t hash=UINT64_C(14695981039346656037);
+  for(const auto id:ids)for(unsigned shift=0;shift<64;shift+=8){
+    hash^=static_cast<std::uint8_t>(id>>shift);hash*=UINT64_C(1099511628211);
+  }
+  return hash;
+}
+std::pair<std::uint64_t,std::uint64_t> persist_slot_audit(
+    const fs::path& dir,const std::shared_ptr<ProtocolIBmw16ProcessSlotClaimSet>& slots) {
+  const auto ids=slots->snapshot();std::ostringstream audit;
+  for(const auto id:ids)audit<<id<<'\n';
+  const auto audit_start=std::chrono::steady_clock::now();
+  write_text_atomic(dir/"claims.audit",audit.str());
+  const auto write_us=std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now()-audit_start).count();
+  std::ofstream extra(dir/"slot_audit.metrics",std::ios::trunc);
+  extra<<"count="<<ids.size()<<"\nfnv64=0x"<<std::hex<<fnv64_slot_ids(ids)<<std::dec
+       <<"\nwrite_us="<<write_us<<"\n";
+  extra.close();require(static_cast<bool>(extra),"write slot audit metrics");
+  return {ids.size(),fnv64_slot_ids(ids)};
+}
 std::uint64_t peak_rss_kb() { struct rusage usage{};if(::getrusage(RUSAGE_SELF,&usage)!=0)throw std::runtime_error("getrusage");return static_cast<std::uint64_t>(usage.ru_maxrss); }
 void write_party_result(const fs::path& dir,const std::string& status,const std::string& scope,
                         const std::string& state,const std::string& reason,int exit_code) {
@@ -123,6 +146,9 @@ int output_exit_code(const ProtocolIBmw16ExperimentalPartyOutput& out) {
 void run_material_negative_tests() {
   Case c{{0,1},1,0x1299,false};const auto cfg0=config_for(c,0),cfg1=config_for(c,1);
   auto pair=protocol_i_bmw16_experimental_material_generate(cfg0);std::array<std::uint8_t,32> k0{},k1{};random_bytes(k0.data(),32);random_bytes(k1.data(),32);
+  require(!pair.party0.forward_shuffle.has_cmpagg_material&&pair.party0.forward_shuffle.edge_materials.empty()&&
+          !pair.party0.inverse_shuffle.has_cmpagg_material&&pair.party0.inverse_shuffle.edge_materials.empty(),
+          "BMW16 S14 material unexpectedly includes shuffle CmpAgg keys");
   ProtocolIBmw16BundleStats st{};auto b0=protocol_i_bmw16_bundle_seal_party(cfg0,0,pair.party0,k0,&st);
   auto b1=protocol_i_bmw16_bundle_seal_party(cfg1,1,pair.party1,k1);
   auto expect_reject=[&](const char* label,auto fn){bool rejected=false;try{fn();}catch(...){rejected=true;}require(rejected,label);std::cout<<"negative="<<label<<" result=REJECTED\n";};
@@ -134,22 +160,51 @@ void run_material_negative_tests() {
   auto changed=b0;changed.back()^=1;expect_reject("ciphertext_or_slot_manifest_tamper",[&]{(void)protocol_i_bmw16_bundle_open_party(cfg0,0,changed,k0);});
   auto wrong_width=cfg0;++wrong_width.comparison_bits;expect_reject("wrong_comparison_width",[&]{(void)protocol_i_bmw16_bundle_open_party(wrong_width,0,b0,k0);});
 
-  const auto claimdir=fs::path("/tmp")/("bmw16-s12-claim-"+std::to_string(::getpid()));
+  const auto claimdir=fs::path("/tmp")/("bmw16-s14-claim-"+std::to_string(::getpid()));
   require(::mkdir(claimdir.c_str(),0700)==0,"claim negative mkdir");
   {
     ProtocolIBmw16PersistentClaimStore store(claimdir.string(),cfg0.session,0);store.claim_bundle(st.manifest_sha256);
     expect_reject("duplicate_bundle_claim",[&]{store.claim_bundle(st.manifest_sha256);});
-    store.claim_slot(7);expect_reject("duplicate_slot_claim",[&]{store.claim_slot(7);});
   }
+  ProtocolIBmw16ProcessSlotClaimSet process_slots;
+  process_slots.claim_once(7);
+  expect_reject("duplicate_in_process_slot_claim",[&]{process_slots.claim_once(7);});
+  std::atomic<unsigned> slot_winners{0},slot_duplicates{0};
+  std::vector<std::thread> slot_threads;
+  for(unsigned i=0;i<8;++i)slot_threads.emplace_back([&]{
+    try{process_slots.claim_once(99);++slot_winners;}
+    catch(const ProtocolIBmw16ExpectedFailure&){++slot_duplicates;}
+  });
+  for(auto& thread:slot_threads)thread.join();
+  require(slot_winners==1&&slot_duplicates==7,"concurrent in-process slot claim");
+  const pid_t forked_consumer=::fork();if(forked_consumer<0)throw std::runtime_error("slot guard fork");
+  if(forked_consumer==0){try{process_slots.claim_once(123);::_exit(0);}catch(const ProtocolIBmw16ExpectedFailure&){::_exit(1);}}
+  require(wait_ok(forked_consumer)==1,"forked slot-claim guard was accepted");
+  process_slots.claim_once(123);
   std::error_code ec;fs::remove_all(claimdir,ec);
 
-  const auto crashdir=fs::path("/tmp")/("bmw16-s12-crash-claim-"+std::to_string(::getpid()));
+  const auto crashdir=fs::path("/tmp")/("bmw16-s14-crash-claim-"+std::to_string(::getpid()));
   require(::mkdir(crashdir.c_str(),0700)==0,"crash claim mkdir");
   const pid_t child=::fork();if(child<0)throw std::runtime_error("claim crash fork");
-  if(child==0){ProtocolIBmw16PersistentClaimStore store(crashdir.string(),cfg0.session,0);store.claim_slot(77);::_exit(0);}
+  if(child==0){ProtocolIBmw16PersistentClaimStore store(crashdir.string(),cfg0.session,0);store.claim_bundle(st.manifest_sha256);::_exit(0);}
   require(wait_ok(child)==0,"claim crash child");
-  {ProtocolIBmw16PersistentClaimStore store(crashdir.string(),cfg0.session,0);expect_reject("claim_survives_process_exit",[&]{store.claim_slot(77);});}
+  {ProtocolIBmw16PersistentClaimStore store(crashdir.string(),cfg0.session,0);expect_reject("bundle_burned_after_crash_before_eval",[&]{store.claim_bundle(st.manifest_sha256);});}
   fs::remove_all(crashdir,ec);
+
+  const auto race_dir=fs::path("/tmp")/("bmw16-s14-race-claim-"+std::to_string(::getpid()));
+  require(::mkdir(race_dir.c_str(),0700)==0,"claim race mkdir");
+  int gate[2];require(::pipe(gate)==0,"claim race barrier pipe");
+  std::array<pid_t,2> competitors{};
+  for(auto& pid:competitors){
+    pid=::fork();if(pid<0)throw std::runtime_error("claim race fork");
+    if(pid==0){::close(gate[1]);char token=0;if(::read(gate[0],&token,1)!=1)::_exit(90);::close(gate[0]);
+      try{ProtocolIBmw16PersistentClaimStore store(race_dir.string(),cfg0.session,0);store.claim_bundle(st.manifest_sha256);::_exit(0);}
+      catch(...){::_exit(1);}}
+  }
+  ::close(gate[0]);const char release[2]={'x','x'};require(::write(gate[1],release,2)==2,"claim race release");::close(gate[1]);
+  const auto race_a=wait_ok(competitors[0]),race_b=wait_ok(competitors[1]);
+  require((race_a==0&&race_b==1)||(race_a==1&&race_b==0),"cross-process bundle claim is not exclusive");
+  fs::remove_all(race_dir,ec);
 
   int closed_pair[2];require(::socketpair(AF_UNIX,SOCK_STREAM,0,closed_pair)==0,"closed peer socketpair");::close(closed_pair[1]);
   expect_reject("peer_closed_local_abort",[&]{ProtocolIFramedChannel ch(closed_pair[0],{cfg0.session,cfg0.fingerprint,cfg0.n,cfg0.k,cfg0.comparison_bits,0,1,19,9},100);(void)ch.receive();});::close(closed_pair[0]);
@@ -207,6 +262,7 @@ int run_party(int argc,char** argv) {
   Case test{{},k,seed,force};test.scores.resize(n);const auto c=config_for(test,party);
   ProtocolIBmw16ExperimentalPartyMaterial material;
   std::shared_ptr<ProtocolIBmw16PersistentClaimStore> claims;
+  std::shared_ptr<ProtocolIBmw16ProcessSlotClaimSet> process_slots;
   std::uint64_t bundle_open_us=0,bundle_claim_us=0,raw_share_read_us=0;
   if(n>1){
     try {
@@ -218,10 +274,8 @@ int run_party(int argc,char** argv) {
       claims=std::make_shared<ProtocolIBmw16PersistentClaimStore>((dir/"claims").string(),c.session,static_cast<std::uint8_t>(party));
       claims->claim_bundle(stats.manifest_sha256);
       bundle_claim_us=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-claim_start).count();
-      material.durable_slot_claim=[claims](std::uint64_t id){
-        try { claims->claim_slot(id); }
-        catch(const std::exception& e) { throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,e.what()); }
-      };
+      process_slots=std::make_shared<ProtocolIBmw16ProcessSlotClaimSet>();
+      material.process_slot_claim_once=[process_slots](std::uint64_t id){process_slots->claim_once(id);};
     } catch(const ProtocolIBmw16ExpectedFailure&) { throw; }
       catch(const std::exception& e) { throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,e.what()); }
   }
@@ -233,7 +287,19 @@ int run_party(int argc,char** argv) {
   std::vector<std::uint32_t> share(n);for(std::size_t i=0;i<n;++i)share[i]=get_u32(raw.data()+4U*i);
   const std::array<int,2> score{fd[0],fd[1]},fwd{fd[2],fd[3]},inv{fd[8],fd[9]};
   const std::array<int,4> select{fd[4],fd[5],fd[6],fd[7]};
-  auto out=protocol_i_bmw16_experimental_raw_score_mask_party(c,std::move(material),share,score,fwd,select,inv,fd[10],fd[11],nullptr);
+  ProtocolIBmw16ExperimentalPartyOutput out;
+  try {
+    out=protocol_i_bmw16_experimental_raw_score_mask_party(c,std::move(material),share,score,fwd,select,inv,fd[10],fd[11],nullptr);
+  } catch(...) {
+    if(process_slots) {
+      const auto summary=persist_slot_audit(dir,process_slots);
+      std::ofstream partial(dir/"result.metrics",std::ios::trunc);
+      partial<<"claimed_slots="<<summary.first<<"\nprocess_slot_claim_us=NOT_MEASURED\n"
+             <<"slot_lookup_us=NOT_MEASURED\n";
+      partial.close();require(static_cast<bool>(partial),"write exceptional partial metrics");
+    }
+    throw;
+  }
   const int exit_code=output_exit_code(out);
   std::ofstream report(dir/"result.metrics",std::ios::trunc);report<<"status="<<out.status<<"\nscope="<<out.abort_scope
       <<"\nstate="<<(exit_code==kExitSuccess?"SUCCESS":exit_code==kExitAlgorithmAbort?"AGREED_ALGORITHM_ABORT":
@@ -244,8 +310,9 @@ int run_party(int argc,char** argv) {
       <<"\nselect_unique="<<std::accumulate(m.unique_select_slots_consumed.begin(),m.unique_select_slots_consumed.end(),UINT64_C(0))
       <<"\nmembership_slots="<<m.membership_slots_consumed
       <<"\nmessage_phases="<<m.online_message_phases<<"\nsent="<<m.online_bytes_sent<<"\nrecv="<<m.online_bytes_received
-      <<"\nclaimed_slots="<<m.durable_slots_claimed<<"\nsampler_prf_words="<<m.sampler_prf_words
-      <<"\nonline_time_us="<<m.online_time_us<<"\nunused_cmpagg="<<m.forward_shuffle_cmpagg_slots_unused+m.inverse_shuffle_cmpagg_slots_unused<<"\n";
+      <<"\nclaimed_slots="<<m.process_slots_claimed<<"\nsampler_prf_words="<<m.sampler_prf_words
+      <<"\nonline_time_us="<<m.online_time_us<<"\nunused_cmpagg="<<m.forward_shuffle_cmpagg_slots_unused+m.inverse_shuffle_cmpagg_slots_unused
+      <<"\nomitted_cmpagg="<<m.shuffle_cmpagg_slots_omitted<<"\n";
   report<<"bundle_open_us="<<bundle_open_us<<"\nbundle_claim_us="<<bundle_claim_us
       <<"\nraw_share_read_us="<<raw_share_read_us<<"\nraw_adapter_us="<<m.raw_adapter_time_us
       <<"\nraw_adapter_eval_us="<<m.raw_adapter_eval_time_us<<"\nraw_adapter_exchange_us="<<m.raw_adapter_exchange_time_us
@@ -254,8 +321,8 @@ int run_party(int argc,char** argv) {
       <<"\nsampling_coin_exchange_us="<<m.sampling_coin_exchange_time_us
       <<"\nmembership_eval_us="<<m.membership_eval_time_us<<"\ninverse_shuffle_us="<<m.inverse_shuffle_time_us
       <<"\ninverse_shuffle_exchange_us="<<m.inverse_shuffle_exchange_time_us
-      <<"\nstatus_coordination_us="<<m.status_coordination_time_us<<"\ndurable_slot_claim_us="<<m.durable_claim_time_us
-      <<"\nslot_lookup_us="<<m.slot_lookup_time_us<<"\ndurable_claim_io_us="<<m.durable_claim_io_time_us
+      <<"\nstatus_coordination_us="<<m.status_coordination_time_us<<"\nprocess_slot_claim_us="<<m.process_slot_claim_time_us
+      <<"\nslot_lookup_us="<<m.slot_lookup_time_us
       <<"\npeak_rss_kb="<<peak_rss_kb()<<"\ninternal_fss_prg_calls=NOT_MEASURED\n";
   for(std::size_t r=0;r<4;++r)report<<"round"<<(r+1)<<"_time_us="<<m.select_round_time_us[r]
       <<"\nround"<<(r+1)<<"_eval_us="<<m.select_eval_time_us[r]
@@ -264,6 +331,14 @@ int run_party(int argc,char** argv) {
       <<"_unique="<<m.unique_select_slots_consumed[r]<<"_dummy="<<m.dummy_related_calls[r]
       <<"_repeat="<<m.repeated_logical_calls[r]<<"_fnv64="<<std::hex<<m.edge_plan_fnv64[r]<<std::dec<<"\n";
   report.close();require(static_cast<bool>(report),"write party metrics");
+  std::uint64_t slot_audit_write_us=0;
+  if(process_slots){
+    const auto audit=persist_slot_audit(dir,process_slots);
+    (void)audit;
+    const auto summary_bytes=read_file(dir/"slot_audit.metrics");
+    const std::string summary(summary_bytes.begin(),summary_bytes.end());
+    slot_audit_write_us=number_field(summary,"write_us");
+  }
   if(std::string(out.status)=="SUCCESS")write_file(dir/"mask.share",out.xor_mask_share);
   write_party_result(dir,out.status,out.abort_scope,
       exit_code==kExitSuccess?"SUCCESS":exit_code==kExitAlgorithmAbort?"AGREED_ALGORITHM_ABORT":
@@ -284,7 +359,7 @@ void root_write_owned(const fs::path& path,const std::vector<std::uint8_t>& b,ui
 
 void run_case(const Case& test,const std::string& exe,const std::string& fault="none") {
   require(::geteuid()==0,"three-process E2E must run under WSL root to drop distinct UIDs");
-  const auto root=fs::path("/tmp")/("bmw16-s12-"+std::to_string(::getpid())+"-"+std::to_string(test.seed));
+  const auto root=fs::path("/tmp")/("bmw16-s14-"+std::to_string(::getpid())+"-"+std::to_string(test.seed));
   if(::mkdir(root.c_str(),0700)!=0)throw std::runtime_error("create root fixture dir");
   auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){std::error_code ec;fs::remove_all(root,ec);});
   if(::chmod(root.c_str(),0711)!=0)throw std::runtime_error("open fixture parent traversal");
@@ -333,6 +408,31 @@ void run_case(const Case& test,const std::string& exe,const std::string& fault="
   const auto code0=static_cast<int>(number_field(r0,"exit_code")),code1=static_cast<int>(number_field(r1,"exit_code"));
   require(e0==code0&&e1==code1,"party exit code/result contract mismatch");
   require(status0==status1&&scope0==scope1&&state0==state1,"party status disagreement");
+  const auto audit_summary=[&](const fs::path& dir)->std::pair<std::uint64_t,std::uint64_t>{
+    const auto audit_bytes=read_file(dir/"claims.audit");
+    const std::string audit_text(audit_bytes.begin(),audit_bytes.end());
+    std::istringstream audit_stream(audit_text);std::vector<std::uint64_t> ids;std::uint64_t id=0;
+    while(audit_stream>>id)ids.push_back(id);
+    std::ifstream summary_file(dir/"slot_audit.metrics");
+    const std::string summary((std::istreambuf_iterator<char>(summary_file)),{});
+    const auto count=number_field(summary,"count"),digest=number_field(summary,"fnv64");
+    require(ids.size()==count&&std::is_sorted(ids.begin(),ids.end())&&
+            std::adjacent_find(ids.begin(),ids.end())==ids.end(),"slot claim audit ordering/count");
+    require(fnv64_slot_ids(ids)==digest,"slot claim audit digest");
+    return {count,digest};
+  };
+  std::pair<std::uint64_t,std::uint64_t> audit0{},audit1{};
+  const bool audit0_exists=fs::exists(p0/"claims.audit"),audit1_exists=fs::exists(p1/"claims.audit");
+  require(audit0_exists==audit1_exists,"one-sided slot audit presence");
+  if(audit0_exists){
+    audit0=audit_summary(p0);audit1=audit_summary(p1);
+    const auto metric_claims0=number_field(metrics0,"claimed_slots");
+    const auto metric_claims1=number_field(metrics1,"claimed_slots");
+    if(audit0.first!=metric_claims0||audit1.first!=metric_claims1)
+      throw std::runtime_error("slot claim audit/metric mismatch p0="+std::to_string(audit0.first)+"/"+
+          std::to_string(metric_claims0)+" p1="+std::to_string(audit1.first)+"/"+
+          std::to_string(metric_claims1));
+  }
   const auto expected_code=[&](const std::string& status,const std::string& scope,const std::string& state){
     if(status=="SUCCESS"&&scope=="NONE"&&state=="SUCCESS")return kExitSuccess;
     if(status=="ABORT_ALGORITHM_PROBABILITY"&&scope=="PEER_AGREED"&&state=="AGREED_ALGORITHM_ABORT")return kExitAlgorithmAbort;
@@ -354,9 +454,9 @@ void run_case(const Case& test,const std::string& exe,const std::string& fault="
     const auto pair_count=static_cast<std::uint64_t>(test.scores.size())*(test.scores.size()-1U)/2U;
     const auto expected_claims=2U*config_for(test,0).padded_n+1U+number_field(metrics0,"select_unique")+
         (success?number_field(metrics0,"membership_slots"):0U)+(success?1U:0U);
-    require(number_field(metrics0,"claimed_slots")==expected_claims,"durable slot accounting identity");
+    require(number_field(metrics0,"claimed_slots")==expected_claims,"process slot accounting identity");
     const auto dslots=number_field(dealer_metrics,"slots_per_party");
-    require(dslots==2U*config_for(test,0).padded_n+2U+11U*pair_count,"bundle slot coverage identity");
+    require(dslots==2U*config_for(test,0).padded_n+2U+9U*pair_count,"bundle slot coverage identity");
   }
   const bool mask0=fs::exists(p0/"mask.share"),mask1=fs::exists(p1/"mask.share");
   if(status0=="SUCCESS"){
@@ -375,6 +475,8 @@ void run_case(const Case& test,const std::string& exe,const std::string& fault="
       status0=="ABORT_MATERIAL"&&status1=="ABORT_MATERIAL","bundle tamper did not produce typed material abort");
   std::cout<<"case n="<<test.scores.size()<<" K="<<test.k<<" seed="<<test.seed<<" status="<<status0
       <<" scope="<<scope0<<" state="<<state0<<" p0_exit="<<e0<<" p1_exit="<<e1
+      <<" p0_slot_audit="<<audit0.first<<":"<<std::hex<<audit0.second<<std::dec
+      <<" p1_slot_audit="<<audit1.first<<":"<<std::hex<<audit1.second<<std::dec
       <<" fault="<<fault<<" forced_abort="<<(test.force_abort?1:0)<<" p0_uid=22012 p1_uid=22013"
       <<" party0_metrics={"<<metrics0<<"} party1_metrics={"<<metrics1<<"}"
       <<" dealer={"<<dealer_metrics.substr(0,dealer_metrics.find_last_not_of('\n')+1)<<"}\n";
@@ -405,6 +507,21 @@ int main(int argc,char** argv) {
         std::cerr<<"party-unexpected-error=non-standard exception\n";return kExitUnexpectedError;
       }
     }
+    if(argc==5&&std::string(argv[1])=="--pilot-case"){
+      const auto n=static_cast<std::uint32_t>(std::stoul(argv[2]));
+      const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));
+      const auto seed=std::stoull(argv[4]);
+      std::vector<std::int32_t> scores;
+      if(n==64&&seed==1206){for(int i=0;i<64;++i)scores.push_back((i*17)%23-11);}
+      else if(n==128&&seed==128080){
+        std::mt19937_64 rng(UINT64_C(128080));
+        for(int i=0;i<128;++i)scores.push_back(static_cast<std::int32_t>(rng()%2001U)-1000);
+        scores[0]=INT32_MIN;scores[127]=INT32_MAX;
+      } else throw std::invalid_argument("pilot input is not a frozen S14 profile");
+      require((n==64&&k==8)||(n==128&&k==80),"pilot profile n/K mismatch");
+      run_case({std::move(scores),k,seed,false},self_path());
+      return 0;
+    }
     require(argc==1,"no arguments expected");const auto exe=self_path();
     run_material_negative_tests();
     run_case({{INT32_MIN},1,1201,false},exe);
@@ -425,6 +542,15 @@ int main(int argc,char** argv) {
     run_case({{5,-6,17,3,-20,0,2},7,1218,false},exe);
     std::vector<std::int32_t> scores64;for(int i=0;i<64;++i)scores64.push_back((i*17)%23-11);
     run_case({scores64,8,1206,false},exe);
+    std::vector<std::int32_t> scores128_k2;for(int i=0;i<128;++i)
+      scores128_k2.push_back(i==0?INT32_MIN:i==127?INT32_MAX:(i*37)%101-50);
+    run_case({scores128_k2,2,128002,false},exe);
+    std::vector<std::int32_t> scores128_k8;for(int i=0;i<128;++i)scores128_k8.push_back((i*17)%23-11);
+    run_case({scores128_k8,8,128008,false},exe);
+    std::mt19937_64 rng128(UINT64_C(128080));std::vector<std::int32_t> scores128_k80;
+    for(int i=0;i<128;++i)scores128_k80.push_back(static_cast<std::int32_t>(rng128()%2001U)-1000);
+    scores128_k80[0]=INT32_MIN;scores128_k80[127]=INT32_MAX;
+    run_case({scores128_k80,80,128080,false},exe);
     run_case({{12,1,9,-4,2},2,1207,true},exe);
     run_case({{12,1,9,-4,2},2,1219,false},exe,"corrupt_bundle");
     run_case({{12,1,9,-4,2},2,1220,false},exe,"unexpected_api");
@@ -438,5 +564,5 @@ int main(int argc,char** argv) {
         run_case({ordered,k,UINT64_C(200000)+100U*n+k,false},exe);
     }
     return 0;
-  }catch(const std::exception& e){std::cerr<<"BMW16 S12 3-process TEST_ONLY failure: "<<e.what()<<'\n';return 1;}
+  }catch(const std::exception& e){std::cerr<<"BMW16 S14 3-process TEST_ONLY failure: "<<e.what()<<'\n';return 1;}
 }
