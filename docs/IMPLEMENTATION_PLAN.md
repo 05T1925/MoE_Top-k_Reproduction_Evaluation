@@ -75,13 +75,15 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 
 **2026-10-06 范围补充：**用户明确授权在 V3 结束前开展 S10 所定义的隔离 `EXPERIMENTAL_TEST_ONLY` 候选、raw-score adapter conformance 和有界 E2E，以解决 S9 的执行身份与正式输入接线问题。该授权仅提前开放研发/研究，不改变 V3→V4 正式验收依赖，不创建 secure API，不把 S10 的小规模 loopback 计量填入 V4 或六方案性能结果。详见 [S10 决策](decisions/BMW16_S10_RAW_SCORE_UID_ISOLATION_AND_FORMAL_ADAPTER_2026-10-06.md)。
 
+**2026-10-06 S11 补充：**用户继续授权提前推进完整候选研发。S11 新增默认关闭的 VFSS C++ `EXPERIMENTAL` party API，已把正式 raw-score adapter、shuffle、两份四层 Select、membership、inverse shuffle 和 mask shares 接入可调用函数，并通过有限线程级 oracle E2E。该测试不是 T/P0/P1 独立 OS 进程；party-only AEAD bundle/耐久一次性领取及相关全池/实际 shuffle 联合视图 hybrid 未完成，故安全门仍 NO-GO。该研发授权不提前完成 V3/V4、不得启动或填充正式 LAN/WAN 矩阵。详见 [S11 决策](decisions/BMW16_S11_VFSS_EXPERIMENTAL_COMPOSITION_AND_SECURITY_GATE_2026-10-06.md) 与 [S11 验证报告](reproduction/BMW16_S11_CPP_EXPERIMENTAL_COMPOSITION_VALIDATION_2026-10-06.md)。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S10 TEST_ONLY adapter/E2E 已运行，secure gate NO-GO）。
+5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S11 opt-in EXPERIMENTAL VFSS C++ 全链 API 与有界 oracle E2E 已运行，private-material/party-view/independent-process secure gate NO-GO）。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
@@ -733,6 +735,8 @@ Protocol III + AAV86
 S9 在隔离实验路径接入正式 `uint32_t` raw-score share 语义的 carry/sign-lift 端口，并独立重跑 S8 功能矩阵、raw-score oracle differential、n=64 非全量抽样样本及边审计。S9 复核发现同 OS token 可以读 peer share/package；其两世界 witness 以概率 1 区分；匿名公开 transcript 的 n≤5 枚举不覆盖本地 shuffle state 或共享 node-mask 相关的完整 DCF/uCMP pool。故 `OFFLINE_PRIVATE_MATERIAL` 与完整 `PARTY_VIEW_SECURITY` 继续 `NO-GO`，未建 secure API、未运行正式性能矩阵。该实验 raw adapter 不是正式 runtime adapter 接收。见 [S9 决策](decisions/BMW16_S9_RAW_ABI_AND_PRIVACY_GATE_2026-10-06.md) 与 [S9 报告](reproduction/BMW16_S9_INDEPENDENT_ACCEPTANCE_RAW_ABI_AND_VIEW_AUDIT_2026-10-06.md)。
 
 S10 在不同 Linux UID 的本地 WSL 环境独立复跑 S9，并新增默认关闭的正式 raw-score party adapter 与 TEST_ONLY T/P0/P1 接线。11 个 n≤8 样本和一个 n64 样本通过 frozen C++ oracle；同 UID 文件读取夹具改为 UID ACL 双世界访问测试。root harness 本地拷贝材料、command-line metadata、无 AEAD/来源认证、公开 adaptive transcript 和相关全池 key 的联合模拟仍是明确安全缺口，因此只接受 `FUNCTIONAL_TEST_ONLY`，不建立 secure API；V3/V4 正式次序和 LAN/WAN 门不变。见 [S10 决策](decisions/BMW16_S10_RAW_SCORE_UID_ISOLATION_AND_FORMAL_ADAPTER_2026-10-06.md)、[验证报告](reproduction/BMW16_S10_INDEPENDENT_ACCEPTANCE_AND_EXECUTION_ISOLATION_2026-10-06.md) 与 [运行 summary](reproduction/evidence/BMW16_S10_RUN_SUMMARY.json)。
+
+S11 在 S10 后新增 C++ `EXPERIMENTAL` 全链 party 函数与 T 的输入无关内存发材生成器，使用实际 uCMP/DCF 与 Protocol I shuffle state machine，party selection control 已从 S10 Python runner 移入 VFSS C++。固定 n=1/2/3/5/8/64 矩阵与强制 abort 通过 TEST_ONLY frozen oracle；n64 实际走非全量抽样分支。测试由一个进程中的两条 C++ party 线程执行，不能当作独立 OS process E2E。T→party 包未实现认证保密交付/耐久消费；实际 shuffle + 相关多 key FSS pool + adaptive transcript + local shuffle state + output shares 的 simulator 未证明。方案保持 `EXPERIMENTAL`，只记有界功能通过，不进入 secure API 或正式性能表。详见 [S11 决策](decisions/BMW16_S11_VFSS_EXPERIMENTAL_COMPOSITION_AND_SECURITY_GATE_2026-10-06.md) 和 [S11 验证报告](reproduction/BMW16_S11_CPP_EXPERIMENTAL_COMPOSITION_VALIDATION_2026-10-06.md)。
 
 #### 前置条件
 
