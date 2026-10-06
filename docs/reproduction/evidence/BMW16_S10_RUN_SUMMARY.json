@@ -1,0 +1,2764 @@
+{
+  "binary": {
+    "bytes": 367992,
+    "path": "/tmp/m6b_i_bmw16_s10_build/bmw16_s10_experimental_backend",
+    "sha256": "301b8a8b06b778fb4667e8b8e437faf419dc409879b04d6bbde94be289187ebc"
+  },
+  "environment": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3"
+  },
+  "label": "BMW16_S10_FORMAL_RAW_SCORE_UID_ISOLATED_EXPERIMENTAL_TEST_ONLY",
+  "protocol_identity": "Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED",
+  "raw_json_policy": "Full run JSON stays in WSL /tmp or Windows TEMP; this file excludes party stdout/stderr, open masks, shares, keys, and score values.",
+  "s10_forced_abort": {
+    "forced_injection": true,
+    "no_mask": true,
+    "oracle_differential": "NOT_RUN_ABORT",
+    "party_exit_codes": [
+      2,
+      2
+    ],
+    "raw_identity": {
+      "bytes": 1263738,
+      "path": "/tmp/BMW16_S10_FORCED_ABORT_RELEASE_FINAL.json",
+      "sha256": "a58f2926aa35c3b4c14dced51bb640b245cdd4a7282b13ca591d561946b5a610"
+    },
+    "status": "ABORT_ALGORITHM_PROBABILITY"
+  },
+  "s10_formal_adapter_isolated_matrix": {
+    "cases": [
+      {
+        "K": 1,
+        "case_id": "n1_min_k1",
+        "comparison_bits": 34,
+        "full_online_DAG_message_phases": 1,
+        "n": 1,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 0,
+          "raw_score_input_slots": 0,
+          "select_key_pool_slots": 0,
+          "total_serialized_uCMP_slots": 0,
+          "unused_shuffle_cmpagg_slots": 0
+        },
+        "offline_package_bytes_per_party": [
+          0,
+          0
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            159,
+            160
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "2": {
+            "comparison_calls": 4,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 4,
+            "edge_sha256": "b7291f40d91f52ed83504b6dddc2bdd1735b74503147b3db8ddd5ba6ec689e6f",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 4,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 2,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 2
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 1,
+        "case_id": "n2_extremes_k1",
+        "comparison_bits": 34,
+        "full_online_DAG_message_phases": 16,
+        "n": 2,
+        "offline_material_conformance": {
+          "claim_persisted_before_simulated_crash": true,
+          "crash_claim_retry_rejected": true,
+          "duplicate_slot_eval_rejected": true,
+          "first_slot_eval_returns_share": true,
+          "material_claim_consumed_once": true,
+          "peer_silent_error": "timed out",
+          "peer_silent_no_mask": true,
+          "peer_silent_party_status": "ABORT_COMMUNICATION",
+          "peer_silent_process_exit": 2,
+          "peer_silent_returns_no_mask": true,
+          "truncated_package_rejected": true,
+          "two_party_material_abort_agrees": true,
+          "two_party_material_abort_no_mask": [
+            true,
+            true
+          ],
+          "two_party_material_abort_statuses": [
+            "ABORT_MATERIAL",
+            "ABORT_MATERIAL"
+          ],
+          "wrong_endpoint_key_rejected": true,
+          "wrong_party_package_rejected": true,
+          "wrong_round_key_rejected": true
+        },
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 1,
+          "raw_score_input_slots": 4,
+          "select_key_pool_slots": 8,
+          "total_serialized_uCMP_slots": 15,
+          "unused_shuffle_cmpagg_slots": 2
+        },
+        "offline_package_bytes_per_party": [
+          14009,
+          14009
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            373,
+            374
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 10,
+            "edge_sha256": "5038dab0165ce52dd87e1aeafee5f4ee8134e1d8746f00f9f47e7bff7783ec28",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 1,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 11
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 9,
+            "edge_sha256": "6f2107b2f178fcc158a793bc5a87d05460e83428a85b78f0fbf02fed973314a9",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 3,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 9
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "d343d6d8ae4f14dbbdb8d776c441bb293f5c468472ab2aa3c48a991b7ac2676e",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "d343d6d8ae4f14dbbdb8d776c441bb293f5c468472ab2aa3c48a991b7ac2676e",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 2,
+        "case_id": "n2_equal_k2",
+        "comparison_bits": 34,
+        "full_online_DAG_message_phases": 16,
+        "n": 2,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 1,
+          "raw_score_input_slots": 4,
+          "select_key_pool_slots": 8,
+          "total_serialized_uCMP_slots": 15,
+          "unused_shuffle_cmpagg_slots": 2
+        },
+        "offline_package_bytes_per_party": [
+          14009,
+          14009
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            482,
+            483
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 10,
+            "edge_sha256": "578a522a40c141d142869a725d10d9e92e3e95172e7d6c4cbfc4c2300f39bbd2",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 1,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 11
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 9,
+            "edge_sha256": "7c4294d0bd0fb2dfe125039e0f741e83c2b4223969a393ca179ebfd8cb94eb38",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 3,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 9
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "cbb233c7eb031360de4acbdf158335663320af48c276ff3b73649a17a76a1b02",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "cbb233c7eb031360de4acbdf158335663320af48c276ff3b73649a17a76a1b02",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 2,
+        "case_id": "n3_all_equal_k2",
+        "comparison_bits": 35,
+        "full_online_DAG_message_phases": 16,
+        "n": 3,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 3,
+          "raw_score_input_slots": 8,
+          "select_key_pool_slots": 24,
+          "total_serialized_uCMP_slots": 41,
+          "unused_shuffle_cmpagg_slots": 6
+        },
+        "offline_package_bytes_per_party": [
+          38359,
+          38359
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            591,
+            592
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 3,
+            "dummy_related_calls": 6,
+            "edge_sha256": "808964b2c9910322652bb656140304b5d42008c7389558a5385c3834e302a97a",
+            "fss_material_slots": 6,
+            "fss_party_dcf_evals": 12,
+            "fss_two_party_dcf_evals": 24,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 6,
+            "reverse_share_complements": 4,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 9
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 3,
+            "dummy_related_calls": 4,
+            "edge_sha256": "ec33a9e581e4b5135bf3c53d28c5fef014b065a8bf2ee4e00c853d4c49767d8c",
+            "fss_material_slots": 6,
+            "fss_party_dcf_evals": 12,
+            "fss_two_party_dcf_evals": 24,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 8,
+            "reverse_share_complements": 4,
+            "same_round_duplicate_calls": 5,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 7
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "34b4b351e440dfd5281f2c59ff7327fddeeeaa85472a88f4dcb0241c5a29dc87",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "34b4b351e440dfd5281f2c59ff7327fddeeeaa85472a88f4dcb0241c5a29dc87",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 1,
+        "case_id": "n5_repeat_mixed_k1",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 5,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 10,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 80,
+          "total_serialized_uCMP_slots": 126,
+          "unused_shuffle_cmpagg_slots": 20
+        },
+        "offline_package_bytes_per_party": [
+          119630,
+          119630
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            700,
+            701
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 70,
+            "edge_sha256": "5fe8abcc73b8a407c28954e2b75a514b96f0b50647f3eeb716b90d0a92789f1d",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 7,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 80
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 4,
+            "dummy_related_calls": 24,
+            "edge_sha256": "ef8fbb98293d33f1f1ff464a325965989d33abbf3fa649424cae79ac5d7e10ae",
+            "fss_material_slots": 11,
+            "fss_party_dcf_evals": 22,
+            "fss_two_party_dcf_evals": 44,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 12,
+            "reverse_share_complements": 8,
+            "same_round_duplicate_calls": 6,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 30
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "bc26d5514488de13e260f28a6077fe85f18e0ea4b4356c9c0cc2018072a6b845",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "bc26d5514488de13e260f28a6077fe85f18e0ea4b4356c9c0cc2018072a6b845",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 3,
+        "case_id": "n5_repeat_mixed_k3",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 5,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 10,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 80,
+          "total_serialized_uCMP_slots": 126,
+          "unused_shuffle_cmpagg_slots": 20
+        },
+        "offline_package_bytes_per_party": [
+          119630,
+          119630
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            809,
+            810
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 30,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 10,
+            "edge_sha256": "0f07189f69d451b7e16066c5b9bc8d41a1807428b720b1bce93437921af0c0bc",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 10,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 20
+          },
+          "2": {
+            "comparison_calls": 20,
+            "cross_task_repeat_calls_same_round": 5,
+            "dummy_related_calls": 4,
+            "edge_sha256": "215741eef1818058f0248debd5f67ac117ab53e8e76954b69fd374e898d798cc",
+            "fss_material_slots": 14,
+            "fss_party_dcf_evals": 28,
+            "fss_two_party_dcf_evals": 56,
+            "prior_round_repeat_calls": 20,
+            "real_real_calls": 16,
+            "reverse_share_complements": 9,
+            "same_round_duplicate_calls": 7,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 13
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "2c40f245e2ad3a137b495b105db4c4a17c75029d56c4b1654f01cb178c0db2d0",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "2c40f245e2ad3a137b495b105db4c4a17c75029d56c4b1654f01cb178c0db2d0",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 5,
+        "case_id": "n5_repeat_mixed_kn",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 5,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 10,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 80,
+          "total_serialized_uCMP_slots": 126,
+          "unused_shuffle_cmpagg_slots": 20
+        },
+        "offline_package_bytes_per_party": [
+          119630,
+          119630
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            918,
+            919
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 70,
+            "edge_sha256": "224c35e83025ec9d5e121d79de3c47a02d9ce4cd66e686fe443f3a782fa4faea",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 14,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 80
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 4,
+            "dummy_related_calls": 24,
+            "edge_sha256": "2dfe0a18ccfd001bf29ed5f62fece01c0046fe73b6dab36727e06fcf31f850d0",
+            "fss_material_slots": 11,
+            "fss_party_dcf_evals": 22,
+            "fss_two_party_dcf_evals": 44,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 12,
+            "reverse_share_complements": 10,
+            "same_round_duplicate_calls": 6,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 30
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 1,
+        "case_id": "n8_repeat_k1",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            1027,
+            1028
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 240,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 184,
+            "edge_sha256": "83da93b0215716354581259c1de25ab3a1d6593d8d16469e9499d7bc08ab2ef1",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 30,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 212
+          },
+          "2": {
+            "comparison_calls": 60,
+            "cross_task_repeat_calls_same_round": 7,
+            "dummy_related_calls": 39,
+            "edge_sha256": "d0b9c63eaa5fcb4481555985150e3513bdcd37a5f15ace7c3fcba9fc0357c109",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 60,
+            "real_real_calls": 21,
+            "reverse_share_complements": 18,
+            "same_round_duplicate_calls": 9,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 51
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "7e1e9cd91bdfe52d16d76d3be09d32938d5d191d4f1a9d62aceab1b4d0cea22c",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "7e1e9cd91bdfe52d16d76d3be09d32938d5d191d4f1a9d62aceab1b4d0cea22c",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 3,
+        "case_id": "n8_mixed_extremes_k3",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            1136,
+            1137
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 132,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 76,
+            "edge_sha256": "a1b3f01c0e02ffb0613a424af451cb5fcd44c8ab105920ae5ddf2412f852630d",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 23,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 104
+          },
+          "2": {
+            "comparison_calls": 44,
+            "cross_task_repeat_calls_same_round": 8,
+            "dummy_related_calls": 16,
+            "edge_sha256": "4db3ada0d5da0fa4a7bdd552a39132b8d7352924659d0129a76ac851c462db8b",
+            "fss_material_slots": 26,
+            "fss_party_dcf_evals": 52,
+            "fss_two_party_dcf_evals": 104,
+            "prior_round_repeat_calls": 44,
+            "real_real_calls": 28,
+            "reverse_share_complements": 10,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 34
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "4965b8549532db5a0883e3efb73f2f3d559ecaa4bb9b0e8b8dde739fef4c8948",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "4965b8549532db5a0883e3efb73f2f3d559ecaa4bb9b0e8b8dde739fef4c8948",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 4,
+        "case_id": "n8_all_equal_k4",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            1245,
+            1246
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 34,
+            "edge_sha256": "e4c0ff3c7fd2eefdd92dbe1a935c846d3cae9877ae74ebed7f916b2b1d9f7f15",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 24,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 62
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 8,
+            "dummy_related_calls": 8,
+            "edge_sha256": "e11eef532746cd68c9af673d252074b9b2538bac4f6978535e5392a333816e76",
+            "fss_material_slots": 26,
+            "fss_party_dcf_evals": 52,
+            "fss_two_party_dcf_evals": 104,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 28,
+            "reverse_share_complements": 20,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 26
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "54accfbaf96f1eef424b5dd45ae7e11010c543f8cd1c4373e8959bc647d9931e",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "54accfbaf96f1eef424b5dd45ae7e11010c543f8cd1c4373e8959bc647d9931e",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 8,
+        "case_id": "n8_boundary_k8",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 16,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": {
+          "T_can_read_controller_input": {
+            "p0_share": false,
+            "p1_share": false
+          },
+          "T_can_read_party_input": {
+            "P0_share": false,
+            "P1_share": false
+          },
+          "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+          "party_pids": [
+            1354,
+            1355
+          ],
+          "peer_file_readable": {
+            "P0_peer_input": false,
+            "P0_peer_package": false,
+            "P1_peer_input": false,
+            "P1_peer_package": false
+          },
+          "peer_result_file_readable": {
+            "P0_peer_result": false,
+            "P1_peer_result": false
+          },
+          "process_args_readable": {
+            "P0_can_read_peer_process_args": true,
+            "P0_peer_input_or_package_path_in_own_argv": false,
+            "P1_can_read_peer_process_args": true,
+            "P1_peer_input_or_package_path_in_own_argv": false
+          },
+          "trusted_t_staging_readable": {
+            "P0_generated_package": false,
+            "P1_generated_package": false
+          },
+          "uids": {
+            "P0": 65534,
+            "P1": 33,
+            "T": 1000
+          }
+        },
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 240,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 184,
+            "edge_sha256": "5c47e0d912274373a3a95ae70e53338598280d7e9714923539292fcfbd5d89e8",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 20,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 212
+          },
+          "2": {
+            "comparison_calls": 60,
+            "cross_task_repeat_calls_same_round": 7,
+            "dummy_related_calls": 39,
+            "edge_sha256": "a3247b5ba3dad80847bd87e1967fd36d0e1b0457c763c81e678b94804cfff16f",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 60,
+            "real_real_calls": 21,
+            "reverse_share_complements": 5,
+            "same_round_duplicate_calls": 9,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 51
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "40caf90be6fece711da735c5f901395a68e1942f75def0c39d4b2a0c6c8686cc",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "40caf90be6fece711da735c5f901395a68e1942f75def0c39d4b2a0c6c8686cc",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      }
+    ],
+    "raw_identity": {
+      "bytes": 358088,
+      "path": "/tmp/BMW16_S10_FORMAL_ISOLATED_MATRIX_RELEASE_FINAL.json",
+      "sha256": "4ef2ee4a7731e59f07b43eefd6651d8286965692898e3f55d79dc286226e99c0"
+    },
+    "scope": "11 frozen n<=8 cases; native official raw-score adapter; distinct Linux UID process run; CSPRNG sample coins",
+    "summary": {
+      "abort_or_failure": 0,
+      "oracle_pass": 11,
+      "success": 11
+    }
+  },
+  "s10_n64_nonfull_sampling": {
+    "case": {
+      "K": 2,
+      "case_id": "S10-n64-seed20261006-final",
+      "comparison_bits": 39,
+      "full_online_DAG_message_phases": 16,
+      "n": 64,
+      "offline_material_conformance": null,
+      "offline_material_slot_breakdown_per_party": {
+        "membership_key_pool_slots": 2016,
+        "raw_score_input_slots": 128,
+        "select_key_pool_slots": 16128,
+        "total_serialized_uCMP_slots": 22304,
+        "unused_shuffle_cmpagg_slots": 4032
+      },
+      "offline_package_bytes_per_party": [
+        22723604,
+        22723604
+      ],
+      "oracle_differential": "PASS",
+      "os_identity_isolation_checks": {
+        "T_can_read_controller_input": {
+          "p0_share": false,
+          "p1_share": false
+        },
+        "T_can_read_party_input": {
+          "P0_share": false,
+          "P1_share": false
+        },
+        "mode": "distinct Linux UIDs; T/private-controller staging under WSL ext4",
+        "party_pids": [
+          1466,
+          1467
+        ],
+        "peer_file_readable": {
+          "P0_peer_input": false,
+          "P0_peer_package": false,
+          "P1_peer_input": false,
+          "P1_peer_package": false
+        },
+        "peer_result_file_readable": {
+          "P0_peer_result": false,
+          "P1_peer_result": false
+        },
+        "process_args_readable": {
+          "P0_can_read_peer_process_args": true,
+          "P0_peer_input_or_package_path_in_own_argv": false,
+          "P1_can_read_peer_process_args": true,
+          "P1_peer_input_or_package_path_in_own_argv": false
+        },
+        "trusted_t_staging_readable": {
+          "P0_generated_package": false,
+          "P1_generated_package": false
+        },
+        "uids": {
+          "P0": 65534,
+          "P1": 33,
+          "T": 1000
+        }
+      },
+      "party_exit_codes": [
+        0,
+        0
+      ],
+      "select_round_metrics": {
+        "1": {
+          "comparison_calls": 8010,
+          "cross_task_repeat_calls_same_round": 351,
+          "dummy_related_calls": 6109,
+          "edge_sha256": "f896dcd5b4b5a81dd98d6d825c5b0b73f92106d53f23f1cc7c31b888e0eb1f3b",
+          "fss_material_slots": 1901,
+          "fss_party_dcf_evals": 3802,
+          "fss_two_party_dcf_evals": 7604,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 1901,
+          "reverse_share_complements": 1026,
+          "same_round_duplicate_calls": 351,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 7659
+        },
+        "2": {
+          "comparison_calls": 500,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 374,
+          "edge_sha256": "c9faa67c737b8c6bdb7d3de863ed7827b6f7fe33900e7e84bf69fac417f8f76c",
+          "fss_material_slots": 126,
+          "fss_party_dcf_evals": 252,
+          "fss_two_party_dcf_evals": 504,
+          "prior_round_repeat_calls": 376,
+          "real_real_calls": 126,
+          "reverse_share_complements": 65,
+          "same_round_duplicate_calls": 3,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 497
+        },
+        "3": {
+          "comparison_calls": 10549,
+          "cross_task_repeat_calls_same_round": 1075,
+          "dummy_related_calls": 7975,
+          "edge_sha256": "be281de9bb472c54de23ac8a9104647a35fcb16fb21faa0f78d951299b816110",
+          "fss_material_slots": 2574,
+          "fss_party_dcf_evals": 5148,
+          "fss_two_party_dcf_evals": 10296,
+          "prior_round_repeat_calls": 6383,
+          "real_real_calls": 2574,
+          "reverse_share_complements": 1341,
+          "same_round_duplicate_calls": 1075,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 9474
+        },
+        "4": {
+          "comparison_calls": 6,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 0,
+          "edge_sha256": "2702efdb5ca97ed0de04a069665aa415fc776a3be25dfcc77f867ac62eb3f08d",
+          "fss_material_slots": 6,
+          "fss_party_dcf_evals": 12,
+          "fss_two_party_dcf_evals": 24,
+          "prior_round_repeat_calls": 6,
+          "real_real_calls": 6,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 1,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 5
+        }
+      },
+      "status": "SUCCESS"
+    },
+    "p0_metrics": {
+      "DCF_Eval_both_parties": 18680,
+      "DCF_Eval_per_party": 9340,
+      "membership_party_key_slots_consumed": 63,
+      "offline_shuffle_cmpagg_slots_per_party_unused": 4032,
+      "online_PRG_calls": "NOT_MEASURED",
+      "online_party_elapsed_seconds": 1.8346949919999958,
+      "peer_payload_bytes_received": 732028,
+      "peer_payload_bytes_sent": 732033,
+      "raw_score_abi_input_adapter": "VFSS_protocol_i_raw_score_input_party",
+      "raw_score_input_DCF_Eval_both_parties": 512,
+      "raw_score_input_DCF_Eval_per_party": 256,
+      "raw_score_input_carry_received_bytes": 1072,
+      "raw_score_input_carry_sent_bytes": 1072,
+      "raw_score_input_dcf_calls_per_party": 256,
+      "raw_score_input_peer_message_phases": 2,
+      "raw_score_input_sign_received_bytes": 1072,
+      "raw_score_input_sign_sent_bytes": 1072,
+      "raw_score_input_uCMP_key_slots_per_party": 128,
+      "raw_score_input_ucmp_calls": 128,
+      "select_dummy_related_logic_calls": 14458,
+      "select_logical_comparison_calls": 19065,
+      "select_party_uCMP_key_slots_consumed": 4607,
+      "select_same_round_same_task_cached_calls": 0,
+      "uCMP_calls_per_party": 4670
+    },
+    "raw_identity": {
+      "bytes": 1255698,
+      "path": "/tmp/BMW16_S10_FORMAL_ISOLATED_N64_RELEASE_FINAL.json",
+      "sha256": "6b1683f5e92d09b1ce5ce92803b33ff2205f7b2fc0b9be4a0a6b30c9ff571b6d"
+    },
+    "scope": "one fixed n=64 TEST_ONLY sample; not a performance benchmark or failure-rate estimate"
+  },
+  "s10_two_world_uid_access_test": {
+    "all_p0_peer_and_t_file_access_denied": true,
+    "delivery_contract": "root-owned TEST_ONLY local install; not authenticated/private production delivery",
+    "ideal_p0_output_share_identical": true,
+    "label": "BMW16_S10_UID_ISOLATED_TWO_WORLD_OS_ACCESS_TEST_ONLY",
+    "p0_input_identical": true,
+    "p1_inputs_differ": true,
+    "security_scope": "filesystem ACL boundary only; does not simulate shuffle, key-pool, transcript, or mask-share views",
+    "worlds": {
+      "A": {
+        "clear_order_for_fixture_only": [
+          0,
+          1
+        ],
+        "ideal_p0_output_sha256": "bf63b14ff37caa3a864dc650369b921861b952d9a06eaaa79c4bff5011dc6b0d",
+        "p0_input_sha256": "4c3a7d62da7208d47496daa6afd95180c50212bf793f740942821e8dd3506d2f",
+        "p0_lists_p1_directory": false,
+        "p0_reads_p1_input": false,
+        "p0_reads_p1_material": false,
+        "p0_reads_t_staging": false,
+        "p1_input_sha256": "eaf39cc4d60cb4406d2130c3b70fa8732eae3e8c6f147c3fe7f4d10f66c017d1",
+        "t_reads_p0_input": false
+      },
+      "B": {
+        "clear_order_for_fixture_only": [
+          1,
+          0
+        ],
+        "ideal_p0_output_sha256": "bf63b14ff37caa3a864dc650369b921861b952d9a06eaaa79c4bff5011dc6b0d",
+        "p0_input_sha256": "4c3a7d62da7208d47496daa6afd95180c50212bf793f740942821e8dd3506d2f",
+        "p0_lists_p1_directory": false,
+        "p0_reads_p1_input": false,
+        "p0_reads_p1_material": false,
+        "p0_reads_t_staging": false,
+        "p1_input_sha256": "11abb5fd4491fcde9c53a956d2151d93b0aea2f51e7f833b99325396855898a8",
+        "t_reads_p0_input": false
+      }
+    }
+  },
+  "s9_independent_rerun": {
+    "cases": [
+      {
+        "K": 1,
+        "case_id": "n1_min_k1",
+        "comparison_bits": 34,
+        "full_online_DAG_message_phases": 1,
+        "n": 1,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 0,
+          "raw_score_input_slots": 0,
+          "select_key_pool_slots": 0,
+          "total_serialized_uCMP_slots": 0,
+          "unused_shuffle_cmpagg_slots": 0
+        },
+        "offline_package_bytes_per_party": [
+          0,
+          0
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "2": {
+            "comparison_calls": 4,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 4,
+            "edge_sha256": "b7291f40d91f52ed83504b6dddc2bdd1735b74503147b3db8ddd5ba6ec689e6f",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 4,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 2,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 2
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 2,
+            "edge_sha256": "efe2c042c81255fbec73d9d083d93e017d6b2bc31d556cc7905aa9091158d96d",
+            "fss_material_slots": 0,
+            "fss_party_dcf_evals": 0,
+            "fss_two_party_dcf_evals": 0,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 0,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 1,
+        "case_id": "n2_extremes_k1",
+        "comparison_bits": 34,
+        "full_online_DAG_message_phases": 15,
+        "n": 2,
+        "offline_material_conformance": {
+          "duplicate_slot_eval_rejected": true,
+          "first_slot_eval_returns_share": true,
+          "material_claim_consumed_once": true,
+          "peer_silent_error": "timed out",
+          "peer_silent_no_mask": true,
+          "peer_silent_party_status": "ABORT_COMMUNICATION",
+          "peer_silent_process_exit": 2,
+          "peer_silent_returns_no_mask": true,
+          "truncated_package_rejected": true,
+          "two_party_material_abort_agrees": true,
+          "two_party_material_abort_no_mask": [
+            true,
+            true
+          ],
+          "two_party_material_abort_statuses": [
+            "ABORT_MATERIAL",
+            "ABORT_MATERIAL"
+          ],
+          "wrong_endpoint_key_rejected": true,
+          "wrong_party_package_rejected": true,
+          "wrong_round_key_rejected": true
+        },
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 1,
+          "raw_score_input_slots": 4,
+          "select_key_pool_slots": 8,
+          "total_serialized_uCMP_slots": 15,
+          "unused_shuffle_cmpagg_slots": 2
+        },
+        "offline_package_bytes_per_party": [
+          14009,
+          14009
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 10,
+            "edge_sha256": "0860d8cfe6479d0f76a5751dede8f740969c8ffdd88c7c8af6ecdd81ffc45205",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 1,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 11
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 9,
+            "edge_sha256": "fd76533681b7ff00348090406cab038dee61449c7a548775d35f004b6b62c014",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 3,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 9
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "305e00e5aaa7a17a85f3e8c58f0f0dca89fbfee867421bd47e303c1055adb0fa",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "305e00e5aaa7a17a85f3e8c58f0f0dca89fbfee867421bd47e303c1055adb0fa",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 2,
+        "case_id": "n2_equal_k2",
+        "comparison_bits": 34,
+        "full_online_DAG_message_phases": 15,
+        "n": 2,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 1,
+          "raw_score_input_slots": 4,
+          "select_key_pool_slots": 8,
+          "total_serialized_uCMP_slots": 15,
+          "unused_shuffle_cmpagg_slots": 2
+        },
+        "offline_package_bytes_per_party": [
+          14009,
+          14009
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 10,
+            "edge_sha256": "34eeacf3bc6e2282827c5e04743995ec83723951c9fbe56e65d6a454b7f43ce2",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 1,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 11
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 1,
+            "dummy_related_calls": 9,
+            "edge_sha256": "7c4294d0bd0fb2dfe125039e0f741e83c2b4223969a393ca179ebfd8cb94eb38",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 3,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 9
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "cbb233c7eb031360de4acbdf158335663320af48c276ff3b73649a17a76a1b02",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "cbb233c7eb031360de4acbdf158335663320af48c276ff3b73649a17a76a1b02",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 2,
+        "case_id": "n3_all_equal_k2",
+        "comparison_bits": 35,
+        "full_online_DAG_message_phases": 15,
+        "n": 3,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 3,
+          "raw_score_input_slots": 8,
+          "select_key_pool_slots": 24,
+          "total_serialized_uCMP_slots": 41,
+          "unused_shuffle_cmpagg_slots": 6
+        },
+        "offline_package_bytes_per_party": [
+          38359,
+          38359
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 3,
+            "dummy_related_calls": 6,
+            "edge_sha256": "d0ed88eb6d6ebcace103e2766dd9178017a6e11cef6ed51fac298165b8f64207",
+            "fss_material_slots": 6,
+            "fss_party_dcf_evals": 12,
+            "fss_two_party_dcf_evals": 24,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 6,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 3,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 9
+          },
+          "2": {
+            "comparison_calls": 12,
+            "cross_task_repeat_calls_same_round": 3,
+            "dummy_related_calls": 4,
+            "edge_sha256": "ec33a9e581e4b5135bf3c53d28c5fef014b065a8bf2ee4e00c853d4c49767d8c",
+            "fss_material_slots": 6,
+            "fss_party_dcf_evals": 12,
+            "fss_two_party_dcf_evals": 24,
+            "prior_round_repeat_calls": 12,
+            "real_real_calls": 8,
+            "reverse_share_complements": 4,
+            "same_round_duplicate_calls": 5,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 7
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "34b4b351e440dfd5281f2c59ff7327fddeeeaa85472a88f4dcb0241c5a29dc87",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "34b4b351e440dfd5281f2c59ff7327fddeeeaa85472a88f4dcb0241c5a29dc87",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 1,
+        "case_id": "n5_repeat_mixed_k1",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 5,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 10,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 80,
+          "total_serialized_uCMP_slots": 126,
+          "unused_shuffle_cmpagg_slots": 20
+        },
+        "offline_package_bytes_per_party": [
+          119630,
+          119630
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 70,
+            "edge_sha256": "f325410be37373d573a3dacb10c1a54dc4ac0109975b35004f73ad7ddb62a253",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 7,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 80
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 4,
+            "dummy_related_calls": 24,
+            "edge_sha256": "0ee0de7a14f50586155dd8844c2e1d097dff588e77e725dd5f1d7d4b7797f52a",
+            "fss_material_slots": 11,
+            "fss_party_dcf_evals": 22,
+            "fss_two_party_dcf_evals": 44,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 12,
+            "reverse_share_complements": 7,
+            "same_round_duplicate_calls": 6,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 30
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "e1ffc01e897cad54938f5568468bc23c33e2c4003fbecd99aceac776944edf2f",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "e1ffc01e897cad54938f5568468bc23c33e2c4003fbecd99aceac776944edf2f",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 3,
+        "case_id": "n5_repeat_mixed_k3",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 5,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 10,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 80,
+          "total_serialized_uCMP_slots": 126,
+          "unused_shuffle_cmpagg_slots": 20
+        },
+        "offline_package_bytes_per_party": [
+          119630,
+          119630
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 30,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 10,
+            "edge_sha256": "da6a981379c65e7478628275aef03a574fa896d19498a683a28331af1b9fee45",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 11,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 20
+          },
+          "2": {
+            "comparison_calls": 20,
+            "cross_task_repeat_calls_same_round": 5,
+            "dummy_related_calls": 4,
+            "edge_sha256": "e21941685d903a706b7e4d727107d874a6b30ff1df78e96af271801f641e8c84",
+            "fss_material_slots": 14,
+            "fss_party_dcf_evals": 28,
+            "fss_two_party_dcf_evals": 56,
+            "prior_round_repeat_calls": 20,
+            "real_real_calls": 16,
+            "reverse_share_complements": 10,
+            "same_round_duplicate_calls": 7,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 13
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "327d81bf9d0a46e645bb2eaf5770e5e0ca17c71365fd275ebe7a874338c0644e",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "327d81bf9d0a46e645bb2eaf5770e5e0ca17c71365fd275ebe7a874338c0644e",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 5,
+        "case_id": "n5_repeat_mixed_kn",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 5,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 10,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 80,
+          "total_serialized_uCMP_slots": 126,
+          "unused_shuffle_cmpagg_slots": 20
+        },
+        "offline_package_bytes_per_party": [
+          119630,
+          119630
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 10,
+            "dummy_related_calls": 70,
+            "edge_sha256": "6c67c8a4ab4cd96bc96721705452b409e8ed16b9921ea553fc32d027bec62b39",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 20,
+            "reverse_share_complements": 8,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 80
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 4,
+            "dummy_related_calls": 24,
+            "edge_sha256": "2dfe0a18ccfd001bf29ed5f62fece01c0046fe73b6dab36727e06fcf31f850d0",
+            "fss_material_slots": 11,
+            "fss_party_dcf_evals": 22,
+            "fss_two_party_dcf_evals": 44,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 12,
+            "reverse_share_complements": 10,
+            "same_round_duplicate_calls": 6,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 30
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "95d05ea0d4ea1279525e336dc4655f848b1c746003f2a44ecf751da9251a3fb3",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 1,
+        "case_id": "n8_repeat_k1",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 240,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 184,
+            "edge_sha256": "354dad7f12a102e4bc467f95a1b61d27a03fa838663e9e95ac2eaf5d6b68a59a",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 32,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 212
+          },
+          "2": {
+            "comparison_calls": 60,
+            "cross_task_repeat_calls_same_round": 7,
+            "dummy_related_calls": 39,
+            "edge_sha256": "e4c6bfa7e7868cef4d2041e78a057184f1c8a771b715f238be0b555887ce16a2",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 60,
+            "real_real_calls": 21,
+            "reverse_share_complements": 12,
+            "same_round_duplicate_calls": 9,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 51
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "787284559941d3257bd738cee2f0b97d33d8547a0e9d0e2c2551df8f8d9e1669",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "787284559941d3257bd738cee2f0b97d33d8547a0e9d0e2c2551df8f8d9e1669",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 3,
+        "case_id": "n8_mixed_extremes_k3",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 132,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 76,
+            "edge_sha256": "73700fa56ad229b2db2e16911a424f62e060b4b457c07d291deabc3534656002",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 32,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 104
+          },
+          "2": {
+            "comparison_calls": 44,
+            "cross_task_repeat_calls_same_round": 8,
+            "dummy_related_calls": 16,
+            "edge_sha256": "2b8df512a79e64e2f43a65da6cc4d23ab136850395a8e509c55047900ff45e63",
+            "fss_material_slots": 26,
+            "fss_party_dcf_evals": 52,
+            "fss_two_party_dcf_evals": 104,
+            "prior_round_repeat_calls": 44,
+            "real_real_calls": 28,
+            "reverse_share_complements": 6,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 34
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "cac81239830a1afe28ceb756487b2ffbe3156c2d82aec2578fc940a71326a92c",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "cac81239830a1afe28ceb756487b2ffbe3156c2d82aec2578fc940a71326a92c",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 4,
+        "case_id": "n8_all_equal_k4",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 90,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 34,
+            "edge_sha256": "233815c3778c849670115d9e9ef5c9f297beb1487e9d70381cfe5d5059523375",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 26,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 62
+          },
+          "2": {
+            "comparison_calls": 36,
+            "cross_task_repeat_calls_same_round": 8,
+            "dummy_related_calls": 8,
+            "edge_sha256": "c1b2d11f152547edb3520fb9c54b3004fa87db633779473ca82381300bcc4c22",
+            "fss_material_slots": 26,
+            "fss_party_dcf_evals": 52,
+            "fss_two_party_dcf_evals": 104,
+            "prior_round_repeat_calls": 36,
+            "real_real_calls": 28,
+            "reverse_share_complements": 12,
+            "same_round_duplicate_calls": 10,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 26
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "9bccad9dabed540593897e4babeb2debb43a156830be9836f14e0c188a00f003",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 2,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 0,
+            "edge_sha256": "9bccad9dabed540593897e4babeb2debb43a156830be9836f14e0c188a00f003",
+            "fss_material_slots": 2,
+            "fss_party_dcf_evals": 4,
+            "fss_two_party_dcf_evals": 8,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 2,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      },
+      {
+        "K": 8,
+        "case_id": "n8_boundary_k8",
+        "comparison_bits": 36,
+        "full_online_DAG_message_phases": 15,
+        "n": 8,
+        "offline_material_conformance": null,
+        "offline_material_slot_breakdown_per_party": {
+          "membership_key_pool_slots": 28,
+          "raw_score_input_slots": 16,
+          "select_key_pool_slots": 224,
+          "total_serialized_uCMP_slots": 324,
+          "unused_shuffle_cmpagg_slots": 56
+        },
+        "offline_package_bytes_per_party": [
+          307616,
+          307616
+        ],
+        "oracle_differential": "PASS",
+        "os_identity_isolation_checks": null,
+        "party_exit_codes": [
+          0,
+          0
+        ],
+        "select_round_metrics": {
+          "1": {
+            "comparison_calls": 240,
+            "cross_task_repeat_calls_same_round": 28,
+            "dummy_related_calls": 184,
+            "edge_sha256": "362a1dd8135ecef66f676dbadb8366303d9b133f2a2a0c4d2fd1727b4dba0310",
+            "fss_material_slots": 56,
+            "fss_party_dcf_evals": 112,
+            "fss_two_party_dcf_evals": 224,
+            "prior_round_repeat_calls": 0,
+            "real_real_calls": 56,
+            "reverse_share_complements": 15,
+            "same_round_duplicate_calls": 28,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 212
+          },
+          "2": {
+            "comparison_calls": 60,
+            "cross_task_repeat_calls_same_round": 7,
+            "dummy_related_calls": 39,
+            "edge_sha256": "8579be672e773dec8b878a006bb273b1666bcb7c2f36ded94d64b4e4075895bd",
+            "fss_material_slots": 20,
+            "fss_party_dcf_evals": 40,
+            "fss_two_party_dcf_evals": 80,
+            "prior_round_repeat_calls": 60,
+            "real_real_calls": 21,
+            "reverse_share_complements": 16,
+            "same_round_duplicate_calls": 9,
+            "same_task_repeat_calls_same_round": 2,
+            "unique_unordered_edges_this_round": 51
+          },
+          "3": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "885522ca3b7c7bc9630346df04df8826e9d0e12982607552cc3a1c37dbe743f4",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 1,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          },
+          "4": {
+            "comparison_calls": 2,
+            "cross_task_repeat_calls_same_round": 0,
+            "dummy_related_calls": 1,
+            "edge_sha256": "885522ca3b7c7bc9630346df04df8826e9d0e12982607552cc3a1c37dbe743f4",
+            "fss_material_slots": 1,
+            "fss_party_dcf_evals": 2,
+            "fss_two_party_dcf_evals": 4,
+            "prior_round_repeat_calls": 2,
+            "real_real_calls": 1,
+            "reverse_share_complements": 0,
+            "same_round_duplicate_calls": 0,
+            "same_task_repeat_calls_same_round": 0,
+            "unique_unordered_edges_this_round": 2
+          }
+        },
+        "status": "SUCCESS"
+      }
+    ],
+    "matrix_identity": {
+      "bytes": 315234,
+      "path": "/mnt/c/Users/28641/AppData/Local/Temp/BMW16_S10_S9_RAW_MATRIX.json",
+      "sha256": "368d23fde67f1747faaa3789895dca5300df99df3b6d927fde62f94cebb17351"
+    },
+    "matrix_summary": {
+      "abort_or_failure": 0,
+      "oracle_pass": 11,
+      "success": 11
+    },
+    "n64": {
+      "K": 2,
+      "case_id": "s10_s9_acceptance_n64_k2",
+      "comparison_bits": 39,
+      "full_online_DAG_message_phases": 15,
+      "n": 64,
+      "offline_material_conformance": null,
+      "offline_material_slot_breakdown_per_party": {
+        "membership_key_pool_slots": 2016,
+        "raw_score_input_slots": 128,
+        "select_key_pool_slots": 16128,
+        "total_serialized_uCMP_slots": 22304,
+        "unused_shuffle_cmpagg_slots": 4032
+      },
+      "offline_package_bytes_per_party": [
+        22723604,
+        22723604
+      ],
+      "oracle_differential": "PASS",
+      "os_identity_isolation_checks": null,
+      "party_exit_codes": [
+        0,
+        0
+      ],
+      "select_round_metrics": {
+        "1": {
+          "comparison_calls": 8010,
+          "cross_task_repeat_calls_same_round": 630,
+          "dummy_related_calls": 5706,
+          "edge_sha256": "9ee228d1d5364fcbd50b0584a45ce3624c5ee8f6bea9dc5af6c766827ca3b1fe",
+          "fss_material_slots": 2304,
+          "fss_party_dcf_evals": 4608,
+          "fss_two_party_dcf_evals": 9216,
+          "prior_round_repeat_calls": 0,
+          "real_real_calls": 2304,
+          "reverse_share_complements": 1142,
+          "same_round_duplicate_calls": 630,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 7380
+        },
+        "2": {
+          "comparison_calls": 500,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 374,
+          "edge_sha256": "4de1f7161d53f381212f175d765764e928e692276a17a629524854edc3e16ae9",
+          "fss_material_slots": 126,
+          "fss_party_dcf_evals": 252,
+          "fss_two_party_dcf_evals": 504,
+          "prior_round_repeat_calls": 368,
+          "real_real_calls": 126,
+          "reverse_share_complements": 58,
+          "same_round_duplicate_calls": 3,
+          "same_task_repeat_calls_same_round": 2,
+          "unique_unordered_edges_this_round": 497
+        },
+        "3": {
+          "comparison_calls": 10766,
+          "cross_task_repeat_calls_same_round": 1288,
+          "dummy_related_calls": 7831,
+          "edge_sha256": "d15c15202a0904d0718e1da13ab57f39ba941fe1f68da78b85a17dc7e89ec8e6",
+          "fss_material_slots": 2935,
+          "fss_party_dcf_evals": 5870,
+          "fss_two_party_dcf_evals": 11740,
+          "prior_round_repeat_calls": 6350,
+          "real_real_calls": 2935,
+          "reverse_share_complements": 1486,
+          "same_round_duplicate_calls": 1288,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 9478
+        },
+        "4": {
+          "comparison_calls": 6,
+          "cross_task_repeat_calls_same_round": 1,
+          "dummy_related_calls": 0,
+          "edge_sha256": "671a7023364946d46bbcb93e6ca6e8ee30dc1df7578f5e9ba3bf721ee5a8adc3",
+          "fss_material_slots": 6,
+          "fss_party_dcf_evals": 12,
+          "fss_two_party_dcf_evals": 24,
+          "prior_round_repeat_calls": 6,
+          "real_real_calls": 6,
+          "reverse_share_complements": 0,
+          "same_round_duplicate_calls": 1,
+          "same_task_repeat_calls_same_round": 0,
+          "unique_unordered_edges_this_round": 5
+        }
+      },
+      "status": "SUCCESS"
+    },
+    "n64_identity": {
+      "bytes": 1261673,
+      "path": "/mnt/c/Users/28641/AppData/Local/Temp/BMW16_S10_S9_N64.json",
+      "sha256": "7e903d6e572f5e8a45f8694f7e02c3f6f7556714ab4f5fd1d16d1c1c34848e02"
+    },
+    "scope": "S9 source behavior rerun before S10 changes; copied raw-score lift path, not official adapter composition"
+  },
+  "security_status": "EXPERIMENTAL_TEST_ONLY; no secure entry; no BMW16 Theorem 8 inheritance"
+}

@@ -73,13 +73,15 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 
 资料研究、设计、失败用例整理可以提前进行；依赖未冻结接口的实现和正式验收必须遵循上述顺序。
 
+**2026-10-06 范围补充：**用户明确授权在 V3 结束前开展 S10 所定义的隔离 `EXPERIMENTAL_TEST_ONLY` 候选、raw-score adapter conformance 和有界 E2E，以解决 S9 的执行身份与正式输入接线问题。该授权仅提前开放研发/研究，不改变 V3→V4 正式验收依赖，不创建 secure API，不把 S10 的小规模 loopback 计量填入 V4 或六方案性能结果。详见 [S10 决策](decisions/BMW16_S10_RAW_SCORE_UID_ISOLATION_AND_FORMAL_ADAPTER_2026-10-06.md)。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S9 secure gate NO-GO）。
+5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S10 TEST_ONLY adapter/E2E 已运行，secure gate NO-GO）。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
@@ -729,6 +731,8 @@ Protocol III + AAV86
 按用户明确范围，六方案中的 Protocol I 选择路线候选为 **Protocol I + BMW16-derived Select + DCF**（`PROJECT_DERIVED`），不登记为 BB90 算法或 BMW16 定理直接实现。本节的 Protocol III 路线仍按 BB90 研究目标执行。S7 集中式原型与报告保留历史身份；S8 已交付 T 离线发材、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` raw-score→原序 mask 组合，并验证有限样本。S8 联合 party-view 安全仍 `NO-GO`，未新增 secure runtime，完整性能矩阵 `NOT_RUN`。正式安全入口仍须等待独立安全门；M6A 与正式 V4 性能验收的既定依赖不因隔离实验授权而标记完成。见 [S7 决策/报告](docs/decisions/BMW16_S7_PROTOCOL_I_COMPOSITION_DECISION_2026-10-06.md) 与 [S8 决策/报告](docs/decisions/BMW16_S8_OFFLINE_THREE_PROCESS_COMPOSITION_DECISION_2026-10-06.md)。
 
 S9 在隔离实验路径接入正式 `uint32_t` raw-score share 语义的 carry/sign-lift 端口，并独立重跑 S8 功能矩阵、raw-score oracle differential、n=64 非全量抽样样本及边审计。S9 复核发现同 OS token 可以读 peer share/package；其两世界 witness 以概率 1 区分；匿名公开 transcript 的 n≤5 枚举不覆盖本地 shuffle state 或共享 node-mask 相关的完整 DCF/uCMP pool。故 `OFFLINE_PRIVATE_MATERIAL` 与完整 `PARTY_VIEW_SECURITY` 继续 `NO-GO`，未建 secure API、未运行正式性能矩阵。该实验 raw adapter 不是正式 runtime adapter 接收。见 [S9 决策](decisions/BMW16_S9_RAW_ABI_AND_PRIVACY_GATE_2026-10-06.md) 与 [S9 报告](reproduction/BMW16_S9_INDEPENDENT_ACCEPTANCE_RAW_ABI_AND_VIEW_AUDIT_2026-10-06.md)。
+
+S10 在不同 Linux UID 的本地 WSL 环境独立复跑 S9，并新增默认关闭的正式 raw-score party adapter 与 TEST_ONLY T/P0/P1 接线。11 个 n≤8 样本和一个 n64 样本通过 frozen C++ oracle；同 UID 文件读取夹具改为 UID ACL 双世界访问测试。root harness 本地拷贝材料、command-line metadata、无 AEAD/来源认证、公开 adaptive transcript 和相关全池 key 的联合模拟仍是明确安全缺口，因此只接受 `FUNCTIONAL_TEST_ONLY`，不建立 secure API；V3/V4 正式次序和 LAN/WAN 门不变。见 [S10 决策](decisions/BMW16_S10_RAW_SCORE_UID_ISOLATION_AND_FORMAL_ADAPTER_2026-10-06.md)、[验证报告](reproduction/BMW16_S10_INDEPENDENT_ACCEPTANCE_AND_EXECUTION_ISOLATION_2026-10-06.md) 与 [运行 summary](reproduction/evidence/BMW16_S10_RUN_SUMMARY.json)。
 
 #### 前置条件
 

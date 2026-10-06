@@ -21,6 +21,8 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(OpenMP COMPONENTS CXX REQUIRED)
 option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
+option(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER
+    "Build the opt-in TEST_ONLY BMW16-derived Select key-direction adapter" OFF)
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
@@ -71,6 +73,13 @@ PUBLIC
 )
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
+
+if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  target_sources(${PROJECT_NAME} PRIVATE
+      src/moe_topk/experimental_bmw16_select_adapter.cpp)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+      MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER=1)
+endif()
 
 
 # === Benchmarks ===

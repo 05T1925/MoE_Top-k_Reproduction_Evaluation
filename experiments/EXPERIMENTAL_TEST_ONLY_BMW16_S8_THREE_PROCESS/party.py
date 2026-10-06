@@ -24,6 +24,11 @@ from typing import Any
 
 import numpy as np
 
+try:
+    import pwd
+except ImportError:  # Windows harness does not expose Linux account metadata.
+    pwd = None
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "experiments" / "TEST_ONLY_BMW16_S7_COMPOSITION"))
 from select4r_s4_source import Context  # noqa: E402
@@ -153,15 +158,24 @@ def linux_path(path: str) -> str:
 
 
 class Worker:
-    def __init__(self, binary: str, party: int, package: str):
-        if binary.startswith("wsl:"):
+    def __init__(self, binary: str, party: int, package: str,
+                 peer_socket: socket.socket | None = None,
+                 formal_raw_score_abi: bool = False):
+        pass_fds: tuple[int, ...] = ()
+        if formal_raw_score_abi:
+            if binary.startswith("wsl:") or os.name == "nt" or peer_socket is None:
+                raise RuntimeError("formal raw adapter requires a native POSIX peer socket fd")
+            peer_fd = peer_socket.fileno()
+            command = [binary, "--party-formal-score", str(party), package, str(peer_fd)]
+            pass_fds = (peer_fd,)
+        elif binary.startswith("wsl:"):
             command = ["wsl.exe", "-d", "Ubuntu-24.04", "--", binary[4:], "--party",
                        str(party), linux_path(package)]
         else:
             command = [binary, "--party", str(party), package]
         self.proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE, text=True, encoding="ascii",
-                                     errors="replace", bufsize=1)
+                                     errors="replace", bufsize=1, pass_fds=pass_fds)
 
     def call(self, command: str, lines: int = 1) -> list[list[str]]:
         assert self.proc.stdin is not None and self.proc.stdout is not None
@@ -300,6 +314,10 @@ class PartyComparator:
 
 
 def run_party(args: argparse.Namespace) -> dict[str, Any]:
+    if args.test_only_isolation_probe_delay_ms > 0:
+        # Restrict result/claim file creation to the owning TEST_ONLY account.
+        # This validates OS separation only; it is not a protocol security claim.
+        os.umask(0o077)
     online_started = time.perf_counter()
     source = json.loads(Path(args.input).read_text(encoding="utf-8"))
     party, n, k = args.party, int(source["n"]), int(source["k"])
@@ -307,8 +325,11 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
     if len(shares) != n or not 1 <= k <= n:
         raise ValueError("invalid local input shape")
     b = max(1, (n - 1).bit_length())
-    raw_score_abi = bool(args.raw_score_abi)
-    label_suffix = ("EXPERIMENTAL_TEST_ONLY_BMW16_S9_RAW_ABI_CSPRNG"
+    formal_raw_score_abi = bool(args.formal_raw_score_abi)
+    raw_score_abi = bool(args.raw_score_abi or formal_raw_score_abi)
+    label_suffix = ("EXPERIMENTAL_TEST_ONLY_BMW16_S10_FORMAL_RAW_ADAPTER"
+                    if formal_raw_score_abi else
+                    "EXPERIMENTAL_TEST_ONLY_BMW16_S9_RAW_ABI_CSPRNG"
                     if (raw_score_abi or args.joint_csprng_coins or
                         args.test_only_force_algorithm_abort or args.test_only_probe_peer_files)
                     else "EXPERIMENTAL_TEST_ONLY_BMW16_S8_THREE_PROCESS")
@@ -332,8 +353,10 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
         # loopback harness. The probe reads and discards bytes; it never emits
         # another party's shares or key material into the evidence file.
         peer = 1 - party
-        peer_input = Path(args.input).with_name(f"p{peer}.input.json")
-        peer_package = Path(args.package).with_name(f"p{peer}.offline")
+        peer_input = (Path(args.test_only_peer_input) if args.test_only_peer_input else
+                      Path(args.input).with_name(f"p{peer}.input.json"))
+        peer_package = (Path(args.test_only_peer_package) if args.test_only_peer_package else
+                        Path(args.package).with_name(f"p{peer}.offline"))
         def read_probe(path: Path) -> dict[str, Any]:
             try:
                 with path.open("rb") as handle:
@@ -368,6 +391,11 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
     peer: Peer | None = None
     worker: Worker | None = None
     effective_algorithm_seed = args.algorithm_seed
+    raw_score_metrics = {
+        "carry_sent_bytes": 0, "carry_received_bytes": 0,
+        "sign_sent_bytes": 0, "sign_received_bytes": 0,
+        "ucmp_calls": 0, "raw_dcf_calls": 0,
+    }
     randomness_record: dict[str, Any] = {
         "mode": "FIXED_TEST_SEED",
         "source": "Python Random seed; reproducible only, not a cryptographic sampling claim",
@@ -375,6 +403,8 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
         "domain_separation": "S4-derived per-task sample domains",
     }
     try:
+        if args.test_only_isolation_probe_delay_ms > 0:
+            time.sleep(args.test_only_isolation_probe_delay_ms / 1000.0)
         peer = Peer(party, args.port, args.peer_timeout)
         if args.joint_csprng_coins and n >= 2:
             local_nonce = secrets.token_bytes(32)
@@ -404,8 +434,25 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
         if n == 1:
             z = [0]
         else:
-            worker = Worker(args.backend, party, args.package)
-            if raw_score_abi:
+            worker = Worker(args.backend, party, args.package, peer.sock,
+                            formal_raw_score_abi=formal_raw_score_abi)
+            if formal_raw_score_abi:
+                key_row, metric_row = worker.call(
+                    "RAW_SCORE_ADAPTER " + str(n) + " " + " ".join(map(str, shares)), lines=2)
+                if len(key_row) != n + 2 or key_row[0] != "K" or int(key_row[1]) != n:
+                    raise ValueError("bad formal raw-score adapter output")
+                if len(metric_row) != 7 or metric_row[0] != "RAW_METRICS":
+                    raise ValueError("bad formal raw-score adapter metrics")
+                raw_score_metrics = {
+                    "carry_sent_bytes": int(metric_row[1]),
+                    "carry_received_bytes": int(metric_row[2]),
+                    "sign_sent_bytes": int(metric_row[3]),
+                    "sign_received_bytes": int(metric_row[4]),
+                    "ucmp_calls": int(metric_row[5]),
+                    "raw_dcf_calls": int(metric_row[6]),
+                }
+                records = [[int(value), 0, 0] for value in key_row[2:]]
+            elif raw_score_abi:
                 padded_n = 1 << b
                 carry_row = worker.call(f"SCORE_CARRY_PREP {n} " + " ".join(map(str, shares)))[0]
                 if len(carry_row) != 2 + 2 * padded_n or carry_row[0] != "S":
@@ -538,11 +585,19 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
             "mask_share": mask_share if status == "SUCCESS" else None,
             "trace": selected_result.get("trace"),
             "metrics": {
-                "raw_score_abi_input_adapter": "PROJECT_DERIVED_TEST_ONLY_PORT" if raw_score_abi else "NOT_USED_DIRECT_Z2_34",
+                "raw_score_abi_input_adapter": ("VFSS_protocol_i_raw_score_input_party" if formal_raw_score_abi else
+                                                  "PROJECT_DERIVED_TEST_ONLY_PORT" if raw_score_abi else
+                                                  "NOT_USED_DIRECT_Z2_34"),
                 "raw_score_input_uCMP_key_slots_per_party": (2 * (1 << b)) if raw_score_abi and n >= 2 else 0,
                 "raw_score_input_DCF_Eval_per_party": (4 * (1 << b)) if raw_score_abi and n >= 2 else 0,
                 "raw_score_input_DCF_Eval_both_parties": (8 * (1 << b)) if raw_score_abi and n >= 2 else 0,
                 "raw_score_input_peer_message_phases": (2 if raw_score_abi and n >= 2 else 0),
+                "raw_score_input_carry_sent_bytes": raw_score_metrics["carry_sent_bytes"],
+                "raw_score_input_carry_received_bytes": raw_score_metrics["carry_received_bytes"],
+                "raw_score_input_sign_sent_bytes": raw_score_metrics["sign_sent_bytes"],
+                "raw_score_input_sign_received_bytes": raw_score_metrics["sign_received_bytes"],
+                "raw_score_input_ucmp_calls": raw_score_metrics["ucmp_calls"],
+                "raw_score_input_dcf_calls_per_party": raw_score_metrics["raw_dcf_calls"],
                 "select_logical_comparison_calls": selected_result["total_comparison_calls"],
                 "select_party_uCMP_key_slots_consumed": select_slots,
                 "membership_party_key_slots_consumed": membership_slots,
@@ -552,8 +607,8 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
                 "DCF_Eval_per_party": 2 * (select_slots + membership_slots),
                 "DCF_Eval_both_parties": 4 * (select_slots + membership_slots),
                 "offline_shuffle_cmpagg_slots_per_party_unused": 0 if n == 1 else n * (n - 1),
-                "peer_payload_bytes_sent": peer.sent_bytes,
-                "peer_payload_bytes_received": peer.received_bytes,
+                "peer_payload_bytes_sent": peer.sent_bytes + raw_score_metrics["carry_sent_bytes"] + raw_score_metrics["sign_sent_bytes"],
+                "peer_payload_bytes_received": peer.received_bytes + raw_score_metrics["carry_received_bytes"] + raw_score_metrics["sign_received_bytes"],
                 "online_party_elapsed_seconds": time.perf_counter() - online_started,
                 "online_PRG_calls": "NOT_MEASURED",
             },
@@ -603,9 +658,14 @@ def main() -> int:
     parser.add_argument("--input-seed", type=int, required=True)
     parser.add_argument("--algorithm-seed", type=int, required=True)
     parser.add_argument("--raw-score-abi", action="store_true")
+    parser.add_argument("--formal-raw-score-abi", action="store_true",
+                        help="call VFSS protocol_i_raw_score_input_party in the native TEST_ONLY worker")
     parser.add_argument("--joint-csprng-coins", action="store_true")
     parser.add_argument("--test-only-force-algorithm-abort", action="store_true")
     parser.add_argument("--test-only-probe-peer-files", action="store_true")
+    parser.add_argument("--test-only-peer-input")
+    parser.add_argument("--test-only-peer-package")
+    parser.add_argument("--test-only-isolation-probe-delay-ms", type=int, default=0)
     parser.add_argument("--peer-timeout", type=float, default=20.0)
     args = parser.parse_args()
     result = run_party(args)

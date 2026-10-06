@@ -1,6 +1,7 @@
 // EXPERIMENTAL_TEST_ONLY: offline T material generator and party-local
 // Protocol-I shuffle/uCMP endpoint. No production API or secure claim.
 #include <FSS/prng.h>
+#include <moe_topk/experimental_bmw16_select_adapter.h>
 #include <moe_topk/protocol_i_parallel_shuffle.h>
 #include <moe_topk/protocol_i_permutation.h>
 #include <moe_topk/protocol_i_ucmp.h>
@@ -205,8 +206,9 @@ int dealer(int argc,char**argv,bool raw_score_abi){
 struct Loaded { int party=0,bits=0;std::uint32_t n=0,k=0,score_padded_n=0;std::uint64_t session=0,fp=0;
   ProtocolIParallelShufflePartyMaterial fwd,inv;std::map<Slot,ProtocolIUcmpPartyMaterial> keys;std::set<Slot> used;
   std::map<std::pair<int,std::uint32_t>,ScoreLocal> score_keys;
+  ProtocolIPartyPackage score_adapter_package;
   std::vector<std::uint64_t> score_raw,score_lift; };
-Loaded load(int party,const std::string&path){
+Loaded load(int party,const std::string&path,bool use_official_score_adapter=false){
   const auto b=read_file(path);require(b.size()>=32&&b[0]=='S'&&b[1]=='8'&&b[2]=='P'&&b[3]=='K'&&(b[4]==1||b[4]==2)&&b[5]==party,"party package header");
   std::size_t o=8;Loaded x;x.party=party;x.bits=b[6];x.n=get32(b,o);x.k=get32(b,o);x.session=get64(b,o);x.fp=get64(b,o);
   x.fwd=protocol_i_parallel_shuffle_deserialize_material(get_blob(b,o),party);
@@ -214,6 +216,9 @@ Loaded load(int party,const std::string&path){
   if(b[4]==2){
     x.score_padded_n=get32(b,o);require(x.score_padded_n>=2&&x.score_padded_n>=x.n&&
         (x.score_padded_n&(x.score_padded_n-1U))==0,"score input padded size");
+    x.score_adapter_package.session=x.session;x.score_adapter_package.fingerprint=x.fp;
+    x.score_adapter_package.party=party;x.score_adapter_package.n=x.score_padded_n;
+    x.score_adapter_package.k=x.k;x.score_adapter_package.comparison_bits=x.bits;
     const auto score_count=get64(b,o);require(score_count==2ULL*x.score_padded_n,"score input slot count");
     for(std::uint64_t i=0;i<score_count;++i){
       require(o+4<=b.size(),"score slot header");const int stage=b[o++];
@@ -224,6 +229,20 @@ Loaded load(int party,const std::string&path){
               "score slot binding");
       require(x.score_keys.emplace(std::make_pair(stage,slot),ScoreLocal{left,right,std::move(key)}).second,
               "duplicate score slot");
+    }
+    if(use_official_score_adapter){
+      for(std::uint32_t slot=0;slot<x.score_padded_n;++slot){
+        auto& carry=x.score_keys.at({1,slot});
+        auto& sign=x.score_keys.at({2,slot});
+        x.score_adapter_package.carry_materials.emplace_back(
+            slot,1,carry.left,carry.right,std::move(carry.key));
+        x.score_adapter_package.sign_materials.emplace_back(
+            slot,2,sign.left,sign.right,std::move(sign.key));
+      }
+      // This narrow in-memory view contains only the stage materials consumed
+      // by protocol_i_raw_score_input_party; it is never serialized as the
+      // general full-clique ProtocolIPartyPackage.
+      x.score_keys.clear();
     }
     x.score_raw.assign(x.score_padded_n,0);x.score_lift.assign(x.score_padded_n,0);
   }
@@ -248,12 +267,40 @@ void print_records(const char*tag,const std::vector<ProtocolIBlock192>&v){std::c
 std::vector<std::uint64_t> read_words(std::istringstream& in,std::size_t count){
   std::vector<std::uint64_t> out(count);for(auto& value:out)require(static_cast<bool>(in>>value),"score word input");return out;
 }
-int endpoint(int argc,char**argv){
-  require(argc==4,"endpoint args: party package");const int party=std::stoi(argv[2]);claim_file_once(argv[3]);auto x=load(party,argv[3]);
+int endpoint(int argc,char**argv,bool use_official_score_adapter){
+  require(argc==(use_official_score_adapter?5:4),"endpoint args: party package [peer-fd]");
+  const int party=std::stoi(argv[2]);const int score_peer_fd=use_official_score_adapter?std::stoi(argv[4]):-1;
+  require(!use_official_score_adapter||score_peer_fd>=0,"score adapter peer fd");
+  claim_file_once(argv[3]);auto x=load(party,argv[3],use_official_score_adapter);
   ProtocolIParallelShufflePartyConfig cf{x.session,x.fp,x.fwd.material_id,x.n,x.k,static_cast<std::uint8_t>(x.bits),static_cast<std::uint8_t>(party),10000};
   std::unique_ptr<ProtocolIParallelShuffleParty> fwd,inv;std::string line;
   while(std::getline(std::cin,line)){if(line.empty())continue;std::istringstream in(line);std::string op;in>>op;
     if(op=="QUIT"){std::cout<<"Q\n"<<std::flush;break;}
+    else if(op=="RAW_SCORE_ADAPTER"){
+      require(use_official_score_adapter&&score_peer_fd>=0,"formal raw adapter unavailable");
+      std::uint32_t logical_n;in>>logical_n;require(logical_n==x.n,"formal raw adapter logical n");
+      std::vector<std::uint32_t> raw_share(logical_n);
+      for(auto& value:raw_share){std::uint64_t word;in>>word;require(static_cast<bool>(in)&&word<=UINT32_MAX,"formal raw adapter input word");value=static_cast<std::uint32_t>(word);}
+      ProtocolIScoreInputConfig input_config{x.session,x.fp,x.n,x.score_padded_n,x.k,
+          static_cast<std::uint8_t>(x.bits-33),static_cast<std::uint8_t>(x.bits),
+          static_cast<std::uint8_t>(party),10000};
+      ProtocolIScoreInputMetrics input_metrics;
+      // protocol_i_raw_score_input_party transfers ownership of each fd to a
+      // ProtocolIFramedChannel (whose destructor closes it). Keep the worker's
+      // long-lived peer fd intact and give the two sequential phases distinct
+      // descriptors for the same full-duplex socket.
+      const std::array<int,2> stage_fds{::dup(score_peer_fd),::dup(score_peer_fd)};
+      require(stage_fds[0]>=0&&stage_fds[1]>=0,"duplicate score stage socket");
+      const auto select_keys=protocol_i_bmw16_experimental_select_key_party(
+          input_config,x.score_adapter_package,raw_share,stage_fds,&input_metrics);
+      std::cout<<"K "<<x.n;
+      for(std::uint32_t i=0;i<x.n;++i)std::cout<<' '<<select_keys[i];
+      std::cout<<'\n'<<"RAW_METRICS "<<input_metrics.carry_sent_bytes<<' '
+          <<input_metrics.carry_received_bytes<<' '<<input_metrics.sign_sent_bytes<<' '
+          <<input_metrics.sign_received_bytes<<' '<<input_metrics.ucmp_calls<<' '
+          <<input_metrics.raw_dcf_calls<<'\n'<<std::flush;
+      continue;
+    }
     if(op=="FWD1"){std::uint32_t n;in>>n;require(n==x.n,"FWD1 n");auto v=read_records(in,n);fwd=std::make_unique<ProtocolIParallelShuffleParty>(cf,std::move(x.fwd));print_records("R",fwd->prepare_round1(v));}
     else if(op=="FWD2"){std::uint32_t n;in>>n;require(n==x.n&&fwd,"FWD2 n/state");print_records("R",fwd->receive_round1_prepare_round2(read_records(in,n)));}
     else if(op=="FWD3"){std::uint32_t n;in>>n;require(n==x.n&&fwd,"FWD3 n/state");auto r=fwd->receive_round2(read_records(in,n));print_records("F",r.shuffled_share);print_records("Z",r.public_masked_records);}
@@ -308,4 +355,4 @@ int endpoint(int argc,char**argv){
 int oracle(int argc,char**argv){require(argc>=4,"oracle n k scores...");const auto n=std::stoul(argv[2]),k=std::stoul(argv[3]);require(argc==4+static_cast<int>(n),"oracle score count");std::vector<std::uint32_t>s(n);for(std::size_t i=0;i<n;++i)s[i]=static_cast<std::uint32_t>(std::stoll(argv[4+i]));auto m=top_k_mask(s,k);std::cout<<"O";for(auto b:m)std::cout<<' '<<static_cast<unsigned>(b);std::cout<<'\n';return 0;}
 }
 
-int main(int argc,char**argv){try{require(argc>=2,"missing role");const std::string role=argv[1];if(role=="--dealer")return dealer(argc,argv,false);if(role=="--dealer-raw-score-abi")return dealer(argc,argv,true);if(role=="--party")return endpoint(argc,argv);if(role=="--oracle")return oracle(argc,argv);throw std::runtime_error("unknown role");}catch(const std::exception&e){std::cerr<<"S8_TEST_ONLY_BACKEND_ERROR: "<<e.what()<<'\n';return 2;}}
+int main(int argc,char**argv){try{require(argc>=2,"missing role");const std::string role=argv[1];if(role=="--dealer")return dealer(argc,argv,false);if(role=="--dealer-raw-score-abi")return dealer(argc,argv,true);if(role=="--party")return endpoint(argc,argv,false);if(role=="--party-formal-score")return endpoint(argc,argv,true);if(role=="--oracle")return oracle(argc,argv);throw std::runtime_error("unknown role");}catch(const std::exception&e){std::cerr<<"S8_TEST_ONLY_BACKEND_ERROR: "<<e.what()<<'\n';return 2;}}
