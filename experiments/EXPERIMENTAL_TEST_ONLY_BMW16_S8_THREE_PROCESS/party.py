@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import hmac
 import json
 import os
+import secrets
 import socket
 import struct
 import subprocess
@@ -27,6 +29,50 @@ sys.path.insert(0, str(ROOT / "experiments" / "TEST_ONLY_BMW16_S7_COMPOSITION"))
 from select4r_s4_source import Context  # noqa: E402
 
 MASK64 = (1 << 64) - 1
+
+
+class CryptoSampleRNG:
+    """TEST_ONLY SHA-256 counter PRF stream with unbiased sampling."""
+
+    def __init__(self, seed: bytes, domain: str):
+        self.key = hashlib.sha256(b"BMW16-S9-SAMPLE-v1\0" + seed + domain.encode("ascii")).digest()
+        self.counter = 0
+        self.buffer = bytearray()
+
+    def _bytes(self, count: int) -> bytes:
+        while len(self.buffer) < count:
+            block = hmac.new(self.key, self.counter.to_bytes(16, "big"), hashlib.sha256).digest()
+            self.counter += 1
+            self.buffer.extend(block)
+        result = bytes(self.buffer[:count])
+        del self.buffer[:count]
+        return result
+
+    def getrandbits(self, bits: int) -> int:
+        if bits < 0:
+            raise ValueError("number of bits must be non-negative")
+        if bits == 0:
+            return 0
+        count = (bits + 7) // 8
+        return int.from_bytes(self._bytes(count), "big") & ((1 << bits) - 1)
+
+    def randbelow(self, upper: int) -> int:
+        if upper <= 0:
+            raise ValueError("empty sampling range")
+        bits = upper.bit_length()
+        while True:
+            candidate = self.getrandbits(bits)
+            if candidate < upper:
+                return candidate
+
+    def sample(self, population: list[Any], count: int) -> list[Any]:
+        if count < 0 or count > len(population):
+            raise ValueError("sample larger than population")
+        pool = list(population)
+        selected: list[Any] = []
+        for _ in range(count):
+            selected.append(pool.pop(self.randbelow(len(pool))))
+        return selected
 
 
 class Peer:
@@ -261,24 +307,133 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
     if len(shares) != n or not 1 <= k <= n:
         raise ValueError("invalid local input shape")
     b = max(1, (n - 1).bit_length())
-    bits = 34 + b
+    raw_score_abi = bool(args.raw_score_abi)
+    label_suffix = ("EXPERIMENTAL_TEST_ONLY_BMW16_S9_RAW_ABI_CSPRNG"
+                    if (raw_score_abi or args.joint_csprng_coins or
+                        args.test_only_force_algorithm_abort or args.test_only_probe_peer_files)
+                    else "EXPERIMENTAL_TEST_ONLY_BMW16_S8_THREE_PROCESS")
+    implementation_label = f"Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / {label_suffix}"
+    bits = (33 if raw_score_abi else 34) + b
     ring_raw = (1 << 34) - 1
     ring_key = (1 << bits) - 1
-    records = []
-    for i, value in enumerate(shares):
-        ordered_share = (value + ((1 << 31) if party == 0 else 0)) & ring_raw
-        key_share = ((ordered_share << b) + ((n - 1 - i) if party == 0 else 0)) & ring_key
-        records.append([key_share, 0, 0])
+    records: list[list[int]] = []
+    if raw_score_abi:
+        if any(value < 0 or value > 0xFFFFFFFF for value in shares):
+            raise ValueError("raw score ABI share must be an unsigned 32-bit word")
+    else:
+        for i, value in enumerate(shares):
+            ordered_share = (value + ((1 << 31) if party == 0 else 0)) & ring_raw
+            key_share = ((ordered_share << b) + ((n - 1 - i) if party == 0 else 0)) & ring_key
+            records.append([key_share, 0, 0])
+
+    peer_file_probe: dict[str, Any] | None = None
+    if args.test_only_probe_peer_files and n >= 2:
+        # Deliberately test the actual same-OS-token boundary used by this
+        # loopback harness. The probe reads and discards bytes; it never emits
+        # another party's shares or key material into the evidence file.
+        peer = 1 - party
+        peer_input = Path(args.input).with_name(f"p{peer}.input.json")
+        peer_package = Path(args.package).with_name(f"p{peer}.offline")
+        def read_probe(path: Path) -> dict[str, Any]:
+            try:
+                with path.open("rb") as handle:
+                    count = 0
+                    while True:
+                        block = handle.read(1024 * 1024)
+                        if not block:
+                            break
+                        count += len(block)
+                return {"can_read": True, "bytes_read_and_discarded": count}
+            except OSError as exc:
+                return {"can_read": False, "error_class": type(exc).__name__}
+        peer_file_probe = {
+            "scope": "TEST_ONLY same OS identity/token; not a remote-host claim",
+            "peer_input_share_file": read_probe(peer_input),
+            "peer_offline_material_file": read_probe(peer_package),
+        }
+        if raw_score_abi and peer_file_probe["peer_input_share_file"].get("can_read"):
+            peer_source = json.loads(peer_input.read_text(encoding="utf-8"))
+            peer_shares = [int(value) for value in peer_source.get("shares", [])]
+            if peer_source.get("n") == n and len(peer_shares) == n:
+                # This intentionally models a corrupted party exploiting the
+                # shared OS token. Only a Boolean/count is recorded.
+                recovered = [((shares[i] + peer_shares[i]) & 0xFFFFFFFF) for i in range(n)]
+                signed = [value - (1 << 32) if value & (1 << 31) else value for value in recovered]
+                peer_file_probe["clear_score_reconstruction"] = {
+                    "possible_from_sibling_share_file": True,
+                    "recovered_count_not_values": len(signed),
+                    "all_values_signed_int32": all(-(1 << 31) <= value < (1 << 31) for value in signed),
+                }
 
     peer: Peer | None = None
     worker: Worker | None = None
+    effective_algorithm_seed = args.algorithm_seed
+    randomness_record: dict[str, Any] = {
+        "mode": "FIXED_TEST_SEED",
+        "source": "Python Random seed; reproducible only, not a cryptographic sampling claim",
+        "joint_coin_message_phases": 0,
+        "domain_separation": "S4-derived per-task sample domains",
+    }
     try:
         peer = Peer(party, args.port, args.peer_timeout)
+        if args.joint_csprng_coins and n >= 2:
+            local_nonce = secrets.token_bytes(32)
+            remote = peer.exchange({"kind": "select_joint_coin", "party": party,
+                                    "session": int(source.get("session", 0)),
+                                    "nonce": local_nonce.hex()})
+            if (remote.get("kind") != "select_joint_coin" or remote.get("party") != 1 - party or
+                    remote.get("session") != int(source.get("session", 0))):
+                raise ValueError("joint algorithm coin binding")
+            remote_nonce = bytes.fromhex(str(remote.get("nonce", "")))
+            if len(remote_nonce) != 32:
+                raise ValueError("joint algorithm coin width")
+            pair = [local_nonce, remote_nonce] if party == 0 else [remote_nonce, local_nonce]
+            xor_seed = bytes(a ^ b for a, b in zip(pair[0], pair[1]))
+            seed = hashlib.sha256(b"BMW16-S9-JOINT-COIN-v1\0" + xor_seed).digest()
+            effective_algorithm_seed = int.from_bytes(seed, "big")
+            randomness_record = {
+                "mode": "JOINT_CSPRNG_XOR_SHA256_HMAC_DRBG_TEST_ONLY",
+                "source": "two 256-bit secrets.token_bytes contributions; uniform if either contribution is uniform",
+                "joint_coin_message_phases": 1,
+                "seed_sha256": hashlib.sha256(seed).hexdigest(),
+                "domain_separation": "BMW16-S9-SAMPLE-v1 + task and S4 R1/R3 sample-domain string",
+                "sampling": "HMAC-SHA256 counter stream; rejection randbelow; partial Fisher-Yates without replacement",
+                "adversarial_scope": "semi-honest only; no commit/reveal bias resistance or authenticated channel",
+            }
         z: list[int]
         if n == 1:
             z = [0]
         else:
             worker = Worker(args.backend, party, args.package)
+            if raw_score_abi:
+                padded_n = 1 << b
+                carry_row = worker.call(f"SCORE_CARRY_PREP {n} " + " ".join(map(str, shares)))[0]
+                if len(carry_row) != 2 + 2 * padded_n or carry_row[0] != "S":
+                    raise ValueError("bad score carry prep batch")
+                local_carry = [int(value) for value in carry_row[2:]]
+                remote = peer.exchange({"kind": "score_carry", "values": local_carry})
+                if remote.get("kind") != "score_carry" or len(remote.get("values", [])) != 2 * padded_n:
+                    raise ValueError("bad peer score carry batch")
+                carry_values = [((int(a) + int(b_)) & ((1 << 34) - 1))
+                                for a, b_ in zip(local_carry, remote["values"])]
+                carry_eval = worker.call("SCORE_CARRY_EVAL " + str(len(carry_values)) + " " +
+                                         " ".join(map(str, carry_values)))[0]
+                if carry_eval != ["Q", "OK"]:
+                    raise ValueError("bad score carry evaluation")
+                sign_row = worker.call("SCORE_SIGN_PREP")[0]
+                if len(sign_row) != 2 + 2 * padded_n or sign_row[0] != "S":
+                    raise ValueError("bad score sign prep batch")
+                local_sign = [int(value) for value in sign_row[2:]]
+                remote = peer.exchange({"kind": "score_sign", "values": local_sign})
+                if remote.get("kind") != "score_sign" or len(remote.get("values", [])) != 2 * padded_n:
+                    raise ValueError("bad peer score sign batch")
+                sign_values = [((int(a) + int(b_)) & ((1 << 34) - 1))
+                               for a, b_ in zip(local_sign, remote["values"])]
+                key_row = worker.call("SCORE_SIGN_EVAL " + str(len(sign_values)) + " " +
+                                      " ".join(map(str, sign_values)))[0]
+                if len(key_row) != n + 2 or key_row[0] != "K" or int(key_row[1]) != n:
+                    raise ValueError("bad stable-key output batch")
+                records = [[int(value), 0, 0] for value in key_row[2:]]
             row = worker.call(f"FWD1 {n} {encode_records(records)}")[0]
             local1 = parse_records(row, "R", n)
             remote = peer.exchange({"kind": "shuffle_r1", "records": local1})
@@ -311,13 +466,28 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
             backend: Any = DirectBackend()
         else:
             backend = comparator
-        context = Context([0] * n, k, args.input_seed, args.algorithm_seed,
+        context = Context([0] * n, k, args.input_seed, effective_algorithm_seed,
                           True, list(range(n)), backend)
+        if args.joint_csprng_coins and n >= 2:
+            domains = []
+            for partition in context.partitions:
+                task = str(partition["task"])
+                for suffix in ("R1_SAMPLE", "R3_SAMPLE"):
+                    domain = f"{task}:{suffix}"
+                    context.rngs[domain] = CryptoSampleRNG(seed, domain)
+                    domains.append(domain)
+            randomness_record["sample_domains"] = domains
         selected_result = context.run()
         raw_status = str(selected_result["status"])
+        forced_abort = bool(args.test_only_force_algorithm_abort)
+        if forced_abort:
+            # Contract fixture only: inject the same algorithm-abort class
+            # after Select control-flow execution and before membership/
+            # inverse routing. It does not claim to trigger a paper failure.
+            raw_status = "PROJECT_RANDOM_FAILURE_PATH"
         status = ("ABORT_ALGORITHM_PROBABILITY" if raw_status == "PROJECT_RANDOM_FAILURE_PATH" else
                   "ABORT_ALGORITHM_INVALID" if raw_status == "COMPLETED_WRONG" else raw_status)
-        selected = selected_result.get("selected_original_index")
+        selected = None if forced_abort else selected_result.get("selected_original_index")
         round_metrics = selected_result["round_metrics"]
         mask_share: list[int] | None = None
         if status == "SUCCESS":
@@ -350,19 +520,29 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
         select_slots = sum(comparator.round_slots.values()) if comparator else 0
         membership_slots = comparator.membership_slots if comparator else 0
         result: dict[str, Any] = {
-            "label": "Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL_TEST_ONLY",
+            "label": implementation_label,
             "party": party, "n": n, "K": k, "comparison_bits": bits,
-            "input_seed": args.input_seed, "algorithm_seed": args.algorithm_seed,
+            "input_seed": args.input_seed,
+            "algorithm_seed": effective_algorithm_seed if args.joint_csprng_coins and n >= 2 else args.algorithm_seed,
+            "algorithm_randomness": randomness_record,
             "status": status, "selected_anonymous_handle": selected,
             "round_metrics": round_metrics,
-            "network_message_phases": (1 if n == 1 else 5) +
+            "network_message_phases": (1 if n == 1 else (5 + (2 if raw_score_abi else 0) +
+                                                           randomness_record["joint_coin_message_phases"])) +
                                       (comparator.net_rounds if comparator else 0),
             "public_graph_and_comparison_bits": True,
             "opened_original_index_or_shuffle_map": False,
+            "test_only_forced_algorithm_abort": forced_abort,
+            "test_only_same_os_peer_file_probe": peer_file_probe,
             "offline_keygen_online": False,
             "mask_share": mask_share if status == "SUCCESS" else None,
             "trace": selected_result.get("trace"),
             "metrics": {
+                "raw_score_abi_input_adapter": "PROJECT_DERIVED_TEST_ONLY_PORT" if raw_score_abi else "NOT_USED_DIRECT_Z2_34",
+                "raw_score_input_uCMP_key_slots_per_party": (2 * (1 << b)) if raw_score_abi and n >= 2 else 0,
+                "raw_score_input_DCF_Eval_per_party": (4 * (1 << b)) if raw_score_abi and n >= 2 else 0,
+                "raw_score_input_DCF_Eval_both_parties": (8 * (1 << b)) if raw_score_abi and n >= 2 else 0,
+                "raw_score_input_peer_message_phases": (2 if raw_score_abi and n >= 2 else 0),
                 "select_logical_comparison_calls": selected_result["total_comparison_calls"],
                 "select_party_uCMP_key_slots_consumed": select_slots,
                 "membership_party_key_slots_consumed": membership_slots,
@@ -396,7 +576,7 @@ def run_party(args: argparse.Namespace) -> dict[str, Any]:
                 peer.send({"kind": "abort", "class": abort_class})
         except Exception:
             pass
-        result = {"label": "Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL_TEST_ONLY",
+        result = {"label": implementation_label,
                   "party": party, "n": n, "K": k,
                   "status": abort_class, "no_mask": True,
                   "error_class": type(exc).__name__, "error": str(exc)}
@@ -422,6 +602,10 @@ def main() -> int:
     parser.add_argument("--result", required=True)
     parser.add_argument("--input-seed", type=int, required=True)
     parser.add_argument("--algorithm-seed", type=int, required=True)
+    parser.add_argument("--raw-score-abi", action="store_true")
+    parser.add_argument("--joint-csprng-coins", action="store_true")
+    parser.add_argument("--test-only-force-algorithm-abort", action="store_true")
+    parser.add_argument("--test-only-probe-peer-files", action="store_true")
     parser.add_argument("--peer-timeout", type=float, default=20.0)
     args = parser.parse_args()
     result = run_party(args)

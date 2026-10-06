@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED 候选；secure gate NO-GO，尚未实现 |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED；S9 offline-material/party-view gate NO-GO，secure runtime 未实现 |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -113,6 +113,8 @@ AAV86 和 BB90 的原始文献用于补充算法来源。引用时必须区分�
 S7 的集中式 `TEST_ONLY` 原型保留为历史证据。S8 新增 T 离线发材、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` 功能候选并通过有限 oracle 样本；完整 party-view 联合安全仍为 **NO-GO**，故没有 secure 入口，正式性能矩阵仍 **未开始**。算法标签 `BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY` 只表示 S4 项目衍生样本括区算法；不得继承 BMW16 Theorem 8 的概率/常数，不得称为 BB90 复现，也不得把四个 Select 比较依赖层称为完整安全入口四轮。具体复核见 [S7 决策](docs/decisions/BMW16_S7_PROTOCOL_I_COMPOSITION_DECISION_2026-10-06.md)、[S8 决策](docs/decisions/BMW16_S8_OFFLINE_THREE_PROCESS_COMPOSITION_DECISION_2026-10-06.md) 与 [S8 验证报告](docs/reproduction/BMW16_S8_THREE_PROCESS_COMPOSITION_AND_PRIVACY_AUDIT_2026-10-06.md)。
 
 旧路线计划中“先完成 M6A 性能、再进行 M6B 正式性能矩阵”的顺序仍约束生产集成和统一性能验收；本次明确授权的是隔离研究原型和安全组合设计，不据此把后续正式顺序或验收状态标成完成。
+
+S9（2026-10-06）在 S8 隔离实验上新增 `uint32_t` raw-score additive-share 的 TEST_ONLY carry/sign-lift 端口、joint CSPRNG 抽样试验及同 OS 身份文件访问攻击夹具。raw differential 有限样本通过，但同身份进程可读取 peer share/package，整池 DCF/uCMP keys 与自适应访问的联合单方模拟仍未证明，因此离线私有发材和 secure party-view 均为 **NO-GO**。没有新增 VFSS secure runtime；正式性能矩阵仍未开始。见 [S9 决策](docs/decisions/BMW16_S9_RAW_ABI_AND_PRIVACY_GATE_2026-10-06.md) 与 [S9 验证报告](docs/reproduction/BMW16_S9_INDEPENDENT_ACCEPTANCE_RAW_ABI_AND_VIEW_AUDIT_2026-10-06.md)。
 
 ### 4.1 Agarwal 四个协议名称
 
@@ -233,7 +235,7 @@ Protocol III + AAV86 的 `2r` 保留为团队组合目标；实现前必须补�
 
 M6B 在 M6A 两种升级实现及完整性能验收完成后推进，分别交付：
 
-1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S7 secure gate `NO-GO`）。
+1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S9 secure gate `NO-GO`）。
 2. Protocol III + BB90+DCF。
 
 以下 BB90 原文和比较图要求只适用于 Protocol III 路线。Protocol I 候选来源、TEST_ONLY 功能证据和安全阻塞见 S7 决策与验证报告；不得继承 BMW16 Theorem 8 的失败概率或比较常数。

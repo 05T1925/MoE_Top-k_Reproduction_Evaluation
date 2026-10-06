@@ -546,6 +546,8 @@ Protocol I 对应构造可对照 Theorem 5.1；Protocol III 组合使用单独�
 
 2026-10-06 范围注记：Protocol I 的候选选择源依用户更新登记为 `PROJECT_DERIVED` BMW16-derived Select；Protocol III 与历史 BB90 项目记录不变。S7 的集中式证据保留历史身份；S8 新增 T 离线、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` 功能组合及 loopback 计数，但联合 party-view 安全仍 NO-GO，没有 secure runtime 或 LAN/WAN 结果。故本节 V4 仍为 **未开始/未完成**；S7/S8 的小样本时间、FSS Eval、实际实验材料文件字节和解析容量均不得填作正式性能指标，也不得继承 BMW16 Theorem 8 或 BB90 性能常数。未实测指标统一记为 `NOT_MEASURED`。详见 S8 决策与复核报告。
 
+S9 后续注记（2026-10-06）：隔离 TEST_ONLY 路径验证了 raw `uint32_t` shares 的 carry/sign 转换样本、joint CSPRNG 抽样流程和 S8 三方实验重跑；同时发现同 OS 身份 peer-file 可读的概率 1 区分 witness，完整 party-view/full-pool key 安全未通过。V4 仍 **未开始/未完成**，不创建 secure 入口、不把 loopback 时间/字节或解析材料容量登记为正式性能结果；raw adapter 只是项目移植实验。详见 S9 决策与验证报告。
+
 ### 10.1 前置条件
 
 - V3 完整性能验收完成；

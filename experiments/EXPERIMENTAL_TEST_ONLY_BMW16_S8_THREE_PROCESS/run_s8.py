@@ -163,11 +163,21 @@ def reserve_port() -> int:
 
 
 def one_case(scores: list[int], k: int, *, backend: str, input_seed: int,
-             algorithm_seed: int, case_id: str) -> dict[str, Any]:
+             algorithm_seed: int, case_id: str,
+             test_only_force_algorithm_abort: bool = False,
+             test_only_probe_peer_files: bool = False,
+             raw_score_abi: bool = False,
+             joint_csprng_coins: bool = False) -> dict[str, Any]:
     if not scores or not 1 <= k <= len(scores) or any(not -(1 << 31) <= x < (1 << 31) for x in scores):
         raise ValueError("invalid signed-int32 input")
     n = len(scores)
-    bits = 34 + max(1, (n - 1).bit_length())
+    index_bits = max(1, (n - 1).bit_length())
+    bits = (33 if raw_score_abi else 34) + index_bits
+    label_suffix = ("EXPERIMENTAL_TEST_ONLY_BMW16_S9_RAW_ABI_CSPRNG"
+                    if (raw_score_abi or joint_csprng_coins or
+                        test_only_force_algorithm_abort or test_only_probe_peer_files)
+                    else "EXPERIMENTAL_TEST_ONLY_BMW16_S8_THREE_PROCESS")
+    implementation_label = f"Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / {label_suffix}"
     seed_id = int(hashlib.sha256(f"{case_id}:{n}:{k}:{input_seed}:{algorithm_seed}".encode()).hexdigest()[:12], 16)
     session = (0x5838000000000000 | (seed_id & 0x0000FFFFFFFFFFFF)) or 1
     fingerprint = session ^ 0x1A2B3C4D5E6F7801
@@ -175,17 +185,25 @@ def one_case(scores: list[int], k: int, *, backend: str, input_seed: int,
         p0_pkg, p1_pkg = Path(temp) / "p0.offline", Path(temp) / "p1.offline"
         p0_input, p1_input = Path(temp) / "p0.input.json", Path(temp) / "p1.input.json"
         p0_result, p1_result = Path(temp) / "p0.result.json", Path(temp) / "p1.result.json"
-        t_stdout = backend_call(backend, ["--dealer", str(n), str(k), str(bits), str(session),
+        dealer_role = "--dealer-raw-score-abi" if raw_score_abi else "--dealer"
+        t_stdout = backend_call(backend, [dealer_role, str(n), str(k), str(bits), str(session),
                                          str(fingerprint), wsl_path(str(p0_pkg)), wsl_path(str(p1_pkg))]) if n >= 2 else "T_NOT_REQUIRED_SINGLETON"
         conformance = package_conformance(backend, p0_pkg, Path(temp), n) if n >= 2 and case_id == "n2_extremes_k1" else None
         input_rng = random.Random(input_seed)
         shares = [[], []]
         for score in scores:
-            left = input_rng.getrandbits(34)
-            shares[0].append(left)
-            shares[1].append((score - left) & MASK34)
+            if raw_score_abi:
+                ring_mask = (1 << 32) - 1
+                left = input_rng.getrandbits(32)
+                shares[0].append(left)
+                shares[1].append(((score & ring_mask) - left) & ring_mask)
+            else:
+                left = input_rng.getrandbits(34)
+                shares[0].append(left)
+                shares[1].append((score - left) & MASK34)
         for party, path in enumerate((p0_input, p1_input)):
-            path.write_text(json.dumps({"n": n, "k": k, "party": party, "shares": shares[party]},
+            path.write_text(json.dumps({"n": n, "k": k, "party": party, "session": session,
+                                        "fingerprint": fingerprint, "shares": shares[party]},
                                        separators=(",", ":")), encoding="utf-8")
         port = reserve_port()
         child_args = []
@@ -194,6 +212,14 @@ def one_case(scores: list[int], k: int, *, backend: str, input_seed: int,
                                "--input", str(inp), "--package", str(pkg), "--backend", backend,
                                "--result", str(out), "--input-seed", str(input_seed),
                                "--algorithm-seed", str(algorithm_seed)])
+            if test_only_force_algorithm_abort:
+                child_args[-1].append("--test-only-force-algorithm-abort")
+            if test_only_probe_peer_files:
+                child_args[-1].append("--test-only-probe-peer-files")
+            if raw_score_abi:
+                child_args[-1].append("--raw-score-abi")
+            if joint_csprng_coins:
+                child_args[-1].append("--joint-csprng-coins")
         p0 = subprocess.Popen(child_args[0], text=True, encoding="utf-8", errors="replace",
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         p1 = subprocess.Popen(child_args[1], text=True, encoding="utf-8", errors="replace",
@@ -213,14 +239,29 @@ def one_case(scores: list[int], k: int, *, backend: str, input_seed: int,
         r0, r1 = json.loads(p0_result.read_text()), json.loads(p1_result.read_text())
         status = r0.get("status") if r0.get("status") == r1.get("status") else "ABORT_PARTY_STATUS_MISMATCH"
         result: dict[str, Any] = {
-            "case_id": case_id, "label": "Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL_TEST_ONLY",
+            "case_id": case_id, "label": implementation_label,
+            "implementation_label": implementation_label,
             "n": n, "K": k, "comparison_bits": bits,
-            "input_seed": input_seed, "algorithm_seed": algorithm_seed,
-            "input_semantics": "signed int32 values, additive shares in Z/(2^34) for TEST_ONLY sign-preserving lift",
+            "input_seed": input_seed, "algorithm_seed": r0.get("algorithm_seed", algorithm_seed),
+            "algorithm_seed_mode": r0.get("algorithm_randomness", {}).get("mode", "FIXED_TEST_SEED"),
+            "algorithm_randomness_P0": r0.get("algorithm_randomness"),
+            "algorithm_randomness_P1": r1.get("algorithm_randomness"),
+            "input_semantics": ("formal raw int32/Q20.12 additive share words in Z/(2^32); experimental port of Protocol I carry/sign lift"
+                                if raw_score_abi else
+                                "TEST_ONLY-only signed int32 additive shares in Z/(2^34); not the repository raw-score ABI"),
+            "input_adapter_label": "PROJECT_DERIVED_TEST_ONLY_PORT_OF_PROTOCOL_I_RAW_SCORE_LIFT" if raw_score_abi else "TEST_ONLY_DIRECT_Z2_34_FIXTURE",
             "status": status, "selected_anonymous_handle": r0.get("selected_anonymous_handle"),
             "party_exit_codes": [p0.returncode, p1.returncode],
             "T_offline_stdout": t_stdout,
             "offline_package_bytes_per_party": [p0_pkg.stat().st_size, p1_pkg.stat().st_size] if n >= 2 else [0, 0],
+            "offline_material_slot_breakdown_per_party": {
+                "select_key_pool_slots": (8 * (n * (n - 1) // 2)) if n >= 2 else 0,
+                "membership_key_pool_slots": (n * (n - 1) // 2) if n >= 2 else 0,
+                "unused_shuffle_cmpagg_slots": (2 * (n * (n - 1) // 2)) if n >= 2 else 0,
+                "raw_score_input_slots": (2 * (1 << index_bits)) if raw_score_abi and n >= 2 else 0,
+                "total_serialized_uCMP_slots": ((11 * (n * (n - 1) // 2)) +
+                                                 (2 * (1 << index_bits) if raw_score_abi else 0)) if n >= 2 else 0,
+            },
             "offline_material_conformance": conformance,
             "offline_T_exited_before_parties": n >= 2,
             "offline_T_not_required_singleton": n == 1,
@@ -236,6 +277,9 @@ def one_case(scores: list[int], k: int, *, backend: str, input_seed: int,
             "full_online_DAG_message_phases": r0.get("network_message_phases"),
             "party_trace_P0": r0.get("trace"),
             "party_trace_P1": r1.get("trace"),
+            "test_only_forced_algorithm_abort": test_only_force_algorithm_abort,
+            "same_os_identity_peer_file_probe_P0": r0.get("test_only_same_os_peer_file_probe"),
+            "same_os_identity_peer_file_probe_P1": r1.get("test_only_same_os_peer_file_probe"),
             "party_stdout": [out0.strip(), out1.strip()],
             "party_stderr": [err0.strip(), err1.strip()],
         }
@@ -270,6 +314,14 @@ def main() -> int:
     parser.add_argument("--input-seed", type=int, default=11)
     parser.add_argument("--algorithm-seed", type=int, default=42)
     parser.add_argument("--case-id", default="manual")
+    parser.add_argument("--test-only-force-algorithm-abort", action="store_true",
+                        help="inject ABORT_ALGORITHM_PROBABILITY before membership; contract test only")
+    parser.add_argument("--test-only-probe-peer-files", action="store_true",
+                        help="read/discard sibling input/material files as the same OS token")
+    parser.add_argument("--raw-score-abi", action="store_true",
+                        help="use Z/(2^32) raw score shares and experimental Protocol-I carry/sign lift")
+    parser.add_argument("--joint-csprng-coins", action="store_true",
+                        help="exchange CSPRNG contributions and use a domain-separated HMAC-SHA256 sample stream")
     parser.add_argument("--matrix", action="store_true")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -291,8 +343,15 @@ def main() -> int:
         rows = []
         for i, (name, scores, k) in enumerate(cases):
             rows.append(one_case(scores, k, backend=args.backend, input_seed=args.input_seed + i,
-                                 algorithm_seed=args.algorithm_seed + i, case_id=name))
-        data = {"implementation_label": "Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL_TEST_ONLY",
+                                 algorithm_seed=args.algorithm_seed + i, case_id=name,
+                                 test_only_force_algorithm_abort=args.test_only_force_algorithm_abort,
+                                 test_only_probe_peer_files=args.test_only_probe_peer_files,
+                                 raw_score_abi=args.raw_score_abi,
+                                 joint_csprng_coins=args.joint_csprng_coins))
+        matrix_label = ("Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL_TEST_ONLY_BMW16_S9_RAW_ABI_CSPRNG"
+                        if (args.raw_score_abi or args.joint_csprng_coins or args.test_only_force_algorithm_abort or args.test_only_probe_peer_files)
+                        else "Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL_TEST_ONLY_BMW16_S8_THREE_PROCESS")
+        data = {"implementation_label": matrix_label,
                 "matrix_cases": rows,
                 "summary": {"success": sum(r.get("status") == "SUCCESS" for r in rows),
                             "oracle_pass": sum(r.get("oracle_differential") == "PASS" for r in rows),
@@ -302,13 +361,18 @@ def main() -> int:
             parser.error("--scores-json and --k are required unless --matrix is set")
         scores = json.loads(args.scores_json.read_text(encoding="utf-8"))
         data = one_case(scores, args.k, backend=args.backend, input_seed=args.input_seed,
-                        algorithm_seed=args.algorithm_seed, case_id=args.case_id)
+                        algorithm_seed=args.algorithm_seed, case_id=args.case_id,
+                        test_only_force_algorithm_abort=args.test_only_force_algorithm_abort,
+                        test_only_probe_peer_files=args.test_only_probe_peer_files,
+                        raw_score_abi=args.raw_score_abi,
+                        joint_csprng_coins=args.joint_csprng_coins)
     payload = json.dumps(data, separators=(",", ":"), sort_keys=True) + "\n"
     if args.output:
         args.output.write_text(payload, encoding="utf-8")
     else:
         print(payload, end="")
-    return 0 if (data.get("oracle_differential") == "PASS" or
+    expected_forced_abort = args.test_only_force_algorithm_abort and data.get("status") == "ABORT_ALGORITHM_PROBABILITY"
+    return 0 if (expected_forced_abort or data.get("oracle_differential") == "PASS" or
                  ("matrix_cases" in data and all(r.get("oracle_differential") in {"PASS", "NOT_RUN_ABORT"} for r in data["matrix_cases"]))) else 1
 
 

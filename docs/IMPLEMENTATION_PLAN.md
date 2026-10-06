@@ -79,7 +79,7 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S7 secure gate NO-GO）。
+5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S9 secure gate NO-GO）。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
@@ -728,6 +728,8 @@ Protocol III + AAV86
 
 按用户明确范围，六方案中的 Protocol I 选择路线候选为 **Protocol I + BMW16-derived Select + DCF**（`PROJECT_DERIVED`），不登记为 BB90 算法或 BMW16 定理直接实现。本节的 Protocol III 路线仍按 BB90 研究目标执行。S7 集中式原型与报告保留历史身份；S8 已交付 T 离线发材、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` raw-score→原序 mask 组合，并验证有限样本。S8 联合 party-view 安全仍 `NO-GO`，未新增 secure runtime，完整性能矩阵 `NOT_RUN`。正式安全入口仍须等待独立安全门；M6A 与正式 V4 性能验收的既定依赖不因隔离实验授权而标记完成。见 [S7 决策/报告](docs/decisions/BMW16_S7_PROTOCOL_I_COMPOSITION_DECISION_2026-10-06.md) 与 [S8 决策/报告](docs/decisions/BMW16_S8_OFFLINE_THREE_PROCESS_COMPOSITION_DECISION_2026-10-06.md)。
 
+S9 在隔离实验路径接入正式 `uint32_t` raw-score share 语义的 carry/sign-lift 端口，并独立重跑 S8 功能矩阵、raw-score oracle differential、n=64 非全量抽样样本及边审计。S9 复核发现同 OS token 可以读 peer share/package；其两世界 witness 以概率 1 区分；匿名公开 transcript 的 n≤5 枚举不覆盖本地 shuffle state 或共享 node-mask 相关的完整 DCF/uCMP pool。故 `OFFLINE_PRIVATE_MATERIAL` 与完整 `PARTY_VIEW_SECURITY` 继续 `NO-GO`，未建 secure API、未运行正式性能矩阵。该实验 raw adapter 不是正式 runtime adapter 接收。见 [S9 决策](decisions/BMW16_S9_RAW_ABI_AND_PRIVACY_GATE_2026-10-06.md) 与 [S9 报告](reproduction/BMW16_S9_INDEPENDENT_ACCEPTANCE_RAW_ABI_AND_VIEW_AUDIT_2026-10-06.md)。
+
 #### 前置条件
 
 M6A 两种路线的实现、性能验收及交接完成。
@@ -736,7 +738,7 @@ BB90 原文研究和明文算法设计可以提前进行，但不能以此跳过
 
 #### 设计阶段
 
-1. Protocol I 固定 S4/S8 选择候选版本、有限规模行为、失败语义与安全门；不得继承 BMW16 Theorem 8 的概率或比较常数。S8 的三进程材料合同只在 `EXPERIMENTAL_TEST_ONLY` 范围运行，不能视作 secure 接收或正式性能入口。
+1. Protocol I 固定 S4/S9 选择候选版本、有限规模行为、失败语义与安全门；不得继承 BMW16 Theorem 8 的概率或比较常数。S8/S9 的三进程材料合同只在 `EXPERIMENTAL_TEST_ONLY` 范围运行，不能视作 secure 接收或正式性能入口。S9 的 raw input 移植 differential 不等于正式 raw adapter/party-view 接收。
 2. Protocol III 固定 BB90 采用版本、适用范围、迭代参数及概率保证。
 3. 明确两种算法各自从顺序统计量到本项目稳定 K-th 优先级的映射、成本界和失败事件。
 4. 给出各自比较图/阶段到安全组合的转换依据。

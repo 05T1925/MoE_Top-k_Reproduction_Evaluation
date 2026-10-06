@@ -101,7 +101,24 @@ def audit_row(row: dict[str, Any]) -> dict[str, Any]:
     expected_eval_both = 4 * (total_slots + mem)
     if int(row["logical_and_actual_metrics_P0"]["DCF_Eval_both_parties"]) != expected_eval_both:
         raise ValueError(f"{row['case_id']}: both-party DCF eval formula mismatch")
-    expected_phases = 1 if n == 1 else 13
+    metrics = row["logical_and_actual_metrics_P0"]
+    raw_slots = int(metrics.get("raw_score_input_uCMP_key_slots_per_party", 0))
+    raw_eval_party = int(metrics.get("raw_score_input_DCF_Eval_per_party", 0))
+    raw_eval_both = int(metrics.get("raw_score_input_DCF_Eval_both_parties", 0))
+    raw_phases = int(metrics.get("raw_score_input_peer_message_phases", 0))
+    if (raw_eval_party != 2 * raw_slots or raw_eval_both != 4 * raw_slots or
+            raw_phases not in (0, 2)):
+        raise ValueError(f"{row['case_id']}: raw-score material/eval ledger mismatch")
+    if raw_slots and raw_slots != 2 * (1 << max(1, (n - 1).bit_length())):
+        raise ValueError(f"{row['case_id']}: raw-score padded slot count mismatch")
+    random_p0 = row.get("algorithm_randomness_P0", {}) or {}
+    random_p1 = row.get("algorithm_randomness_P1", {}) or {}
+    joint_phases = int(random_p0.get("joint_coin_message_phases", 0))
+    if joint_phases not in (0, 1):
+        raise ValueError(f"{row['case_id']}: joint random coin phase count")
+    if joint_phases and random_p0.get("seed_sha256") != random_p1.get("seed_sha256"):
+        raise ValueError(f"{row['case_id']}: parties did not share the same sampling seed")
+    expected_phases = 1 if n == 1 else 13 + raw_phases + joint_phases
     if row["full_online_DAG_message_phases"] != expected_phases:
         raise ValueError(f"{row['case_id']}: full-protocol message phase mismatch")
     if row.get("original_index_opened") or row.get("shuffle_map_opened"):

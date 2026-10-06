@@ -80,6 +80,16 @@ Bytes read_file(const std::string& path) { std::ifstream f(path,std::ios::binary
 void write_file(const std::string& path,const Bytes& b){std::ofstream f(path,std::ios::binary|std::ios::trunc);require(f.good(),"cannot write package");f.write(reinterpret_cast<const char*>(b.data()),b.size());require(f.good(),"package write failed");}
 
 struct KeyEntry { Slot slot; ProtocolIUcmpPartyMaterial p0,p1; };
+struct ScorePair {
+  std::uint32_t slot=0;
+  std::uint8_t stage=0;
+  std::uint64_t left0=0,right0=0,left1=0,right1=0;
+  ProtocolIUcmpPartyMaterial p0,p1;
+};
+struct ScoreLocal {
+  std::uint64_t left=0,right=0;
+  ProtocolIUcmpPartyMaterial key;
+};
 struct TargetPair { ProtocolIParallelShufflePartyMaterial p0,p1; std::vector<ProtocolIBlock192> full_r; };
 
 TargetPair make_shuffle_for_pi(const ProtocolIParallelShuffleDealerConfig& cfg,
@@ -113,9 +123,20 @@ TargetPair make_shuffle_for_pi(const ProtocolIParallelShuffleDealerConfig& cfg,
 
 Bytes encode_package(int party,int bits,std::uint32_t n,std::uint32_t k,
                      std::uint64_t session,std::uint64_t fingerprint,
-                     const Bytes& first,const Bytes& inverse,const std::vector<KeyEntry>& keys) {
-  Bytes out{'S','8','P','K',1,static_cast<std::uint8_t>(party),static_cast<std::uint8_t>(bits),0};
-  put32(out,n);put32(out,k);put64(out,session);put64(out,fingerprint);put_blob(out,first);put_blob(out,inverse);put64(out,keys.size());
+                     const Bytes& first,const Bytes& inverse,const std::vector<KeyEntry>& keys,
+                     const std::vector<ScorePair>& score_keys,std::uint32_t score_padded_n) {
+  const std::uint8_t version=score_keys.empty()?1:2;
+  Bytes out{'S','8','P','K',version,static_cast<std::uint8_t>(party),static_cast<std::uint8_t>(bits),0};
+  put32(out,n);put32(out,k);put64(out,session);put64(out,fingerprint);put_blob(out,first);put_blob(out,inverse);
+  if(version==2){
+    put32(out,score_padded_n);put64(out,score_keys.size());
+    for(const auto& e:score_keys){
+      out.push_back(e.stage);out.push_back(static_cast<std::uint8_t>(party));out.push_back(34);out.push_back(0);
+      put32(out,e.slot);put64(out,party==0?e.left0:e.left1);put64(out,party==0?e.right0:e.right1);
+      put_blob(out,(party==0?e.p0:e.p1).serialize());
+    }
+  }
+  put64(out,keys.size());
   for(const auto& e:keys){
     const auto [stage,round,task,left,right]=e.slot;
     out.push_back(static_cast<std::uint8_t>(stage));out.push_back(static_cast<std::uint8_t>(round));
@@ -127,7 +148,7 @@ Bytes encode_package(int party,int bits,std::uint32_t n,std::uint32_t k,
   return out;
 }
 
-int dealer(int argc,char**argv){
+int dealer(int argc,char**argv,bool raw_score_abi){
   require(argc==9,"dealer args: n k bits session fingerprint output0 output1");
   const auto n=static_cast<std::uint32_t>(std::stoul(argv[2])),k=static_cast<std::uint32_t>(std::stoul(argv[3]));
   const auto bits=std::stoi(argv[4]);const auto session=std::stoull(argv[5]),fp=std::stoull(argv[6]);
@@ -156,23 +177,56 @@ int dealer(int argc,char**argv){
                                 (first.party0.r_share[j].word0+first.party1.r_share[j].word0)&fullmask);
     entries.push_back({Slot{1,0,0,i,j},key.export_party_material(0),key.export_party_material(1)});
   }
-  const auto p0=encode_package(0,bits,n,k,session,fp,first0,inv0,entries);
-  const auto p1=encode_package(1,bits,n,k,session,fp,first1,inv1,entries);
+  std::vector<ScorePair> score_entries;
+  std::uint32_t score_padded_n=0;
+  if(raw_score_abi){
+    score_padded_n=2;while(score_padded_n<n)score_padded_n<<=1U;
+    constexpr std::uint64_t score_mask=(UINT64_C(1)<<34U)-1U;
+    for(std::uint8_t stage=1;stage<=2;++stage)for(std::uint32_t slot=0;slot<score_padded_n;++slot){
+      const auto ml=random64()&score_mask,mr=random64()&score_mask;
+      const auto l0=random64()&score_mask,r0=random64()&score_mask;
+      ProtocolIUcmpMaterial key(34,ml,mr);
+      score_entries.push_back({slot,stage,l0,r0,(ml-l0)&score_mask,(mr-r0)&score_mask,
+                               key.export_party_material(0),key.export_party_material(1)});
+    }
+  }
+  const auto p0=encode_package(0,bits,n,k,session,fp,first0,inv0,entries,score_entries,score_padded_n);
+  const auto p1=encode_package(1,bits,n,k,session,fp,first1,inv1,entries,score_entries,score_padded_n);
   write_file(argv[7],p0);write_file(argv[8],p1);
   (void)::chmod(argv[7],S_IRUSR|S_IWUSR);(void)::chmod(argv[8],S_IRUSR|S_IWUSR);
   std::cout<<"T_OFFLINE_OK n="<<n<<" K="<<k<<" bits="<<bits<<" select_slots="<<8ULL*n*(n-1)/2
            <<" membership_slots="<<1ULL*n*(n-1)/2<<" shuffle_cmpagg_slots_per_party="<<2ULL*n*(n-1)/2
+           <<" raw_score_uCMP_slots_per_party="<<score_entries.size()
+           <<" raw_score_DCF_Eval_per_party="<<2ULL*score_entries.size()
            <<" party0_bytes="<<p0.size()<<" party1_bytes="<<p1.size()<<"\n";
   return 0;
 }
 
-struct Loaded { int party=0,bits=0;std::uint32_t n=0,k=0;std::uint64_t session=0,fp=0;
-  ProtocolIParallelShufflePartyMaterial fwd,inv;std::map<Slot,ProtocolIUcmpPartyMaterial> keys;std::set<Slot> used; };
+struct Loaded { int party=0,bits=0;std::uint32_t n=0,k=0,score_padded_n=0;std::uint64_t session=0,fp=0;
+  ProtocolIParallelShufflePartyMaterial fwd,inv;std::map<Slot,ProtocolIUcmpPartyMaterial> keys;std::set<Slot> used;
+  std::map<std::pair<int,std::uint32_t>,ScoreLocal> score_keys;
+  std::vector<std::uint64_t> score_raw,score_lift; };
 Loaded load(int party,const std::string&path){
-  const auto b=read_file(path);require(b.size()>=32&&b[0]=='S'&&b[1]=='8'&&b[2]=='P'&&b[3]=='K'&&b[4]==1&&b[5]==party,"party package header");
+  const auto b=read_file(path);require(b.size()>=32&&b[0]=='S'&&b[1]=='8'&&b[2]=='P'&&b[3]=='K'&&(b[4]==1||b[4]==2)&&b[5]==party,"party package header");
   std::size_t o=8;Loaded x;x.party=party;x.bits=b[6];x.n=get32(b,o);x.k=get32(b,o);x.session=get64(b,o);x.fp=get64(b,o);
   x.fwd=protocol_i_parallel_shuffle_deserialize_material(get_blob(b,o),party);
   x.inv=protocol_i_parallel_shuffle_deserialize_material(get_blob(b,o),party);
+  if(b[4]==2){
+    x.score_padded_n=get32(b,o);require(x.score_padded_n>=2&&x.score_padded_n>=x.n&&
+        (x.score_padded_n&(x.score_padded_n-1U))==0,"score input padded size");
+    const auto score_count=get64(b,o);require(score_count==2ULL*x.score_padded_n,"score input slot count");
+    for(std::uint64_t i=0;i<score_count;++i){
+      require(o+4<=b.size(),"score slot header");const int stage=b[o++];
+      require(b[o++]==party&&b[o++]==34&&b[o++]==0,"score slot party/width");
+      const auto slot=get32(b,o);const auto left=get64(b,o),right=get64(b,o);
+      auto key=ProtocolIUcmpPartyMaterial::deserialize(get_blob(b,o));
+      require((stage==1||stage==2)&&slot<x.score_padded_n&&key.party_id()==party&&key.comparison_bits()==34,
+              "score slot binding");
+      require(x.score_keys.emplace(std::make_pair(stage,slot),ScoreLocal{left,right,std::move(key)}).second,
+              "duplicate score slot");
+    }
+    x.score_raw.assign(x.score_padded_n,0);x.score_lift.assign(x.score_padded_n,0);
+  }
   const auto count=get64(b,o);require(count<=25000,"pool count");
   for(std::uint64_t i=0;i<count;++i){require(o+6<=b.size(),"slot header");int stage=b[o++],round=b[o++],task=b[o++];require(b[o++]==party&&b[o++]==x.bits&&b[o++]==0,"slot party/width binding");auto lo=get32(b,o),hi=get32(b,o);require(get64(b,o)==(x.session^UINT64_C(0x8100000000000001)),"slot mask binding");auto material=ProtocolIUcmpPartyMaterial::deserialize(get_blob(b,o));
     require(lo<hi&&hi<x.n&&material.party_id()==party&&material.comparison_bits()==x.bits,"slot binding");
@@ -191,6 +245,9 @@ void claim_file_once(const std::string& path) {
 }
 std::vector<ProtocolIBlock192> read_records(std::istringstream&in,std::uint32_t n){std::vector<ProtocolIBlock192>v(n);for(auto&x:v)require(static_cast<bool>(in>>x.word0>>x.word1>>x.word2),"record input");return v;}
 void print_records(const char*tag,const std::vector<ProtocolIBlock192>&v){std::cout<<tag<<' '<<v.size();for(const auto&x:v)std::cout<<' '<<x.word0<<' '<<x.word1<<' '<<x.word2;std::cout<<'\n'<<std::flush;}
+std::vector<std::uint64_t> read_words(std::istringstream& in,std::size_t count){
+  std::vector<std::uint64_t> out(count);for(auto& value:out)require(static_cast<bool>(in>>value),"score word input");return out;
+}
 int endpoint(int argc,char**argv){
   require(argc==4,"endpoint args: party package");const int party=std::stoi(argv[2]);claim_file_once(argv[3]);auto x=load(party,argv[3]);
   ProtocolIParallelShufflePartyConfig cf{x.session,x.fp,x.fwd.material_id,x.n,x.k,static_cast<std::uint8_t>(x.bits),static_cast<std::uint8_t>(party),10000};
@@ -200,6 +257,46 @@ int endpoint(int argc,char**argv){
     if(op=="FWD1"){std::uint32_t n;in>>n;require(n==x.n,"FWD1 n");auto v=read_records(in,n);fwd=std::make_unique<ProtocolIParallelShuffleParty>(cf,std::move(x.fwd));print_records("R",fwd->prepare_round1(v));}
     else if(op=="FWD2"){std::uint32_t n;in>>n;require(n==x.n&&fwd,"FWD2 n/state");print_records("R",fwd->receive_round1_prepare_round2(read_records(in,n)));}
     else if(op=="FWD3"){std::uint32_t n;in>>n;require(n==x.n&&fwd,"FWD3 n/state");auto r=fwd->receive_round2(read_records(in,n));print_records("F",r.shuffled_share);print_records("Z",r.public_masked_records);}
+    else if(op=="SCORE_CARRY_PREP"){
+      std::uint32_t logical_n;in>>logical_n;require(logical_n==x.n&&x.score_padded_n>=logical_n&&x.score_keys.size()==2ULL*x.score_padded_n,"raw-score carry state");
+      constexpr std::uint64_t smask=(UINT64_C(1)<<34U)-1U;x.score_raw.assign(x.score_padded_n,0);
+      for(std::uint32_t i=0;i<logical_n;++i){std::uint64_t value;in>>value;require(value<=UINT32_MAX,"raw-score share width");x.score_raw[i]=value;}
+      for(std::uint32_t i=logical_n;i<x.score_padded_n;++i)x.score_raw[i]=party==0?UINT32_C(0x80000000):0U;
+      std::cout<<"S "<<2*x.score_padded_n;
+      for(std::uint32_t i=0;i<x.score_padded_n;++i){const auto word=x.score_raw[i];
+        const auto left=party==1?UINT32_MAX-word:0U;const auto right=party==0?word:0U;
+        const auto& item=x.score_keys.at({1,i});std::cout<<' '<<((left+item.left)&smask)<<' '<<((right+item.right)&smask);}
+      std::cout<<'\n'<<std::flush;
+    }
+    else if(op=="SCORE_CARRY_EVAL"){
+      std::uint32_t count;in>>count;require(count==2*x.score_padded_n,"raw-score carry batch shape");const auto values=read_words(in,count);
+      constexpr std::uint64_t smask=(UINT64_C(1)<<34U)-1U;
+      for(std::uint32_t i=0;i<x.score_padded_n;++i){auto& item=x.score_keys.at({1,i});
+        const auto carry=item.key.eval_strict_lt(values[2*i]&smask,values[2*i+1]&smask);
+        x.score_lift[i]=(x.score_raw[i]-((carry&3U)<<32U))&smask;}
+      std::cout<<"Q OK\n"<<std::flush;
+    }
+    else if(op=="SCORE_SIGN_PREP"){
+      require(x.score_padded_n>=x.n&&x.score_lift.size()==x.score_padded_n,"raw-score sign state");constexpr std::uint64_t smask=(UINT64_C(1)<<34U)-1U;
+      std::cout<<"S "<<2*x.score_padded_n;
+      for(std::uint32_t i=0;i<x.score_padded_n;++i){const auto left=party==0?UINT32_C(0x7fffffff):0U;
+        const auto& item=x.score_keys.at({2,i});std::cout<<' '<<((left+item.left)&smask)<<' '<<((x.score_lift[i]+item.right)&smask);}
+      std::cout<<'\n'<<std::flush;
+    }
+    else if(op=="SCORE_SIGN_EVAL"){
+      std::uint32_t count;in>>count;require(count==2*x.score_padded_n,"raw-score sign batch shape");const auto values=read_words(in,count);
+      constexpr std::uint64_t smask=(UINT64_C(1)<<34U)-1U;const auto keymask=mask_for(x.bits);const auto index_bits=static_cast<unsigned>(x.bits-33);
+      const auto stable_constant=(static_cast<std::uint64_t>(UINT32_MAX)<<index_bits)+(x.n-1U);
+      std::cout<<"K "<<x.n;
+      for(std::uint32_t i=0;i<x.score_padded_n;++i){auto& item=x.score_keys.at({2,i});
+        const auto sign=item.key.eval_strict_lt(values[2*i]&smask,values[2*i+1]&smask);
+        const auto q_share=party==0?(UINT64_C(0x7fffffff)-x.score_lift[i]+((sign&3U)<<32U)):
+                                     (UINT64_C(0)-x.score_lift[i]+((sign&3U)<<32U));
+        const auto priority_share=((q_share<<index_bits)+(party==0?i:0U))&keymask;
+        if(i<x.n){const auto stable_share=party==0?(stable_constant-priority_share)&keymask:(UINT64_C(0)-priority_share)&keymask;
+          std::cout<<' '<<stable_share;}}
+      std::cout<<'\n'<<std::flush;
+    }
     else if(op=="CMP"||op=="MEM"){int round=0,task=0;std::uint32_t lo,hi;std::uint64_t zl,zr;if(op=="CMP")in>>round>>task>>lo>>hi>>zl>>zr;else{in>>lo>>hi>>zl>>zr;round=0;task=0;}require(static_cast<bool>(in),"comparison input");const Slot s{op=="CMP"?0:1,round,task,lo,hi};auto it=x.keys.find(s);require(it!=x.keys.end()&&x.used.insert(s).second,"missing or replayed key slot");std::cout<<"C "<<it->second.eval_strict_lt(zl,zr)<<'\n'<<std::flush;}
     else if(op=="INV1"){std::uint32_t n;in>>n;require(n==x.n,"INV1 n");auto v=read_records(in,n);auto ic=cf;ic.material_id=x.inv.material_id;inv=std::make_unique<ProtocolIParallelShuffleParty>(ic,std::move(x.inv));print_records("R",inv->prepare_round1(v));}
     else if(op=="INV2"){std::uint32_t n;in>>n;require(n==x.n&&inv,"INV2 n/state");print_records("R",inv->receive_round1_prepare_round2(read_records(in,n)));}
@@ -211,4 +308,4 @@ int endpoint(int argc,char**argv){
 int oracle(int argc,char**argv){require(argc>=4,"oracle n k scores...");const auto n=std::stoul(argv[2]),k=std::stoul(argv[3]);require(argc==4+static_cast<int>(n),"oracle score count");std::vector<std::uint32_t>s(n);for(std::size_t i=0;i<n;++i)s[i]=static_cast<std::uint32_t>(std::stoll(argv[4+i]));auto m=top_k_mask(s,k);std::cout<<"O";for(auto b:m)std::cout<<' '<<static_cast<unsigned>(b);std::cout<<'\n';return 0;}
 }
 
-int main(int argc,char**argv){try{require(argc>=2,"missing role");const std::string role=argv[1];if(role=="--dealer")return dealer(argc,argv);if(role=="--party")return endpoint(argc,argv);if(role=="--oracle")return oracle(argc,argv);throw std::runtime_error("unknown role");}catch(const std::exception&e){std::cerr<<"S8_TEST_ONLY_BACKEND_ERROR: "<<e.what()<<'\n';return 2;}}
+int main(int argc,char**argv){try{require(argc>=2,"missing role");const std::string role=argv[1];if(role=="--dealer")return dealer(argc,argv,false);if(role=="--dealer-raw-score-abi")return dealer(argc,argv,true);if(role=="--party")return endpoint(argc,argv);if(role=="--oracle")return oracle(argc,argv);throw std::runtime_error("unknown role");}catch(const std::exception&e){std::cerr<<"S8_TEST_ONLY_BACKEND_ERROR: "<<e.what()<<'\n';return 2;}}
