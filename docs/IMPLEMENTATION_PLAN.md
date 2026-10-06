@@ -46,7 +46,7 @@ M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核�
 ### 1.2 当前待完成目标
 
 - Protocol I、Protocol III 各自的 AAV86 升级及完整性能验收。
-- Protocol I、Protocol III 各自的 BB90+DCF 升级及完整性能验收。
+- Protocol I BMW16-derived Select + DCF 与 Protocol III BB90+DCF 候选的安全组合、实现和完整性能验收。
 - 六种目标方案的统一横向报告。
 
 轮数口径固定为：
@@ -64,7 +64,7 @@ M2：COMPLETED
   → M5：COMPLETED（F1/F2/G3 PASS；接收方复核 revision 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1）
   → M6A 两种 AAV86 升级实现
   → M6A 完整性能验收
-  → M6B 两种 BB90+DCF 升级实现
+  → M6B Protocol I BMW16-derived Select+DCF / Protocol III BB90+DCF
   → M6B 完整性能验收
   → M7 六种方案统一报告
 ```
@@ -79,7 +79,7 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BB90+DCF。
+5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S7 secure gate NO-GO）。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
@@ -722,7 +722,11 @@ Protocol III + AAV86
 - 报告经另一方复核；
 - M6A 实现与性能验收完成后，才进入 M6B 依赖实现和正式实验。
 
-### 4.8 M6B：BB90+DCF 两种升级与完整性能验收
+### 4.8 M6B：Protocol I BMW16-derived Select + DCF / Protocol III BB90+DCF
+
+#### 2026-10-06 Protocol I 候选更新
+
+按用户本次明确范围，六方案中的 Protocol I 选择路线当前候选改为 **Protocol I + BMW16-derived Select + DCF**（`PROJECT_DERIVED`），不登记为 BB90 算法或 BMW16 定理直接实现。本节的 Protocol III 路线仍按 BB90 研究目标执行。该变更仅授权从 S4/S5/S6 证据继续做隔离参考实现与组合门审查，不覆盖 BB90 历史计划。S7 交付状态为 `TEST_ONLY` 功能原型；联合 party-view 安全仍 `NO-GO`，未新增 secure runtime，完整性能矩阵 `NOT_RUN`。安全入口实现仍须等待独立安全门；M6A 与正式 V4 性能验收的既定依赖不因本次研究授权而标记完成。见 S7 决策与验证报告。
 
 #### 前置条件
 
@@ -732,28 +736,28 @@ BB90 原文研究和明文算法设计可以提前进行，但不能以此跳过
 
 #### 设计阶段
 
-1. 固定 BB90 采用版本、适用范围、迭代参数及概率保证。
-2. 明确从算法顺序统计量到本项目第 K 大稳定优先级的映射。
-3. 明确随机成本界、失败事件与输出正确性条件。
-4. 给出比较图到 CA 的转换。
-5. 定义第 K 大阈值的秘密共享表示。
-6. 设计在线阈值与预生成 DCF 材料的衔接。
+1. Protocol I 固定 S7 选择候选版本、有限规模行为、失败语义与安全门；不得继承 BMW16 Theorem 8 的概率或比较常数。
+2. Protocol III 固定 BB90 采用版本、适用范围、迭代参数及概率保证。
+3. 明确两种算法各自从顺序统计量到本项目稳定 K-th 优先级的映射、成本界和失败事件。
+4. 给出各自比较图/阶段到安全组合的转换依据。
+5. 定义 selected stable key 的秘密共享表示和 DCF membership 方向。
+6. 设计在线阈值与输入无关预生成 DCF 材料的衔接。
 7. 分别设计 Protocol I、Protocol III 路线的完整阶段。
-8. 推导消息依赖和总轮数，不预先套用 AAV86 公式。
+8. 推导消息依赖和总轮数，不预先套用 AAV86 或明文 Select 的四层公式。
 
 #### 实现阶段
 
 分别实现：
 
 ```text
-Protocol I + BB90+DCF
+Protocol I + BMW16-derived Select + DCF
 Protocol III + BB90+DCF
 ```
 
 完整功能为：
 
 ```text
-BB90 得到稳定第 K 大阈值
+选择算法得到稳定第 K 大阈值
   → DCF 生成成员指示共享
   → 必要的路由、逆映射和共享转换
   → 原顺序 Top-K mask
@@ -767,7 +771,7 @@ BB90 得到稳定第 K 大阈值
 
 #### 正确性与安全验收
 
-- BB90 选择结果与稳定顺序统计量 oracle 一致；
+- 两种选择算法各自与稳定顺序统计量 oracle 一致；
 - DCF 成员选择与完整 Top-K oracle 一致；
 - 覆盖随机、重复值、全相等、边界、非二次幂及 K 边界；
 - 阈值、selected index 和最终 mask 不通过测试路径进入 secure transcript；
@@ -778,20 +782,20 @@ BB90 得到稳定第 K 大阈值
 
 分别计量：
 
-1. BB90 选择；
+1. Select 选择阶段（Protocol I 与 Protocol III 分别报告其来源标签）；
 2. DCF 成员选择；
 3. 输入、路由、逆映射和 mask 适配；
 4. 完整端到端路径。
 
 记录实际迭代数、节点和边计数、DCF/uCMP/PRG 调用、离线材料、每轮通信和时间。
 
-对统一 `(n,K)` 矩阵及已确定的 BB90 参数进行 LAN/WAN 完整性能实验。遵循预热一次、正式五次及 median/min/max 规则。
+在安全入口通过后，对统一 `(n,K)` 矩阵及各自固定参数进行 LAN/WAN 完整性能实验。遵循预热一次、正式五次及 median/min/max 规则。
 
 与对应全对全和 AAV86 方案比较，不能只报告 BB90 图内部成本而省略最终 DCF 选择。
 
 #### 交付物
 
-- 两种 BB90+DCF 组合实现；
+- Protocol I BMW16-derived Select + DCF 与 Protocol III BB90+DCF 两种组合实现；
 - 算法版本、阈值表示及预处理设计；
 - 正确性、泄露和消息审计；
 - 全部适用性能指标；
@@ -819,12 +823,12 @@ M7 汇总前述已完成结果，不把 M6A、M6B 的性能验收推迟到此阶
 | I vs III | 比较全对全精确核心路线 |
 | I vs I+AAV86 | 评估 I 路线的图排序升级 |
 | III vs III+AAV86 | 评估 III 路线的图排序升级 |
-| I vs I+BB90+DCF | 评估 I 路线的选择升级 |
+| I vs I+BMW16-derived Select+DCF | 评估 I 路线的选择升级 |
 | III vs III+BB90+DCF | 评估 III 路线的选择升级 |
-| I+AAV86 vs I+BB90+DCF | 相同路线比较两种升级算法 |
+| I+AAV86 vs I+BMW16-derived Select+DCF | 相同路线比较排序与选择候选 |
 | III+AAV86 vs III+BB90+DCF | 相同路线比较两种升级算法 |
 | I+AAV86 vs III+AAV86 | 相同图算法比较组合路线 |
-| I+BB90+DCF vs III+BB90+DCF | 相同选择算法比较组合路线 |
+| I+BMW16-derived Select+DCF vs III+BB90+DCF | 比较不同选择候选及组合路线 |
 
 工程对照另列：
 

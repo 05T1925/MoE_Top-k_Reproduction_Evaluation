@@ -25,7 +25,7 @@
 | V1 | Protocol I 精确三轮核心 | 核验论文成本、实际通信与接口边界 | 实现、正确性及消息审计通过 |
 | V2 | Protocol III 精确两轮核心 | 核验压缩核心成本及适配开销 | V1 交接完成，M5 实现与审计通过 |
 | V3 | I+AAV86、III+AAV86 | 完成两种升级的全部适用性能指标 | V1、V2 及基础接口交接完成 |
-| V4 | I+BB90+DCF、III+BB90+DCF | 完成两种组合的全部适用性能指标 | V3 完整性能验收完成 |
+| V4 | I+BMW16-derived Select+DCF、III+BB90+DCF | 完成两种组合的全部适用性能指标 | V3 完整性能验收完成且各自安全门通过 |
 
 执行顺序：
 
@@ -75,7 +75,7 @@ V1、V2 不以先跑完所有超大规模全对全配置为前提。V3、V4 不�
 2. Protocol III。
 3. Protocol I+AAV86。
 4. Protocol III+AAV86。
-5. Protocol I+BB90+DCF。
+5. Protocol I+BMW16-derived Select+DCF（PROJECT_DERIVED）。
 6. Protocol III+BB90+DCF。
 
 每个实际实现必须记录独立标签、revision、输入边界、输出边界和安全模型。规划名称不能作为已完成证明。
@@ -102,7 +102,7 @@ CipherGPT 不纳入本轮实验。
 
 各方案使用同一 oracle。测试重构与明文校验只存在于隔离的 TEST_ONLY 路径，不进入 secure runtime。
 
-BB90+DCF 必须验证完整阈值选择与成员判断，不能只验证第 K 大 score。重复值情况下必须保持稳定同分规则，不能用简单 `score >= 阈值` 代替精确 Top-K。
+两条 Select+DCF 路线都必须验证完整阈值选择与成员判断，不能只验证第 K 大 score。重复值情况下必须保持稳定同分规则，不能用简单 `score >= 阈值` 代替精确 Top-K。Protocol I BMW16-derived 候选的概率与失败记录只按 S7 固定版本报告，不继承 BMW16 Theorem 8；Protocol III 的 BB90 参数和保证须独立固定。
 
 ## 3. 参数与输入矩阵
 
@@ -413,18 +413,19 @@ AES 调用、DCF.Eval、DPF.Eval 和 PRG 调用不是同一单位。可以并列
 
 实际计数与理论期望值分别列出。单次随机图的边数不能冒充期望复杂度。
 
-### 6.5 BB90+DCF
+### 6.5 Select+DCF
 
 分开记录：
 
-- BB90 选择阶段；
+- Protocol I BMW16-derived Select 阶段；
+- Protocol III BB90 选择阶段；
 - 最终 DCF 成员选择阶段；
 - 路由、逆映射和共享转换；
 - 完整总路径。
 
-记录 BB90 参数、实际迭代、种子、节点/边数及算法保证。
+分别记录来源标签、参数、实际比较/边计数、随机种子与失败事件。不得把 S7 TEST_ONLY 逻辑边或解析材料上界当作正式性能结果。
 
-最终 DCF 调用不应被隐藏在 BB90 图计数中；若另计入总体比较统计，必须明确分类和汇总关系。
+最终 DCF 调用不应隐藏在 Select 图计数中；若另计入总体比较统计，必须明确分类和汇总关系。
 
 ## 7. V1：Protocol I 通信核验
 
@@ -541,26 +542,28 @@ Protocol I 对应构造可对照 Theorem 5.1；Protocol III 组合使用单独�
 
 仅明文图、在线 Dealer 原型或完整图预留对照，不能作为目标协议的正式验收结果。
 
-## 10. V4：BB90+DCF 完整性能验收
+## 10. V4：Protocol I BMW16-derived Select + DCF / Protocol III BB90+DCF
+
+2026-10-06 范围注记：Protocol I 的候选选择源依用户更新登记为 `PROJECT_DERIVED` BMW16-derived Select；Protocol III 与历史 BB90 项目记录不变。S7 只有集中式 `TEST_ONLY` 功能/计数证据，没有 secure runtime 或 LAN/WAN 结果。故本节 V4 仍为 **未开始/未完成**；S7 小样本时间、集中式 FSS Eval 和解析容量均不得填作正式性能指标，也不得继承 BMW16 Theorem 8 或 BB90 性能常数。S7 指标缺失统一记为 `NOT_MEASURED`。
 
 ### 10.1 前置条件
 
 - V3 完整性能验收完成；
-- BB90 版本、参数和概率保证固定；
+- Protocol I 与 Protocol III 的来源版本、参数和各自概率保证固定；
 - 两种完整组合正确；
 - 稳定阈值、DCF 衔接及预处理条件经过审计。
 
 ### 10.2 执行
 
-1. 校验 BB90 阈值与稳定顺序统计量 oracle。
+1. 分别校验 BMW16-derived Select 与 BB90 候选阈值和稳定顺序统计量 oracle。
 2. 校验最终 mask 与完整 Top-K oracle。
-3. 固定 BB90 参数及种子安排。
+3. 固定各自参数及种子安排。
 4. 执行统一 `(n,K)` LAN/WAN 矩阵。
-5. 分别记录 BB90、DCF 和适配成本。
+5. 分别记录两种 Select、DCF 和适配成本。
 6. 对比同路线全对全与 AAV86 方案。
 7. 记录随机成本变化、失败事件和资源限制。
 
-不能因 BB90 内部比较少而省略后续 DCF、逆映射或共享转换成本。
+不能因任一 Select 内部比较少而省略后续 DCF、逆映射或共享转换成本。
 
 ### 10.3 交付物与通过条件
 

@@ -1,0 +1,55 @@
+{
+  "four_causal_plan_result_barriers": "PASS",
+  "label": "BMW16_S7_INDEPENDENT_EDGE_LIST_AUDIT_TEST_ONLY",
+  "rounds": {
+    "1": {
+      "cross_task_repeats_recomputed": 28,
+      "dummy_related_edges_recomputed": 76,
+      "edge_sha256_recomputed": "b46a044fe1a6ca6734c65a6015b7deff4e7f4cb8ca339395ff520348f2bae574",
+      "logical_edges_recomputed": 132,
+      "prior_round_repeat_calls_recomputed": 0,
+      "real_real_edges_recomputed": 56,
+      "same_round_global_repeats_recomputed": 28,
+      "same_task_repeats_recomputed": 0,
+      "unique_unordered_edges_recomputed": 104
+    },
+    "2": {
+      "cross_task_repeats_recomputed": 8,
+      "dummy_related_edges_recomputed": 16,
+      "edge_sha256_recomputed": "5e1d7ee305cc870c67e80a30bb0c9b4c26851cd2cf7850d8b4c0ccdfc1f1a38a",
+      "logical_edges_recomputed": 44,
+      "prior_round_repeat_calls_recomputed": 44,
+      "real_real_edges_recomputed": 28,
+      "same_round_global_repeats_recomputed": 10,
+      "same_task_repeats_recomputed": 2,
+      "unique_unordered_edges_recomputed": 34
+    },
+    "3": {
+      "cross_task_repeats_recomputed": 0,
+      "dummy_related_edges_recomputed": 0,
+      "edge_sha256_recomputed": "d1c6c90b276aea6abfdfbbb709b52ee783e116d289d6ac444a30b7054c1f7d5d",
+      "logical_edges_recomputed": 2,
+      "prior_round_repeat_calls_recomputed": 2,
+      "real_real_edges_recomputed": 2,
+      "same_round_global_repeats_recomputed": 0,
+      "same_task_repeats_recomputed": 0,
+      "unique_unordered_edges_recomputed": 2
+    },
+    "4": {
+      "cross_task_repeats_recomputed": 0,
+      "dummy_related_edges_recomputed": 0,
+      "edge_sha256_recomputed": "d1c6c90b276aea6abfdfbbb709b52ee783e116d289d6ac444a30b7054c1f7d5d",
+      "logical_edges_recomputed": 2,
+      "prior_round_repeat_calls_recomputed": 2,
+      "real_real_edges_recomputed": 2,
+      "same_round_global_repeats_recomputed": 0,
+      "same_task_repeats_recomputed": 0,
+      "unique_unordered_edges_recomputed": 2
+    }
+  },
+  "scope": "Independent counting and event-order audit of TEST_ONLY trace; not a secure-view proof.",
+  "source_run_json": "docs\\reproduction\\evidence\\BMW16_S7_E2E_N8_K3_SEED42.json",
+  "total_fss_material_slots_recomputed": 178,
+  "total_logical_edges_recomputed": 180,
+  "total_two_party_dcf_evals_recomputed": 712
+}

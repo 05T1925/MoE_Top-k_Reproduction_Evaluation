@@ -1,0 +1,2062 @@
+{
+  "label": "BMW16_S7_INDEPENDENT_VIEW_AND_NAMESPACE_AUDIT_TEST_ONLY",
+  "anonymous_handle_transcript_enumeration": [
+    {
+      "n": 2,
+      "secret_orders": 2,
+      "queried_undirected_edges": [],
+      "hidden_permutations_per_order": 2,
+      "transcript_distribution": {
+        "number_of_transcripts": 1,
+        "count_per_transcript": 2
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 1,
+        "count_per_transcript": 6
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 3
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 3
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 3
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 3,
+      "secret_orders": 6,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 6,
+      "transcript_distribution": {
+        "number_of_transcripts": 6,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 1,
+        "count_per_transcript": 24
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 12
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 12
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 12
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 2
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 12
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 6,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 6
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 12
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 6
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 6,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 2
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 14,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 18,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 2,
+        "count_per_transcript": 12
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 6
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 6,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 2
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 14,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 18,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 4,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 14,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 8,
+        "count_per_transcript": 2
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 18,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 6,
+        "count_per_transcript": 4
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 18,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 12,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 18,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 18,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    },
+    {
+      "n": 4,
+      "secret_orders": 24,
+      "queried_undirected_edges": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "hidden_permutations_per_order": 24,
+      "transcript_distribution": {
+        "number_of_transcripts": 24,
+        "count_per_transcript": 1
+      },
+      "same_distribution_for_every_secret_order": true
+    }
+  ],
+  "original_record_endpoint_leak_counterexample": {
+    "same_corrupted_P0_additive_shares": [
+      0,
+      0
+    ],
+    "same_corrupted_P1_additive_shares": [
+      0,
+      0
+    ],
+    "other_party_additive_shares_by_world": {
+      "when_P0_is_corrupted": {
+        "world_0_lt_1": [
+          0,
+          1
+        ],
+        "world_1_lt_0": [
+          1,
+          0
+        ]
+      },
+      "when_P1_is_corrupted": {
+        "world_0_lt_1": [
+          0,
+          1
+        ],
+        "world_1_lt_0": [
+          1,
+          0
+        ]
+      }
+    },
+    "world_order_0_lt_1_public_bit": 1,
+    "world_order_1_lt_0_public_bit": 0,
+    "ideal_top1_masks": {
+      "world_0_lt_1": [
+        0,
+        1
+      ],
+      "world_1_lt_0": [
+        1,
+        0
+      ]
+    },
+    "P0_ideal_XOR_output_share_distribution_each_world": {
+      "all_2_bit_share_vectors": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "probability_each": "1/4 in both worlds"
+    },
+    "public_bit_supports_disjoint_even_conditioned_on_P0_ideal_output_share": true,
+    "distinguishing_event": "public bit for endpoints named by original record IDs equals 1",
+    "conclusion": "S6 attack applies when public endpoint handles can be mapped to original records"
+  },
+  "namespace_capacity_configs": [
+    {
+      "n": 128,
+      "K": 2,
+      "M_each_select_partition": 254,
+      "two_instance_shared_real_plus_private_dummy_union": 380,
+      "S6_global_next_power_of_two_domain": 512,
+      "S6_comparator_numeric_code_bits_33_plus_b": 40,
+      "corrected_current_uCMP_bits_34_plus_b": 41,
+      "corrected_width_supported": true,
+      "S6_global_D_all_pairs_ordered_slots_direction_safe": 2109312,
+      "S6_global_D_all_pairs_unordered_slots_if_complement_proved": 1054656,
+      "per_instance_M_active_ordered_slots_direction_safe": 530352,
+      "per_instance_M_active_unordered_slots_if_complement_proved": 265176,
+      "membership_offline_ordered_slots_worst_case_threshold_unknown": 16256,
+      "membership_offline_unordered_slots_if_complement_proved": 8128,
+      "membership_actual_test_harness_calls_after_threshold_open": 128,
+      "per_party_serialized_lower_bound_bytes_corrected_width_M_active": 573310512,
+      "bytes_per_logical_slot_model": 1081,
+      "three_contracts": {
+        "global_shared_real_private_dummy_H_union_then_D_storage": {
+          "two_sentinel_intersection": "preserved if opaque real IDs match across instances",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "must include instance/round/stage/pair; global reuse would be invalid",
+          "capacity": {
+            "D": 512,
+            "ordered_active_full_D_pool": 2109312
+          }
+        },
+        "two_disjoint_M_local_namespaces": {
+          "two_sentinel_intersection": "not directly available; needs secret cross-instance real-record join",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "instance-scoped IDs naturally distinct",
+          "capacity": {
+            "ordered_full_active_pool": 530352
+          }
+        },
+        "shared_real_handles_plus_instance_local_dummy_addresses": {
+          "two_sentinel_intersection": "preserved for shared real handles; dummy addresses remain task-local",
+          "shuffle_privacy": "not established; public intersection may identify real cohort",
+          "key_id": "must include instance/round/stage even on a shared real endpoint pair",
+          "capacity": {
+            "union_handles": 380,
+            "per_instance_active_domain": 254,
+            "ordered_full_active_pool": 530352
+          }
+        }
+      },
+      "review": "next_power_of_two(2M-n) is a conservative global envelope, not required for each Select's active pair pool. Active-M capacity is smaller, but exceeds the existing 1,000,000 edge package limit at n=1000/K=80; DCF adaptive retrieval and joint views remain open."
+    },
+    {
+      "n": 128,
+      "K": 8,
+      "M_each_select_partition": 242,
+      "two_instance_shared_real_plus_private_dummy_union": 356,
+      "S6_global_next_power_of_two_domain": 512,
+      "S6_comparator_numeric_code_bits_33_plus_b": 40,
+      "corrected_current_uCMP_bits_34_plus_b": 41,
+      "corrected_width_supported": true,
+      "S6_global_D_all_pairs_ordered_slots_direction_safe": 2109312,
+      "S6_global_D_all_pairs_unordered_slots_if_complement_proved": 1054656,
+      "per_instance_M_active_ordered_slots_direction_safe": 482832,
+      "per_instance_M_active_unordered_slots_if_complement_proved": 241416,
+      "membership_offline_ordered_slots_worst_case_threshold_unknown": 16256,
+      "membership_offline_unordered_slots_if_complement_proved": 8128,
+      "membership_actual_test_harness_calls_after_threshold_open": 128,
+      "per_party_serialized_lower_bound_bytes_corrected_width_M_active": 521941392,
+      "bytes_per_logical_slot_model": 1081,
+      "three_contracts": {
+        "global_shared_real_private_dummy_H_union_then_D_storage": {
+          "two_sentinel_intersection": "preserved if opaque real IDs match across instances",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "must include instance/round/stage/pair; global reuse would be invalid",
+          "capacity": {
+            "D": 512,
+            "ordered_active_full_D_pool": 2109312
+          }
+        },
+        "two_disjoint_M_local_namespaces": {
+          "two_sentinel_intersection": "not directly available; needs secret cross-instance real-record join",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "instance-scoped IDs naturally distinct",
+          "capacity": {
+            "ordered_full_active_pool": 482832
+          }
+        },
+        "shared_real_handles_plus_instance_local_dummy_addresses": {
+          "two_sentinel_intersection": "preserved for shared real handles; dummy addresses remain task-local",
+          "shuffle_privacy": "not established; public intersection may identify real cohort",
+          "key_id": "must include instance/round/stage even on a shared real endpoint pair",
+          "capacity": {
+            "union_handles": 356,
+            "per_instance_active_domain": 242,
+            "ordered_full_active_pool": 482832
+          }
+        }
+      },
+      "review": "next_power_of_two(2M-n) is a conservative global envelope, not required for each Select's active pair pool. Active-M capacity is smaller, but exceeds the existing 1,000,000 edge package limit at n=1000/K=80; DCF adaptive retrieval and joint views remain open."
+    },
+    {
+      "n": 256,
+      "K": 2,
+      "M_each_select_partition": 510,
+      "two_instance_shared_real_plus_private_dummy_union": 764,
+      "S6_global_next_power_of_two_domain": 1024,
+      "S6_comparator_numeric_code_bits_33_plus_b": 41,
+      "corrected_current_uCMP_bits_34_plus_b": 42,
+      "corrected_width_supported": true,
+      "S6_global_D_all_pairs_ordered_slots_direction_safe": 8445696,
+      "S6_global_D_all_pairs_unordered_slots_if_complement_proved": 4222848,
+      "per_instance_M_active_ordered_slots_direction_safe": 2142000,
+      "per_instance_M_active_unordered_slots_if_complement_proved": 1071000,
+      "membership_offline_ordered_slots_worst_case_threshold_unknown": 65280,
+      "membership_offline_unordered_slots_if_complement_proved": 32640,
+      "membership_actual_test_harness_calls_after_threshold_open": 256,
+      "per_party_serialized_lower_bound_bytes_corrected_width_M_active": 2366910000,
+      "bytes_per_logical_slot_model": 1105,
+      "three_contracts": {
+        "global_shared_real_private_dummy_H_union_then_D_storage": {
+          "two_sentinel_intersection": "preserved if opaque real IDs match across instances",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "must include instance/round/stage/pair; global reuse would be invalid",
+          "capacity": {
+            "D": 1024,
+            "ordered_active_full_D_pool": 8445696
+          }
+        },
+        "two_disjoint_M_local_namespaces": {
+          "two_sentinel_intersection": "not directly available; needs secret cross-instance real-record join",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "instance-scoped IDs naturally distinct",
+          "capacity": {
+            "ordered_full_active_pool": 2142000
+          }
+        },
+        "shared_real_handles_plus_instance_local_dummy_addresses": {
+          "two_sentinel_intersection": "preserved for shared real handles; dummy addresses remain task-local",
+          "shuffle_privacy": "not established; public intersection may identify real cohort",
+          "key_id": "must include instance/round/stage even on a shared real endpoint pair",
+          "capacity": {
+            "union_handles": 764,
+            "per_instance_active_domain": 510,
+            "ordered_full_active_pool": 2142000
+          }
+        }
+      },
+      "review": "next_power_of_two(2M-n) is a conservative global envelope, not required for each Select's active pair pool. Active-M capacity is smaller, but exceeds the existing 1,000,000 edge package limit at n=1000/K=80; DCF adaptive retrieval and joint views remain open."
+    },
+    {
+      "n": 256,
+      "K": 8,
+      "M_each_select_partition": 498,
+      "two_instance_shared_real_plus_private_dummy_union": 740,
+      "S6_global_next_power_of_two_domain": 1024,
+      "S6_comparator_numeric_code_bits_33_plus_b": 41,
+      "corrected_current_uCMP_bits_34_plus_b": 42,
+      "corrected_width_supported": true,
+      "S6_global_D_all_pairs_ordered_slots_direction_safe": 8445696,
+      "S6_global_D_all_pairs_unordered_slots_if_complement_proved": 4222848,
+      "per_instance_M_active_ordered_slots_direction_safe": 2045328,
+      "per_instance_M_active_unordered_slots_if_complement_proved": 1022664,
+      "membership_offline_ordered_slots_worst_case_threshold_unknown": 65280,
+      "membership_offline_unordered_slots_if_complement_proved": 32640,
+      "membership_actual_test_harness_calls_after_threshold_open": 256,
+      "per_party_serialized_lower_bound_bytes_corrected_width_M_active": 2260087440,
+      "bytes_per_logical_slot_model": 1105,
+      "three_contracts": {
+        "global_shared_real_private_dummy_H_union_then_D_storage": {
+          "two_sentinel_intersection": "preserved if opaque real IDs match across instances",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "must include instance/round/stage/pair; global reuse would be invalid",
+          "capacity": {
+            "D": 1024,
+            "ordered_active_full_D_pool": 8445696
+          }
+        },
+        "two_disjoint_M_local_namespaces": {
+          "two_sentinel_intersection": "not directly available; needs secret cross-instance real-record join",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "instance-scoped IDs naturally distinct",
+          "capacity": {
+            "ordered_full_active_pool": 2045328
+          }
+        },
+        "shared_real_handles_plus_instance_local_dummy_addresses": {
+          "two_sentinel_intersection": "preserved for shared real handles; dummy addresses remain task-local",
+          "shuffle_privacy": "not established; public intersection may identify real cohort",
+          "key_id": "must include instance/round/stage even on a shared real endpoint pair",
+          "capacity": {
+            "union_handles": 740,
+            "per_instance_active_domain": 498,
+            "ordered_full_active_pool": 2045328
+          }
+        }
+      },
+      "review": "next_power_of_two(2M-n) is a conservative global envelope, not required for each Select's active pair pool. Active-M capacity is smaller, but exceeds the existing 1,000,000 edge package limit at n=1000/K=80; DCF adaptive retrieval and joint views remain open."
+    },
+    {
+      "n": 1000,
+      "K": 80,
+      "M_each_select_partition": 1842,
+      "two_instance_shared_real_plus_private_dummy_union": 2684,
+      "S6_global_next_power_of_two_domain": 4096,
+      "S6_comparator_numeric_code_bits_33_plus_b": 43,
+      "corrected_current_uCMP_bits_34_plus_b": 44,
+      "corrected_width_supported": true,
+      "S6_global_D_all_pairs_ordered_slots_direction_safe": 135183960,
+      "S6_global_D_all_pairs_unordered_slots_if_complement_proved": 67591980,
+      "per_instance_M_active_ordered_slots_direction_safe": 28127976,
+      "per_instance_M_active_unordered_slots_if_complement_proved": 14063988,
+      "membership_offline_ordered_slots_worst_case_threshold_unknown": 999000,
+      "membership_offline_unordered_slots_if_complement_proved": 499500,
+      "membership_actual_test_harness_calls_after_threshold_open": 1000,
+      "per_party_serialized_lower_bound_bytes_corrected_width_M_active": 32431556328,
+      "bytes_per_logical_slot_model": 1153,
+      "three_contracts": {
+        "global_shared_real_private_dummy_H_union_then_D_storage": {
+          "two_sentinel_intersection": "preserved if opaque real IDs match across instances",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "must include instance/round/stage/pair; global reuse would be invalid",
+          "capacity": {
+            "D": 4096,
+            "ordered_active_full_D_pool": 135183960
+          }
+        },
+        "two_disjoint_M_local_namespaces": {
+          "two_sentinel_intersection": "not directly available; needs secret cross-instance real-record join",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "instance-scoped IDs naturally distinct",
+          "capacity": {
+            "ordered_full_active_pool": 28127976
+          }
+        },
+        "shared_real_handles_plus_instance_local_dummy_addresses": {
+          "two_sentinel_intersection": "preserved for shared real handles; dummy addresses remain task-local",
+          "shuffle_privacy": "not established; public intersection may identify real cohort",
+          "key_id": "must include instance/round/stage even on a shared real endpoint pair",
+          "capacity": {
+            "union_handles": 2684,
+            "per_instance_active_domain": 1842,
+            "ordered_full_active_pool": 28127976
+          }
+        }
+      },
+      "review": "next_power_of_two(2M-n) is a conservative global envelope, not required for each Select's active pair pool. Active-M capacity is smaller, but exceeds the existing 1,000,000 edge package limit at n=1000/K=80; DCF adaptive retrieval and joint views remain open."
+    },
+    {
+      "n": 1000000,
+      "K": 1,
+      "M_each_select_partition": 2000000,
+      "two_instance_shared_real_plus_private_dummy_union": 3000000,
+      "S6_global_next_power_of_two_domain": 4194304,
+      "S6_comparator_numeric_code_bits_33_plus_b": 53,
+      "corrected_current_uCMP_bits_34_plus_b": 54,
+      "corrected_width_supported": false,
+      "S6_global_D_all_pairs_ordered_slots_direction_safe": 141737453800896,
+      "S6_global_D_all_pairs_unordered_slots_if_complement_proved": 70868726900448,
+      "per_instance_M_active_ordered_slots_direction_safe": 32999983000000,
+      "per_instance_M_active_unordered_slots_if_complement_proved": 16499991500000,
+      "membership_offline_ordered_slots_worst_case_threshold_unknown": 999999000000,
+      "membership_offline_unordered_slots_if_complement_proved": 499999500000,
+      "membership_actual_test_harness_calls_after_threshold_open": 1000000,
+      "per_party_serialized_lower_bound_bytes_corrected_width_M_active": "NOT_SUPPORTED_BY_CURRENT_UCMP",
+      "bytes_per_logical_slot_model": "NOT_SUPPORTED_BY_CURRENT_UCMP",
+      "three_contracts": {
+        "global_shared_real_private_dummy_H_union_then_D_storage": {
+          "two_sentinel_intersection": "preserved if opaque real IDs match across instances",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "must include instance/round/stage/pair; global reuse would be invalid",
+          "capacity": {
+            "D": 4194304,
+            "ordered_active_full_D_pool": 141737453800896
+          }
+        },
+        "two_disjoint_M_local_namespaces": {
+          "two_sentinel_intersection": "not directly available; needs secret cross-instance real-record join",
+          "shuffle_privacy": "not established by domain arithmetic",
+          "key_id": "instance-scoped IDs naturally distinct",
+          "capacity": {
+            "ordered_full_active_pool": 32999983000000
+          }
+        },
+        "shared_real_handles_plus_instance_local_dummy_addresses": {
+          "two_sentinel_intersection": "preserved for shared real handles; dummy addresses remain task-local",
+          "shuffle_privacy": "not established; public intersection may identify real cohort",
+          "key_id": "must include instance/round/stage even on a shared real endpoint pair",
+          "capacity": {
+            "union_handles": 3000000,
+            "per_instance_active_domain": 2000000,
+            "ordered_full_active_pool": 32999983000000
+          }
+        }
+      },
+      "review": "next_power_of_two(2M-n) is a conservative global envelope, not required for each Select's active pair pool. Active-M capacity is smaller, but exceeds the existing 1,000,000 edge package limit at n=1000/K=80; DCF adaptive retrieval and joint views remain open."
+    }
+  ],
+  "proof_boundary": {
+    "enumeration_proves": "For fixed queried handle edges and a uniformly random hidden relabeling, public strict-order bits have the same distribution for every strict underlying order for n<=4.",
+    "enumeration_does_not_prove": "Joint simulation of local shares, per-party shuffle state/messages, correlated multi-instance DCF materials/access trace, adaptive edge selection, abort, or output shares."
+  }
+}
