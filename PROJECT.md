@@ -110,7 +110,7 @@ AAV86 和 BB90 的原始文献用于补充算法来源。引用时必须区分�
 
 用户将六方案中 Protocol I 的选择升级候选指定为 **Protocol I + BMW16-derived Select + DCF**，身份为 `PROJECT_DERIVED`。该范围更新只替代 Protocol I 原先“BB90+DCF”比较项的候选算法来源；不改变 Protocol III 路线，不改写 BB90 历史来源、既有实验或论文结论，也不表示候选已经进入 VFSS secure runtime。
 
-S7 已交付集中式 `TEST_ONLY` 功能原型，但 party-view 联合安全、独立在线进程、输入无关离线材料、隐藏自适应图和安全逆路由仍未通过。因此当前安全入口为 **未实现**，正式性能矩阵为 **未开始**。算法标签 `BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY` 只表示 S4 项目衍生样本括区算法；不得继承 BMW16 Theorem 8 的概率/常数，不得称为 BB90 复现，也不得把四个明文比较依赖层称为完整安全入口四轮。具体复核见 [S7 决策](docs/decisions/BMW16_S7_PROTOCOL_I_COMPOSITION_DECISION_2026-10-06.md) 与 [S7 验证报告](docs/reproduction/BMW16_S7_COMPOSITION_AND_SECURITY_AUDIT_2026-10-06.md)。
+S7 的集中式 `TEST_ONLY` 原型保留为历史证据。S8 新增 T 离线发材、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` 功能候选并通过有限 oracle 样本；完整 party-view 联合安全仍为 **NO-GO**，故没有 secure 入口，正式性能矩阵仍 **未开始**。算法标签 `BMW16_DERIVED_SAMPLE_BRACKET_SELECT_4R_TEST_ONLY` 只表示 S4 项目衍生样本括区算法；不得继承 BMW16 Theorem 8 的概率/常数，不得称为 BB90 复现，也不得把四个 Select 比较依赖层称为完整安全入口四轮。具体复核见 [S7 决策](docs/decisions/BMW16_S7_PROTOCOL_I_COMPOSITION_DECISION_2026-10-06.md)、[S8 决策](docs/decisions/BMW16_S8_OFFLINE_THREE_PROCESS_COMPOSITION_DECISION_2026-10-06.md) 与 [S8 验证报告](docs/reproduction/BMW16_S8_THREE_PROCESS_COMPOSITION_AND_PRIVACY_AUDIT_2026-10-06.md)。
 
 旧路线计划中“先完成 M6A 性能、再进行 M6B 正式性能矩阵”的顺序仍约束生产集成和统一性能验收；本次明确授权的是隔离研究原型和安全组合设计，不据此把后续正式顺序或验收状态标成完成。
 

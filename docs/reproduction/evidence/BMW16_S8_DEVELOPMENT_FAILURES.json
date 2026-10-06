@@ -1,0 +1,51 @@
+{
+  "label": "BMW16_S8_DEVELOPMENT_FAILURES_TEST_ONLY",
+  "scope": "Implementation and audit-tool bring-up failures; none is an algorithm sample removed from the final matrix.",
+  "algorithm_failures_in_final_runs": 0,
+  "events": [
+    {
+      "id": "S8-DEV-01",
+      "stage": "first two-party smoke",
+      "observed": "P0/P1 adaptive graph equality check rejected a plan",
+      "cause": "one process serialized edge tuples while the peer comparison decoded them as JSON lists",
+      "resolution": "canonicalized both plan payloads to JSON list form before equality checks",
+      "classification": "harness interoperability error; no algorithm result counted",
+      "retested": true
+    },
+    {
+      "id": "S8-DEV-02",
+      "stage": "offline package negative conformance",
+      "observed": "silent-peer timeout exited with a traceback and no structured party result",
+      "cause": "Peer construction occurred before the party exception handler",
+      "resolution": "moved peer creation into the same handler and propagated a received peer abort class; peer-silent now writes ABORT_COMMUNICATION/no_mask, and a connected wrong-party package test makes both parties write ABORT_MATERIAL/no_mask",
+      "classification": "real TEST_ONLY abort-contract defect; fixed before final matrix",
+      "retested": true
+    },
+    {
+      "id": "S8-DEV-03",
+      "stage": "n64 fixture load",
+      "observed": "JSONDecodeError: Extra data at file end",
+      "cause": "fixture writer appended the two literal characters backslash+n after the JSON array",
+      "resolution": "rewrote fixture with an actual newline and verified exactly 64 signed-int32 values",
+      "classification": "fixture formatting error; T and party processes did not run",
+      "retested": true
+    },
+    {
+      "id": "S8-DEV-04",
+      "stage": "first independent edge-auditor run",
+      "observed": "auditor rejected n=1 because it expected no comparison trace",
+      "cause": "S4 still emits four local dummy-only trace layers for the singleton while the endpoint uses a one-phase no-shuffle shortcut",
+      "resolution": "auditor now verifies all four causal trace layers, zero FSS slots, and the single final network phase",
+      "classification": "audit-tool model error; no protocol run was rejected",
+      "retested": true
+    }
+  ],
+  "final_algorithm_cases": {
+    "n_le_8": 11,
+    "n64": 1,
+    "success": 12,
+    "oracle_pass": 12,
+    "probability_abort": 0,
+    "completed_wrong": 0
+  }
+}

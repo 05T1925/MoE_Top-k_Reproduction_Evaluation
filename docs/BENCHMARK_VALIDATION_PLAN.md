@@ -544,7 +544,7 @@ Protocol I 对应构造可对照 Theorem 5.1；Protocol III 组合使用单独�
 
 ## 10. V4：Protocol I BMW16-derived Select + DCF / Protocol III BB90+DCF
 
-2026-10-06 范围注记：Protocol I 的候选选择源依用户更新登记为 `PROJECT_DERIVED` BMW16-derived Select；Protocol III 与历史 BB90 项目记录不变。S7 只有集中式 `TEST_ONLY` 功能/计数证据，没有 secure runtime 或 LAN/WAN 结果。故本节 V4 仍为 **未开始/未完成**；S7 小样本时间、集中式 FSS Eval 和解析容量均不得填作正式性能指标，也不得继承 BMW16 Theorem 8 或 BB90 性能常数。S7 指标缺失统一记为 `NOT_MEASURED`。
+2026-10-06 范围注记：Protocol I 的候选选择源依用户更新登记为 `PROJECT_DERIVED` BMW16-derived Select；Protocol III 与历史 BB90 项目记录不变。S7 的集中式证据保留历史身份；S8 新增 T 离线、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` 功能组合及 loopback 计数，但联合 party-view 安全仍 NO-GO，没有 secure runtime 或 LAN/WAN 结果。故本节 V4 仍为 **未开始/未完成**；S7/S8 的小样本时间、FSS Eval、实际实验材料文件字节和解析容量均不得填作正式性能指标，也不得继承 BMW16 Theorem 8 或 BB90 性能常数。未实测指标统一记为 `NOT_MEASURED`。详见 S8 决策与复核报告。
 
 ### 10.1 前置条件
 

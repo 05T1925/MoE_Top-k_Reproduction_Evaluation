@@ -726,7 +726,7 @@ Protocol III + AAV86
 
 #### 2026-10-06 Protocol I 候选更新
 
-按用户本次明确范围，六方案中的 Protocol I 选择路线当前候选改为 **Protocol I + BMW16-derived Select + DCF**（`PROJECT_DERIVED`），不登记为 BB90 算法或 BMW16 定理直接实现。本节的 Protocol III 路线仍按 BB90 研究目标执行。该变更仅授权从 S4/S5/S6 证据继续做隔离参考实现与组合门审查，不覆盖 BB90 历史计划。S7 交付状态为 `TEST_ONLY` 功能原型；联合 party-view 安全仍 `NO-GO`，未新增 secure runtime，完整性能矩阵 `NOT_RUN`。安全入口实现仍须等待独立安全门；M6A 与正式 V4 性能验收的既定依赖不因本次研究授权而标记完成。见 S7 决策与验证报告。
+按用户明确范围，六方案中的 Protocol I 选择路线候选为 **Protocol I + BMW16-derived Select + DCF**（`PROJECT_DERIVED`），不登记为 BB90 算法或 BMW16 定理直接实现。本节的 Protocol III 路线仍按 BB90 研究目标执行。S7 集中式原型与报告保留历史身份；S8 已交付 T 离线发材、P0/P1 分进程的 `EXPERIMENTAL_TEST_ONLY` raw-score→原序 mask 组合，并验证有限样本。S8 联合 party-view 安全仍 `NO-GO`，未新增 secure runtime，完整性能矩阵 `NOT_RUN`。正式安全入口仍须等待独立安全门；M6A 与正式 V4 性能验收的既定依赖不因隔离实验授权而标记完成。见 [S7 决策/报告](docs/decisions/BMW16_S7_PROTOCOL_I_COMPOSITION_DECISION_2026-10-06.md) 与 [S8 决策/报告](docs/decisions/BMW16_S8_OFFLINE_THREE_PROCESS_COMPOSITION_DECISION_2026-10-06.md)。
 
 #### 前置条件
 
@@ -736,7 +736,7 @@ BB90 原文研究和明文算法设计可以提前进行，但不能以此跳过
 
 #### 设计阶段
 
-1. Protocol I 固定 S7 选择候选版本、有限规模行为、失败语义与安全门；不得继承 BMW16 Theorem 8 的概率或比较常数。
+1. Protocol I 固定 S4/S8 选择候选版本、有限规模行为、失败语义与安全门；不得继承 BMW16 Theorem 8 的概率或比较常数。S8 的三进程材料合同只在 `EXPERIMENTAL_TEST_ONLY` 范围运行，不能视作 secure 接收或正式性能入口。
 2. Protocol III 固定 BB90 采用版本、适用范围、迭代参数及概率保证。
 3. 明确两种算法各自从顺序统计量到本项目稳定 K-th 优先级的映射、成本界和失败事件。
 4. 给出各自比较图/阶段到安全组合的转换依据。

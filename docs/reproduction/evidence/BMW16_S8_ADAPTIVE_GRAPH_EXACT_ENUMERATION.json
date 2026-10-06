@@ -1,0 +1,114 @@
+{
+  "all_public_transcript_distributions_equal": true,
+  "both_select_instances": "same real handles, separate sentinel/dummy identities and derived seeds",
+  "enumerated": [
+    {
+      "K": 1,
+      "n": 2,
+      "rows": [
+        {
+          "algorithm_seed": 42,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 2,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 2,
+          "transcript_support_world1": 2
+        },
+        {
+          "algorithm_seed": 43,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 2,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 2,
+          "transcript_support_world1": 2
+        }
+      ]
+    },
+    {
+      "K": 1,
+      "n": 3,
+      "rows": [
+        {
+          "algorithm_seed": 42,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 6,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 6,
+          "transcript_support_world1": 6
+        },
+        {
+          "algorithm_seed": 43,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 6,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 6,
+          "transcript_support_world1": 6
+        }
+      ]
+    },
+    {
+      "K": 2,
+      "n": 4,
+      "rows": [
+        {
+          "algorithm_seed": 42,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 24,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 24,
+          "transcript_support_world1": 24
+        },
+        {
+          "algorithm_seed": 43,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 24,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 24,
+          "transcript_support_world1": 24
+        }
+      ]
+    },
+    {
+      "K": 2,
+      "n": 5,
+      "rows": [
+        {
+          "algorithm_seed": 42,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 120,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 120,
+          "transcript_support_world1": 120
+        },
+        {
+          "algorithm_seed": 43,
+          "corrupt_P0_view_multiset_equal_under_ideal_output_shares": true,
+          "corrupt_P1_view_multiset_equal_under_ideal_output_shares": true,
+          "hidden_permutations_per_world": 120,
+          "scope": "adaptive R1-R4 edges/outcomes, both sentinel instances, shared handles, selected handle, and abort; no local shuffle messages or DCF keys",
+          "transcript_multiset_equal": true,
+          "transcript_support_world0": 120,
+          "transcript_support_world1": 120
+        }
+      ]
+    }
+  ],
+  "fixed_corrupt_party_input_shares": "all-zero vector in both worlds",
+  "label": "BMW16_S8_EXACT_ADAPTIVE_GRAPH_VIEW_ENUMERATION_TEST_ONLY",
+  "permutation_model": "uniform hidden mapping from original records to anonymous handles",
+  "security_boundary": "finite exact check for public comparison graph and ideal output-share marginal only; it excludes actual local shuffle state/messages, FSS key pools/access traces, and their joint correlation"
+}
