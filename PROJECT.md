@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-26
+更新日期：2026-10-07
 
 ## 1. 项目目标与当前边界
 
@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED；S14 在 opt-in VFSS C++ 三进程全链上完成 bundle-wide one-shot claim、shuffle-only 发材、n=128 有界验证与 loopback pilot；完整联合视图与生产认证发材仍 NO-GO，无 secure runtime |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S15 在既有 opt-in VFSS C++ 三进程全链上完成 n=256 有界验证和 DCF AES 扩展调用计数；SUCCESS soundness 与理想抽样界有条件推导，完整 shuffle/相关多 key 联合视图和生产认证交付仍 NO-GO，无 secure runtime |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -880,3 +880,7 @@ CryptoMoE 的模型参数、eligibility、容量、dummy、drop 和 transcript �
 ### 2026-10-06 S14 有界研发补充
 
 S14 在 S13 同一 VFSS C++ 实验入口实施 bundle-wide durable burn + 进程内 slot guard，并为 BMW16 前向/逆向 shuffle 采用 shuffle-only materials；通用 Protocol I shuffle 默认仍携带 CmpAgg。checked capacity 后 n=128/K=2、8、80 的 common-tape differential 与三进程 frozen-oracle E2E 均通过；n=64/K=8 和 n=128/K=80 完成同机 loopback pilot。多 key correlated/adaptive DCF party-view hybrid 和生产 T 私有认证发材仍 NO-GO/未实现，因此实现身份保持 `PROJECT_DERIVED / EXPERIMENTAL`，不创建 secure alias，不启动 V4 正式 LAN/WAN 五次矩阵。详见 `docs/decisions/BMW16_S14_ONE_SHOT_MATERIAL_AND_N128_BOUNDED_PILOT_2026-10-06.md`、`docs/reproduction/BMW16_S14_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md` 和相邻证据索引。
+
+### 2026-10-07 S15 接收与 n=256 有界扩展
+
+S15 从 S14 报告提交 `1c92ca6` 独立接收被测源码 `998726b`，复用既有全链入口并将其 TEST_ONLY 域上限扩展到 n≤256；增加默认关闭的普通 DCF KeyGen/Eval AES 扩展调用计数，并用独立审计器复算计量恒等式。对精确比较结果下的任意有效 n/K 给出 SUCCESS soundness 证明；对实际整数抽样规则给出理想无放回采样 abort union bound，不继承 BMW16 Theorem 8。n=256/K=2、8 的 common-tape trace 和独立进程 oracle E2E 有界样本通过。整池 correlated/adaptive DCF 与实际 shuffle 联合 party-view hybrid、生产凭据/远程私有发材仍 NO-GO；S15 保持 `PROJECT_DERIVED / EXPERIMENTAL`，不创建 secure alias、不启动 V4 正式矩阵。S15 同时复现“复制 bundle 到新的空 claim store 后可以再次领取”的最小反例，故 durable one-shot 仅限共用受保护 claim store。详见 [S15 决策](docs/decisions/BMW16_S15_SUCCESS_SOUNDNESS_ABORT_BOUND_AND_VIEW_GATE_2026-10-07.md)、[S15 独立验证报告](docs/reproduction/BMW16_S15_INDEPENDENT_ACCEPTANCE_AND_N256_DIAGNOSTICS_2026-10-07.md) 与[外部证据索引](docs/reproduction/evidence/BMW16_S15_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。

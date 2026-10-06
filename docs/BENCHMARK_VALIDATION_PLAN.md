@@ -711,3 +711,7 @@ V3、V4 报告额外包含：
 - 未解释的关键通信或协议差异不能被数量级结论覆盖。
 - 后续改动使既有结果失效时，只重跑受影响范围并保留版本关系。
 - M7 汇总已经验收的证据，不通过写最终报告追认未完成工作。
+
+### 2026-10-07 M6B-I-BMW16-S15 有界诊断补充
+
+S15 对 `Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL` 做的 n=64/128/256 同机 loopback 1 warmup + 5 attempt 只作为研究性 pilot。其输入、计时和材料边界没有与 Protocol I 全对全及 Protocol I+AAV86 在同一被测 revision/环境下配对，因此不得横向拼接中位数、不得写入 V4 正式验收表。汇总必须保留每次 attempt（包括概率 abort、材料 abort、通信错误及其成本），并将条件于 SUCCESS 的耗时与每次尝试总成本分栏。S15 增加普通 DCF KeyGen/Eval AES 扩展调用字段；该计数不覆盖 shuffle 或 FSS 全库 PRG，未覆盖字段仍记 `NOT_MEASURED`。详见 [S15 验证报告](reproduction/BMW16_S15_INDEPENDENT_ACCEPTANCE_AND_N256_DIAGNOSTICS_2026-10-07.md)。

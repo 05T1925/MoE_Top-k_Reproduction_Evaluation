@@ -1,12 +1,14 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-26
+更新日期：2026-10-07
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
 
 **2026-10-06 S14 有界研发附注：**S14 从 S13 `0eab2e3` 的隔离 worktree 继续复用 VFSS C++ party API，实施 bundle-wide one-shot burn 与进程内槽唯一性 guard、BMW16 shuffle-only 发材、n=128/K=2/8/80 的 common-tape 与独立进程 E2E，以及 n=64/128 的 1 warmup + 5 same-host loopback pilot。该研发由用户明确授权，提前开放的是 `EXPERIMENTAL` 研发和有界诊断，不表示 V3 完成或 V4 正式性能验收可以开始。完整 shuffle + correlated multi-key/adaptive DCF party-view simulator 和生产 T→party 私有认证交付仍未闭合/未实现；保持 NO-GO，不创建 secure alias。历史 S13 “n=128 未运行”陈述仍是 S13 截止时的准确记录，S14 的 n=128 数据只记在 [S14 决策](decisions/BMW16_S14_ONE_SHOT_MATERIAL_AND_N128_BOUNDED_PILOT_2026-10-06.md) 与 [S14 报告](reproduction/BMW16_S14_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
+
+**2026-10-07 S15 有界扩展附注：**S15 从 S14 报告提交 `1c92ca6` 独立重建并接收被测源码 `998726b`，复用同一 C++ EXPERIMENTAL 全链入口；将该实验 API/bundle 的有限域从 n≤128 扩至 n≤256，增加默认关闭的普通 DCF AES 扩展调用计数、独立日志/成本审计器、n=256 checked 容量/理想 abort 界与 common-tape/E2E/pilot 工具。对精确比较结果证明 SUCCESS soundness；理想均匀无放回采样下的实际有限参数 union bound 与计算随机源假设分开。完整 shuffle 与相关整池 DCF/adaptive view 的 simulator、生产 party 凭据/跨目录抗重放仍 NO-GO；状态保持 `PROJECT_DERIVED / EXPERIMENTAL`。V3/V4 与六方案验收没有提前完成，loopback 只属有界研究 pilot，不能并入正式性能表。具体复跑结果与外部证据哈希见 [S15 决策](decisions/BMW16_S15_SUCCESS_SOUNDNESS_ABORT_BOUND_AND_VIEW_GATE_2026-10-07.md)、[S15 验证报告](reproduction/BMW16_S15_INDEPENDENT_ACCEPTANCE_AND_N256_DIAGNOSTICS_2026-10-07.md) 和[证据索引](reproduction/evidence/BMW16_S15_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。
 当前状态：M2 已完成；三轮 C-INSTANTIATION、独立评审与 Theorem 4.1 逻辑通信匹配不改变 `AUTHOR_EXACT = NOT_PROVEN` 的证据边界。接收方复跑后 M5 已完成，M6A 为当前阶段。M5-H1 通过用户指定的数量级门槛，但 Theorem 4.2 精确逻辑成本仍相差 `254n` bits。F1 经 PR #25 合入；接收方在 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过 F2/G3 和 41/41 回归。dated strict-gate 与 H2 初始 FAIL 记录保留为历史。M5-FIX-F1 = COMPLETED；F2 / G3 = PASS。详见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
