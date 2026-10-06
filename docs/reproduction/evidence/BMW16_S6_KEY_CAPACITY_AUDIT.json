@@ -1,0 +1,2559 @@
+{
+  "S4_comparison_bound_configurations": [
+    {
+      "M": 254,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 4301744,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 2150872,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 508,
+        "current_uCMP_evalDCF_per_party": 254,
+        "logical_real_record_comparisons": 127,
+        "offline_unordered_real_pair_slot_universe": 8128,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 32512,
+        "current_uCMP_evalDCF_per_party": 16256,
+        "logical_real_real_comparisons": 8128,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 10668,
+        "R2": 508,
+        "R3": 520192,
+        "R4": 6350
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 21336,
+        "R2": 1016,
+        "R3": 1040384,
+        "R4": 12700
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 1075436
+    },
+    {
+      "M": 242,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 4098512,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 2049256,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 508,
+        "current_uCMP_evalDCF_per_party": 254,
+        "logical_real_record_comparisons": 127,
+        "offline_unordered_real_pair_slot_universe": 8128,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 32512,
+        "current_uCMP_evalDCF_per_party": 16256,
+        "logical_real_real_comparisons": 8128,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 10164,
+        "R2": 484,
+        "R3": 495616,
+        "R4": 6050
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 20328,
+        "R2": 968,
+        "R3": 991232,
+        "R4": 12100
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 1024628
+    },
+    {
+      "M": 256,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 4335616,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 2167808,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 508,
+        "current_uCMP_evalDCF_per_party": 254,
+        "logical_real_record_comparisons": 127,
+        "offline_unordered_real_pair_slot_universe": 8128,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 32512,
+        "current_uCMP_evalDCF_per_party": 16256,
+        "logical_real_real_comparisons": 8128,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 10752,
+        "R2": 512,
+        "R3": 524288,
+        "R4": 6400
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 21504,
+        "R2": 1024,
+        "R3": 1048576,
+        "R4": 12800
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 1083904
+    },
+    {
+      "M": 256,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 4335616,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 2167808,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 508,
+        "current_uCMP_evalDCF_per_party": 254,
+        "logical_real_record_comparisons": 127,
+        "offline_unordered_real_pair_slot_universe": 8128,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 32512,
+        "current_uCMP_evalDCF_per_party": 16256,
+        "logical_real_real_comparisons": 8128,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 10752,
+        "R2": 512,
+        "R3": 524288,
+        "R4": 6400
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 21504,
+        "R2": 1024,
+        "R3": 1048576,
+        "R4": 12800
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 1083904
+    },
+    {
+      "M": 510,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 8637360,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 4318680,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 1020,
+        "current_uCMP_evalDCF_per_party": 510,
+        "logical_real_record_comparisons": 255,
+        "offline_unordered_real_pair_slot_universe": 32640,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 130560,
+        "current_uCMP_evalDCF_per_party": 65280,
+        "logical_real_real_comparisons": 32640,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 21420,
+        "R2": 1020,
+        "R3": 1044480,
+        "R4": 12750
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 42840,
+        "R2": 2040,
+        "R3": 2088960,
+        "R4": 25500
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 2159340
+    },
+    {
+      "M": 498,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 8434128,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 4217064,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 1020,
+        "current_uCMP_evalDCF_per_party": 510,
+        "logical_real_record_comparisons": 255,
+        "offline_unordered_real_pair_slot_universe": 32640,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 130560,
+        "current_uCMP_evalDCF_per_party": 65280,
+        "logical_real_real_comparisons": 32640,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 20916,
+        "R2": 996,
+        "R3": 1019904,
+        "R4": 12450
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 41832,
+        "R2": 1992,
+        "R3": 2039808,
+        "R4": 24900
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 2108532
+    },
+    {
+      "M": 512,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 8671232,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 4335616,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 1020,
+        "current_uCMP_evalDCF_per_party": 510,
+        "logical_real_record_comparisons": 255,
+        "offline_unordered_real_pair_slot_universe": 32640,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 130560,
+        "current_uCMP_evalDCF_per_party": 65280,
+        "logical_real_real_comparisons": 32640,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 21504,
+        "R2": 1024,
+        "R3": 1048576,
+        "R4": 12800
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 43008,
+        "R2": 2048,
+        "R3": 2097152,
+        "R4": 25600
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 2167808
+    },
+    {
+      "M": 512,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 8671232,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 4335616,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 1020,
+        "current_uCMP_evalDCF_per_party": 510,
+        "logical_real_record_comparisons": 255,
+        "offline_unordered_real_pair_slot_universe": 32640,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 130560,
+        "current_uCMP_evalDCF_per_party": 65280,
+        "logical_real_real_comparisons": 32640,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 21504,
+        "R2": 1024,
+        "R3": 1048576,
+        "R4": 12800
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 43008,
+        "R2": 2048,
+        "R3": 2097152,
+        "R4": 25600
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 2167808
+    },
+    {
+      "M": 1842,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 31196112,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 15598056,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 3996,
+        "current_uCMP_evalDCF_per_party": 1998,
+        "logical_real_record_comparisons": 999,
+        "offline_unordered_real_pair_slot_universe": 499500,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 1998000,
+        "current_uCMP_evalDCF_per_party": 999000,
+        "logical_real_real_comparisons": 499500,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 77364,
+        "R2": 3684,
+        "R3": 3772416,
+        "R4": 46050
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 154728,
+        "R2": 7368,
+        "R3": 7544832,
+        "R4": 92100
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 7799028
+    },
+    {
+      "M": 2000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 33872000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 16936000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 3996,
+        "current_uCMP_evalDCF_per_party": 1998,
+        "logical_real_record_comparisons": 999,
+        "offline_unordered_real_pair_slot_universe": 499500,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 1998000,
+        "current_uCMP_evalDCF_per_party": 999000,
+        "logical_real_real_comparisons": 499500,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 84000,
+        "R2": 4000,
+        "R3": 4096000,
+        "R4": 50000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 168000,
+        "R2": 8000,
+        "R3": 8192000,
+        "R4": 100000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 8468000
+    },
+    {
+      "M": 2000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 33872000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 16936000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 3996,
+        "current_uCMP_evalDCF_per_party": 1998,
+        "logical_real_record_comparisons": 999,
+        "offline_unordered_real_pair_slot_universe": 499500,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 1998000,
+        "current_uCMP_evalDCF_per_party": 999000,
+        "logical_real_real_comparisons": 499500,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 84000,
+        "R2": 4000,
+        "R3": 4096000,
+        "R4": 50000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 168000,
+        "R2": 8000,
+        "R3": 8192000,
+        "R4": 100000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 8468000
+    },
+    {
+      "M": 20000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 116160000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 58080000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 39996,
+        "current_uCMP_evalDCF_per_party": 19998,
+        "logical_real_record_comparisons": 9999,
+        "offline_unordered_real_pair_slot_universe": 49995000,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 199980000,
+        "current_uCMP_evalDCF_per_party": 99990000,
+        "logical_real_real_comparisons": 49995000,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 840000,
+        "R2": 40000,
+        "R3": 13140000,
+        "R4": 500000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 1680000,
+        "R2": 80000,
+        "R3": 26280000,
+        "R4": 1000000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 29040000
+    },
+    {
+      "M": 20000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 116160000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 58080000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 39996,
+        "current_uCMP_evalDCF_per_party": 19998,
+        "logical_real_record_comparisons": 9999,
+        "offline_unordered_real_pair_slot_universe": 49995000,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 199980000,
+        "current_uCMP_evalDCF_per_party": 99990000,
+        "logical_real_real_comparisons": 49995000,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 840000,
+        "R2": 40000,
+        "R3": 13140000,
+        "R4": 500000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 1680000,
+        "R2": 80000,
+        "R3": 26280000,
+        "R4": 1000000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 29040000
+    },
+    {
+      "M": 200000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 1161600000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 580800000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 399996,
+        "current_uCMP_evalDCF_per_party": 199998,
+        "logical_real_record_comparisons": 99999,
+        "offline_unordered_real_pair_slot_universe": 4999950000,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 19999800000,
+        "current_uCMP_evalDCF_per_party": 9999900000,
+        "logical_real_real_comparisons": 4999950000,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 8400000,
+        "R2": 400000,
+        "R3": 131400000,
+        "R4": 5000000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 16800000,
+        "R2": 800000,
+        "R3": 262800000,
+        "R4": 10000000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 290400000
+    },
+    {
+      "M": 200000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 1161600000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 580800000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 399996,
+        "current_uCMP_evalDCF_per_party": 199998,
+        "logical_real_record_comparisons": 99999,
+        "offline_unordered_real_pair_slot_universe": 4999950000,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 19999800000,
+        "current_uCMP_evalDCF_per_party": 9999900000,
+        "logical_real_real_comparisons": 4999950000,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 8400000,
+        "R2": 400000,
+        "R3": 131400000,
+        "R4": 5000000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 16800000,
+        "R2": 800000,
+        "R3": 262800000,
+        "R4": 10000000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 290400000
+    },
+    {
+      "M": 2000000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 11616000000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 5808000000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 3999996,
+        "current_uCMP_evalDCF_per_party": 1999998,
+        "logical_real_record_comparisons": 999999,
+        "offline_unordered_real_pair_slot_universe": 499999500000,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 1999998000000,
+        "current_uCMP_evalDCF_per_party": 999999000000,
+        "logical_real_real_comparisons": 499999500000,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 84000000,
+        "R2": 4000000,
+        "R3": 1314000000,
+        "R4": 50000000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 168000000,
+        "R2": 8000000,
+        "R3": 2628000000,
+        "R4": 100000000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 2904000000
+    },
+    {
+      "M": 2000000,
+      "actual_dummy_related_calls": "NOT_RUN_IN_S6",
+      "actual_final_DCF_membership_Evals": "NOT_IMPLEMENTED",
+      "actual_logical_calls": "NOT_RUN_IN_S6",
+      "actual_true_true_calls": "NOT_RUN_IN_S6",
+      "actual_uCMP_DCF_Evals": "NOT_RUN_IN_S6",
+      "four_comparison_layers": 4,
+      "if_each_call_uses_current_uCMP_DCF_Evals_both_parties": 11616000000,
+      "if_each_call_uses_current_uCMP_DCF_Evals_per_party": 5808000000,
+      "linear_in_original_n_bound": true,
+      "membership_candidate_if_hidden_selected_star_is_available": {
+        "current_uCMP_evalDCF_both_parties": 3999996,
+        "current_uCMP_evalDCF_per_party": 1999998,
+        "logical_real_record_comparisons": 999999,
+        "offline_unordered_real_pair_slot_universe": 499999500000,
+        "status": "HYPOTHETICAL; hidden selected-handle key lookup/MUX is not implemented"
+      },
+      "membership_full_pair_then_secret_mux_fallback": {
+        "current_uCMP_evalDCF_both_parties": 1999998000000,
+        "current_uCMP_evalDCF_per_party": 999999000000,
+        "logical_real_real_comparisons": 499999500000,
+        "status": "HYPOTHETICAL; quadratic online work, not an approved fallback"
+      },
+      "per_instance_logical_comparison_call_upper_bounds": {
+        "R1": 84000000,
+        "R2": 4000000,
+        "R3": 1314000000,
+        "R4": 50000000
+      },
+      "two_partition_instances_same_clock_upper_bounds": {
+        "R1": 168000000,
+        "R2": 8000000,
+        "R3": 2628000000,
+        "R4": 100000000
+      },
+      "two_partition_logical_comparison_call_total_upper_bound": 2904000000
+    }
+  ],
+  "assumptions": {
+    "S4_low_to_high_real_order": "score ascending, original_index descending",
+    "S5_byte_estimate": "97+24*Bin bytes per party/edge (16 endpoint-mask + 24 envelope + current 57+24*Bin key serialization); lower bound only",
+    "compact_shared_pad_option": "M+1 union is a PROJECT_DERIVED identity-sharing extension and is not used for conservative sizing",
+    "comparison_bits": "33 + max(1, ceil(log2(n)))",
+    "current_runtime_domain_limit": "Protocol I layout currently pads logical n only through 1,048,576; a larger common-handle D requires a new domain API",
+    "fixed_sample_pool": "conditional only; requires fixed hidden sample-handle proof; direction-safe R2 union is s*(D-1)",
+    "membership_direction_for_reverse_priority_R": "R_i >= R_selected",
+    "offline_full_pool_canonical_optimization": "8*C(D,2)+C(n,2), only if canonical comparison shares can safely derive the reverse bit without another one-shot key/Eval",
+    "offline_full_pool_direction_safe": "8*D*(D-1)+n*(n-1), where D=next_power_of_two(2*M-n); one slot per ordered comparator request and stage/instance",
+    "scores": "signed int32 raw Q20.12 bit patterns",
+    "select_rank_1based": "r=n-K+1",
+    "slot_accounting": "one ordered one-shot material request requires one party key slot at P0 and one at P1; canonical reuse is separately identified as conditional",
+    "stable_order": "score descending, original_index ascending",
+    "storage_padding": "D-(2*M-n) addresses are capacity-only and are not S4 Select items"
+  },
+  "capacity_configurations": [
+    {
+      "K": 2,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 598767408,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 530352,
+      "S5_fixed_sample_canonical_slots_conditional": 201420,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 227403180,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 418389336,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 370584,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 299383704,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 265176,
+      "S5_tagged_bin": 43,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1114771392,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 584208,
+      "S6_common_logical_union_ordered_slots": 1168416,
+      "S6_compact_shared_pad_union_slots_project_extension": 534416,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 699953856,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1296000384,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 1226112,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 662208,
+      "S6_offset_bin": 40,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 2229542784,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_storage_domain_canonical_slots_conditional": 1054656,
+      "S6_storage_domain_ordered_slots": 2109312,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 255,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 127,
+      "high_pad_H": 125,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 254,
+      "n": 128,
+      "one_round_clique_slots_M": 32131,
+      "one_round_clique_slots_compact_shared_pad_union": 32385,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 72010,
+      "one_round_clique_slots_storage_D": 130816,
+      "one_round_directed_material_slots_storage_D": 261632,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": false,
+      "power_of_two_storage_domain_D": 512,
+      "sample_s5_M": 128,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 128,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 380,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 132,
+      "target_real_rank_1based": 127
+    },
+    {
+      "K": 8,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 545117328,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 482832,
+      "S5_fixed_sample_canonical_slots_conditional": 185022,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 208889838,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 384756426,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 340794,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 272558664,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 241416,
+      "S5_tagged_bin": 43,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1114771392,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 513648,
+      "S6_common_logical_union_ordered_slots": 1027296,
+      "S6_compact_shared_pad_union_slots_project_extension": 486704,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 696713094,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1291161438,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 1221534,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 659142,
+      "S6_offset_bin": 40,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 2229542784,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_storage_domain_canonical_slots_conditional": 1054656,
+      "S6_storage_domain_ordered_slots": 2109312,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 243,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 121,
+      "high_pad_H": 113,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 242,
+      "n": 128,
+      "one_round_clique_slots_M": 29161,
+      "one_round_clique_slots_compact_shared_pad_union": 29403,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 63190,
+      "one_round_clique_slots_storage_D": 130816,
+      "one_round_directed_material_slots_storage_D": 261632,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": false,
+      "power_of_two_storage_domain_D": 512,
+      "sample_s5_M": 125,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 125,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 356,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 156,
+      "target_real_rank_1based": 121
+    },
+    {
+      "K": 1,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 607961984,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 538496,
+      "S5_fixed_sample_canonical_slots_conditional": 203968,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 230279872,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 423564672,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 375168,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 303980992,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 269248,
+      "S5_tagged_bin": 43,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1114771392,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 596416,
+      "S6_common_logical_union_ordered_slots": 1192832,
+      "S6_compact_shared_pad_union_slots_project_extension": 542592,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 699953856,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1296000384,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 1226112,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 662208,
+      "S6_offset_bin": 40,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 2229542784,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_storage_domain_canonical_slots_conditional": 1054656,
+      "S6_storage_domain_ordered_slots": 2109312,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 257,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 128,
+      "high_pad_H": 127,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 256,
+      "n": 128,
+      "one_round_clique_slots_M": 32640,
+      "one_round_clique_slots_compact_shared_pad_union": 32896,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 73536,
+      "one_round_clique_slots_storage_D": 130816,
+      "one_round_directed_material_slots_storage_D": 261632,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": false,
+      "power_of_two_storage_domain_D": 512,
+      "sample_s5_M": 128,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 128,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 384,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 128,
+      "target_real_rank_1based": 128
+    },
+    {
+      "K": 128,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 607961984,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 538496,
+      "S5_fixed_sample_canonical_slots_conditional": 203968,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 230279872,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 423564672,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 375168,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 303980992,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 269248,
+      "S5_tagged_bin": 43,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1114771392,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 596416,
+      "S6_common_logical_union_ordered_slots": 1192832,
+      "S6_compact_shared_pad_union_slots_project_extension": 542592,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 699953856,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 1296000384,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 1226112,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 662208,
+      "S6_offset_bin": 40,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1057,
+        "bits_supported": true,
+        "conservative_party_bytes": 2229542784,
+        "ucmp_party_key_bytes_per_slot": 1017
+      },
+      "S6_storage_domain_canonical_slots_conditional": 1054656,
+      "S6_storage_domain_ordered_slots": 2109312,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 257,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 128,
+      "high_pad_H": 0,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 127,
+      "median_input_size_M": 256,
+      "n": 128,
+      "one_round_clique_slots_M": 32640,
+      "one_round_clique_slots_compact_shared_pad_union": 32896,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 73536,
+      "one_round_clique_slots_storage_D": 130816,
+      "one_round_directed_material_slots_storage_D": 261632,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": false,
+      "power_of_two_storage_domain_D": 512,
+      "sample_s5_M": 128,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 128,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 384,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 128,
+      "target_real_rank_1based": 1
+    },
+    {
+      "K": 2,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 2469726000,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 2142000,
+      "S5_fixed_sample_canonical_slots_conditional": 736078,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 848697934,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1560075874,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 1353058,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1234863000,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 1071000,
+      "S5_tagged_bin": 44,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 4564898688,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 2364368,
+      "S6_common_logical_union_ordered_slots": 4728736,
+      "S6_compact_shared_pad_union_slots_project_extension": 2150160,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 2700413670,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 5070942894,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 4690974,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 2498070,
+      "S6_offset_bin": 41,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 9129797376,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_storage_domain_canonical_slots_conditional": 4222848,
+      "S6_storage_domain_ordered_slots": 8445696,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 511,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 255,
+      "high_pad_H": 253,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 510,
+      "n": 256,
+      "one_round_clique_slots_M": 129795,
+      "one_round_clique_slots_compact_shared_pad_union": 130305,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 291466,
+      "one_round_clique_slots_storage_D": 523776,
+      "one_round_directed_material_slots_storage_D": 1047552,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 1024,
+      "sample_s5_M": 181,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 181,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 764,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 260,
+      "target_real_rank_1based": 255
+    },
+    {
+      "K": 8,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 2358263184,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 2045328,
+      "S5_fixed_sample_canonical_slots_conditional": 705578,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 813531434,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1495387962,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 1296954,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1179131592,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 1022664,
+      "S5_tagged_bin": 44,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 4564898688,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 2220080,
+      "S6_common_logical_union_ordered_slots": 4440160,
+      "S6_compact_shared_pad_union_slots_project_extension": 2053296,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 2695990218,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 5064967126,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 4685446,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 2493978,
+      "S6_offset_bin": 41,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 9129797376,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_storage_domain_canonical_slots_conditional": 4222848,
+      "S6_storage_domain_ordered_slots": 8445696,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 499,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 249,
+      "high_pad_H": 241,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 498,
+      "n": 256,
+      "one_round_clique_slots_M": 123753,
+      "one_round_clique_slots_compact_shared_pad_union": 124251,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 273430,
+      "one_round_clique_slots_storage_D": 523776,
+      "one_round_directed_material_slots_storage_D": 1047552,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 1024,
+      "sample_s5_M": 179,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 179,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 740,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 284,
+      "target_real_rank_1based": 249
+    },
+    {
+      "K": 1,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 2488561408,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 2158336,
+      "S5_fixed_sample_canonical_slots_conditional": 741908,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 855419924,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1572341488,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 1363696,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1244280704,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 1079168,
+      "S5_tagged_bin": 44,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 4564898688,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 2388864,
+      "S6_common_logical_union_ordered_slots": 4777728,
+      "S6_compact_shared_pad_union_slots_project_extension": 2166528,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 2702625396,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 5073937264,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 4693744,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 2500116,
+      "S6_offset_bin": 41,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 9129797376,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_storage_domain_canonical_slots_conditional": 4222848,
+      "S6_storage_domain_ordered_slots": 8445696,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 513,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 256,
+      "high_pad_H": 255,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 512,
+      "n": 256,
+      "one_round_clique_slots_M": 130816,
+      "one_round_clique_slots_compact_shared_pad_union": 131328,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 294528,
+      "one_round_clique_slots_storage_D": 523776,
+      "one_round_directed_material_slots_storage_D": 1047552,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 1024,
+      "sample_s5_M": 182,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 182,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 768,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 256,
+      "target_real_rank_1based": 256
+    },
+    {
+      "K": 256,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 2488561408,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 2158336,
+      "S5_fixed_sample_canonical_slots_conditional": 741908,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 855419924,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1572341488,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 1363696,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1153,
+        "bits_supported": true,
+        "conservative_party_bytes": 1244280704,
+        "ucmp_party_key_bytes_per_slot": 1113
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 1079168,
+      "S5_tagged_bin": 44,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 4564898688,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 2388864,
+      "S6_common_logical_union_ordered_slots": 4777728,
+      "S6_compact_shared_pad_union_slots_project_extension": 2166528,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 2702625396,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 5073937264,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 4693744,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 2500116,
+      "S6_offset_bin": 41,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1081,
+        "bits_supported": true,
+        "conservative_party_bytes": 9129797376,
+        "ucmp_party_key_bytes_per_slot": 1041
+      },
+      "S6_storage_domain_canonical_slots_conditional": 4222848,
+      "S6_storage_domain_ordered_slots": 8445696,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 513,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 256,
+      "high_pad_H": 0,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 255,
+      "median_input_size_M": 512,
+      "n": 256,
+      "one_round_clique_slots_M": 130816,
+      "one_round_clique_slots_compact_shared_pad_union": 131328,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 294528,
+      "one_round_clique_slots_storage_D": 523776,
+      "one_round_directed_material_slots_storage_D": 1047552,
+      "one_round_storage_clique_exceeds_current_package_limit": false,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 1024,
+      "sample_s5_M": 182,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 182,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 768,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 256,
+      "target_real_rank_1based": 1
+    },
+    {
+      "K": 80,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 33781699176,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 28127976,
+      "S5_fixed_sample_canonical_slots_conditional": 8548352,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 10266570752,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 19295362080,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 16066080,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 16890849588,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 14063988,
+      "S5_tagged_bin": 46,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 76311345420,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 29304188,
+      "S6_common_logical_union_ordered_slots": 58608376,
+      "S6_compact_shared_pad_union_slots_project_extension": 28157448,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 41618439900,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 80322506296,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 71144824,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 36863100,
+      "S6_offset_bin": 43,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 152622690840,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_storage_domain_canonical_slots_conditional": 67591980,
+      "S6_storage_domain_ordered_slots": 135183960,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 1843,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 921,
+      "high_pad_H": 841,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 1842,
+      "n": 1000,
+      "one_round_clique_slots_M": 1695561,
+      "one_round_clique_slots_compact_shared_pad_union": 1697403,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 3600586,
+      "one_round_clique_slots_storage_D": 8386560,
+      "one_round_directed_material_slots_storage_D": 16773120,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 4096,
+      "sample_s5_M": 344,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 344,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 2684,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 1412,
+      "target_real_rank_1based": 921
+    },
+    {
+      "K": 1,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 39612583000,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 32983000,
+      "S5_fixed_sample_canonical_slots_conditional": 9926784,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 11922067584,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 22432153096,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 18677896,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 19806291500,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 16491500,
+      "S5_tagged_bin": 46,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 76311345420,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 36487500,
+      "S6_common_logical_union_ordered_slots": 72975000,
+      "S6_compact_shared_pad_union_slots_project_extension": 33015000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 41747891040,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 80474117448,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 71279112,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 36977760,
+      "S6_offset_bin": 43,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 152622690840,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_storage_domain_canonical_slots_conditional": 67591980,
+      "S6_storage_domain_ordered_slots": 135183960,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 1000,
+      "high_pad_H": 999,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 2000,
+      "n": 1000,
+      "one_round_clique_slots_M": 1999000,
+      "one_round_clique_slots_compact_shared_pad_union": 2001000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 4498500,
+      "one_round_clique_slots_storage_D": 8386560,
+      "one_round_directed_material_slots_storage_D": 16773120,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 4096,
+      "sample_s5_M": 358,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 358,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 1096,
+      "target_real_rank_1based": 1000
+    },
+    {
+      "K": 1000,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 39612583000,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 32983000,
+      "S5_fixed_sample_canonical_slots_conditional": 9926784,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 11922067584,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 22432153096,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 18677896,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1201,
+        "bits_supported": true,
+        "conservative_party_bytes": 19806291500,
+        "ucmp_party_key_bytes_per_slot": 1161
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 16491500,
+      "S5_tagged_bin": 46,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 76311345420,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 36487500,
+      "S6_common_logical_union_ordered_slots": 72975000,
+      "S6_compact_shared_pad_union_slots_project_extension": 33015000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 41747891040,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 80474117448,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 71279112,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 36977760,
+      "S6_offset_bin": 43,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1129,
+        "bits_supported": true,
+        "conservative_party_bytes": 152622690840,
+        "ucmp_party_key_bytes_per_slot": 1089
+      },
+      "S6_storage_domain_canonical_slots_conditional": 67591980,
+      "S6_storage_domain_ordered_slots": 135183960,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 1000,
+      "high_pad_H": 0,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 999,
+      "median_input_size_M": 2000,
+      "n": 1000,
+      "one_round_clique_slots_M": 1999000,
+      "one_round_clique_slots_compact_shared_pad_union": 2001000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 4498500,
+      "one_round_clique_slots_storage_D": 8386560,
+      "one_round_directed_material_slots_storage_D": 16773120,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 4096,
+      "sample_s5_M": 358,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 358,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 1096,
+      "target_real_rank_1based": 1
+    },
+    {
+      "K": 1,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 4279879510000,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 3299830000,
+      "S5_fixed_sample_canonical_slots_conditional": 895232736,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 1161116858592,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 2266829571040,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 1747748320,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 2139939755000,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 1649915000,
+      "S5_tagged_bin": 50,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 5322418249400,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 3649875000,
+      "S6_common_logical_union_ordered_slots": 7299750000,
+      "S6_compact_shared_pad_union_slots_project_extension": 3300150000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 2782707060000,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 5477674837600,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 4471571296,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 2271597600,
+      "S6_offset_bin": 47,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 10644836498800,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_storage_domain_canonical_slots_conditional": 4344831224,
+      "S6_storage_domain_ordered_slots": 8689662448,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 20001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 10000,
+      "high_pad_H": 9999,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 20000,
+      "n": 10000,
+      "one_round_clique_slots_M": 199990000,
+      "one_round_clique_slots_compact_shared_pad_union": 200010000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 449985000,
+      "one_round_clique_slots_storage_D": 536854528,
+      "one_round_directed_material_slots_storage_D": 1073709056,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 32768,
+      "sample_s5_M": 1132,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 1132,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 30000,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 2768,
+      "target_real_rank_1based": 10000
+    },
+    {
+      "K": 10000,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 4279879510000,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 3299830000,
+      "S5_fixed_sample_canonical_slots_conditional": 895232736,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 1161116858592,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 2266829571040,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 1747748320,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 2139939755000,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 1649915000,
+      "S5_tagged_bin": 50,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 5322418249400,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 3649875000,
+      "S6_common_logical_union_ordered_slots": 7299750000,
+      "S6_compact_shared_pad_union_slots_project_extension": 3300150000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 2782707060000,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 5477674837600,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 4471571296,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 2271597600,
+      "S6_offset_bin": 47,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1225,
+        "bits_supported": true,
+        "conservative_party_bytes": 10644836498800,
+        "ucmp_party_key_bytes_per_slot": 1185
+      },
+      "S6_storage_domain_canonical_slots_conditional": 4344831224,
+      "S6_storage_domain_ordered_slots": 8689662448,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 20001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 10000,
+      "high_pad_H": 0,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 9999,
+      "median_input_size_M": 20000,
+      "n": 10000,
+      "one_round_clique_slots_M": 199990000,
+      "one_round_clique_slots_compact_shared_pad_union": 200010000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 449985000,
+      "one_round_clique_slots_storage_D": 536854528,
+      "one_round_directed_material_slots_storage_D": 1073709056,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 32768,
+      "sample_s5_M": 1132,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 1132,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 30000,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 2768,
+      "target_real_rank_1based": 1
+    },
+    {
+      "K": 1,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 451767672700000,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 329998300000,
+      "S5_fixed_sample_canonical_slots_conditional": 86430742844,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 118323686953436,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 234723113212864,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 171455889856,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 225883836350000,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 164999150000,
+      "S5_tagged_bin": 53,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 1432548796369328,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 364998750000,
+      "S6_common_logical_union_ordered_slots": 729997500000,
+      "S6_compact_shared_pad_union_slots_project_extension": 330001500000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 724382947469948,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 1443933012554176,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 1113286825408,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 558506513084,
+      "S6_offset_bin": 50,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 2865097592738656,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_storage_domain_canonical_slots_conditional": 1104509480624,
+      "S6_storage_domain_ordered_slots": 2209018961248,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 200001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 100000,
+      "high_pad_H": 99999,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 200000,
+      "n": 100000,
+      "one_round_clique_slots_M": 19999900000,
+      "one_round_clique_slots_compact_shared_pad_union": 20000100000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 44999850000,
+      "one_round_clique_slots_storage_D": 137438691328,
+      "one_round_directed_material_slots_storage_D": 274877382656,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 524288,
+      "sample_s5_M": 3578,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 3578,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 300000,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 224288,
+      "target_real_rank_1based": 100000
+    },
+    {
+      "K": 100000,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 451767672700000,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 329998300000,
+      "S5_fixed_sample_canonical_slots_conditional": 86430742844,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 118323686953436,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 234723113212864,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 171455889856,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 225883836350000,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 164999150000,
+      "S5_tagged_bin": 53,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 1432548796369328,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 364998750000,
+      "S6_common_logical_union_ordered_slots": 729997500000,
+      "S6_compact_shared_pad_union_slots_project_extension": 330001500000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 724382947469948,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 1443933012554176,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 1113286825408,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 558506513084,
+      "S6_offset_bin": 50,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1297,
+        "bits_supported": true,
+        "conservative_party_bytes": 2865097592738656,
+        "ucmp_party_key_bytes_per_slot": 1257
+      },
+      "S6_storage_domain_canonical_slots_conditional": 1104509480624,
+      "S6_storage_domain_ordered_slots": 2209018961248,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 200001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 100000,
+      "high_pad_H": 0,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 99999,
+      "median_input_size_M": 200000,
+      "n": 100000,
+      "one_round_clique_slots_M": 19999900000,
+      "one_round_clique_slots_compact_shared_pad_union": 20000100000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 44999850000,
+      "one_round_clique_slots_storage_D": 137438691328,
+      "one_round_directed_material_slots_storage_D": 274877382656,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 524288,
+      "sample_s5_M": 3578,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 3578,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 300000,
+      "storage_D_fits_current_protocol_i_padded_domain": true,
+      "storage_only_padding_D_minus_M_plus_1": 224288,
+      "target_real_rank_1based": 1
+    },
+    {
+      "K": 1,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 32999983000000,
+      "S5_fixed_sample_canonical_slots_conditional": 8545251477372,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 17045502967936,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 16499991500000,
+      "S5_tagged_bin": 56,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 97019287126713312,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 36499987500000,
+      "S6_common_logical_union_ordered_slots": 72999975000000,
+      "S6_compact_shared_pad_union_slots_project_extension": 33000015000000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 48981823215367452,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 97834066887556224,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 71463891079296,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 35779271888508,
+      "S6_offset_bin": 53,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 194038574253426624,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_storage_domain_canonical_slots_conditional": 70868726900448,
+      "S6_storage_domain_ordered_slots": 141737453800896,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2000001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 1000000,
+      "high_pad_H": 999999,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 0,
+      "median_input_size_M": 2000000,
+      "n": 1000000,
+      "one_round_clique_slots_M": 1999999000000,
+      "one_round_clique_slots_compact_shared_pad_union": 2000001000000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 4499998500000,
+      "one_round_clique_slots_storage_D": 8796090925056,
+      "one_round_directed_material_slots_storage_D": 17592181850112,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 4194304,
+      "sample_s5_M": 11314,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 11314,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000000,
+      "storage_D_fits_current_protocol_i_padded_domain": false,
+      "storage_only_padding_D_minus_M_plus_1": 1194304,
+      "target_real_rank_1based": 1000000
+    },
+    {
+      "K": 1000000,
+      "S5_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_direction_safe_ordered_edge_material_slots": 32999983000000,
+      "S5_fixed_sample_canonical_slots_conditional": 8545251477372,
+      "S5_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_fixed_sample_direction_safe_capacity_if_no_orientation_reuse": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_fixed_sample_direction_safe_slots_if_no_orientation_reuse": 17045502967936,
+      "S5_reported_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": null,
+        "bits_supported": false,
+        "conservative_party_bytes": null,
+        "fixed_sample_party_bytes": null,
+        "ucmp_party_key_bytes_per_slot": null
+      },
+      "S5_reported_canonical_edge_material_slots_conditional": 16499991500000,
+      "S5_tagged_bin": 56,
+      "S6_canonical_capacity_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 97019287126713312,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_common_logical_union_canonical_slots_conditional": 36499987500000,
+      "S6_common_logical_union_ordered_slots": 72999975000000,
+      "S6_compact_shared_pad_union_slots_project_extension": 33000015000000,
+      "S6_fixed_sample_capacity_canonical_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 48981823215367452,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_fixed_sample_capacity_ordered_conditional": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 97834066887556224,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_fixed_sample_storage_domain_ordered_slots_conditional": 71463891079296,
+      "S6_fixed_sample_storage_domain_slots_canonical_conditional": 35779271888508,
+      "S6_offset_bin": 53,
+      "S6_ordered_capacity": {
+        "accounted_lower_bound_bytes_per_party_slot": 1369,
+        "bits_supported": true,
+        "conservative_party_bytes": 194038574253426624,
+        "ucmp_party_key_bytes_per_slot": 1329
+      },
+      "S6_storage_domain_canonical_slots_conditional": 70868726900448,
+      "S6_storage_domain_ordered_slots": 141737453800896,
+      "actual_disk_bytes": "NOT_MEASURED",
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2000001,
+      "current_party_package_edge_limit": 1000000,
+      "current_protocol_i_max_padded_domain": 1048576,
+      "estimated_generated_bytes": "NOT_MEASURED",
+      "half_h": 1000000,
+      "high_pad_H": 0,
+      "keygen_time": "NOT_MEASURED",
+      "low_pad_L": 999999,
+      "median_input_size_M": 2000000,
+      "n": 1000000,
+      "one_round_clique_slots_M": 1999999000000,
+      "one_round_clique_slots_compact_shared_pad_union": 2000001000000,
+      "one_round_clique_slots_source_faithful_union_2M_minus_n": 4499998500000,
+      "one_round_clique_slots_storage_D": 8796090925056,
+      "one_round_directed_material_slots_storage_D": 17592181850112,
+      "one_round_storage_clique_exceeds_current_package_limit": true,
+      "one_round_storage_directed_pool_exceeds_current_package_limit": true,
+      "power_of_two_storage_domain_D": 4194304,
+      "sample_s5_M": 11314,
+      "sample_s6_M_algorithm_D_storage_envelope_conditional": 11314,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000000,
+      "storage_D_fits_current_protocol_i_padded_domain": false,
+      "storage_only_padding_D_minus_M_plus_1": 1194304,
+      "target_real_rank_1based": 1
+    }
+  ],
+  "edge_coverage_enumeration": {
+    "possible_pivot_pair_sets_exhausted": 2815,
+    "r1_formula": "C(s,2)",
+    "r2_directed_union_formula": "s*(D-1): item->pivot; sample-sample edges include both orientations",
+    "r2_union_formula": "s*D - C(s+1,2)",
+    "r3_r4_full_pool": "D*(D-1) ordered slots per round and instance; C(D,2) only with a proven reverse-share complement transform",
+    "sample_subsets_exhausted": 466
+  },
+  "environment": {
+    "implementation": "CPython",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.7"
+  },
+  "key_conformance": {
+    "exhaustive_boundary_vectors_n_le_4": 780,
+    "exhaustive_ternary_vectors_n_le_6": 1092,
+    "topk_kth_cases_checked": 8975
+  },
+  "label": "BMW16_DERIVED_SELECT_PROTOCOL_I_COMPOSITION_REVIEW_TEST_ONLY",
+  "metrics_not_measured": [
+    "actual key generation/Dealer runtime",
+    "actual material bytes generated and persisted",
+    "online time, per-party sent/received bytes",
+    "PRG calls, abort frequency",
+    "actual DCF/uCMP evaluations for an S6 secure entry",
+    "secure online causal rounds"
+  ],
+  "status": "PASS_ARITHMETIC_AND_COVERAGE_CHECKS; NO_SECURE_COMPOSITION_CLAIM",
+  "width_configurations": [
+    {
+      "K": 2,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 43,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 255,
+      "derived_comparison_bits_33_plus_b": 40,
+      "encoded_union_max_code": 549755814014,
+      "half_h": 127,
+      "high_pad_H": 125,
+      "index_bits_b": 7,
+      "low_pad_L": 0,
+      "median_input_size_M": 254,
+      "n": 128,
+      "power_of_two_storage_domain_D": 512,
+      "real_key_max_Rmax": 549755813887,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 380,
+      "storage_only_padding_D_minus_M_plus_1": 132,
+      "target_real_rank_1based": 127,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 8,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 43,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 243,
+      "derived_comparison_bits_33_plus_b": 40,
+      "encoded_union_max_code": 549755814002,
+      "half_h": 121,
+      "high_pad_H": 113,
+      "index_bits_b": 7,
+      "low_pad_L": 0,
+      "median_input_size_M": 242,
+      "n": 128,
+      "power_of_two_storage_domain_D": 512,
+      "real_key_max_Rmax": 549755813887,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 356,
+      "storage_only_padding_D_minus_M_plus_1": 156,
+      "target_real_rank_1based": 121,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 43,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 257,
+      "derived_comparison_bits_33_plus_b": 40,
+      "encoded_union_max_code": 549755814016,
+      "half_h": 128,
+      "high_pad_H": 127,
+      "index_bits_b": 7,
+      "low_pad_L": 0,
+      "median_input_size_M": 256,
+      "n": 128,
+      "power_of_two_storage_domain_D": 512,
+      "real_key_max_Rmax": 549755813887,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 384,
+      "storage_only_padding_D_minus_M_plus_1": 128,
+      "target_real_rank_1based": 128,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 128,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 43,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 257,
+      "derived_comparison_bits_33_plus_b": 40,
+      "encoded_union_max_code": 549755814016,
+      "half_h": 128,
+      "high_pad_H": 0,
+      "index_bits_b": 7,
+      "low_pad_L": 127,
+      "median_input_size_M": 256,
+      "n": 128,
+      "power_of_two_storage_domain_D": 512,
+      "real_key_max_Rmax": 549755813887,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 384,
+      "storage_only_padding_D_minus_M_plus_1": 128,
+      "target_real_rank_1based": 1,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 2,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 44,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 511,
+      "derived_comparison_bits_33_plus_b": 41,
+      "encoded_union_max_code": 1099511628030,
+      "half_h": 255,
+      "high_pad_H": 253,
+      "index_bits_b": 8,
+      "low_pad_L": 0,
+      "median_input_size_M": 510,
+      "n": 256,
+      "power_of_two_storage_domain_D": 1024,
+      "real_key_max_Rmax": 1099511627775,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 764,
+      "storage_only_padding_D_minus_M_plus_1": 260,
+      "target_real_rank_1based": 255,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 8,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 44,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 499,
+      "derived_comparison_bits_33_plus_b": 41,
+      "encoded_union_max_code": 1099511628018,
+      "half_h": 249,
+      "high_pad_H": 241,
+      "index_bits_b": 8,
+      "low_pad_L": 0,
+      "median_input_size_M": 498,
+      "n": 256,
+      "power_of_two_storage_domain_D": 1024,
+      "real_key_max_Rmax": 1099511627775,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 740,
+      "storage_only_padding_D_minus_M_plus_1": 284,
+      "target_real_rank_1based": 249,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 44,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 513,
+      "derived_comparison_bits_33_plus_b": 41,
+      "encoded_union_max_code": 1099511628032,
+      "half_h": 256,
+      "high_pad_H": 255,
+      "index_bits_b": 8,
+      "low_pad_L": 0,
+      "median_input_size_M": 512,
+      "n": 256,
+      "power_of_two_storage_domain_D": 1024,
+      "real_key_max_Rmax": 1099511627775,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 768,
+      "storage_only_padding_D_minus_M_plus_1": 256,
+      "target_real_rank_1based": 256,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 256,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 44,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 513,
+      "derived_comparison_bits_33_plus_b": 41,
+      "encoded_union_max_code": 1099511628032,
+      "half_h": 256,
+      "high_pad_H": 0,
+      "index_bits_b": 8,
+      "low_pad_L": 255,
+      "median_input_size_M": 512,
+      "n": 256,
+      "power_of_two_storage_domain_D": 1024,
+      "real_key_max_Rmax": 1099511627775,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 768,
+      "storage_only_padding_D_minus_M_plus_1": 256,
+      "target_real_rank_1based": 1,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 80,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 46,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 1843,
+      "derived_comparison_bits_33_plus_b": 43,
+      "encoded_union_max_code": 4398046511922,
+      "half_h": 921,
+      "high_pad_H": 841,
+      "index_bits_b": 10,
+      "low_pad_L": 0,
+      "median_input_size_M": 1842,
+      "n": 1000,
+      "power_of_two_storage_domain_D": 4096,
+      "real_key_max_Rmax": 4398046511079,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 2684,
+      "storage_only_padding_D_minus_M_plus_1": 1412,
+      "target_real_rank_1based": 921,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 46,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2001,
+      "derived_comparison_bits_33_plus_b": 43,
+      "encoded_union_max_code": 4398046512080,
+      "half_h": 1000,
+      "high_pad_H": 999,
+      "index_bits_b": 10,
+      "low_pad_L": 0,
+      "median_input_size_M": 2000,
+      "n": 1000,
+      "power_of_two_storage_domain_D": 4096,
+      "real_key_max_Rmax": 4398046511079,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000,
+      "storage_only_padding_D_minus_M_plus_1": 1096,
+      "target_real_rank_1based": 1000,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1000,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 46,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2001,
+      "derived_comparison_bits_33_plus_b": 43,
+      "encoded_union_max_code": 4398046512080,
+      "half_h": 1000,
+      "high_pad_H": 0,
+      "index_bits_b": 10,
+      "low_pad_L": 999,
+      "median_input_size_M": 2000,
+      "n": 1000,
+      "power_of_two_storage_domain_D": 4096,
+      "real_key_max_Rmax": 4398046511079,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000,
+      "storage_only_padding_D_minus_M_plus_1": 1096,
+      "target_real_rank_1based": 1,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 50,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 20001,
+      "derived_comparison_bits_33_plus_b": 47,
+      "encoded_union_max_code": 70368744181280,
+      "half_h": 10000,
+      "high_pad_H": 9999,
+      "index_bits_b": 14,
+      "low_pad_L": 0,
+      "median_input_size_M": 20000,
+      "n": 10000,
+      "power_of_two_storage_domain_D": 32768,
+      "real_key_max_Rmax": 70368744171279,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 30000,
+      "storage_only_padding_D_minus_M_plus_1": 2768,
+      "target_real_rank_1based": 10000,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 10000,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 50,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 20001,
+      "derived_comparison_bits_33_plus_b": 47,
+      "encoded_union_max_code": 70368744181280,
+      "half_h": 10000,
+      "high_pad_H": 0,
+      "index_bits_b": 14,
+      "low_pad_L": 9999,
+      "median_input_size_M": 20000,
+      "n": 10000,
+      "power_of_two_storage_domain_D": 32768,
+      "real_key_max_Rmax": 70368744171279,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 30000,
+      "storage_only_padding_D_minus_M_plus_1": 2768,
+      "target_real_rank_1based": 1,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 53,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 200001,
+      "derived_comparison_bits_33_plus_b": 50,
+      "encoded_union_max_code": 562949953490240,
+      "half_h": 100000,
+      "high_pad_H": 99999,
+      "index_bits_b": 17,
+      "low_pad_L": 0,
+      "median_input_size_M": 200000,
+      "n": 100000,
+      "power_of_two_storage_domain_D": 524288,
+      "real_key_max_Rmax": 562949953390239,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 300000,
+      "storage_only_padding_D_minus_M_plus_1": 224288,
+      "target_real_rank_1based": 100000,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 100000,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 53,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 200001,
+      "derived_comparison_bits_33_plus_b": 50,
+      "encoded_union_max_code": 562949953490240,
+      "half_h": 100000,
+      "high_pad_H": 0,
+      "index_bits_b": 17,
+      "low_pad_L": 99999,
+      "median_input_size_M": 200000,
+      "n": 100000,
+      "power_of_two_storage_domain_D": 524288,
+      "real_key_max_Rmax": 562949953390239,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 300000,
+      "storage_only_padding_D_minus_M_plus_1": 224288,
+      "target_real_rank_1based": 1,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 56,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2000001,
+      "derived_comparison_bits_33_plus_b": 53,
+      "encoded_union_max_code": 4503599628321920,
+      "half_h": 1000000,
+      "high_pad_H": 999999,
+      "index_bits_b": 20,
+      "low_pad_L": 0,
+      "median_input_size_M": 2000000,
+      "n": 1000000,
+      "power_of_two_storage_domain_D": 4194304,
+      "real_key_max_Rmax": 4503599627321919,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000000,
+      "storage_only_padding_D_minus_M_plus_1": 1194304,
+      "target_real_rank_1based": 1000000,
+      "uCMP_34_to_53_supported": true
+    },
+    {
+      "K": 1000000,
+      "S5_tagged_comparison_bits_36_plus_ceil_log2_n": 56,
+      "compact_shared_pad_union_handles_M_plus_1_project_extension": 2000001,
+      "derived_comparison_bits_33_plus_b": 53,
+      "encoded_union_max_code": 4503599628321920,
+      "half_h": 1000000,
+      "high_pad_H": 0,
+      "index_bits_b": 20,
+      "low_pad_L": 999999,
+      "median_input_size_M": 2000000,
+      "n": 1000000,
+      "power_of_two_storage_domain_D": 4194304,
+      "real_key_max_Rmax": 4503599627321919,
+      "real_key_min": 0,
+      "source_faithful_two_instance_union_handles_2M_minus_n": 3000000,
+      "storage_only_padding_D_minus_M_plus_1": 1194304,
+      "target_real_rank_1based": 1,
+      "uCMP_34_to_53_supported": true
+    }
+  ]
+}
