@@ -5,6 +5,8 @@
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
+
+**2026-10-06 S14 有界研发附注：**S14 从 S13 `0eab2e3` 的隔离 worktree 继续复用 VFSS C++ party API，实施 bundle-wide one-shot burn 与进程内槽唯一性 guard、BMW16 shuffle-only 发材、n=128/K=2/8/80 的 common-tape 与独立进程 E2E，以及 n=64/128 的 1 warmup + 5 same-host loopback pilot。该研发由用户明确授权，提前开放的是 `EXPERIMENTAL` 研发和有界诊断，不表示 V3 完成或 V4 正式性能验收可以开始。完整 shuffle + correlated multi-key/adaptive DCF party-view simulator 和生产 T→party 私有认证交付仍未闭合/未实现；保持 NO-GO，不创建 secure alias。历史 S13 “n=128 未运行”陈述仍是 S13 截止时的准确记录，S14 的 n=128 数据只记在 [S14 决策](decisions/BMW16_S14_ONE_SHOT_MATERIAL_AND_N128_BOUNDED_PILOT_2026-10-06.md) 与 [S14 报告](reproduction/BMW16_S14_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
 当前状态：M2 已完成；三轮 C-INSTANTIATION、独立评审与 Theorem 4.1 逻辑通信匹配不改变 `AUTHOR_EXACT = NOT_PROVEN` 的证据边界。接收方复跑后 M5 已完成，M6A 为当前阶段。M5-H1 通过用户指定的数量级门槛，但 Theorem 4.2 精确逻辑成本仍相差 `254n` bits。F1 经 PR #25 合入；接收方在 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过 F2/G3 和 41/41 回归。dated strict-gate 与 H2 初始 FAIL 记录保留为历史。M5-FIX-F1 = COMPLETED；F2 / G3 = PASS。详见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase

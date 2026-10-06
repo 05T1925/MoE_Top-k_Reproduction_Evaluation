@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED；S13 在 S12 opt-in VFSS C++ 三进程全链上修正状态/退出码和分项计量；完整联合视图与生产认证发材仍 NO-GO，无 secure runtime |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED；S14 在 opt-in VFSS C++ 三进程全链上完成 bundle-wide one-shot claim、shuffle-only 发材、n=128 有界验证与 loopback pilot；完整联合视图与生产认证发材仍 NO-GO，无 secure runtime |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -243,7 +243,7 @@ Protocol III + AAV86 的 `2r` 保留为团队组合目标；实现前必须补�
 
 M6B 在 M6A 两种升级实现及完整性能验收完成后推进，分别交付：
 
-1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S13 party-view/生产发材门 `NO-GO`；存在 opt-in EXPERIMENTAL VFSS C++ 三进程全链测试路径，不是 secure 入口）。
+1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S14 party-view/生产发材门 `NO-GO`；存在 opt-in EXPERIMENTAL VFSS C++ 三进程全链与 n≤128 有界 pilot，不是 secure 入口或 V4 正式性能结果）。
 2. Protocol III + BB90+DCF。
 
 以下 BB90 原文和比较图要求只适用于 Protocol III 路线。Protocol I 候选来源、TEST_ONLY 功能证据和安全阻塞见 S7 决策与验证报告；不得继承 BMW16 Theorem 8 的失败概率或比较常数。
@@ -876,3 +876,7 @@ Protocol III 精确两轮已是明确目标，不再将“是否只保留三轮�
 CryptoMoE 的模型参数、eligibility、容量、dummy、drop 和 transcript 需求留待 M7 之后单独确定。Ruffle、恶意安全 3PC 及 CipherGPT 不作为当前六种方案的前置任务。
 
 总体计划、详细实施计划、两份分工计划及路线决策应保持一致。修改计划不等于完成实现；所有完成状态、论文一致性和性能结论必须对应可审计证据。
+
+### 2026-10-06 S14 有界研发补充
+
+S14 在 S13 同一 VFSS C++ 实验入口实施 bundle-wide durable burn + 进程内 slot guard，并为 BMW16 前向/逆向 shuffle 采用 shuffle-only materials；通用 Protocol I shuffle 默认仍携带 CmpAgg。checked capacity 后 n=128/K=2、8、80 的 common-tape differential 与三进程 frozen-oracle E2E 均通过；n=64/K=8 和 n=128/K=80 完成同机 loopback pilot。多 key correlated/adaptive DCF party-view hybrid 和生产 T 私有认证发材仍 NO-GO/未实现，因此实现身份保持 `PROJECT_DERIVED / EXPERIMENTAL`，不创建 secure alias，不启动 V4 正式 LAN/WAN 五次矩阵。详见 `docs/decisions/BMW16_S14_ONE_SHOT_MATERIAL_AND_N128_BOUNDED_PILOT_2026-10-06.md`、`docs/reproduction/BMW16_S14_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md` 和相邻证据索引。

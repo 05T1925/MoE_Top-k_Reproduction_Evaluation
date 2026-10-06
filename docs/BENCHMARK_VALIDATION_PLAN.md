@@ -631,6 +631,8 @@ max
 
 ## 12. 原始记录与交付物
 
+**2026-10-06 S14 有界 pilot 附注：**S14 已对 `n=64,K=8` 与 `n=128,K=80` 的 EXPERIMENTAL 三进程入口执行各 1 次预热 + 5 次同机 loopback 样本，并记录 T material generation/seal/delivery、party bundle open/durable claim/process slot check/lookup、raw adapter、shuffle、Select R1–R4、membership、inverse、状态、party bytes、uCMP/DCF Eval、峰值 RSS 和 sampler PRF words。该 pilot 用于诊断 S13 逐槽 durable claim 开销和验证 n=128 有界容量；不是 LAN/WAN，不是正式 V4 五次网络矩阵，也不证明 secure gate。FSS AES PRG 调用、网络 RTT/bandwidth、部署 T 私有交付等仍 `NOT_MEASURED`。全部逐次日志和 JSON 保存在 `C:\Users\28641\.codex\artifacts\BMW16_S14_20261006`，清单见 [S14 evidence index](reproduction/evidence/BMW16_S14_EVIDENCE_INDEX_2026-10-06.md)。该结果不改变 V3→V4 阶段顺序、六方案正式对照资格和本计划中正式性能门。
+
 ### 12.1 每次运行记录
 
 至少包含：
