@@ -87,9 +87,15 @@ struct ProtocolIBmw16ExperimentalPartyConfig {
   std::uint64_t test_only_algorithm_seed = 0;
   // This hook exists only in the opt-in experimental/test interface.
   bool test_only_force_probability_abort_after_select = false;
+  bool test_only_force_engineering_failure_after_select = false;
+  bool test_only_force_final_status_disagreement = false;
   // v3 party bundles bind to the pre-provisioned claim-root directory inode.
   // Zero values are retained only for in-memory TEST_ONLY fixtures.
   std::uint64_t claim_root_device = 0, claim_root_inode = 0;
+  // Set only by the party-tls entry. Kept after the original aggregate fields
+  // so existing positional TEST_ONLY initializers preserve their meaning.
+  // Every framed message must consume an authenticated byte stream, never a raw FD.
+  bool require_authenticated_transport = false;
 };
 
 struct ProtocolIBmw16ExperimentalMetrics {
@@ -137,6 +143,9 @@ struct ProtocolIBmw16ExperimentalPartyOutput {
   // acknowledgement; caller must not claim a bilateral abort).
   const char* abort_scope = "LOCAL_ONLY";
   std::string abort_reason;
+  // True for protocol invariant/status disagreement failures, which are
+  // engineering faults (exit 70), not normal randomized algorithm aborts.
+  bool engineering_failure = false;
   std::vector<std::uint8_t> xor_mask_share;
   ProtocolIBmw16ExperimentalMetrics metrics;
 };

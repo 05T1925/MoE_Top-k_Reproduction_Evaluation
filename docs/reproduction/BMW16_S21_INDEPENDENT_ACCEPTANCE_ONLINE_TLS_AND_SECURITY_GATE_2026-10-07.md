@@ -207,3 +207,7 @@ No binary, key, certificate, sidecar or raw large log is staged.
 | `VFSS/tests/moe_topk/experimental_bmw16_party_node_e2e_test.cpp` | 不同 UID/TCP 在线 TLS E2E、n=3、概率 abort 和静默 peer deadline 覆盖 |
 
 被测 S21 party-node / runner 对应上述源文件构建出的外部哈希。仓库本地提交 revision 用于冻结本报告与源码组合；没有更新正式安全或性能验收状态。
+
+### 2026-10-07 S22 独立复核时间线补充
+
+本报告的测试与安全裁决只对应 S21 精确源码，不因 S22 的后续改动而改写。S22 独立复跑发现：S21 `ProtocolIFramedChannel` 在普通 constructor 下接受未注册的 fd，故 TLS stream 缺失时存在回落裸 FD 的路径；S22 新增 strict authenticated-stream mode 与定向负例。S21 当时列为“尚未批准”的字段，在 S22 才由用户转述学姐答复获项目层面的公开许可；这不等于密码学安全审查通过。见 [S22 接收报告](BMW16_S22_INDEPENDENT_ACCEPTANCE_ABORT_TLS_FAILCLOSED_AND_SECURITY_REVIEW_2026-10-07.md)。

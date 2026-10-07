@@ -55,3 +55,7 @@
 | `JOINT_PARTY_VIEW` | NO-GO；首个未闭合引理为 `AdaptiveAuxiliaryOutputMultiKeyDCF-Privacy`，随后仍需 H2→H3 shuffle/output 模拟 |
 | `SECURE_ALIAS` | NOT_CREATED；保持 EXPERIMENTAL |
 | `PERFORMANCE_READY` | NOT_RUN；无正式 LAN/WAN/V4 资格 |
+
+### 2026-10-07 S22 时间线补充（不改写 S21 结论）
+
+本文件上文“待项目所有者裁决/尚未批准”的泄露判断准确描述 S21 当时的状态。2026-10-07 的 S22 用户消息转述学姐答复后，项目才登记 P0/P1 可公开匿名比较端点/bit、pivot/U/V/W、masked operands/public_z、匿名 selected position、实际 key ID/order、比较次数、通信长度和统一算法中止状态。该后续许可不证明这些字段满足联合模拟安全；详见 [S22 决策](BMW16_S22_APPROVED_LEAKAGE_ABORT_AND_JOINT_VIEW_2026-10-07.md)。S22 另增加 final status 三值分类和 strict TLS transport fail-closed；没有回写或改变 S21 被测源码状态。

@@ -328,7 +328,10 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                   const std::string& online_failpoint={},
                   bool expect_algorithm_abort=false,
                   bool expect_online_timeout=false,
-                  const std::string& p1_only_failpoint={}) {
+                  const std::string& p1_only_failpoint={},
+                  bool expect_engineering_failure=false,
+                  bool expect_tls_stream_failure=false,
+                  bool expect_final_disagreement=false) {
   require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
   static std::uint64_t serial=0;
   const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+std::to_string(serial++));
@@ -539,6 +542,22 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                 << " P1_exit=" << e1 << " scope=LOCAL_ONLY_OR_PEER_OBSERVED mask=NONE\n";
       return;
     }
+    if (expect_tls_stream_failure) {
+      require(e0 == 30 && e1 == 30 && gate.gate_open,
+              "missing authenticated TLS stream did not fail closed as communication abort");
+      std::cout << "tls_missing_stream_fail_closed n=" << n << " K=" << k
+                << " P0_exit=" << e0 << " P1_exit=" << e1
+                << " mode=REQUIRE_AUTHENTICATED_STREAM fallback=NONE mask=NONE\n";
+      return;
+    }
+    if (expect_engineering_failure || expect_final_disagreement) {
+      require(e0 == 70 && e1 == 70 && gate.gate_open,
+              "algorithm invariant or final status disagreement was not classified as engineering failure");
+      std::cout << (expect_engineering_failure ? "tls_engineering_fault" : "tls_final_status_disagreement")
+                << " n=" << n << " K=" << k << " P0_exit=" << e0 << " P1_exit=" << e1
+                << " scope=PEER_AGREED_OR_OBSERVED mask=NONE\n";
+      return;
+    }
     throw std::runtime_error("TLS-delivered parties failed online E2E");
   }
   const auto m0=read_all(p0/"mask.share"),m1=read_all(p1/"mask.share");require(m0.size()==n&&m1.size()==n,"TLS E2E mask share length");
@@ -604,6 +623,12 @@ void run_tls_suite(const std::string& node) {
                "",false,"force_probability_abort_after_select",true);
   run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a010),tls,"",false,"",false,
                "",false,"",false,true,"online_silent_after_tls");
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a011),tls,"",false,"",false,
+               "",false,"force_engineering_failure_after_select",false,false,"",true);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a012),tls,"",false,"",false,
+               "",false,"online_missing_tls_stream",false,false,"",false,true);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a013),tls,"",false,"",false,
+               "",false,"",false,false,"force_final_status_disagreement",false,false,true);
 }
 
 void run_tls_n1000(const std::string& node) {

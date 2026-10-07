@@ -3,7 +3,9 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <fcntl.h>
 #include <iostream>
+#include <memory>
 #include <poll.h>
 #include <stdexcept>
 #include <sys/socket.h>
@@ -81,6 +83,60 @@ void write_all(int fd, const Bytes& bytes) {
 ProtocolIFrameConfig config(int sender, int receiver) {
   return {7, 9, 5, 2, static_cast<std::uint8_t>(kBits), static_cast<std::uint8_t>(sender),
           static_cast<std::uint8_t>(receiver), 1, 1};
+}
+
+class TestOwnedAuthenticatedStream final : public ProtocolIAuthenticatedByteStream {
+ public:
+  explicit TestOwnedAuthenticatedStream(int fd) : fd_(fd) {}
+  ~TestOwnedAuthenticatedStream() override { if (fd_ >= 0) ::close(fd_); }
+  std::size_t read_some(std::uint8_t*, std::size_t, int) override { return 0; }
+  std::size_t write_some(const std::uint8_t*, std::size_t, int) override { return 0; }
+ private:
+  int fd_;
+};
+
+void expect_explicit_transport_modes() {
+  int missing[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, missing) == 0, "required stream missing socketpair");
+  bool rejected = false;
+  try {
+    ProtocolIFramedChannel channel(missing[0], config(0, 1),
+        ProtocolIFramedChannelOptions{200, 1024,
+            ProtocolITransportMode::RequireAuthenticatedStream});
+  } catch (const ProtocolITransportError&) { rejected = true; }
+  require(rejected, "TLS-required channel rejects missing stream before any raw I/O");
+  require(::fcntl(missing[0], F_GETFD) >= 0, "failed channel constructor leaves caller descriptor owned by caller");
+  ::close(missing[0]); ::close(missing[1]);
+
+  int wrong_mode[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, wrong_mode) == 0, "registered stream socketpair");
+  std::weak_ptr<ProtocolIAuthenticatedByteStream> retained;
+  auto stream = std::make_shared<TestOwnedAuthenticatedStream>(wrong_mode[0]);
+  retained = stream;
+  protocol_i_attach_authenticated_stream(wrong_mode[0], std::move(stream));
+  rejected = false;
+  try { ProtocolIFramedChannel channel(wrong_mode[0], config(0, 1)); }
+  catch (const ProtocolITransportError&) { rejected = true; }
+  require(rejected && protocol_i_has_authenticated_stream(wrong_mode[0]),
+          "explicit caller-FD mode rejects without consuming registered TLS stream");
+  protocol_i_discard_unclaimed_authenticated_stream(wrong_mode[0]);
+  require(retained.expired(), "unclaimed test stream is destroyed exactly once");
+  ::close(wrong_mode[1]);
+
+  int consumed[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, consumed) == 0, "required stream consume socketpair");
+  auto owned = std::make_shared<TestOwnedAuthenticatedStream>(consumed[0]);
+  std::weak_ptr<ProtocolIAuthenticatedByteStream> consumed_weak = owned;
+  protocol_i_attach_authenticated_stream(consumed[0], std::move(owned));
+  {
+    ProtocolIFramedChannel channel(consumed[0], config(0, 1),
+        ProtocolIFramedChannelOptions{200, 1024,
+            ProtocolITransportMode::RequireAuthenticatedStream});
+    require(!protocol_i_has_authenticated_stream(consumed[0]),
+            "required channel atomically consumes registered stream once");
+  }
+  require(consumed_weak.expired(), "consumed authenticated stream is released once by channel");
+  ::close(consumed[1]);
 }
 
 void wait_child(pid_t child) {
@@ -388,6 +444,7 @@ void expect_chunk_sequence_rejected(bool duplicate_offset, bool truncate_after_f
 
 int main() {
   try {
+    expect_explicit_transport_modes();
     for (const auto chunk : {std::size_t{1}, std::size_t{2}, std::size_t{3}, std::size_t{7}}) {
       expect_chunked_io(chunk);
     }

@@ -15,6 +15,7 @@ struct ProtocolIScoreInputConfig {
   std::uint32_t logical_n = 0, padded_n = 0, k = 0;
   std::uint8_t index_bits = 0, comparison_bits = 0, party = 0;
   int timeout_ms = 0;
+  bool require_authenticated_transport = false;
 };
 
 struct ProtocolIScoreInputMetrics {

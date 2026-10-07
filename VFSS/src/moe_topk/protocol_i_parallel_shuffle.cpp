@@ -249,11 +249,29 @@ struct ExchangeResult {
 
 ExchangeResult exchange_payload(int fd, const ProtocolIParallelShufflePartyConfig& config,
                                 std::uint8_t phase, const std::vector<std::uint8_t>& outbound) {
-  const auto send_fd = ::dup(fd);
-  if (send_fd < 0) throw std::runtime_error("parallel shuffle dup");
   ProtocolIFrameConfig framing{config.session, config.fingerprint, config.n, config.k,
                                config.comparison_bits, config.party,
                                static_cast<std::uint8_t>(1U - config.party), phase, 7};
+  if (config.require_authenticated_transport) {
+    // A dup() of a TLS socket is not an SSL stream. The authenticated path
+    // therefore uses one registered stream and role-ordered I/O; the peer
+    // with id 1 receives while id 0 sends, avoiding both TLS bypass and a
+    // second concurrent operation on one SSL object.
+    ProtocolIFramedChannel channel(fd, framing, ProtocolIFramedChannelOptions{
+        config.timeout_ms, std::numeric_limits<std::size_t>::max(),
+        ProtocolITransportMode::RequireAuthenticatedStream});
+    std::vector<std::uint8_t> incoming;
+    if (config.party == 0) {
+      channel.send(outbound);
+      incoming = channel.receive();
+    } else {
+      incoming = channel.receive();
+      channel.send(outbound);
+    }
+    return {std::move(incoming), channel.sent_bytes(), channel.received_bytes()};
+  }
+  const auto send_fd = ::dup(fd);
+  if (send_fd < 0) throw std::runtime_error("parallel shuffle dup");
   ProtocolIFramedChannel sender(send_fd, framing, config.timeout_ms);
   ProtocolIFramedChannel receiver(fd, framing, config.timeout_ms);
   std::exception_ptr send_error;

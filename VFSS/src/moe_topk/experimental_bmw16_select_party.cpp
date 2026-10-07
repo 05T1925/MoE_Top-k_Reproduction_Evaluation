@@ -135,10 +135,13 @@ std::vector<std::uint8_t> exchange_frame(int fd, std::uint64_t session,
     std::uint64_t fingerprint, std::uint32_t n, std::uint32_t k, std::uint8_t bits,
     std::uint8_t party, int timeout_ms, std::uint8_t phase,
     const std::vector<std::uint8_t>& payload, std::uint64_t* sent, std::uint64_t* received,
-    std::uint64_t* elapsed) {
+    std::uint64_t* elapsed, bool require_authenticated_transport = false) {
   const auto started=SteadyClock::now();
   ProtocolIFramedChannel channel(fd, {session, fingerprint, n, k, bits, party,
-      static_cast<std::uint8_t>(1U - party), phase, 9}, timeout_ms);
+      static_cast<std::uint8_t>(1U - party), phase, 9}, ProtocolIFramedChannelOptions{
+          timeout_ms, std::numeric_limits<std::size_t>::max(),
+          require_authenticated_transport ? ProtocolITransportMode::RequireAuthenticatedStream
+                                          : ProtocolITransportMode::CallerOwnedFd});
   std::vector<std::uint8_t> incoming;
   if (party == 0) { channel.send(payload); incoming = channel.receive(); }
   else { incoming = channel.receive(); channel.send(payload); }
@@ -312,7 +315,11 @@ struct Runtime {
   std::vector<std::uint8_t> exchange(int fd, std::uint8_t phase,
       const std::vector<std::uint8_t>& outbound, std::uint64_t* sent, std::uint64_t* received) {
     ProtocolIFramedChannel channel(fd, {c.session, c.fingerprint, c.n, c.k,
-        c.comparison_bits, c.party, static_cast<std::uint8_t>(1U - c.party), phase, 9}, c.timeout_ms);
+        c.comparison_bits, c.party, static_cast<std::uint8_t>(1U - c.party), phase, 9},
+        ProtocolIFramedChannelOptions{c.timeout_ms,
+            std::numeric_limits<std::size_t>::max(),
+            c.require_authenticated_transport ? ProtocolITransportMode::RequireAuthenticatedStream
+                                              : ProtocolITransportMode::CallerOwnedFd});
     std::vector<std::uint8_t> inbound;
     if (c.party == 0) { channel.send(outbound); inbound = channel.receive(); }
     else { inbound = channel.receive(); channel.send(outbound); }
@@ -435,7 +442,10 @@ struct Runtime {
         throw std::overflow_error("BMW16 comparison layer byte size overflow");
       ProtocolIFramedChannel channel(fd, {c.session, c.fingerprint, c.n, c.k,
           c.comparison_bits, c.party, static_cast<std::uint8_t>(1U - c.party), phase, 9},
-          c.timeout_ms);
+          ProtocolIFramedChannelOptions{c.timeout_ms,
+              std::numeric_limits<std::size_t>::max(),
+              c.require_authenticated_transport ? ProtocolITransportMode::RequireAuthenticatedStream
+                                                : ProtocolITransportMode::CallerOwnedFd});
       if (c.party == 0) {
         protocol_i_send_framed_chunks(channel, outbound);
         inbound = protocol_i_receive_framed_chunks(channel, expected_bytes);
@@ -975,7 +985,7 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
   const auto raw_start=SteadyClock::now();
   const auto stable_share = protocol_i_bmw16_experimental_select_key_party(
       {c.session, c.fingerprint, c.n, c.padded_n, c.k, c.index_bits,
-       c.comparison_bits, c.party, c.timeout_ms}, material.score_input,
+       c.comparison_bits, c.party, c.timeout_ms, c.require_authenticated_transport}, material.score_input,
       raw_score_share, score_fds, &score_metrics);
   output.metrics.raw_adapter_time_us=elapsed_us(raw_start);
   output.metrics.raw_adapter_eval_time_us=score_metrics.ucmp_eval_time_us;
@@ -986,6 +996,7 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
 
   ProtocolIParallelShufflePartyConfig fcfg{c.session, c.fingerprint,
       material.forward_shuffle.material_id, c.n, c.k, c.comparison_bits, c.party, c.timeout_ms};
+  fcfg.require_authenticated_transport = c.require_authenticated_transport;
   const auto forward_start=SteadyClock::now();
   claim_slot(material,ProtocolIBmw16MaterialStage::ForwardShuffle,0xff,0,0,c.n-1U,output.metrics);
   ProtocolIParallelShuffleParty fwd(fcfg, std::move(material.forward_shuffle));
@@ -993,13 +1004,13 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
   auto p1b = exchange_frame(forward_shuffle_fds[0], c.session, c.fingerprint, c.n, c.k,
       c.comparison_bits, c.party, c.timeout_ms, 10, encode_records(r1),
       &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
-      &output.metrics.forward_shuffle_exchange_time_us);
+      &output.metrics.forward_shuffle_exchange_time_us,c.require_authenticated_transport);
   ++output.metrics.online_message_phases;
   auto r2 = fwd.receive_round1_prepare_round2(decode_records(p1b, c.n));
   auto p2b = exchange_frame(forward_shuffle_fds[1], c.session, c.fingerprint, c.n, c.k,
       c.comparison_bits, c.party, c.timeout_ms, 11, encode_records(r2),
       &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
-      &output.metrics.forward_shuffle_exchange_time_us);
+      &output.metrics.forward_shuffle_exchange_time_us,c.require_authenticated_transport);
   ++output.metrics.online_message_phases;
   auto shuffled = fwd.receive_round2(decode_records(p2b, c.n));
   std::vector<std::uint64_t> public_z(c.n);
@@ -1015,7 +1026,7 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
     const auto peer=exchange_frame(sampling_coin_fd,c.session,c.fingerprint,c.n,c.k,
         c.comparison_bits,c.party,c.timeout_ms,19,local,
         &output.metrics.online_bytes_sent,&output.metrics.online_bytes_received,
-        &output.metrics.sampling_coin_exchange_time_us);
+        &output.metrics.sampling_coin_exchange_time_us,c.require_authenticated_transport);
     ++output.metrics.online_message_phases;
     if(peer.size()!=contribution.size())throw std::runtime_error("BMW16 sampler coin payload length");
     for(std::size_t i=0;i<sampler_seed.size();++i)sampler_seed[i]=contribution[i]^peer[i];
@@ -1026,6 +1037,10 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
   if (c.test_only_force_probability_abort_after_select && status == "SUCCESS") {
     status = "ABORT_ALGORITHM_PROBABILITY";
     select.failure_reason = "TEST_ONLY_FORCED_ABORT_AFTER_SELECT";
+  }
+  if (c.test_only_force_engineering_failure_after_select && status == "SUCCESS") {
+    status = "ABORT_ALGORITHM_INVALID";
+    select.failure_reason = "TEST_ONLY_FORCED_INVARIANT_FAILURE_AFTER_SELECT";
   }
   if (status == "SUCCESS") {
     const auto membership_start=SteadyClock::now();
@@ -1065,19 +1080,20 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
     const auto inverse_start=SteadyClock::now();
     ProtocolIParallelShufflePartyConfig icfg{c.session, c.fingerprint,
         material.inverse_shuffle.material_id, c.n, c.k, c.comparison_bits, c.party, c.timeout_ms};
+    icfg.require_authenticated_transport = c.require_authenticated_transport;
     claim_slot(material,ProtocolIBmw16MaterialStage::InverseShuffle,0xff,0,0,c.n-1U,output.metrics);
     ProtocolIParallelShuffleParty inverse(icfg, std::move(material.inverse_shuffle));
     auto ir1 = inverse.prepare_round1(membership_records);
     auto ip1b = exchange_frame(inverse_shuffle_fds[0], c.session, c.fingerprint, c.n, c.k,
         c.comparison_bits, c.party, c.timeout_ms, 31, encode_records(ir1),
-        &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
-        &output.metrics.inverse_shuffle_exchange_time_us);
+      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+      &output.metrics.inverse_shuffle_exchange_time_us,c.require_authenticated_transport);
     ++output.metrics.online_message_phases;
     auto ir2 = inverse.receive_round1_prepare_round2(decode_records(ip1b, c.n));
     auto ip2b = exchange_frame(inverse_shuffle_fds[1], c.session, c.fingerprint, c.n, c.k,
         c.comparison_bits, c.party, c.timeout_ms, 32, encode_records(ir2),
-        &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
-        &output.metrics.inverse_shuffle_exchange_time_us);
+      &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
+      &output.metrics.inverse_shuffle_exchange_time_us,c.require_authenticated_transport);
     ++output.metrics.online_message_phases;
     auto mask_records = inverse.receive_round2(decode_records(ip2b, c.n));
     output.xor_mask_share.resize(c.n);
@@ -1086,24 +1102,34 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
     output.metrics.inverse_shuffle_time_us=elapsed_us(inverse_start);
   }
 
+  // Test-only asymmetric fault occurs after both parties completed the same
+  // successful data path, so it exercises the final agreement mismatch
+  // without stranding one side in membership or inverse routing.
+  if (c.test_only_force_final_status_disagreement && c.party == 1 && status == "SUCCESS") {
+    status = "ABORT_ALGORITHM_PROBABILITY";
+    select.failure_reason = "TEST_ONLY_FINAL_STATUS_DISAGREEMENT";
+  }
   const std::uint8_t status_code = status == "SUCCESS" ? 0U :
       status == "ABORT_ALGORITHM_PROBABILITY" ? 1U : 2U;
   const auto status_start=SteadyClock::now();
   const auto remote_status = exchange_frame(final_agreement_fd, c.session, c.fingerprint,
       c.n, c.k, c.comparison_bits, c.party, c.timeout_ms, 40, {status_code},
       &output.metrics.online_bytes_sent, &output.metrics.online_bytes_received,
-      &output.metrics.status_coordination_time_us);
+      &output.metrics.status_coordination_time_us,c.require_authenticated_transport);
   ++output.metrics.online_message_phases;
   output.metrics.status_coordination_time_us=elapsed_us(status_start);
   if (remote_status != std::vector<std::uint8_t>{status_code}) {
-    output.status = "ABORT_MATERIAL"; output.abort_scope = "LOCAL_ONLY";
-    output.abort_reason = "FINAL_STATUS_MISMATCH"; output.xor_mask_share.clear();
+    output.status = "ABORT_ALGORITHM_INVALID"; output.abort_scope = "PEER_OBSERVED";
+    output.abort_reason = "FINAL_STATUS_DISAGREEMENT";
+    output.engineering_failure = true;
+    output.xor_mask_share.clear();
   } else if (status == "SUCCESS") { output.status = "SUCCESS"; output.abort_scope = "NONE"; }
   else if (status == "ABORT_ALGORITHM_PROBABILITY") {
     output.status = "ABORT_ALGORITHM_PROBABILITY"; output.abort_scope = "PEER_AGREED";
     output.abort_reason = select.failure_reason;
   } else { output.status = "ABORT_ALGORITHM_INVALID"; output.abort_scope = "PEER_AGREED";
-    output.abort_reason = select.failure_reason; output.xor_mask_share.clear(); }
+    output.abort_reason = select.failure_reason; output.engineering_failure = true;
+    output.xor_mask_share.clear(); }
   output.metrics.online_bytes_sent += score_metrics.carry_sent_bytes + score_metrics.sign_sent_bytes;
   output.metrics.online_bytes_received += score_metrics.carry_received_bytes + score_metrics.sign_received_bytes;
   output.metrics.online_message_phases += 2U;

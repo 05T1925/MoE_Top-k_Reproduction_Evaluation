@@ -154,7 +154,21 @@ ProtocolIFramedChannel::ProtocolIFramedChannel(int fd, ProtocolIFrameConfig conf
       c_.n == 0 || c_.k == 0 || c_.k > c_.n) {
     throw std::invalid_argument("frame config");
   }
-  authenticated_stream_ = take_authenticated_stream(fd_);
+  const bool registered = protocol_i_has_authenticated_stream(fd_);
+  if (options.transport_mode == ProtocolITransportMode::RequireAuthenticatedStream) {
+    if (!registered) {
+      // Ownership stays with the caller on constructor failure. This matters
+      // when the TLS owner is unwinding the channel set after a consumed or
+      // discarded stream; closing the integer FD here could double-close it.
+      throw ProtocolITransportError("authenticated stream required but absent or already consumed");
+    }
+    authenticated_stream_ = take_authenticated_stream(fd_);
+    if (!authenticated_stream_)
+      throw ProtocolITransportError("authenticated stream registration raced consumption");
+  } else {
+    if (registered)
+      throw ProtocolITransportError("authenticated stream registered but caller-FD mode requested");
+  }
 }
 
 ProtocolIFramedChannel::ProtocolIFramedChannel(int fd, ProtocolIFrameConfig config, int timeout)

@@ -532,9 +532,14 @@ int party_online(int argc, char** argv, bool online_tls = false) {
   const auto fingerprint = std::stoull(argv[6]);
   const auto timeout = std::stoi(argv[13]);
   auto c = config(n, k, session, fingerprint, party, timeout, argv[7]);
+  c.require_authenticated_transport = online_tls;
 #if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
   c.test_only_force_probability_abort_after_select =
       test_failpoint_is("force_probability_abort_after_select");
+  c.test_only_force_engineering_failure_after_select =
+      test_failpoint_is("force_engineering_failure_after_select");
+  c.test_only_force_final_status_disagreement =
+      test_failpoint_is("force_final_status_disagreement");
 #endif
   ProtocolIBmw16ExperimentalPartyMaterial material;
   std::unique_ptr<ProtocolIBmw16PersistentClaimStore> claim;
@@ -611,6 +616,8 @@ int party_online(int argc, char** argv, bool online_tls = false) {
     online_tls_channels->verify_all_registered();
     all_fds = online_tls_channels->party_fds();
 #if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    if (test_failpoint_is("online_missing_tls_stream"))
+      protocol_i_discard_unclaimed_authenticated_stream(all_fds[0]);
     if (test_failpoint_is("online_silent_after_tls"))
       std::this_thread::sleep_for(std::chrono::milliseconds(timeout) * 3);
 #endif
@@ -640,9 +647,12 @@ int party_online(int argc, char** argv, bool online_tls = false) {
     exit_code = kMaterialAbort;
   } else if (status == "ABORT_COMMUNICATION") {
     exit_code = kCommunicationAbort;
+  } else if (status == "ABORT_ALGORITHM_INVALID" && result.engineering_failure) {
+    exit_code = kUnexpected;
   }
   std::cout << "role=P" << static_cast<unsigned>(party) << " status=" << status
             << " scope=" << scope << " exit_code=" << exit_code
+            << " local_reason=" << result.abort_reason
             << " mask=" << (exit_code == kSuccess ? "PUBLISHED_SHARE" : "NONE")
             << " logical_comparisons="
             << std::accumulate(result.metrics.logical_comparison_calls.begin(),

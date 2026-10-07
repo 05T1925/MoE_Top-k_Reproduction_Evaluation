@@ -34,7 +34,12 @@ std::vector<std::uint64_t> exchange(const ProtocolIScoreInputConfig& config, int
   const auto started=std::chrono::steady_clock::now();
   const auto peer = static_cast<std::uint8_t>(1U - config.party);
   ProtocolIFramedChannel channel(fd, {config.session, config.fingerprint, config.padded_n,
-      config.k, config.comparison_bits, config.party, peer, phase, 2}, config.timeout_ms);
+      config.k, config.comparison_bits, config.party, peer, phase, 2},
+      ProtocolIFramedChannelOptions{config.timeout_ms,
+          std::numeric_limits<std::size_t>::max(),
+          config.require_authenticated_transport
+              ? ProtocolITransportMode::RequireAuthenticatedStream
+              : ProtocolITransportMode::CallerOwnedFd});
   std::vector<std::uint8_t> remote;
   const auto encoded = encode_words(local);
   if (config.party == 0) { channel.send(encoded); remote = channel.receive(); }

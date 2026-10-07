@@ -44,9 +44,18 @@ struct ProtocolIFrameConfig {
   std::uint8_t bits, sender, receiver, phase, type;
 };
 
+// The historical Protocol I APIs use caller-owned descriptors. BMW16's
+// authenticated online path opts into RequireAuthenticatedStream so a missing
+// or already-consumed TLS stream can never silently downgrade to raw FD I/O.
+enum class ProtocolITransportMode : std::uint8_t {
+  CallerOwnedFd = 0,
+  RequireAuthenticatedStream = 1
+};
+
 struct ProtocolIFramedChannelOptions {
   int timeout_ms = 2000;
   std::size_t max_io_chunk = std::numeric_limits<std::size_t>::max();
+  ProtocolITransportMode transport_mode = ProtocolITransportMode::CallerOwnedFd;
 };
 
 class ProtocolIFramedChannel {
