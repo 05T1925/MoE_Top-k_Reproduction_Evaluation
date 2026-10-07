@@ -177,7 +177,7 @@ struct Runtime {
           const ProtocolIBmw16TestOnlyRandomTape* fixed_tape)
       : c(config), m(material), z(public_z), metrics(output_metrics),
         sampler_seed(seed), test_tape(fixed_tape) {
-    if (c.n < 2 || c.n > 256 || c.k == 0 || c.k > c.n || z.size() != c.n)
+    if (c.n < 2 || c.n > (1U << 20U) || c.k == 0 || c.k > c.n || z.size() != c.n)
       throw std::invalid_argument("BMW16 experimental finite domain");
     ring_mask = (UINT64_C(1) << c.comparison_bits) - 1U;
     items.reserve(static_cast<std::size_t>(c.n) * 3U + 8U);
@@ -420,8 +420,32 @@ struct Runtime {
     }
     metrics.edge_plan_fnv64[round - 1] = plan_hash;
     const auto exchange_start=SteadyClock::now();
-    const auto inbound = exchange(fd, static_cast<std::uint8_t>(20 + round), encode_word_vector(local),
-                                  &metrics.online_bytes_sent, &metrics.online_bytes_received);
+    const auto phase = static_cast<std::uint8_t>(20 + round);
+    const auto outbound = encode_word_vector(local);
+    std::vector<std::uint8_t> inbound;
+    if (outbound.empty()) {
+      inbound = exchange(fd, phase, outbound, &metrics.online_bytes_sent,
+                         &metrics.online_bytes_received);
+    } else {
+      // A comparison layer can contain more than ProtocolIFramedChannel's
+      // single-frame payload cap at larger n. Preserve the existing ordered
+      // exchange while carrying this one frozen layer as bounded frames.
+      const auto expected_bytes = local.size() * sizeof(std::uint64_t);
+      if (expected_bytes / sizeof(std::uint64_t) != local.size())
+        throw std::overflow_error("BMW16 comparison layer byte size overflow");
+      ProtocolIFramedChannel channel(fd, {c.session, c.fingerprint, c.n, c.k,
+          c.comparison_bits, c.party, static_cast<std::uint8_t>(1U - c.party), phase, 9},
+          c.timeout_ms);
+      if (c.party == 0) {
+        protocol_i_send_framed_chunks(channel, outbound);
+        inbound = protocol_i_receive_framed_chunks(channel, expected_bytes);
+      } else {
+        inbound = protocol_i_receive_framed_chunks(channel, expected_bytes);
+        protocol_i_send_framed_chunks(channel, outbound);
+      }
+      metrics.online_bytes_sent += channel.sent_bytes();
+      metrics.online_bytes_received += channel.received_bytes();
+    }
     metrics.select_exchange_time_us[round-1]+=elapsed_us(exchange_start);
     ++metrics.online_message_phases;
     const auto peer = decode_words(inbound, local.size());
@@ -761,6 +785,105 @@ void configure_score_packages(const ProtocolIBmw16ExperimentalPartyConfig& c,
   }
 }
 
+ProtocolIBmw16ExperimentalMaterialPair make_material_prefix(
+    const ProtocolIBmw16ExperimentalPartyConfig& c) {
+  const ProtocolIParallelShuffleDealerConfig fcfg{c.session, c.fingerprint,
+      c.session ^ UINT64_C(0x8100000000000001), c.n, c.k, c.comparison_bits, false};
+  auto forward = protocol_i_parallel_shuffle_dealer_generate(fcfg);
+  const auto pi = protocol_i_compose_permutation(forward.party0.tau, forward.party1.sigma);
+  auto icfg = fcfg; icfg.material_id = c.session ^ UINT64_C(0x8200000000000001);
+  auto inverse = make_inverse_shuffle(icfg, protocol_i_inverse_permutation(pi));
+  ProtocolIBmw16ExperimentalMaterialPair out;
+  configure_score_packages(c, out.party0.score_input, out.party1.score_input);
+  make_score_package_pair(c, out.party0.score_input, out.party1.score_input);
+  out.party0.forward_shuffle = std::move(forward.party0);
+  out.party1.forward_shuffle = std::move(forward.party1);
+  out.party0.inverse_shuffle = std::move(inverse.party0);
+  out.party1.inverse_shuffle = std::move(inverse.party1);
+  return out;
+}
+
+void generate_ucmp_slots(const ProtocolIBmw16ExperimentalPartyConfig& c,
+    ProtocolIBmw16ExperimentalMaterialPair& out, bool retain,
+    const ProtocolIBmw16UcmpSlotPairSink& sink) {
+  const auto pairs = static_cast<std::uint64_t>(c.n) * (c.n - 1U) / 2U;
+  if (retain) {
+    for (auto& task : out.party0.select_keys) for (auto& round : task) round.reserve(static_cast<std::size_t>(pairs));
+    for (auto& task : out.party1.select_keys) for (auto& round : task) round.reserve(static_cast<std::size_t>(pairs));
+    out.party0.membership_keys.reserve(static_cast<std::size_t>(pairs));
+    out.party1.membership_keys.reserve(static_cast<std::size_t>(pairs));
+  }
+  const auto base = static_cast<std::uint64_t>(2U) * c.padded_n + 2U;
+  std::uint64_t slot_id = base;
+  const auto mask = ring_mask(c.comparison_bits);
+  for (std::uint8_t task = 0; task < 2; ++task) {
+    for (std::uint8_t round = 1; round <= 4; ++round) {
+      for (std::uint32_t lo = 0; lo < c.n; ++lo) {
+        for (std::uint32_t hi = lo + 1U; hi < c.n; ++hi) {
+          const auto rl = (out.party0.forward_shuffle.r_share[lo].word0 +
+                           out.party1.forward_shuffle.r_share[lo].word0) & mask;
+          const auto rh = (out.party0.forward_shuffle.r_share[hi].word0 +
+                           out.party1.forward_shuffle.r_share[hi].word0) & mask;
+          ProtocolIUcmpMaterial key(c.comparison_bits, rl, rh);
+          const ProtocolIBmw16MaterialSlot slot{slot_id++, ProtocolIBmw16MaterialStage::Select,
+                                                 task, round, lo, hi};
+          auto p0 = key.export_party_material(0);
+          auto p1 = key.export_party_material(1);
+          if (sink) sink(slot, p0, p1);
+          if (retain) {
+            out.party0.select_keys[task][round - 1U].push_back(std::move(p0));
+            out.party1.select_keys[task][round - 1U].push_back(std::move(p1));
+          }
+        }
+      }
+    }
+  }
+  for (std::uint32_t lo = 0; lo < c.n; ++lo) {
+    for (std::uint32_t hi = lo + 1U; hi < c.n; ++hi) {
+      const auto rl = (out.party0.forward_shuffle.r_share[lo].word0 +
+                       out.party1.forward_shuffle.r_share[lo].word0) & mask;
+      const auto rh = (out.party0.forward_shuffle.r_share[hi].word0 +
+                       out.party1.forward_shuffle.r_share[hi].word0) & mask;
+      ProtocolIUcmpMaterial key(c.comparison_bits, rl, rh);
+      const ProtocolIBmw16MaterialSlot slot{slot_id++, ProtocolIBmw16MaterialStage::Membership,
+                                             0xff, 1, lo, hi};
+      auto p0 = key.export_party_material(0);
+      auto p1 = key.export_party_material(1);
+      if (sink) sink(slot, p0, p1);
+      if (retain) {
+        out.party0.membership_keys.push_back(std::move(p0));
+        out.party1.membership_keys.push_back(std::move(p1));
+      }
+    }
+  }
+  if (slot_id != base + pairs * 9U) throw std::logic_error("BMW16 generated slot count");
+}
+
+void measure_material_sizes(const ProtocolIBmw16ExperimentalPartyConfig& c,
+    ProtocolIBmw16ExperimentalMaterialPair& out, bool include_ucmp) {
+  const auto pairs = static_cast<std::uint64_t>(c.n) * (c.n - 1U) / 2U;
+  if (include_ucmp) {
+    out.party0.slot_manifest = protocol_i_bmw16_enumerate_material_slots(c);
+    out.party1.slot_manifest = out.party0.slot_manifest;
+  }
+  const auto slots = static_cast<std::uint64_t>(2U) * c.padded_n + 2U + pairs * 9U;
+  out.offline_material_slots_per_party = {slots, slots};
+  for (int party = 0; party < 2; ++party) {
+    auto& p = party == 0 ? out.party0 : out.party1;
+    std::uint64_t bytes = 0;
+    for (const auto& key : p.score_input.carry_materials) bytes += key.material.serialize().size();
+    for (const auto& key : p.score_input.sign_materials) bytes += key.material.serialize().size();
+    bytes += protocol_i_parallel_shuffle_serialize_material(p.forward_shuffle).size();
+    bytes += protocol_i_parallel_shuffle_serialize_material(p.inverse_shuffle).size();
+    if (include_ucmp) {
+      for (const auto& task : p.select_keys) for (const auto& round : task)
+        for (const auto& key : round) bytes += key.serialize().size();
+      for (const auto& key : p.membership_keys) bytes += key.serialize().size();
+    }
+    out.primitive_key_and_shuffle_bytes_per_party[party] = bytes;
+  }
+}
+
 }  // namespace
 
 ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_generate(
@@ -769,58 +892,49 @@ ProtocolIBmw16ExperimentalMaterialPair protocol_i_bmw16_experimental_material_ge
       c.padded_n < c.n || (c.padded_n & (c.padded_n - 1U)) != 0 ||
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53)
     throw std::invalid_argument("BMW16 offline generator configuration");
-  const ProtocolIParallelShuffleDealerConfig fcfg{c.session, c.fingerprint,
-      c.session ^ UINT64_C(0x8100000000000001), c.n, c.k, c.comparison_bits, false};
-  auto forward = protocol_i_parallel_shuffle_dealer_generate(fcfg);
-  const auto pi = protocol_i_compose_permutation(forward.party0.tau, forward.party1.sigma);
-  auto icfg = fcfg; icfg.material_id = c.session ^ UINT64_C(0x8200000000000001);
-  auto inverse = make_inverse_shuffle(icfg, protocol_i_inverse_permutation(pi));
+  auto out = make_material_prefix(c);
+  generate_ucmp_slots(c, out, true, {});
+  measure_material_sizes(c, out, true);
+  return out;
+}
 
-  ProtocolIBmw16ExperimentalMaterialPair out;
-  configure_score_packages(c, out.party0.score_input, out.party1.score_input);
-  make_score_package_pair(c, out.party0.score_input, out.party1.score_input);
-  out.party0.forward_shuffle = std::move(forward.party0);
-  out.party1.forward_shuffle = std::move(forward.party1);
-  out.party0.inverse_shuffle = std::move(inverse.party0);
-  out.party1.inverse_shuffle = std::move(inverse.party1);
-  const auto pair_count = static_cast<std::size_t>(c.n) * (c.n - 1U) / 2U;
-  for (int task = 0; task < 2; ++task) for (int round = 0; round < 4; ++round) {
-    auto& a = out.party0.select_keys[task][round]; auto& b = out.party1.select_keys[task][round];
-    a.reserve(pair_count); b.reserve(pair_count);
-    for (std::uint32_t lo = 0; lo < c.n; ++lo) for (std::uint32_t hi = lo + 1U; hi < c.n; ++hi) {
-      const auto mask = ring_mask(c.comparison_bits);
-      const auto rl = (out.party0.forward_shuffle.r_share[lo].word0 + out.party1.forward_shuffle.r_share[lo].word0) & mask;
-      const auto rh = (out.party0.forward_shuffle.r_share[hi].word0 + out.party1.forward_shuffle.r_share[hi].word0) & mask;
-      ProtocolIUcmpMaterial key(c.comparison_bits, rl, rh);
-      a.push_back(key.export_party_material(0)); b.push_back(key.export_party_material(1));
-    }
+ProtocolIBmw16ExperimentalMaterialPair
+protocol_i_bmw16_experimental_material_generate_streaming(
+    const ProtocolIBmw16ExperimentalPartyConfig& c,
+    const ProtocolIBmw16UcmpSlotPairSink& slot_sink) {
+  constexpr std::uint32_t kMaxStreamN = 1U << 20U;
+  if (!slot_sink || c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > kMaxStreamN ||
+      c.k == 0 || c.k > c.n || c.padded_n < c.n ||
+      (c.padded_n & (c.padded_n - 1U)) != 0 ||
+      c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53)
+    throw std::invalid_argument("BMW16 streamed offline generator configuration");
+  std::uint32_t expected_padded = 2;
+  while (expected_padded < c.n) {
+    if (expected_padded > (std::numeric_limits<std::uint32_t>::max() >> 1U))
+      throw std::overflow_error("BMW16 streamed padded size");
+    expected_padded <<= 1U;
   }
-  out.party0.membership_keys.reserve(pair_count); out.party1.membership_keys.reserve(pair_count);
-  for (std::uint32_t lo = 0; lo < c.n; ++lo) for (std::uint32_t hi = lo + 1U; hi < c.n; ++hi) {
-    const auto mask = ring_mask(c.comparison_bits);
-    const auto rl = (out.party0.forward_shuffle.r_share[lo].word0 + out.party1.forward_shuffle.r_share[lo].word0) & mask;
-    const auto rh = (out.party0.forward_shuffle.r_share[hi].word0 + out.party1.forward_shuffle.r_share[hi].word0) & mask;
-    ProtocolIUcmpMaterial key(c.comparison_bits, rl, rh);
-    out.party0.membership_keys.push_back(key.export_party_material(0));
-    out.party1.membership_keys.push_back(key.export_party_material(1));
-  }
-  out.party0.slot_manifest = protocol_i_bmw16_enumerate_material_slots(c);
-  out.party1.slot_manifest = out.party0.slot_manifest;
-  for (int party = 0; party < 2; ++party) {
-    auto& p = party == 0 ? out.party0 : out.party1;
-    out.offline_material_slots_per_party[party] = 2U * c.padded_n + 2U + pair_count * 9U;
-    std::uint64_t byte_count = 0;
-    for (const auto& task : p.select_keys) for (const auto& round : task)
-      for (const auto& key : round) byte_count += key.serialize().size();
-    for (const auto& key : p.membership_keys) byte_count += key.serialize().size();
-    for (const auto& key : p.score_input.carry_materials) byte_count += key.material.serialize().size();
-    for (const auto& key : p.score_input.sign_materials) byte_count += key.material.serialize().size();
-    const auto& shuffle = party == 0 ? p.forward_shuffle : p.inverse_shuffle;
-    byte_count += protocol_i_parallel_shuffle_serialize_material(shuffle).size();
-    const auto& other = party == 0 ? p.inverse_shuffle : p.forward_shuffle;
-    byte_count += protocol_i_parallel_shuffle_serialize_material(other).size();
-    out.primitive_key_and_shuffle_bytes_per_party[party] = byte_count;
-  }
+  std::uint8_t expected_index = 1;
+  for (auto v = expected_padded; v > 2; v >>= 1U) ++expected_index;
+  if (c.padded_n != expected_padded || c.index_bits != expected_index)
+    throw std::invalid_argument("BMW16 streamed padded/index dimensions");
+
+  auto out = make_material_prefix(c);
+  generate_ucmp_slots(c, out, false, slot_sink);
+  measure_material_sizes(c, out, false);
+  return out;
+}
+
+ProtocolIBmw16ExperimentalMaterialPair
+protocol_i_bmw16_test_only_material_generate_with_slot_sink(
+    const ProtocolIBmw16ExperimentalPartyConfig& c,
+    const ProtocolIBmw16UcmpSlotPairSink& slot_sink) {
+  if (!slot_sink || c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > 256 ||
+      c.k == 0 || c.k > c.n || c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53)
+    throw std::invalid_argument("BMW16 TEST_ONLY sink generator configuration");
+  auto out = make_material_prefix(c);
+  generate_ucmp_slots(c, out, true, slot_sink);
+  measure_material_sizes(c, out, true);
   return out;
 }
 
@@ -836,11 +950,11 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
     int final_agreement_fd,
     int sampling_coin_fd,
     const ProtocolIBmw16TestOnlyRandomTape* test_only_tape) {
-  if (c.party > 1 || c.n == 0 || c.k == 0 || c.k > c.n || c.timeout_ms <= 0 ||
+  if (c.party > 1 || c.n == 0 || c.n > (1U << 20U) || c.k == 0 || c.k > c.n || c.timeout_ms <= 0 ||
       c.comparison_bits != 33U + c.index_bits || c.comparison_bits > 53 ||
       c.padded_n < 2 || (c.padded_n & (c.padded_n-1U)) != 0 ||
       raw_score_share.size() != c.n || (c.n==1 && c.k!=1) ||
-      (c.n>256 || (c.n>1 && !test_only_tape && sampling_coin_fd<0)))
+      (c.n>1 && !test_only_tape && sampling_coin_fd<0))
     throw std::invalid_argument("BMW16 experimental party configuration");
   if (c.n > 1 && !material.process_slot_claim_once)
     throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,

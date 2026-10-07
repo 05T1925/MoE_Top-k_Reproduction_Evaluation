@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 namespace {
@@ -165,6 +166,19 @@ void run_case(const Case& test,int tape_pattern=0,
         (stream_root / "p0" / "ucmp.pool").string(), configs[0], 0,
         [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }());
     require(n >= 2, "stream duplicate fixture n");
+    auto wrong_endpoint = first_slot;
+    wrong_endpoint.left = 1;
+    wrong_endpoint.right = 2;
+    bool endpoint_rejected = false;
+    try { (void)duplicate_probe->load_once(wrong_endpoint); }
+    catch (const std::exception&) { endpoint_rejected = true; }
+    require(endpoint_rejected, "stream wrong endpoint binding rejected");
+    bool wrong_party_rejected = false;
+    try { (void)ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+        (stream_root / "p0" / "ucmp.pool").string(), configs[0], 1,
+        [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }()); }
+    catch (const std::exception&) { wrong_party_rejected = true; }
+    require(wrong_party_rejected, "stream wrong party rejected");
     (void)duplicate_probe->load_once(first_slot);
     bool duplicate_rejected = false;
     try { (void)duplicate_probe->load_once(first_slot); }
@@ -182,7 +196,7 @@ void run_case(const Case& test,int tape_pattern=0,
     {
       std::fstream f(tampered_path, std::ios::binary | std::ios::in | std::ios::out);
       require(static_cast<bool>(f), "open stream tamper fixture");
-      constexpr std::streamoff stream_header_bytes = 132;
+      constexpr std::streamoff stream_header_bytes = 164;
       f.seekg(stream_header_bytes, std::ios::beg); char byte = 0; f.read(&byte, 1); byte ^= 0x40;
       f.seekp(stream_header_bytes, std::ios::beg); f.write(&byte, 1); f.flush();
       require(static_cast<bool>(f), "write stream tamper fixture");
@@ -403,6 +417,231 @@ void run_singleton() {
   std::cout << "case n=1 K=1 status=SUCCESS singleton=true\n";
 }
 
+void verify_streamed_keygen_slot_equivalence() {
+  constexpr std::uint32_t n = 5, k = 2;
+  ProtocolIBmw16ExperimentalPartyConfig c0{UINT64_C(0x5331380000000011),
+      UINT64_C(0x5331388000000011), n, k, 8, 3, 36, 0, 5000, 0};
+  ProtocolIBmw16ExperimentalPartyConfig c1 = c0; c1.party = 1;
+  const auto root = std::filesystem::temp_directory_path() /
+      ("bmw16-s18-slot-equivalence-" + std::to_string(::getpid()));
+  std::filesystem::create_directories(root / "p0");
+  std::filesystem::create_directories(root / "p1");
+  for (const auto& dir : {root / "p0", root / "p1"})
+    std::filesystem::permissions(dir, std::filesystem::perms::owner_all);
+  auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(
+      reinterpret_cast<void*>(1), [root](void*) {
+        std::error_code ec; std::filesystem::remove_all(root, ec);
+      });
+  for (int party = 0; party < 2; ++party) {
+    auto& cfg = party ? c1 : c0;
+    const auto id = protocol_i_bmw16_claim_root_identity((root / (party ? "p1" : "p0")).string());
+    cfg.claim_root_device = id.device; cfg.claim_root_inode = id.inode;
+  }
+  std::array<std::uint8_t, 32> stream_id{};
+  for (std::size_t i = 0; i < stream_id.size(); ++i) stream_id[i] = static_cast<std::uint8_t>(0x51U + i);
+  std::array<std::array<std::uint8_t, 32>, 2> recipient_keys{};
+  for (int party = 0; party < 2; ++party)
+    for (std::size_t i = 0; i < recipient_keys[party].size(); ++i)
+      recipient_keys[party][i] = static_cast<std::uint8_t>(0xA0U + party * 17U + i);
+  const auto path0 = (root / "p0" / "slots.bin").string();
+  const auto path1 = (root / "p1" / "slots.bin").string();
+  ProtocolIBmw16StreamedUcmpSlotWriter writer0(path0, c0, 0, recipient_keys[0], stream_id);
+  ProtocolIBmw16StreamedUcmpSlotWriter writer1(path1, c1, 1, recipient_keys[1], stream_id);
+  // This TEST_ONLY tee uses the very same fresh key object both for retained
+  // memory material and for each sealed slot, so byte equality is meaningful.
+  auto material = protocol_i_bmw16_test_only_material_generate_with_slot_sink(c0,
+      [&](const ProtocolIBmw16MaterialSlot& slot, const ProtocolIUcmpPartyMaterial& key0,
+          const ProtocolIUcmpPartyMaterial& key1) {
+        writer0.append(slot, key0); writer1.append(slot, key1);
+      });
+  const auto stats0 = writer0.finalize(), stats1 = writer1.finalize();
+  require(stats0.ucmp_slots == 9U * (n * (n - 1U) / 2U) &&
+          stats0.ucmp_slots == stats1.ucmp_slots &&
+          stats0.sealed_file_bytes == stats1.sealed_file_bytes,
+          "stream writer completion counts");
+  const auto store0 = ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+      path0, c0, 0, recipient_keys[0], stream_id, stats0.file_sha256);
+  const auto store1 = ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+      path1, c1, 1, recipient_keys[1], stream_id, stats1.file_sha256);
+  std::uint64_t id = 2U * c0.padded_n + 2U;
+  auto check_pool = [&](const ProtocolIBmw16ExperimentalPartyMaterial& p,
+                        ProtocolIBmw16StreamedUcmpSlotStore& store) {
+    for (std::uint8_t task = 0; task < 2; ++task) for (std::uint8_t round = 1; round <= 4; ++round) {
+      const auto& pool = p.select_keys[task][round - 1U]; std::size_t pair = 0;
+      for (std::uint32_t left = 0; left < n; ++left) for (std::uint32_t right = left + 1; right < n; ++right) {
+        const ProtocolIBmw16MaterialSlot slot{id++, ProtocolIBmw16MaterialStage::Select, task, round, left, right};
+        require(store.load_once(slot).serialize() == pool[pair++].serialize(),
+                "streamed Select slot differs from same-KeyGen memory slot");
+      }
+    }
+    for (std::uint32_t left = 0; left < n; ++left) for (std::uint32_t right = left + 1; right < n; ++right) {
+      const auto pair = static_cast<std::size_t>(left) * n - static_cast<std::size_t>(left) * (left + 1U) / 2U + right - left - 1U;
+      const ProtocolIBmw16MaterialSlot slot{id++, ProtocolIBmw16MaterialStage::Membership, 0xff, 1, left, right};
+      require(store.load_once(slot).serialize() == p.membership_keys[pair].serialize(),
+              "streamed membership slot differs from same-KeyGen memory slot");
+    }
+  };
+  check_pool(material.party0, *store0);
+  require(id == 2U * c0.padded_n + 2U + stats0.ucmp_slots, "stream writer slot enumeration");
+  // A distinct path/store validates the second party's independently sealed keys.
+  id = 2U * c0.padded_n + 2U;
+  check_pool(material.party1, *store1);
+  require(id == 2U * c1.padded_n + 2U + stats1.ucmp_slots, "stream writer party-1 slot enumeration");
+  const auto bad_hash_path = (root / "p0" / "tampered.bin").string();
+  std::filesystem::copy_file(path0, bad_hash_path);
+  {
+    std::fstream f(bad_hash_path, std::ios::binary | std::ios::in | std::ios::out);
+    require(static_cast<bool>(f), "stream tamper file open");
+    constexpr std::streamoff header_bytes = 164;
+    f.seekg(header_bytes); char b = 0; f.read(&b, 1); b ^= 1;
+    f.seekp(header_bytes); f.write(&b, 1); f.flush(); require(static_cast<bool>(f), "stream tamper write");
+  }
+  bool hash_rejected = false;
+  try { (void)ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+      bad_hash_path, c0, 0, recipient_keys[0], stream_id, stats0.file_sha256); }
+  catch (const std::exception&) { hash_rejected = true; }
+  require(hash_rejected, "whole-sidecar digest rejects modified ciphertext");
+  const auto truncated_path = (root / "p0" / "truncated.bin").string();
+  std::filesystem::copy_file(path0, truncated_path);
+  std::filesystem::resize_file(truncated_path, std::filesystem::file_size(truncated_path) - 1U);
+  bool truncation_rejected = false;
+  try { (void)ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+      truncated_path, c0, 0, recipient_keys[0], stream_id, stats0.file_sha256); }
+  catch (const std::exception&) { truncation_rejected = true; }
+  require(truncation_rejected, "truncated stream file rejected");
+  const auto incomplete_path = (root / "p0" / "incomplete.bin").string();
+  const auto incomplete_pending = incomplete_path + ".pending." + std::to_string(::getpid());
+  bool incomplete_finalize_rejected = false;
+  {
+    ProtocolIBmw16StreamedUcmpSlotWriter incomplete(incomplete_path, c0, 0,
+        recipient_keys[0], stream_id);
+    const ProtocolIBmw16MaterialSlot first{
+        2U * c0.padded_n + 2U, ProtocolIBmw16MaterialStage::Select, 0, 1, 0, 1};
+    incomplete.append(first, material.party0.select_keys[0][0][0]);
+    try { (void)incomplete.finalize(); }
+    catch (const std::logic_error&) { incomplete_finalize_rejected = true; }
+  }
+  require(incomplete_finalize_rejected && !std::filesystem::exists(incomplete_path) &&
+          !std::filesystem::exists(incomplete_pending),
+          "incomplete stream never publishes a claimable file and cleans pending file");
+  std::cout << "stream_keygen_same_slot_equivalence slots_per_party=" << stats0.ucmp_slots
+            << " sidecar_bytes=" << stats0.sealed_file_bytes << " file_hash_bound=true\n";
+}
+
+void verify_persistent_claim_survives_process_exit() {
+  const auto root = std::filesystem::temp_directory_path() /
+      ("bmw16-s18-claim-restart-" + std::to_string(::getpid()));
+  std::filesystem::create_directories(root);
+  std::filesystem::permissions(root, std::filesystem::perms::owner_all);
+  auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(
+      reinterpret_cast<void*>(1), [root](void*) {
+        std::error_code ec; std::filesystem::remove_all(root, ec);
+      });
+  const auto identity = protocol_i_bmw16_claim_root_identity(root.string());
+  constexpr std::uint64_t session = UINT64_C(0x5331385253544152);
+  std::array<std::uint8_t, 32> digest{};
+  for (std::size_t i = 0; i < digest.size(); ++i)
+    digest[i] = static_cast<std::uint8_t>(0xA5U ^ i);
+  const auto child = ::fork();
+  require(child >= 0, "claim restart fork");
+  if (child == 0) {
+    try {
+      ProtocolIBmw16PersistentClaimStore store(root.string(), session, 0, identity);
+      store.claim_bundle(digest);
+      ::_exit(0);  // simulate process death after the durable claim
+    } catch (...) {
+      ::_exit(1);
+    }
+  }
+  int status = 0;
+  require(::waitpid(child, &status, 0) == child && WIFEXITED(status) &&
+          WEXITSTATUS(status) == 0, "child durable claim before simulated crash");
+  bool replay_rejected = false;
+  try {
+    ProtocolIBmw16PersistentClaimStore restarted(root.string(), session, 0, identity);
+    restarted.claim_bundle(digest);
+  } catch (const std::exception&) {
+    replay_rejected = true;
+  }
+  require(replay_rejected, "bundle claim must reject after process exit/reopen");
+  std::cout << "persistent_claim_restart_replay_rejected=true\n";
+}
+
+void verify_concurrent_bundle_claim_single_winner() {
+  const auto root = std::filesystem::temp_directory_path() /
+      ("bmw16-s18-claim-race-" + std::to_string(::getpid()));
+  std::filesystem::create_directories(root);
+  std::filesystem::permissions(root, std::filesystem::perms::owner_all);
+  auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(
+      reinterpret_cast<void*>(1), [root](void*) {
+        std::error_code ec; std::filesystem::remove_all(root, ec);
+      });
+  const auto identity = protocol_i_bmw16_claim_root_identity(root.string());
+  constexpr std::uint64_t session = UINT64_C(0x533138434C41494D);
+  std::array<std::uint8_t, 32> digest{};
+  for (std::size_t i = 0; i < digest.size(); ++i)
+    digest[i] = static_cast<std::uint8_t>(0x3CU + i);
+
+  int ready_pipe[2]{};
+  int start_pipe[2]{};
+  int result_pipe[2]{};
+  require(::pipe(ready_pipe) == 0 && ::pipe(start_pipe) == 0 && ::pipe(result_pipe) == 0,
+          "claim-race pipes");
+  const auto child = ::fork();
+  require(child >= 0, "claim-race fork");
+  if (child == 0) {
+    ::close(ready_pipe[0]); ::close(start_pipe[1]); ::close(result_pipe[0]);
+    std::uint8_t result = 3;
+    try {
+      ProtocolIBmw16PersistentClaimStore store(root.string(), session, 0, identity);
+      const std::uint8_t ready = 1;
+      (void)::write(ready_pipe[1], &ready, sizeof(ready));
+      std::uint8_t start = 0;
+      if (::read(start_pipe[0], &start, sizeof(start)) != sizeof(start) || start != 1)
+        ::_exit(4);
+      try {
+        store.claim_bundle(digest);
+        result = 1;
+      } catch (const std::exception& e) {
+        result = std::string(e.what()) == "BMW16 persistent claim replay" ? 2 : 3;
+      }
+      (void)::write(result_pipe[1], &result, sizeof(result));
+      ::_exit(result == 1 || result == 2 ? 0 : 5);
+    } catch (...) {
+      (void)::write(result_pipe[1], &result, sizeof(result));
+      ::_exit(6);
+    }
+  }
+
+  ::close(ready_pipe[1]); ::close(start_pipe[0]); ::close(result_pipe[1]);
+  std::uint8_t ready = 0;
+  require(::read(ready_pipe[0], &ready, sizeof(ready)) == sizeof(ready) && ready == 1,
+          "claim-race child ready");
+  const std::uint8_t start = 1;
+  require(::write(start_pipe[1], &start, sizeof(start)) == sizeof(start), "claim-race release");
+  std::uint8_t parent_result = 3;
+  try {
+    ProtocolIBmw16PersistentClaimStore store(root.string(), session, 0, identity);
+    store.claim_bundle(digest);
+    parent_result = 1;
+  } catch (const std::exception& e) {
+    parent_result = std::string(e.what()) == "BMW16 persistent claim replay" ? 2 : 3;
+  }
+  std::uint8_t child_result = 3;
+  require(::read(result_pipe[0], &child_result, sizeof(child_result)) == sizeof(child_result),
+          "claim-race child result");
+  int status = 0;
+  require(::waitpid(child, &status, 0) == child && WIFEXITED(status) && WEXITSTATUS(status) == 0,
+          "claim-race child exit");
+  ::close(ready_pipe[0]); ::close(start_pipe[1]); ::close(result_pipe[0]);
+  require(parent_result <= 2 && child_result <= 2 &&
+          (static_cast<unsigned>(parent_result == 1) + static_cast<unsigned>(child_result == 1) == 1U),
+          "concurrent durable bundle claim has exactly one winner");
+  std::cout << "concurrent_bundle_claim_single_winner=true parent="
+            << static_cast<unsigned>(parent_result) << " child="
+            << static_cast<unsigned>(child_result) << "\n";
+}
+
 void run_missing_process_slot_guard() {
   const ProtocolIBmw16ExperimentalPartyConfig config{
       UINT64_C(0x5331340000000001), UINT64_C(0x5331348000000001),
@@ -458,6 +697,9 @@ int main(int argc,char** argv) {
     require(argc==1,"unexpected test args");
     run_missing_process_slot_guard();
     run_singleton();
+    verify_streamed_keygen_slot_equivalence();
+    verify_concurrent_bundle_claim_single_winner();
+    verify_persistent_claim_survives_process_exit();
     run_case({{INT32_MIN, INT32_MAX, 0, -1, INT32_MAX}, 1, UINT64_C(0x1101)});
     run_case({{INT32_MIN, INT32_MAX, 0, -1, INT32_MAX}, 3, UINT64_C(0x1102)});
     run_case({{INT32_MIN, INT32_MAX, 0, -1, INT32_MAX}, 5, UINT64_C(0x1103)});

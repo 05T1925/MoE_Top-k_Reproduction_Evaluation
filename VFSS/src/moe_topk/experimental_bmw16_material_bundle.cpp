@@ -28,6 +28,7 @@ constexpr std::size_t kHeaderV2Bytes = 100;
 constexpr std::size_t kHeaderV3Bytes = 116;
 constexpr std::array<std::uint8_t, 8> kEnvelopeMagic{'B','M','W','1','6','S','1','4'};
 constexpr std::array<std::uint8_t, 8> kPayloadMagic{'B','M','W','1','6','P','1','4'};
+constexpr std::array<std::uint8_t, 8> kStreamShellMagic{'B','M','W','1','6','S','H','1'};
 using Digest = std::array<std::uint8_t, 32>;
 using Key = std::array<std::uint8_t, 32>;
 using Nonce = std::array<std::uint8_t, kNonceBytes>;
@@ -86,8 +87,8 @@ Digest sha256(const std::vector<std::uint8_t>& bytes) {
 }
 
 std::uint32_t expected_padded(std::uint32_t n) {
-  if(n==0||n>256)throw std::invalid_argument("BMW16 bundle n outside S15 bounded domain");
-  std::uint32_t p=2; while(p<n)p<<=1U; return p;
+  if(n==0||n>(1U<<20U))throw std::invalid_argument("BMW16 stream domain n must be 1..2^20");
+  std::uint32_t p=2; while(p<n){if(p>(std::numeric_limits<std::uint32_t>::max()>>1U))throw std::overflow_error("BMW16 padded n");p<<=1U;} return p;
 }
 
 std::uint8_t expected_index_bits(std::uint32_t padded) {
@@ -110,6 +111,7 @@ void add_slot(std::vector<ProtocolIBmw16MaterialSlot>& slots,
 
 std::vector<ProtocolIBmw16MaterialSlot> enumerate_slots(const ProtocolIBmw16ExperimentalPartyConfig& c) {
   validate_config(c,c.party);
+  if (c.n > 256) throw std::invalid_argument("BMW16 in-memory manifest domain capped at n<=256");
   std::vector<ProtocolIBmw16MaterialSlot> slots;
   const auto pairs=static_cast<std::uint64_t>(c.n)*(c.n-1U)/2U;
   slots.reserve(static_cast<std::size_t>(2U*c.padded_n+2U+9U*pairs));
@@ -219,12 +221,120 @@ ProtocolIBmw16ExperimentalPartyMaterial decode_payload(const ProtocolIBmw16Exper
   return m;
 }
 
+std::uint64_t stream_pair_count(const ProtocolIBmw16ExperimentalPartyConfig& c) {
+  const auto n = static_cast<std::uint64_t>(c.n);
+  if (n != 0 && n - 1U > std::numeric_limits<std::uint64_t>::max() / n)
+    throw std::overflow_error("BMW16 streamed pair count");
+  return n * (n - 1U) / 2U;
+}
+
+std::vector<std::uint8_t> encode_stream_manifest(
+    const ProtocolIBmw16ExperimentalPartyConfig& c,
+    const ProtocolIBmw16StreamBundleBinding& stream, std::uint8_t party) {
+  const auto pairs = stream_pair_count(c);
+  if (pairs > std::numeric_limits<std::uint64_t>::max() / 9U ||
+      stream.ucmp_slot_count != pairs * 9U)
+    throw std::invalid_argument("BMW16 streamed manifest slot count");
+  const auto key_bytes = UINT64_C(57) + UINT64_C(24) * c.comparison_bits;
+  constexpr std::uint64_t kSidecarHeaderBytes = 164;
+  const auto record_bytes = key_bytes + 16U;
+  if (stream.ucmp_slot_count > (std::numeric_limits<std::uint64_t>::max() - kSidecarHeaderBytes) / record_bytes ||
+      stream.sealed_sidecar_bytes != kSidecarHeaderBytes + stream.ucmp_slot_count * record_bytes)
+    throw std::invalid_argument("BMW16 streamed manifest byte count");
+  Writer w;
+  w.raw(kStreamShellMagic.data(), kStreamShellMagic.size()); w.u32(1);
+  w.u64(c.session); w.u64(c.fingerprint); w.u8(party); w.u32(c.n); w.u32(c.k);
+  w.u32(c.padded_n); w.u8(c.index_bits); w.u8(c.comparison_bits);
+  w.u64(c.claim_root_device); w.u64(c.claim_root_inode);
+  w.raw(stream.stream_id.data(), stream.stream_id.size());
+  w.raw(stream.sidecar_sha256.data(), stream.sidecar_sha256.size());
+  w.u64(stream.ucmp_slot_count); w.u64(stream.sealed_sidecar_bytes);
+  // The manifest is implicit: exact slot IDs and tuples are the versioned
+  // canonical formula in experimental_bmw16_stream_store.cpp.
+  return std::move(w.bytes);
+}
+
+std::vector<std::uint8_t> encode_stream_shell_payload(
+    const ProtocolIBmw16ExperimentalPartyConfig& c, std::uint8_t party,
+    const ProtocolIBmw16ExperimentalPartyMaterial& m,
+    const ProtocolIBmw16StreamBundleBinding& stream,
+    std::vector<std::uint8_t>* manifest_out) {
+  if (m.forward_shuffle.has_cmpagg_material || m.inverse_shuffle.has_cmpagg_material ||
+      !m.forward_shuffle.edge_materials.empty() || !m.inverse_shuffle.edge_materials.empty())
+    throw std::invalid_argument("BMW16 streamed shell requires shuffle-only material");
+  for (const auto& task : m.select_keys) for (const auto& round : task)
+    if (!round.empty()) throw std::invalid_argument("BMW16 streamed shell must not contain Select keys");
+  if (!m.membership_keys.empty())
+    throw std::invalid_argument("BMW16 streamed shell must not contain membership keys");
+  if (m.forward_shuffle.party != party || m.inverse_shuffle.party != party ||
+      m.forward_shuffle.session != c.session || m.inverse_shuffle.session != c.session ||
+      m.forward_shuffle.n != c.n || m.inverse_shuffle.n != c.n ||
+      m.forward_shuffle.comparison_bits != c.comparison_bits ||
+      m.inverse_shuffle.comparison_bits != c.comparison_bits)
+    throw std::invalid_argument("BMW16 streamed shell shuffle binding");
+  auto manifest = encode_stream_manifest(c, stream, party);
+  *manifest_out = manifest;
+  Writer payload; payload.raw(kStreamShellMagic.data(), kStreamShellMagic.size()); payload.u32(1);
+  payload.blob(manifest);
+  Writer score; encode_score_package(score, m.score_input, party, c); payload.blob(score.bytes);
+  payload.blob(protocol_i_parallel_shuffle_serialize_material(m.forward_shuffle));
+  payload.blob(protocol_i_parallel_shuffle_serialize_material(m.inverse_shuffle));
+  return std::move(payload.bytes);
+}
+
+ProtocolIBmw16StreamBundleOpenResult decode_stream_shell_payload(
+    const ProtocolIBmw16ExperimentalPartyConfig& c, std::uint8_t party,
+    const std::vector<std::uint8_t>& payload,
+    const std::array<std::uint8_t, 32>& expected_manifest_digest) {
+  Reader r(payload);
+  if (r.raw(kStreamShellMagic.size()) !=
+      std::vector<std::uint8_t>(kStreamShellMagic.begin(), kStreamShellMagic.end()) || r.u32() != 1)
+    throw std::runtime_error("BMW16 stream-shell payload version");
+  const auto manifest = r.blob();
+  if (sha256(manifest) != expected_manifest_digest)
+    throw std::runtime_error("BMW16 stream-shell authenticated manifest digest");
+  Reader mr(manifest);
+  if (mr.raw(kStreamShellMagic.size()) !=
+      std::vector<std::uint8_t>(kStreamShellMagic.begin(), kStreamShellMagic.end()) || mr.u32() != 1 ||
+      mr.u64() != c.session || mr.u64() != c.fingerprint || mr.u8() != party ||
+      mr.u32() != c.n || mr.u32() != c.k || mr.u32() != c.padded_n ||
+      mr.u8() != c.index_bits || mr.u8() != c.comparison_bits ||
+      mr.u64() != c.claim_root_device || mr.u64() != c.claim_root_inode)
+    throw std::runtime_error("BMW16 stream-shell manifest configuration");
+  ProtocolIBmw16StreamBundleOpenResult result;
+  for (auto& x : result.stream.stream_id) x = mr.u8();
+  for (auto& x : result.stream.sidecar_sha256) x = mr.u8();
+  result.stream.ucmp_slot_count = mr.u64();
+  result.stream.sealed_sidecar_bytes = mr.u64();
+  mr.done();
+  if (encode_stream_manifest(c, result.stream, party) != manifest)
+    throw std::runtime_error("BMW16 stream-shell canonical manifest mismatch");
+  const auto score_blob = r.blob(); Reader sr(score_blob);
+  result.material.score_input = decode_score_package(sr, party, c); sr.done();
+  result.material.forward_shuffle = protocol_i_parallel_shuffle_deserialize_material(r.blob(), party);
+  result.material.inverse_shuffle = protocol_i_parallel_shuffle_deserialize_material(r.blob(), party);
+  r.done();
+  const auto pairs = stream_pair_count(c);
+  if (result.stream.ucmp_slot_count != pairs * 9U ||
+      result.material.forward_shuffle.has_cmpagg_material || result.material.inverse_shuffle.has_cmpagg_material ||
+      !result.material.forward_shuffle.edge_materials.empty() || !result.material.inverse_shuffle.edge_materials.empty() ||
+      result.material.forward_shuffle.session != c.session || result.material.inverse_shuffle.session != c.session ||
+      result.material.forward_shuffle.n != c.n || result.material.inverse_shuffle.n != c.n ||
+      result.material.forward_shuffle.party != party || result.material.inverse_shuffle.party != party ||
+      result.material.forward_shuffle.comparison_bits != c.comparison_bits ||
+      result.material.inverse_shuffle.comparison_bits != c.comparison_bits)
+    throw std::runtime_error("BMW16 stream-shell shuffle/coverage mismatch");
+  return result;
+}
+
 std::vector<std::uint8_t> make_header(const ProtocolIBmw16ExperimentalPartyConfig& c,
-    std::uint8_t party,const Digest& digest,const Nonce& nonce,std::uint64_t plain_len) {
+    std::uint8_t party,const Digest& digest,const Nonce& nonce,std::uint64_t plain_len,
+    bool stream_shell=false) {
   const bool root_bound = c.claim_root_device != 0 && c.claim_root_inode != 0;
+  if(stream_shell&&!root_bound)throw std::invalid_argument("BMW16 streamed shell requires a bound claim root");
   if ((c.claim_root_device == 0) != (c.claim_root_inode == 0))
     throw std::invalid_argument("BMW16 partial claim-root identity");
-  Writer w;w.raw(kEnvelopeMagic.data(),kEnvelopeMagic.size());w.u32(root_bound ? 3U : 2U);w.u8(party);w.u8(0);w.u8(0);w.u8(0);
+  Writer w;w.raw(kEnvelopeMagic.data(),kEnvelopeMagic.size());w.u32(stream_shell?4U:(root_bound ? 3U : 2U));w.u8(party);w.u8(0);w.u8(0);w.u8(0);
   w.u64(c.session);w.u64(c.fingerprint);w.u32(c.n);w.u32(c.k);w.u32(c.padded_n);w.u8(c.index_bits);w.u8(c.comparison_bits);w.u8(0);w.u8(0);
   w.raw(digest.data(),digest.size());w.raw(nonce.data(),nonce.size());w.u64(plain_len);
   if (root_bound) { w.u64(c.claim_root_device); w.u64(c.claim_root_inode); }
@@ -318,6 +428,73 @@ ProtocolIBmw16ExperimentalPartyMaterial protocol_i_bmw16_bundle_open_party(
   const auto slots=enumerate_slots(expected);auto material=decode_payload(expected,party,plain,slots);material.slot_manifest=slots;
   if(stats){stats->plaintext_bytes=plain.size();stats->manifest_bytes=manifest.size();stats->ciphertext_bytes=encrypted.size();stats->envelope_bytes=envelope.size();stats->authenticated_metadata_bytes=header_size+kTagBytes;stats->slot_count=slots.size();stats->manifest_sha256=digest;}
   return material;
+}
+
+std::vector<std::uint8_t> protocol_i_bmw16_bundle_seal_stream_shell_party(
+    const ProtocolIBmw16ExperimentalPartyConfig& c, std::uint8_t party,
+    const ProtocolIBmw16ExperimentalPartyMaterial& material,
+    const ProtocolIBmw16StreamBundleBinding& stream, const Key& key,
+    ProtocolIBmw16BundleStats* stats) {
+  validate_config(c, party);
+  std::vector<std::uint8_t> manifest;
+  const auto plain = encode_stream_shell_payload(c, party, material, stream, &manifest);
+  const auto digest = sha256(manifest);
+  Nonce nonce{}; random_bytes(nonce.data(), nonce.size());
+  const auto header = make_header(c, party, digest, nonce, plain.size(), true);
+  const auto encrypted = encrypt(key, nonce, header, plain);
+  std::vector<std::uint8_t> out = header; out.insert(out.end(), encrypted.begin(), encrypted.end());
+  if (out.size() > kMaxBundleBytes) throw std::runtime_error("BMW16 stream shell size limit");
+  if (stats) {
+    stats->plaintext_bytes = plain.size(); stats->manifest_bytes = manifest.size();
+    stats->ciphertext_bytes = encrypted.size(); stats->envelope_bytes = out.size();
+    stats->authenticated_metadata_bytes = header.size() + kTagBytes;
+    stats->slot_count = 2U * c.padded_n + 2U + stream.ucmp_slot_count;
+    stats->manifest_sha256 = digest;
+  }
+  return out;
+}
+
+ProtocolIBmw16StreamBundleOpenResult protocol_i_bmw16_bundle_open_stream_shell_party(
+    const ProtocolIBmw16ExperimentalPartyConfig& expected, std::uint8_t party,
+    const std::vector<std::uint8_t>& envelope, const Key& key) {
+  validate_config(expected, party);
+  if (envelope.size() < kHeaderV3Bytes + kTagBytes || envelope.size() > kMaxBundleBytes)
+    throw std::runtime_error("BMW16 stream-shell envelope length");
+  const std::vector<std::uint8_t> base_header(envelope.begin(), envelope.begin() + kHeaderV2Bytes);
+  Reader base(base_header);
+  if (base.raw(kEnvelopeMagic.size()) != std::vector<std::uint8_t>(kEnvelopeMagic.begin(), kEnvelopeMagic.end()))
+    throw std::runtime_error("BMW16 stream-shell envelope magic");
+  if (base.u32() != 4) throw std::runtime_error("BMW16 stream-shell envelope version");
+  Reader h(base_header); (void)h.raw(kEnvelopeMagic.size()); (void)h.u32();
+  const auto got_party = h.u8(); (void)h.u8(); (void)h.u8(); (void)h.u8();
+  const auto session = h.u64(), fingerprint = h.u64();
+  const auto n = h.u32(), k = h.u32(), padded = h.u32();
+  const auto index = h.u8(), bits = h.u8(); (void)h.u8(); (void)h.u8();
+  Digest digest{}; const auto d = h.raw(digest.size()); std::copy(d.begin(), d.end(), digest.begin());
+  Nonce nonce{}; const auto no = h.raw(nonce.size()); std::copy(no.begin(), no.end(), nonce.begin());
+  const auto plain_len = h.u64(); h.done();
+  const std::vector<std::uint8_t> root_bytes(envelope.begin() + kHeaderV2Bytes,
+                                              envelope.begin() + kHeaderV3Bytes);
+  Reader root(root_bytes); const auto root_device = root.u64(), root_inode = root.u64(); root.done();
+  if (got_party != party || session != expected.session || fingerprint != expected.fingerprint ||
+      n != expected.n || k != expected.k || padded != expected.padded_n || index != expected.index_bits ||
+      bits != expected.comparison_bits || root_device == 0 || root_inode == 0 ||
+      root_device != expected.claim_root_device || root_inode != expected.claim_root_inode)
+    throw std::runtime_error("BMW16 stream-shell envelope identity mismatch");
+  if (plain_len != envelope.size() - kHeaderV3Bytes - kTagBytes)
+    throw std::runtime_error("BMW16 stream-shell payload length mismatch");
+  const std::vector<std::uint8_t> header(envelope.begin(), envelope.begin() + kHeaderV3Bytes);
+  const std::vector<std::uint8_t> encrypted(envelope.begin() + kHeaderV3Bytes, envelope.end());
+  const auto plain = decrypt(key, nonce, header, encrypted);
+  auto result = decode_stream_shell_payload(expected, party, plain, digest);
+  result.stats.plaintext_bytes = plain.size(); result.stats.manifest_bytes = 0;
+  result.stats.ciphertext_bytes = encrypted.size(); result.stats.envelope_bytes = envelope.size();
+  result.stats.authenticated_metadata_bytes = header.size() + kTagBytes;
+  result.stats.slot_count = 2U * expected.padded_n + 2U + result.stream.ucmp_slot_count;
+  result.stats.manifest_sha256 = digest;
+  // Preserve the small implicit manifest length for reproducible accounting.
+  result.stats.manifest_bytes = encode_stream_manifest(expected, result.stream, party).size();
+  return result;
 }
 
 void protocol_i_bmw16_bundle_write_atomic(const std::string& path,const std::vector<std::uint8_t>& bytes) {

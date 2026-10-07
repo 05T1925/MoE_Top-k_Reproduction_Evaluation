@@ -98,7 +98,7 @@ std::string find_field(const std::string& line, const std::string& key) {
 void run_case(const std::string& node, const std::vector<std::int32_t>& scores, std::uint32_t k,
               std::uint64_t session) {
   require(::geteuid() == 0, "party node E2E requires root to provision distinct OS identities");
-  const auto root = fs::path("/tmp") / ("bmw16-s17-node-" + std::to_string(::getpid()) + "-" + std::to_string(session));
+  const auto root = fs::path("/tmp") / ("bmw16-s18-node-" + std::to_string(::getpid()) + "-" + std::to_string(session));
   require(::mkdir(root.c_str(), 0700) == 0 && ::chmod(root.c_str(), 0711) == 0, "node fixture root");
   auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(reinterpret_cast<void*>(1), [root](void*) {
     std::error_code ec; fs::remove_all(root, ec);
@@ -120,7 +120,8 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
   const std::uint64_t fingerprint = session ^ UINT64_C(0x535331375f465052);
   const auto targs = std::vector<std::string>{node, "t", std::to_string(n), std::to_string(k),
       std::to_string(session), std::to_string(fingerprint), (p0/"claims").string(), (p1/"claims").string(),
-      (p0/"material.bundle").string(), (p1/"material.bundle").string(), (p0/"aead.key").string(),
+      (p0/"material.shell").string(), (p1/"material.shell").string(),
+      (p0/"ucmp.stream").string(), (p1/"ucmp.stream").string(), (p0/"aead.key").string(),
       (p1/"aead.key").string(), std::to_string(kUid0), std::to_string(kUid1)};
   const int t_exit = exec_capture(targs, root / "t.log");
   require(t_exit == 0, "offline T node failed");
@@ -154,7 +155,8 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
       const auto dir = party ? p1 : p0;
       std::vector<std::string> args{node, "party", std::to_string(party), std::to_string(n), std::to_string(k),
           std::to_string(session), std::to_string(fingerprint), (dir/"claims").string(),
-          (dir/"raw-share.bin").string(), (dir/"material.bundle").string(), (dir/"aead.key").string(),
+          (dir/"raw-share.bin").string(), (dir/"material.shell").string(),
+          (dir/"ucmp.stream").string(), (dir/"aead.key").string(),
           (dir/"mask.share").string(), "30000"};
       for (const auto& pair : channels) args.push_back(std::to_string(pair[party]));
       std::vector<char*> av; for (auto& arg : args) av.push_back(arg.data()); av.push_back(nullptr);
@@ -195,21 +197,41 @@ std::vector<std::int32_t> extended_scores(std::uint32_t n) {
   scores.back() = INT32_MAX;
   return scores;
 }
+
+std::vector<std::int32_t> seeded_scores(std::uint32_t n, std::uint64_t seed) {
+  std::mt19937_64 rng(seed);
+  std::vector<std::int32_t> scores(n);
+  for (auto& score : scores) score = static_cast<std::int32_t>(rng());
+  if (n >= 8) {
+    scores[0] = INT32_MIN; scores[1] = INT32_MAX;
+    scores[2] = -1; scores[3] = 0;
+    scores[4] = scores[5];
+  }
+  return scores;
+}
 }  // namespace
 
 int main(int argc, char** argv) {
   try {
-    require(argc == 2 || argc == 3, "pass party node executable path [--extended]");
-    require(argc == 2 || std::string(argv[2]) == "--extended", "unknown party node E2E option");
+    require(argc == 2 || argc == 3, "pass party node executable path [--extended|--n1000]");
+    require(argc == 2 || std::string(argv[2]) == "--extended" || std::string(argv[2]) == "--n1000",
+            "unknown party node E2E option");
     const auto node = fs::canonical(argv[1]).string();
     run_case(node, {INT32_MIN}, 1, UINT64_C(0x171700));
     run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x171702));
     run_case(node, {INT32_MIN, 13, -5, INT32_MAX, 13}, 2, UINT64_C(0x171703));
     run_case(node, {INT32_MIN, 19, -4, 19, INT32_MAX, 1, -99, 8}, 3, UINT64_C(0x171701));
     if (argc == 3) {
-      run_case(node, extended_scores(64), 8, UINT64_C(0x171740));
-      run_case(node, extended_scores(128), 8, UINT64_C(0x171780));
-      run_case(node, extended_scores(256), 2, UINT64_C(0x171800));
+      if (std::string(argv[2]) == "--extended") {
+        run_case(node, extended_scores(64), 8, UINT64_C(0x171740));
+        run_case(node, seeded_scores(64, UINT64_C(0x18D1)), 1, UINT64_C(0x171741));
+        run_case(node, seeded_scores(64, UINT64_C(0x18D2)), 64, UINT64_C(0x171742));
+        run_case(node, extended_scores(128), 8, UINT64_C(0x171780));
+        run_case(node, seeded_scores(128, UINT64_C(0x18D3)), 80, UINT64_C(0x171781));
+        run_case(node, extended_scores(256), 2, UINT64_C(0x171800));
+      } else {
+        run_case(node, seeded_scores(1000, UINT64_C(0x18D1000)), 80, UINT64_C(0x1711000));
+      }
     }
     return 0;
   } catch (const std::exception& e) {

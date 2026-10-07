@@ -21,6 +21,19 @@ struct ProtocolIBmw16BundleStats {
   std::array<std::uint8_t, 32> manifest_sha256{};
 };
 
+struct ProtocolIBmw16StreamBundleBinding {
+  std::array<std::uint8_t, 32> stream_id{};
+  std::array<std::uint8_t, 32> sidecar_sha256{};
+  std::uint64_t ucmp_slot_count = 0;
+  std::uint64_t sealed_sidecar_bytes = 0;
+};
+
+struct ProtocolIBmw16StreamBundleOpenResult {
+  ProtocolIBmw16ExperimentalPartyMaterial material;
+  ProtocolIBmw16StreamBundleBinding stream;
+  ProtocolIBmw16BundleStats stats;
+};
+
 struct ProtocolIBmw16ClaimRootIdentity {
   std::uint64_t device = 0;
   std::uint64_t inode = 0;
@@ -44,6 +57,21 @@ ProtocolIBmw16ExperimentalPartyMaterial protocol_i_bmw16_bundle_open_party(
     const std::vector<std::uint8_t>& envelope,
     const std::array<std::uint8_t, 32>& recipient_key,
     ProtocolIBmw16BundleStats* stats = nullptr);
+
+// EXPERIMENTAL v4 shell profile: encrypts raw-score and forward/inverse
+// shuffle material plus a compact implicit manifest that binds a streamed
+// Select/membership sidecar. No quadratic uCMP keys are included in memory.
+std::vector<std::uint8_t> protocol_i_bmw16_bundle_seal_stream_shell_party(
+    const ProtocolIBmw16ExperimentalPartyConfig& config, std::uint8_t party,
+    const ProtocolIBmw16ExperimentalPartyMaterial& material,
+    const ProtocolIBmw16StreamBundleBinding& stream,
+    const std::array<std::uint8_t, 32>& recipient_key,
+    ProtocolIBmw16BundleStats* stats = nullptr);
+
+ProtocolIBmw16StreamBundleOpenResult protocol_i_bmw16_bundle_open_stream_shell_party(
+    const ProtocolIBmw16ExperimentalPartyConfig& expected, std::uint8_t party,
+    const std::vector<std::uint8_t>& envelope,
+    const std::array<std::uint8_t, 32>& recipient_key);
 
 void protocol_i_bmw16_bundle_write_atomic(const std::string& path,
                                          const std::vector<std::uint8_t>& bytes);

@@ -20,7 +20,7 @@
 namespace moe_topk {
 namespace {
 
-constexpr std::size_t kPrefixBytes = 84;
+constexpr std::size_t kPrefixBytes = 116;
 constexpr std::size_t kWrappedKeyBytes = 48;
 constexpr std::size_t kHeaderBytes = kPrefixBytes + kWrappedKeyBytes;
 constexpr std::size_t kNonceBytes = 12;
@@ -151,13 +151,15 @@ std::uint64_t expected_slot_id(const ProtocolIBmw16ExperimentalPartyConfig& c,
 }
 
 std::vector<std::uint8_t> prefix_for(const ProtocolIBmw16ExperimentalPartyConfig& c,
-    std::uint8_t party, std::uint32_t key_bytes, std::uint64_t slots, const Nonce& nonce) {
+    std::uint8_t party, std::uint32_t key_bytes, std::uint64_t slots,
+    const Nonce& nonce, const std::array<std::uint8_t, 32>& stream_id) {
   Encoder e;
-  e.raw(kMagic.data(), kMagic.size()); e.u32(1);
+  e.raw(kMagic.data(), kMagic.size()); e.u32(2);
   e.u64(c.session); e.u64(c.fingerprint); e.u32(c.n); e.u32(c.k); e.u32(c.padded_n);
   e.u8(c.index_bits); e.u8(c.comparison_bits); e.u8(party); e.u8(0);
   e.u64(c.claim_root_device); e.u64(c.claim_root_inode); e.u32(key_bytes); e.u64(slots);
   e.raw(nonce.data(), nonce.size());
+  e.raw(stream_id.data(), stream_id.size());
   require(e.b.size() == kPrefixBytes, "BMW16 stream header layout");
   return std::move(e.b);
 }
@@ -197,12 +199,12 @@ void pread_all(int fd, std::uint8_t* p, std::size_t n, std::uint64_t offset) {
 }
 
 void validate_config(const ProtocolIBmw16ExperimentalPartyConfig& c, std::uint8_t party) {
-  if (party > 1 || c.party != party || c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > 256 ||
+  if (party > 1 || c.party != party || c.session == 0 || c.fingerprint == 0 || c.n < 2 || c.n > (1U << 20U) ||
       c.k == 0 || c.k > c.n || c.claim_root_device == 0 || c.claim_root_inode == 0)
     throw std::invalid_argument("BMW16 stream configuration");
-  std::uint32_t padded = 2; while (padded < c.n) padded <<= 1U;
+  std::uint32_t padded = 2; while (padded < c.n) { if (padded > (std::numeric_limits<std::uint32_t>::max() >> 1U)) throw std::overflow_error("BMW16 stream padded n"); padded <<= 1U; }
   std::uint8_t ib = 1; for (auto v = padded; v > 2; v >>= 1U) ++ib;
-  if (c.padded_n != padded || c.index_bits != ib || c.comparison_bits != 33U + ib)
+  if (c.padded_n != padded || c.index_bits != ib || c.comparison_bits != 33U + ib || c.comparison_bits > 53)
     throw std::invalid_argument("BMW16 stream dimensions");
 }
 
@@ -212,7 +214,137 @@ std::uint64_t expected_slot_count(const ProtocolIBmw16ExperimentalPartyConfig& c
   return p * 9U;
 }
 
+std::array<std::uint8_t, 32> digest_file(int fd, std::uint64_t size) {
+  EVP_MD_CTX* raw = EVP_MD_CTX_new();
+  require(raw != nullptr && EVP_DigestInit_ex(raw, EVP_sha256(), nullptr) == 1,
+          "BMW16 stream SHA-256 init");
+  std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> ctx(raw, EVP_MD_CTX_free);
+  std::array<std::uint8_t, 64U * 1024U> buffer{};
+  std::uint64_t offset = 0;
+  while (offset < size) {
+    const auto take = static_cast<std::size_t>(std::min<std::uint64_t>(buffer.size(), size - offset));
+    pread_all(fd, buffer.data(), take, offset);
+    require(EVP_DigestUpdate(ctx.get(), buffer.data(), take) == 1, "BMW16 stream SHA-256 update");
+    offset += take;
+  }
+  std::array<std::uint8_t, 32> out{}; unsigned int out_size = 0;
+  require(EVP_DigestFinal_ex(ctx.get(), out.data(), &out_size) == 1 && out_size == out.size(),
+          "BMW16 stream SHA-256 final");
+  return out;
+}
+
 }  // namespace
+
+ProtocolIBmw16StreamedUcmpSlotWriter::ProtocolIBmw16StreamedUcmpSlotWriter(
+    const std::string& path, const ProtocolIBmw16ExperimentalPartyConfig& config,
+    std::uint8_t party, const std::array<std::uint8_t, 32>& recipient_key,
+    const std::array<std::uint8_t, 32>& stream_id)
+    : final_path_(path), temporary_path_(path + ".pending." + std::to_string(::getpid())),
+      stream_id_(stream_id), config_(config), party_(party) {
+  validate_config(config_, party_);
+  if (path.empty() || std::all_of(stream_id_.begin(), stream_id_.end(), [](auto x) { return x == 0; }))
+    throw std::invalid_argument("BMW16 stream writer path/id");
+  const auto pairs = pair_count(config_.n);
+  if (pairs > std::numeric_limits<std::uint64_t>::max() / 9U)
+    throw std::overflow_error("BMW16 stream writer slot count");
+  expected_slots_ = pairs * 9U;
+  const auto key_bytes64 = UINT64_C(57) + UINT64_C(24) * config_.comparison_bits;
+  if (key_bytes64 > std::numeric_limits<std::uint32_t>::max() || key_bytes64 + kTagBytes > std::numeric_limits<std::uint32_t>::max())
+    throw std::overflow_error("BMW16 stream writer key size");
+  key_bytes_ = static_cast<std::uint32_t>(key_bytes64);
+  record_bytes_ = static_cast<std::uint32_t>(key_bytes64 + kTagBytes);
+  random_bytes(data_key_.data(), data_key_.size());
+  random_bytes(base_nonce_.data(), base_nonce_.size());
+  prefix_ = prefix_for(config_, party_, key_bytes_, expected_slots_, base_nonce_, stream_id_);
+  std::vector<std::uint8_t> clear_key(data_key_.begin(), data_key_.end());
+  BufferCleanseGuard clear_key_guard(clear_key);
+  const auto wrapped = gcm_encrypt(recipient_key, base_nonce_, prefix_, clear_key);
+  const int fd = ::open(temporary_path_.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+  if (fd < 0) throw std::runtime_error("BMW16 stream writer pending file create");
+  fd_ = fd;
+  try {
+    auto* digest = EVP_MD_CTX_new();
+    if (!digest || EVP_DigestInit_ex(digest, EVP_sha256(), nullptr) != 1) {
+      if (digest) EVP_MD_CTX_free(digest);
+      throw std::runtime_error("BMW16 stream writer SHA-256 init");
+    }
+    digest_context_ = digest;
+    write_all(fd_, prefix_.data(), prefix_.size());
+    write_all(fd_, wrapped.data(), wrapped.size());
+    require(EVP_DigestUpdate(static_cast<EVP_MD_CTX*>(digest_context_), prefix_.data(), prefix_.size()) == 1 &&
+            EVP_DigestUpdate(static_cast<EVP_MD_CTX*>(digest_context_), wrapped.data(), wrapped.size()) == 1,
+            "BMW16 stream writer SHA-256 header update");
+  } catch (...) {
+    ::close(fd_); fd_ = -1; ::unlink(temporary_path_.c_str());
+    if (digest_context_) EVP_MD_CTX_free(static_cast<EVP_MD_CTX*>(digest_context_));
+    digest_context_ = nullptr; throw;
+  }
+}
+
+ProtocolIBmw16StreamedUcmpSlotWriter::~ProtocolIBmw16StreamedUcmpSlotWriter() {
+  if (fd_ >= 0) ::close(fd_);
+  if (digest_context_) EVP_MD_CTX_free(static_cast<EVP_MD_CTX*>(digest_context_));
+  if (!finalized_ && !temporary_path_.empty()) ::unlink(temporary_path_.c_str());
+  OPENSSL_cleanse(data_key_.data(), data_key_.size());
+}
+
+void ProtocolIBmw16StreamedUcmpSlotWriter::append(
+    const ProtocolIBmw16MaterialSlot& slot, const ProtocolIUcmpPartyMaterial& key) {
+  if (fd_ < 0 || finalized_ || written_slots_ >= expected_slots_)
+    throw std::logic_error("BMW16 stream writer is closed or full");
+  const auto expected_id = base_slot(config_) + written_slots_;
+  if (slot.id != expected_id || expected_slot_id(config_, slot) != expected_id ||
+      key.party_id() != party_ || key.comparison_bits() != config_.comparison_bits)
+    throw std::invalid_argument("BMW16 stream writer slot/key mismatch");
+  auto plain = key.serialize();
+  BufferCleanseGuard plain_guard(plain);
+  if (plain.size() != key_bytes_) throw std::runtime_error("BMW16 stream writer key serialization length");
+  const auto nonce = slot_nonce(base_nonce_, slot.id);
+  const auto aad = slot_aad(prefix_, slot);
+  auto sealed = gcm_encrypt(data_key_, nonce, aad, plain);
+  BufferCleanseGuard sealed_guard(sealed);
+  if (sealed.size() != record_bytes_) throw std::logic_error("BMW16 stream writer record length");
+  write_all(fd_, sealed.data(), sealed.size());
+  require(EVP_DigestUpdate(static_cast<EVP_MD_CTX*>(digest_context_), sealed.data(), sealed.size()) == 1,
+          "BMW16 stream writer SHA-256 record update");
+  ++written_slots_;
+  plaintext_bytes_ += plain.size();
+}
+
+ProtocolIBmw16StreamStoreStats ProtocolIBmw16StreamedUcmpSlotWriter::finalize() {
+  if (fd_ < 0 || finalized_ || written_slots_ != expected_slots_)
+    throw std::logic_error("BMW16 stream writer incomplete slot pool");
+  require(::fsync(fd_) == 0, "BMW16 stream writer fsync");
+  struct stat st{};
+  const auto expected_size = kHeaderBytes + expected_slots_ * record_bytes_;
+  require(::fstat(fd_, &st) == 0 && S_ISREG(st.st_mode) && st.st_size >= 0 &&
+          static_cast<std::uint64_t>(st.st_size) == expected_size,
+          "BMW16 stream writer exact file length");
+  std::array<std::uint8_t, 32> file_digest{}; unsigned int digest_size = 0;
+  require(digest_context_ && EVP_DigestFinal_ex(static_cast<EVP_MD_CTX*>(digest_context_),
+          file_digest.data(), &digest_size) == 1 && digest_size == file_digest.size(),
+          "BMW16 stream writer SHA-256 final");
+  EVP_MD_CTX_free(static_cast<EVP_MD_CTX*>(digest_context_)); digest_context_ = nullptr;
+  const bool closed = ::close(fd_) == 0; fd_ = -1;
+  require(closed, "BMW16 stream writer close");
+  if (::link(temporary_path_.c_str(), final_path_.c_str()) != 0)
+    throw std::runtime_error("BMW16 stream writer no-replace publish");
+  require(::unlink(temporary_path_.c_str()) == 0, "BMW16 stream writer pending unlink");
+  const auto parent = std::filesystem::path(final_path_).parent_path();
+  const auto dir = parent.empty() ? std::string(".") : parent.string();
+  const int dfd = ::open(dir.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+  require(dfd >= 0, "BMW16 stream writer directory open");
+  const bool synced = ::fsync(dfd) == 0; ::close(dfd);
+  require(synced, "BMW16 stream writer directory fsync");
+  finalized_ = true;
+  ProtocolIBmw16StreamStoreStats stats;
+  stats.ucmp_slots = expected_slots_;
+  stats.plaintext_key_bytes = plaintext_bytes_;
+  stats.sealed_file_bytes = kHeaderBytes + expected_slots_ * record_bytes_;
+  stats.stream_id = stream_id_;
+  stats.file_sha256 = file_digest;
+  return stats;
+}
 
 void protocol_i_bmw16_stream_store_seal_party(const std::string& path,
     const ProtocolIBmw16ExperimentalPartyConfig& config, std::uint8_t party,
@@ -240,9 +372,11 @@ void protocol_i_bmw16_stream_store_seal_party(const std::string& path,
   Key data_key{};
   KeyCleanseGuard data_key_guard(data_key);
   Nonce nonce{};
+  std::array<std::uint8_t, 32> stream_id{};
   random_bytes(data_key.data(), data_key.size());
   random_bytes(nonce.data(), nonce.size());
-  auto prefix = prefix_for(config, party, key_bytes, total, nonce);
+  random_bytes(stream_id.data(), stream_id.size());
+  auto prefix = prefix_for(config, party, key_bytes, total, nonce, stream_id);
   std::vector<std::uint8_t> data_key_plain(data_key.begin(), data_key.end());
   BufferCleanseGuard data_key_plain_guard(data_key_plain);
   auto wrapped = gcm_encrypt(recipient_key, nonce, prefix, data_key_plain);
@@ -296,7 +430,9 @@ void protocol_i_bmw16_stream_store_seal_party(const std::string& path,
 
 std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore> ProtocolIBmw16StreamedUcmpSlotStore::open_party(
     const std::string& path, const ProtocolIBmw16ExperimentalPartyConfig& expected,
-    std::uint8_t party, const std::array<std::uint8_t, 32>& recipient_key) {
+    std::uint8_t party, const std::array<std::uint8_t, 32>& recipient_key,
+    const std::array<std::uint8_t, 32>& expected_stream_id,
+    const std::array<std::uint8_t, 32>& expected_file_sha256) {
   validate_config(expected, party);
   auto store = std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore>(new ProtocolIBmw16StreamedUcmpSlotStore());
   store->fd_ = ::open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
@@ -309,7 +445,7 @@ std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore> ProtocolIBmw16StreamedUcmpS
   pread_all(store->fd_, header.data(), header.size(), 0);
   Decoder d(header.data());
   for (const auto x : kMagic) require(d.u8() == x, "BMW16 stream magic");
-  require(d.u32() == 1, "BMW16 stream version");
+  require(d.u32() == 2, "BMW16 stream version");
   require(d.u64() == expected.session && d.u64() == expected.fingerprint && d.u32() == expected.n &&
           d.u32() == expected.k && d.u32() == expected.padded_n && d.u8() == expected.index_bits &&
           d.u8() == expected.comparison_bits && d.u8() == party && d.u8() == 0 &&
@@ -319,6 +455,10 @@ std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore> ProtocolIBmw16StreamedUcmpS
   store->slot_count_ = d.u64();
   Nonce nonce{};
   for (auto& x : nonce) x = d.u8();
+  store->base_nonce_ = nonce;
+  for (auto& x : store->stream_id_) x = d.u8();
+  const bool expected_id_set = std::any_of(expected_stream_id.begin(), expected_stream_id.end(), [](auto x) { return x != 0; });
+  require(!expected_id_set || expected_stream_id == store->stream_id_, "BMW16 stream ID binding");
   const auto expected_slots = expected_slot_count(expected);
   require(store->slot_count_ == expected_slots && store->key_bytes_ == 57U + 24U * expected.comparison_bits,
           "BMW16 stream key/slot dimensions");
@@ -330,6 +470,11 @@ std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore> ProtocolIBmw16StreamedUcmpS
   const auto expected_size = kHeaderBytes + expected_slots * record_bytes64;
   require(st.st_size >= 0 && static_cast<std::uint64_t>(st.st_size) == expected_size,
           "BMW16 stream exact file size");
+  const bool expected_hash_set = std::any_of(expected_file_sha256.begin(), expected_file_sha256.end(),
+                                              [](auto x) { return x != 0; });
+  if (expected_hash_set)
+    require(digest_file(store->fd_, expected_size) == expected_file_sha256,
+            "BMW16 stream whole-file SHA-256 mismatch");
   std::vector<std::uint8_t> prefix(header.begin(), header.begin() + kPrefixBytes);
   std::vector<std::uint8_t> wrapped(header.begin() + kPrefixBytes, header.end());
   auto key = gcm_decrypt(recipient_key, nonce, prefix, wrapped.data(), wrapped.size());
@@ -357,11 +502,9 @@ ProtocolIUcmpPartyMaterial ProtocolIBmw16StreamedUcmpSlotStore::load_once(
   const auto offset = kHeaderBytes + ordinal * record_bytes_;
   std::vector<std::uint8_t> encrypted(record_bytes_);
   pread_all(fd_, encrypted.data(), encrypted.size(), offset);
-  Nonce base{};
   std::vector<std::uint8_t> header(kPrefixBytes);
   pread_all(fd_, header.data(), header.size(), 0);
-  std::copy(header.end() - kNonceBytes, header.end(), base.begin());
-  auto plain = gcm_decrypt(data_key_, slot_nonce(base, id), slot_aad(header, slot),
+  auto plain = gcm_decrypt(data_key_, slot_nonce(base_nonce_, id), slot_aad(header, slot),
                            encrypted.data(), encrypted.size());
   auto key = ProtocolIUcmpPartyMaterial::deserialize(plain);
   OPENSSL_cleanse(plain.data(), plain.size());
