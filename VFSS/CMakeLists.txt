@@ -94,7 +94,9 @@ if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
       src/moe_topk/experimental_bmw16_material_bundle.cpp
       src/moe_topk/experimental_bmw16_material_delivery.cpp
       src/moe_topk/experimental_bmw16_select_party.cpp
-      src/moe_topk/experimental_bmw16_stream_store.cpp)
+      src/moe_topk/experimental_bmw16_stream_store.cpp
+      src/moe_topk/experimental_bmw16_online_tls.cpp
+      src/moe_topk/experimental_bmw16_startup_gate.cpp)
   target_compile_definitions(${PROJECT_NAME} PUBLIC
       MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER=1)
   target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto OpenSSL::SSL)

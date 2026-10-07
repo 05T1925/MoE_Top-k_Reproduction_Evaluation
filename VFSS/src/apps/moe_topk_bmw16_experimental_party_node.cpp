@@ -1,6 +1,8 @@
 #include <moe_topk/experimental_bmw16_material_bundle.h>
 #include <moe_topk/experimental_bmw16_material_delivery.h>
+#include <moe_topk/experimental_bmw16_online_tls.h>
 #include <moe_topk/experimental_bmw16_select_party.h>
+#include <moe_topk/experimental_bmw16_startup_gate.h>
 #include <moe_topk/experimental_bmw16_stream_store.h>
 #include <moe_topk/protocol_i_transport.h>
 
@@ -39,7 +41,7 @@ constexpr int kAlgorithmAbort = 10;
 constexpr int kMaterialAbort = 20;
 constexpr int kCommunicationAbort = 30;
 constexpr int kUnexpected = 70;
-constexpr std::size_t kChannelCount = 12;
+constexpr std::size_t kChannelCount = kProtocolIBmw16OnlineChannelCount;
 
 void require(bool value, const char* reason) {
   if (!value) throw std::runtime_error(reason);
@@ -415,6 +417,9 @@ int t_tls_offline(int argc,char** argv) {
   const auto k=static_cast<std::uint32_t>(std::stoul(argv[3]));
   const auto session=std::stoull(argv[4]),fingerprint=std::stoull(argv[5]);
   require(n>1,"BMW16 TLS material delivery is unnecessary for singleton");
+  require_party_owned_private_file(argv[14],false);
+  require_party_owned_private_file(argv[15],false);
+  require_party_owned_private_file(argv[17],false);
   auto c0=config_base(n,k,session,fingerprint,0,120000);
   auto c1=config_base(n,k,session,fingerprint,1,120000);
   c0.claim_root_device=std::stoull(argv[6]);c0.claim_root_inode=std::stoull(argv[7]);
@@ -489,6 +494,9 @@ int receive_tls(int argc,char** argv) {
   const auto k=static_cast<std::uint32_t>(std::stoul(argv[4]));
   const auto session=std::stoull(argv[5]),fingerprint=std::stoull(argv[6]);
   const auto timeout=std::stoi(argv[16]);
+  require_party_owned_private_file(argv[7],true);
+  require_party_owned_private_file(argv[11],false);
+  require_party_owned_private_file(argv[13],false);
   const auto c=config(n,k,session,fingerprint,party,timeout,argv[7]);
   ProtocolIBmw16TlsCredentials credentials;credentials.certificate_pem=argv[12];
   credentials.private_key_pem=argv[13];credentials.trust_bundle_pem=argv[14];
@@ -508,10 +516,15 @@ int receive_tls(int argc,char** argv) {
   return kSuccess;
 }
 
-int party_online(int argc, char** argv) {
+int party_online(int argc, char** argv, bool online_tls = false) {
   // party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready fd[12] ready-fd
-  require(argc == 28,
-      "usage: node party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready fd0..fd11 ready-fd");
+  if (online_tls) {
+    require(argc == 24,
+        "usage: node party-tls id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready bind-address local-port-base peer-address peer-port-base cert key ca expected-peer ready-fd");
+  } else {
+    require(argc == 28,
+        "usage: node party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready fd0..fd11 ready-fd");
+  }
   const auto party = static_cast<std::uint8_t>(std::stoul(argv[2]));
   const auto n = static_cast<std::uint32_t>(std::stoul(argv[3]));
   const auto k = static_cast<std::uint32_t>(std::stoul(argv[4]));
@@ -519,6 +532,10 @@ int party_online(int argc, char** argv) {
   const auto fingerprint = std::stoull(argv[6]);
   const auto timeout = std::stoi(argv[13]);
   auto c = config(n, k, session, fingerprint, party, timeout, argv[7]);
+#if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+  c.test_only_force_probability_abort_after_select =
+      test_failpoint_is("force_probability_abort_after_select");
+#endif
   ProtocolIBmw16ExperimentalPartyMaterial material;
   std::unique_ptr<ProtocolIBmw16PersistentClaimStore> claim;
   std::shared_ptr<ProtocolIBmw16ProcessSlotClaimSet> slots;
@@ -563,18 +580,52 @@ int party_online(int argc, char** argv) {
     material.process_slot_claim_once = [slots](std::uint64_t id) { slots->claim_once(id); };
   }
 
-  // The caller injects twelve already-connected descriptors from its private,
-  // authenticated transport. Each phase descriptor is consumed by the API.
-  std::array<int, 2> score{{std::stoi(argv[15]), std::stoi(argv[16])}};
-  std::array<int, 2> forward{{std::stoi(argv[17]), std::stoi(argv[18])}};
-  std::array<int, 4> select{{std::stoi(argv[19]), std::stoi(argv[20]),
-                             std::stoi(argv[21]), std::stoi(argv[22])}};
-  std::array<int, 2> inverse{{std::stoi(argv[23]), std::stoi(argv[24])}};
-  const int agreement = std::stoi(argv[25]);
-  const int coin = std::stoi(argv[26]);
-  const int ready_fd = std::stoi(argv[27]);
+  std::unique_ptr<ProtocolIBmw16OnlineTlsChannels> online_tls_channels;
+  std::array<int, kChannelCount> all_fds{};
+  ReadyBarrierStats ready{};
+  if (online_tls) {
+    const auto parse_port = [&](int index) {
+      const auto parsed = std::stoul(argv[index]);
+      require(parsed <= 65535U, "online TLS port range");
+      return static_cast<std::uint16_t>(parsed);
+    };
+    ProtocolIBmw16OnlineTlsConfig online_config;
+    online_config.session = session;
+    online_config.fingerprint = fingerprint;
+    online_config.n = n;
+    online_config.k = k;
+    online_config.comparison_bits = c.comparison_bits;
+    online_config.party = party;
+    online_config.timeout_ms = timeout;
+    online_config.bind_address = argv[15];
+    online_config.local_port_base = party == 1 ? parse_port(16) : 0;
+    online_config.peer_address = party == 0 ? argv[17] : std::string{};
+    online_config.peer_port_base = party == 0 ? parse_port(18) : 0;
+    online_config.certificate_pem = argv[19];
+    online_config.private_key_pem = argv[20];
+    online_config.trust_bundle_pem = argv[21];
+    online_config.expected_peer_identity = argv[22];
+    online_config.listener_ready_fd = std::stoi(argv[23]);
+    require_party_owned_private_file(argv[20],false);
+    online_tls_channels = std::make_unique<ProtocolIBmw16OnlineTlsChannels>(online_config);
+    online_tls_channels->verify_all_registered();
+    all_fds = online_tls_channels->party_fds();
+#if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    if (test_failpoint_is("online_silent_after_tls"))
+      std::this_thread::sleep_for(std::chrono::milliseconds(timeout) * 3);
+#endif
+  } else {
+    for (std::size_t i = 0; i < all_fds.size(); ++i)
+      all_fds[i] = std::stoi(argv[15 + i]);
+    ready = exchange_ready(std::stoi(argv[27]), c);
+  }
+  std::array<int, 2> score{{all_fds[0], all_fds[1]}};
+  std::array<int, 2> forward{{all_fds[2], all_fds[3]}};
+  std::array<int, 4> select{{all_fds[4], all_fds[5], all_fds[6], all_fds[7]}};
+  std::array<int, 2> inverse{{all_fds[8], all_fds[9]}};
+  const int agreement = all_fds[10];
+  const int coin = all_fds[11];
   auto raw = decode_raw_share(read_bytes(argv[8]), n);
-  const auto ready = exchange_ready(ready_fd, c);
   auto result = protocol_i_bmw16_experimental_raw_score_mask_party(
       c, std::move(material), raw, score, forward, select, inverse, agreement, coin, nullptr);
   const std::string status = result.status ? result.status : "ERROR_UNEXPECTED";
@@ -604,7 +655,9 @@ int party_online(int argc, char** argv) {
             << " peak_rss_kb=" << peak_rss_kb()
             << " ready_barrier_us=" << ready.elapsed_us
             << " ready_sent_bytes=" << ready.sent
-            << " ready_received_bytes=" << ready.received << "\n";
+            << " ready_received_bytes=" << ready.received
+            << " online_transport=" << (online_tls ? "mutual_TLS_1.3_data_path" : "caller_FD")
+            << " online_tls_channels=" << (online_tls ? kChannelCount : 0U) << "\n";
   return exit_code;
 }
 }  // namespace
@@ -620,8 +673,9 @@ int main(int argc, char** argv) {
     if (argc > 1 && std::string(argv[1]) == "t-tls") return t_tls_offline(argc, argv);
     if (argc > 1 && std::string(argv[1]) == "recv-tls") return receive_tls(argc, argv);
     if (argc > 1 && std::string(argv[1]) == "party") return party_online(argc, argv);
+    if (argc > 1 && std::string(argv[1]) == "party-tls") return party_online(argc, argv, true);
     std::cerr << "BMW16-derived Select / PROJECT_DERIVED / EXPERIMENTAL\n"
-              << "usage: node t-tls ... | node recv-tls ... | node party ...";
+              << "usage: node t-tls ... | node recv-tls ... | node party ... | node party-tls ...";
 #if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
     std::cerr << " | node t-local-test-only ...";
 #endif

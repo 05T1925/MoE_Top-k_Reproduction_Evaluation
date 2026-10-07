@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -17,6 +18,25 @@ class ProtocolITransportError : public std::runtime_error {
   explicit ProtocolITransportError(const std::string& message)
       : std::runtime_error(message) {}
 };
+
+// Authenticated byte streams can be attached to an owned descriptor before a
+// ProtocolIFramedChannel is constructed. The framed protocol then reads and
+// writes its complete wire representation through this stream. This narrow
+// adapter keeps existing protocol call signatures while making the byte path
+// (including frame headers) use the authenticated transport.
+class ProtocolIAuthenticatedByteStream {
+ public:
+  virtual ~ProtocolIAuthenticatedByteStream() = default;
+  virtual std::size_t read_some(std::uint8_t* out, std::size_t capacity,
+                                int timeout_ms) = 0;
+  virtual std::size_t write_some(const std::uint8_t* data, std::size_t size,
+                                 int timeout_ms) = 0;
+};
+
+void protocol_i_attach_authenticated_stream(
+    int owned_fd, std::shared_ptr<ProtocolIAuthenticatedByteStream> stream);
+void protocol_i_discard_unclaimed_authenticated_stream(int owned_fd) noexcept;
+bool protocol_i_has_authenticated_stream(int owned_fd) noexcept;
 
 struct ProtocolIFrameConfig {
   std::uint64_t session, fingerprint;
@@ -47,6 +67,7 @@ class ProtocolIFramedChannel {
   int fd_, timeout_;
   std::size_t max_io_chunk_;
   ProtocolIFrameConfig c_;
+  std::shared_ptr<ProtocolIAuthenticatedByteStream> authenticated_stream_;
   std::uint64_t out_ = 0, in_ = 0, sent_ = 0, received_ = 0;
   void exact(void*, std::size_t, bool, Clock::time_point);
 };

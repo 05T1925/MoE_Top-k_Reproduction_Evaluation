@@ -1,4 +1,5 @@
 #include <moe_topk/topk_oracle.h>
+#include <moe_topk/experimental_bmw16_startup_gate.h>
 
 #include <algorithm>
 #include <array>
@@ -31,6 +32,7 @@ namespace fs = std::filesystem;
 namespace {
 constexpr uid_t kUid0 = 22012, kUid1 = 22013;
 constexpr std::size_t kChannels = 13;  // Twelve API channels plus the pre-protocol ready barrier.
+constexpr std::size_t kOnlineTlsChannels = 12;
 void require(bool ok, const char* why) { if (!ok) throw std::runtime_error(why); }
 std::vector<std::int32_t> extended_scores(std::uint32_t n);
 std::vector<std::int32_t> seeded_scores(std::uint32_t n, std::uint64_t seed);
@@ -138,6 +140,41 @@ int listen_loopback(std::uint16_t& port) {
   require(::bind(fd,reinterpret_cast<sockaddr*>(&address),sizeof(address))==0&&::listen(fd,4)==0,"TLS test bind/listen");
   socklen_t size=sizeof(address);require(::getsockname(fd,reinterpret_cast<sockaddr*>(&address),&size)==0,"TLS test bound port");
   port=ntohs(address.sin_port);return fd;
+}
+
+std::uint16_t free_loopback_port_block() {
+  for (std::uint32_t base = 24000; base <= 59000; base += 16) {
+    std::array<int, kOnlineTlsChannels> fds{};
+    fds.fill(-1);
+    bool available = true;
+    for (std::size_t i = 0; i < fds.size(); ++i) {
+      fds[i] = ::socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+      if (fds[i] < 0) { available = false; break; }
+      sockaddr_in address{};
+      address.sin_family = AF_INET;
+      address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+      address.sin_port = htons(static_cast<std::uint16_t>(base + i));
+      if (::bind(fds[i], reinterpret_cast<sockaddr*>(&address), sizeof(address)) != 0) {
+        available = false;
+        break;
+      }
+    }
+    for (auto fd : fds) if (fd >= 0) ::close(fd);
+    if (available) return static_cast<std::uint16_t>(base);
+  }
+  throw std::runtime_error("could not reserve loopback port block for online TLS");
+}
+
+std::vector<std::uint8_t> read_exact_fd(int fd, std::size_t length) {
+  std::vector<std::uint8_t> bytes(length);
+  std::size_t offset = 0;
+  while (offset < bytes.size()) {
+    const auto got = ::read(fd, bytes.data() + offset, bytes.size() - offset);
+    if (got < 0 && errno == EINTR) continue;
+    require(got > 0, "online listener receipt truncated");
+    offset += static_cast<std::size_t>(got);
+  }
+  return bytes;
 }
 
 pid_t spawn_as(const std::vector<std::string>& args,const fs::path& output,uid_t uid,
@@ -285,12 +322,22 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
 void run_tls_case(const std::string& node,const std::vector<std::int32_t>& scores,std::uint32_t k,
                   std::uint64_t session,const TestTlsCredentials& tls,
                   const std::string& t_failpoint={},bool expect_delivery_abort=false,
-                  const std::string& conflict={}, bool use_rogue_t=false) {
+                  const std::string& conflict={}, bool use_rogue_t=false,
+                  const std::string& online_peer_identity_override={},
+                  bool expect_online_abort=false,
+                  const std::string& online_failpoint={},
+                  bool expect_algorithm_abort=false,
+                  bool expect_online_timeout=false,
+                  const std::string& p1_only_failpoint={}) {
   require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
   static std::uint64_t serial=0;
   const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+std::to_string(serial++));
   require(::mkdir(root.c_str(),0700)==0&&::chmod(root.c_str(),0711)==0,"TLS case root");
   auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){
+    if (std::getenv("MOE_BMW16_KEEP_TEST_FIXTURES")) {
+      std::cerr << "TEST_ONLY fixture_preserved=" << root << '\n';
+      return;
+    }
     std::error_code ec;fs::remove_all(root,ec);
   });
   const auto p0=root/"p0",p1=root/"p1",td=root/"t";
@@ -364,14 +411,34 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
       "127.0.0.1",std::to_string(port0),"party0","127.0.0.1",std::to_string(port1),"party1"};
   const auto tpid=spawn_as(targs,td/"t.log",22011,{listen0,listen1},t_failpoint);
   ::close(listen0);::close(listen1);
-  const int t_exit=wait_status(tpid);
-  // A failed T is not allowed to trigger the online phase. The listeners have
-  // bounded receives; collect their local status independently.
-  const int r0=wait_status(recv0),r1=wait_status(recv1);
+  const moe_topk::ProtocolIBmw16StartupBinding startup_binding{session,fingerprint,n,k};
+  const std::array<moe_topk::ProtocolIBmw16OfflineChild,3> offline_children{{
+    {tpid,moe_topk::ProtocolIBmw16OfflineRole::TrustedDealer,startup_binding},
+    {recv0,moe_topk::ProtocolIBmw16OfflineRole::Party0Receiver,startup_binding},
+    {recv1,moe_topk::ProtocolIBmw16OfflineRole::Party1Receiver,startup_binding}}};
+  const auto gate=moe_topk::protocol_i_bmw16_start_after_offline_gate(
+      startup_binding,offline_children,[&] {
+    if (!fs::exists(ready0) || !fs::exists(ready1)) return false;
+    const auto marker0 = read_all(ready0), marker1 = read_all(ready1);
+    return marker0.size() == 132 && marker0 == marker1 && fs::exists(shell0) &&
+        fs::exists(side0) && fs::exists(shell1) && fs::exists(side1);
+  },[&] {
+    // This callback is the only location at which the test creates input
+    // shares. It cannot run until T and both committed receivers exit zero.
+    std::mt19937_64 split_rng(session^UINT64_C(0x534841524553));
+    std::array<std::vector<std::uint8_t>,2> shares;
+    for(const auto score:scores){const auto word=static_cast<std::uint32_t>(score);const auto a=static_cast<std::uint32_t>(split_rng());
+      append_u32(shares[0],a);append_u32(shares[1],word-a);}
+    write_private(p0/"raw-share.bin",shares[0],kUid0);
+    write_private(p1/"raw-share.bin",shares[1],kUid1);
+    return 0;
+  });
+  const int t_exit=gate.exit_codes[0],r0=gate.exit_codes[1],r1=gate.exit_codes[2];
   const auto shell_exists=fs::exists(shell0)||fs::exists(shell1);
   const auto marker_exists=fs::exists(ready0)||fs::exists(ready1);
   if(expect_delivery_abort){
-    require(t_exit!=0&&!fs::exists(p0/"mask.share")&&!fs::exists(p1/"mask.share"),"failed TLS delivery reached online/mask output");
+    require(!gate.gate_open&&t_exit!=0&&!fs::exists(p0/"raw-share.bin")&&!fs::exists(p1/"raw-share.bin")&&
+            !fs::exists(p0/"mask.share")&&!fs::exists(p1/"mask.share"),"failed TLS delivery reached input/online/mask output");
     require((t_exit==20||t_exit==30||t_exit==71)&&
             (r0==0||r0==20||r0==30)&&(r1==0||r1==20||r1==30),
             "TLS failure escaped the structured material/transport/crash status contract");
@@ -395,7 +462,9 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
         <<std::string(bytes.begin(),bytes.end());}
     std::cerr<<"tls_failure_status T="<<t_exit<<" P0="<<r0<<" P1="<<r1<<" fixture="<<root<<"\n";
   }
-  require(t_exit==0&&r0==0&&r1==0,"mutual TLS offline package delivery failed");
+  require(gate.gate_open&&gate.committed_pair_validated&&gate.post_gate_status==0&&
+          t_exit==0&&r0==0&&r1==0,
+          "trusted startup gate did not require T and both receiver exit-zero statuses");
   const auto tlog=read_all(td/"t.log"),log0=read_all(p0/"receive.log"),log1=read_all(p1/"receive.log");
   require(fs::exists(shell0)&&fs::exists(side0)&&fs::exists(ready0)&&fs::exists(shell1)&&fs::exists(side1)&&fs::exists(ready1),
           "TLS delivery missing one package component");
@@ -403,13 +472,7 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   std::cout<<"tls_P0_receive "<<std::string(log0.begin(),log0.end());
   std::cout<<"tls_P1_receive "<<std::string(log1.begin(),log1.end());
 
-  // Inputs are deliberately created only after T exited successfully and both
-  // recipients durably committed their own packages.
-  std::mt19937_64 split_rng(session^UINT64_C(0x534841524553));
-  std::array<std::vector<std::uint8_t>,2> shares;
-  for(const auto score:scores){const auto word=static_cast<std::uint32_t>(score);const auto a=static_cast<std::uint32_t>(split_rng());
-    append_u32(shares[0],a);append_u32(shares[1],word-a);}
-  write_private(p0/"raw-share.bin",shares[0],kUid0);write_private(p1/"raw-share.bin",shares[1],kUid1);
+  // The startup gate callback has now produced the local input shares.
   for(const auto& path:{p1/"aead.key",p1/"party.key",claims1/"material.shell",claims1/"ucmp.stream",p1/"raw-share.bin"})
     require_unreadable_as(kUid0,path);
   for(const auto& path:{p0/"aead.key",p0/"party.key",claims0/"material.shell",claims0/"ucmp.stream",p0/"raw-share.bin"})
@@ -417,27 +480,65 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   for(const auto& path:{p0/"raw-share.bin",p1/"raw-share.bin",claims0/"ucmp.stream",claims1/"ucmp.stream"})
     require_unreadable_as(22011,path);
   std::cout<<"tls_uid_isolation n="<<n<<" P0_cannot_read_P1=PASS P1_cannot_read_P0=PASS T_cannot_read_online_input=PASS scope=LOCAL_TEST_UIDS\n";
-  std::array<std::array<int,2>,kChannels> channels{};for(auto& pair:channels)require(::socketpair(AF_UNIX,SOCK_STREAM,0,pair.data())==0,"TLS case online channels");
-  std::array<pid_t,2> children{};
-  for(int party=0;party<2;++party){const auto child=::fork();require(child>=0,"TLS case fork online party");children[party]=child;
-    if(child==0){for(const auto& pair:channels)::close(pair[1-party]);
-      const auto uid=party?kUid1:kUid0;if(::setgroups(0,nullptr)!=0||::setgid(uid)!=0||::setuid(uid)!=0)::_exit(126);
-      const auto& dir=party?p1:p0;const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
-      const auto& side=party?side1:side0;const auto& ready=party?ready1:ready0;
-      std::vector<std::string> args{node,"party",std::to_string(party),std::to_string(n),std::to_string(k),
-        std::to_string(session),std::to_string(fingerprint),claim.string(),(dir/"raw-share.bin").string(),
-        shell.string(),side.string(),(dir/"aead.key").string(),(dir/"mask.share").string(),
-        n>=1000?"600000":"30000",ready.string()};
-      for(const auto& pair:channels)args.push_back(std::to_string(pair[party]));
-      std::vector<char*> av;for(auto& a:args)av.push_back(a.data());av.push_back(nullptr);::execv(node.c_str(),av.data());::_exit(127);}}
-  for(auto& pair:channels){::close(pair[0]);::close(pair[1]);}
-  const auto e0=wait_status(children[0]),e1=wait_status(children[1]);
+  const auto online_port_base=free_loopback_port_block();
+  int listener_ready[2]{};require(::pipe(listener_ready)==0,"online TLS listener-ready pipe");
+  const std::string online_timeout =
+      (!online_failpoint.empty() || !p1_only_failpoint.empty()) ? "1500" :
+      (n>=1000 ? "600000" : "30000");
+  const auto p1_args=std::vector<std::string>{node,"party-tls","1",std::to_string(n),std::to_string(k),
+    std::to_string(session),std::to_string(fingerprint),claims1.string(),(p1/"raw-share.bin").string(),
+    shell1.string(),side1.string(),(p1/"aead.key").string(),(p1/"mask.share").string(),
+    online_timeout,ready1.string(),"127.0.0.1",std::to_string(online_port_base),"","0",
+    (p1/"party.crt").string(),(p1/"party.key").string(),(p1/"ca.pem").string(),"party0",
+    std::to_string(listener_ready[1])};
+  const auto p1_online=spawn_as(p1_args,p1/"online.log",kUid1,{listener_ready[0]},
+      !p1_only_failpoint.empty()?p1_only_failpoint:online_failpoint);
+  ::close(listener_ready[1]);
+  const auto listener_receipt=read_exact_fd(listener_ready[0],36);
+  ::close(listener_ready[0]);
+  auto get_be16=[&](std::size_t offset){return static_cast<std::uint16_t>((listener_receipt[offset]<<8U)|listener_receipt[offset+1]);};
+  auto get_be32=[&](std::size_t offset){std::uint32_t v=0;for(std::size_t i=0;i<4;++i)v=(v<<8U)|listener_receipt[offset+i];return v;};
+  auto get_be64=[&](std::size_t offset){std::uint64_t v=0;for(std::size_t i=0;i<8;++i)v=(v<<8U)|listener_receipt[offset+i];return v;};
+  require(std::equal(listener_receipt.begin(),listener_receipt.begin()+8,
+      std::array<std::uint8_t,8>{{'M','6','B','2','1','L','S','T'}}.begin())&&
+      get_be16(8)==1&&get_be64(10)==session&&get_be64(18)==fingerprint&&
+      get_be32(26)==n&&get_be32(30)==k&&get_be16(34)==online_port_base,
+      "online TLS listener readiness binding");
+  const auto p0_args=std::vector<std::string>{node,"party-tls","0",std::to_string(n),std::to_string(k),
+    std::to_string(session),std::to_string(fingerprint),claims0.string(),(p0/"raw-share.bin").string(),
+    shell0.string(),side0.string(),(p0/"aead.key").string(),(p0/"mask.share").string(),
+    online_timeout,ready0.string(),"127.0.0.1","0","127.0.0.1",
+    std::to_string(online_port_base),(p0/"party.crt").string(),(p0/"party.key").string(),
+    (p0/"ca.pem").string(),online_peer_identity_override.empty()?"party1":online_peer_identity_override,"-1"};
+  const auto p0_online=spawn_as(p0_args,p0/"online.log",kUid0,{},online_failpoint);
+  const auto e0=wait_status(p0_online),e1=wait_status(p1_online);
   if(e0!=0||e1!=0){
     const bool mask0=fs::exists(p0/"mask.share"),mask1=fs::exists(p1/"mask.share");
     std::cout<<"tls_online_failure n="<<n<<" K="<<k<<" session="<<session<<" P0_exit="<<e0
              <<" P1_exit="<<e1<<" P0_mask="<<(mask0?"present":"none")<<" P1_mask="<<(mask1?"present":"none")
              <<" abort_scope=LOCAL_ONLY_OR_PEER_OBSERVED\n";
     require(!mask0&&!mask1,"TLS E2E failure published a partial mask share");
+    if (expect_algorithm_abort) {
+      require(e0 == 10 && e1 == 10 && gate.gate_open,
+              "forced probability abort did not agree across TLS parties");
+      std::cout << "tls_algorithm_abort n=" << n << " K=" << k << " P0_exit=" << e0
+                << " P1_exit=" << e1 << " scope=PEER_AGREED mask=NONE injected=TEST_ONLY\n";
+      return;
+    }
+    if (expect_online_abort) {
+      require((e0 == 30 || e1 == 30) && gate.gate_open,
+              "online TLS identity failure did not remain a post-start LOCAL_ONLY communication abort");
+      std::cout << "tls_online_auth_abort n=" << n << " K=" << k << " P0_exit=" << e0
+                << " P1_exit=" << e1 << " scope=LOCAL_ONLY mask=NONE identity=REJECTED\n";
+      return;
+    }
+    if (expect_online_timeout) {
+      require(e0 == 30 && e1 == 30 && gate.gate_open,
+              "online silent peer did not produce bounded LOCAL_ONLY communication aborts");
+      std::cout << "tls_online_silent_timeout n=" << n << " K=" << k << " P0_exit=" << e0
+                << " P1_exit=" << e1 << " scope=LOCAL_ONLY_OR_PEER_OBSERVED mask=NONE\n";
+      return;
+    }
     throw std::runtime_error("TLS-delivered parties failed online E2E");
   }
   const auto m0=read_all(p0/"mask.share"),m1=read_all(p1/"mask.share");require(m0.size()==n&&m1.size()==n,"TLS E2E mask share length");
@@ -478,6 +579,7 @@ void run_tls_suite(const std::string& node) {
   });
   const auto tls=make_test_tls_credentials(root);
   run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x20201001),tls);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x20201003),tls);
   run_tls_case(node,{INT32_MIN,7,7,INT32_MAX,-4},5,UINT64_C(0x20201005),tls);
   run_tls_case(node,extended_scores(8),4,UINT64_C(0x20201008),tls);
   run_tls_case(node,seeded_scores(64,UINT64_C(0x20206401)),8,UINT64_C(0x20206401),tls);
@@ -496,6 +598,12 @@ void run_tls_suite(const std::string& node) {
   run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a009),tls,"",true,"existing-p1-sidecar");
   run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00a),tls,"crash_t_tls_after_prepare0",true);
   run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00b),tls,"crash_t_tls_after_commit0",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00e),tls,"",false,"",false,
+               "wrong-party1",true);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a00f),tls,"",false,"",false,
+               "",false,"force_probability_abort_after_select",true);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a010),tls,"",false,"",false,
+               "",false,"",false,true,"online_silent_after_tls");
 }
 
 void run_tls_n1000(const std::string& node) {
