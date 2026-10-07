@@ -318,7 +318,7 @@ M6A 完成两种路线的性能验收后，再进入 M6B 依赖实现及正式�
 
 资料核对、明文算法 oracle 和不依赖未冻结接口的设计可以提前开展。
 
-用户在 S10 后又逐项明确授权将 BMW16-derived Select 的隔离 EXPERIMENTAL 代码研发提前；S19 属于该授权下的复核、发布修复和有界功能验证。此授权不改正式顺序：M6A、V3/V4 门禁与同口径正式性能矩阵状态不提前标记完成，也不把 S19 冒烟数字写入正式比较表。
+用户在 S10 后又逐项明确授权将 BMW16-derived Select 的隔离 EXPERIMENTAL 代码研发提前；S19 属于该授权下的复核、发布修复和有界功能验证，S20 增加离线 TLS 发材接口及独立 party 接收验证。此授权不改正式顺序：M6A、V3/V4 门禁与同口径正式性能矩阵状态不提前标记完成，也不把 S19/S20 冒烟数字写入正式比较表。
 
 ### 3.5 性能状态与失败配置
 
@@ -761,6 +761,8 @@ S12 在 S11 原 C++ party API 上完成本机三进程实验路径：T 使用公
 S13 独立接收 S12 `646f71c`，修正 party API 对意外异常的宽泛吞错、transport/material 字符串分类和 runner 的 `return 0` abort 问题；结构化状态与 exit code 对齐，启动器验证退出码、双方报告、状态 scope 和 mask 文件。独立复建 S12 的 52 SUCCESS/1 注入 abort 与 39 tape matrix 均复现；本轮加双 bundle 篡改、错误 API 输入、peer close 负例。实验计量显示 n=64 单次约 8.95 s API 时间主要由 5,935 次持久 slot claim callback 的 fdatasync/目录 fsync 路径占用；FSS Eval 和网络交换均为毫秒级。本次另给 n=64..1e6 checked-arithmetic 全池下界，n=128 仍因当前硬 cap 和缺少完整验证未运行。复合联合安全第一个失败步骤是共享节点 mask 相关的完整 DCF key pool（含未用槽）、shuffle 辅助状态与自适应 Eval transcript 的 H0→H1 simulator 缺失；当前仍 NO-GO、EXPERIMENTAL、不开始 V4。见 [S13 决策](decisions/BMW16_S13_RECEIVE_EXECUTION_EVIDENCE_SECURITY_CAPACITY_GATE_2026-10-06.md) 与 [S13 报告](reproduction/BMW16_S13_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
 
 S14–S18 决策与验证细节见各自 dated 文档。S18 将原全池内存路径改为逐槽流式离线 KeyGen 与 sidecar 随机读取，并在其源码上完成 n=1000/K=80 路径；但多文件 no-clobber 发布及失败重试合同仍需后续修复。S19（2026-10-07）接收 S18 精确提交 `9e25411027a01bcf47b9c316e3c463c2f7c72127`，从其 tree 在隔离分支重建；将 bundle shell 发布改为 no-clobber 并按 inode 只清理本次拥有产物，增加绑定双方 shell manifest 的 paired-ready marker、要求 launcher 等待 T exit 0 后才启动 parties，以及相应普通失败/崩溃/既存文件/同 session 重试注入。TEST_ONLY 三进程通过 n=1/2/5/8/64/128/256 和 n=1000/K=80 冻结 oracle；S4/C++ common-tape 本轮 39 条 n≤8 和 2 条 n=256 轨迹通过。全部结果为本地 WSL/有限样本，非性能验收。当前候选仍 `PROJECT_DERIVED / EXPERIMENTAL`：相关阈值的整池、输出感知、自适应多 key DCF simulator（H1→H2）先缺，Protocol I shuffle/inverse/output share 联合 simulator 随后缺；候选匿名 transcript 泄露尚未由所有者批准，生产 party 凭据及跨主机私有认证交付也未实现。正式 V4 五次 LAN/WAN 矩阵与六方案排序 `NOT_RUN`。见 [S19 决策](decisions/BMW16_S19_PUBLICATION_RETRY_AND_PARTY_VIEW_DECISION_2026-10-07.md)、[验证报告](reproduction/BMW16_S19_INDEPENDENT_ACCEPTANCE_AND_PUBLICATION_FAULT_REPORT_2026-10-07.md) 与[外部证据索引](reproduction/evidence/BMW16_S19_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。
+
+S20（2026-10-07）接收 S19 精确提交 `617cd3cbbb7b5513c9f606ef5ceb7a73e7a96ef4`，在同一 VFSS party API 上增加 OpenSSL TLS 1.3 mutual authentication 的离线 T→P0/P1 package delivery，保持 Select、FSS key ABI 与 raw-score→mask 函数不变。T 用公开参数逐槽发材到 T 私有 spool，以分块 TLS 传输双方 AEAD sidecar 与 shell；接收端校验身份/参数/长度/digest、先暂存再 no-clobber 持久发布。默认构建不编译测试 failpoint；TEST_ONLY failpoint 必须显式打开且 BUILD_TESTING=ON。独立 UID loopback 验证覆盖 n=2/5/8/64/128/256 的 fresh-material 在线 oracle E2E，以及错凭据/元数据、分块、接收 fsync/发布、既存目标、T 部分提交崩溃。S20 n=1000 fresh TLS 路径试运行及失败/重跑状态见 [S20 验证报告](reproduction/BMW16_S20_INDEPENDENT_ACCEPTANCE_TLS_DELIVERY_AND_JOINT_VIEW_2026-10-07.md)。首次 n=1000 尝试暴露 30 秒 party 在线超时短于全链 Select 执行耗时，延长为有界 10 分钟后以 fresh bundle 复跑；所有 raw shares 只在 T exit 0 且两个 receiver exit 0 后由 TEST_ONLY 控制器创建。T 提交不具备跨端原子性：P0 已发布、P1 失败时会有 orphan，启动器必须以三个正常退出为条件并作废该 session，不能以 marker 代替。mTLS local test 不验证跨主机生产凭据配置；在线协议 fd 仍是调用方注入，S20 未实现 online transport supervisor。H1→H2 全池自适应多 key DCF view 与 H2→H3 shuffle/inverse 联合模拟仍 NO-GO；正式 V4/六方案矩阵未运行。见 [S20 决策](decisions/BMW16_S20_PRIVATE_TLS_DELIVERY_AND_JOINT_VIEW_GATE_2026-10-07.md)。
 
 #### 前置条件
 

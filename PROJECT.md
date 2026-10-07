@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S19 从 S18 tree 独立重建并修复 no-clobber 发布、pair-ready 与失败回滚；本轮 common-tape 41 条、三进程 n≤1000/K=80 功能样本通过冻结 oracle。相关多 key DCF 自适应整池视图与 shuffle/inverse 联合模拟仍 NO-GO；本地离线发布不等于生产认证交付，无 secure runtime |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S20 复用 S19 party API，增加默认关闭的 OpenSSL TLS 1.3 双向认证离线 T→P0/P1 分块交付，并以三进程独立 UID fresh-package 路径复核 n≤256；S20 的 n=1000 TLS E2E 与失败状态见 S20 报告。S19 本轮 common-tape 41 条和独立 n=1000/K=80 仍是 S19 源码结果。候选泄露未获批准；相关多 key DCF 自适应整池视图与 shuffle/inverse 联合模拟仍 NO-GO；在线认证 FD supervisor 未实现，V3/V4 与正式六方案性能验收未完成 |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -32,7 +32,7 @@
 - 保留 M2、M3、M5 的编号、既有实现和历史验收记录。
 - M2 增加 Protocol I 精确核心完成后的通信核验与接口交接。
 - M5 增加 Protocol III 精确核心完成后的通信核验。
-- M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 当前候选为 BMW16-derived Select，Protocol III 保留 BB90+DCF 研究目标。S18 增加逐槽流式 KeyGen 与密文随机访问；S19 修复成对材料发布/重试，独立复核并实跑到 n=1000。此候选仍是默认 opt-in 的 EXPERIMENTAL：联合单方视图未闭合、生产跨主机认证交付未就绪、V3/V4 与正式六方案性能验收未完成。
+- M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 当前候选为 BMW16-derived Select，Protocol III 保留 BB90+DCF 研究目标。S18 增加逐槽流式 KeyGen 与密文随机访问；S19 修复成对材料发布/重试，独立复核并实跑到 n=1000。S20 为同一默认 opt-in EXPERIMENTAL 入口增加 TLS 1.3 相互认证的离线发材代码与独立 UID 测试，但未实现在线 FD 建立服务或闭合联合隐私。此候选仍无 secure alias；V3/V4 与正式六方案性能验收未完成。
 - M7 保留为最终统一汇总与横向报告，不把 M6A、M6B 的性能测试全部推迟到 M7。
 - CryptoMoE 保留为 M7 之后的独立工作负载方向，不属于本轮六种方案的完成条件。
 - 历史 `Direct Top-K` 原型保留其原有身份，不直接改名为 BB90+DCF，也不自动成为额外实施任务。
@@ -125,6 +125,8 @@ S12（2026-10-06）接收 S11 C++ party API，在原实现上增加版本化逐�
 S13（2026-10-06）从 S12 提交 `646f71c` 独立重建并复跑其 52 SUCCESS/1 注入 abort 和 39 common-tape traces；修正 party API 的异常吞错、transport/material 分类和三进程 runner 的退出码合同。本轮三进程 56 配置包括 52 SUCCESS、1 注入 algorithm abort、1 bundle 篡改材料 abort、1 意外 API 异常 exit 70、1 peer-close communication abort；没有自然 abort 样本。n=64 单样本计时发现持久 claim callback（文件及目录同步）约占在线 API 时间 98.7%，计量/容量数据只作 EXPERIMENTAL 工程诊断。完整 shuffle + 相关整池 DCF 自适应 Eval 联合模拟 H0→H1 仍缺，生产凭据/私有认证发材未实现；故仍为 `NO-GO / EXPERIMENTAL`，n=128 和 V4 正式矩阵未运行。详见 [S13 决策](docs/decisions/BMW16_S13_RECEIVE_EXECUTION_EVIDENCE_SECURITY_CAPACITY_GATE_2026-10-06.md)、[S13 验证](docs/reproduction/BMW16_S13_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
 
 S14–S18 的逐步记录分别保留在各自带日期的决策和复核报告中；S18 在原 VFSS party API 上完成逐槽离线生成、随机访问密文读取和 n=1000 功能路径，但其材料发布失败/重试原子性尚未闭合。S19（2026-10-07）从 S18 `9e25411` 独立建树并重建 Release 实验目标；修正 shell no-clobber 发布、仅回滚本次 inode、两方共同完成 marker 和“等待 T exit 0 再启动 parties”的合同。当前三进程本轮 SUCCESS 均在隔离 harness 内逐位通过冻结 oracle；39 条 n≤8 与 2 条 n=256 S4/C++ common-tape 轨迹通过；n=1000/K=80 三进程功能运行通过。发布故障注入验证保留既存文件、T 普通错误仅删除本次拥有产物，durable marker 后 T crash 时测试 launcher 不启动 parties。该结论仅在固定受保护本地 claim-root 与显式启动合同下成立；跨 store/回滚、生产凭据与远程认证交付未接收。H1→H2 的 correlated-threshold/full-pool/adaptive DCF 视图是首个未闭合安全 hybrid，后续实际 shuffle/inverse 组合仍未证；候选保持 `PROJECT_DERIVED / EXPERIMENTAL`，无 secure alias，正式 V4 五次 LAN/WAN 矩阵与六方案排名 `NOT_RUN`。见 [S19 决策](docs/decisions/BMW16_S19_PUBLICATION_RETRY_AND_PARTY_VIEW_DECISION_2026-10-07.md)、[S19 验证报告](docs/reproduction/BMW16_S19_INDEPENDENT_ACCEPTANCE_AND_PUBLICATION_FAULT_REPORT_2026-10-07.md) 与[外部证据索引](docs/reproduction/evidence/BMW16_S19_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。
+
+S20（2026-10-07）接收对象为 S19 `617cd3c`，在同一 VFSS party API 上加入 OpenSSL TLS 1.3 双向认证的 T→P0/P1 离线 package delivery。证书由外部受信任配置提供；测试以不同 UID、loopback TCP 和 fresh materials 验证 n=2/5/8/64/128/256 的发材→在线 party→冻结 oracle 路径，以及错身份/元数据、乱序/截断/篡改分块、接收 fsync/发布失败、既存目标、T 在 PREPARE/部分 COMMIT 后崩溃。T exit 0 且双方 receiver exit 0 才创建 raw shares/启动在线 parties；ready marker 单独不能证明 T 成功，单边提交失败可留下需作废的 orphan。n=1000 新 TLS 路径尝试及报告见 [S20 验证报告](docs/reproduction/BMW16_S20_INDEPENDENT_ACCEPTANCE_TLS_DELIVERY_AND_JOINT_VIEW_2026-10-07.md)。S19 源码的 39 条共同 tape、n≤256 和 n=1000 样本在 S20 仅作为独立接收结果，不改称 S20 代码测试。H1→H2 的相关多 key adaptive DCF 全池模拟与 H2→H3 实际 shuffle/inverse 联合模拟仍 NO-GO；mTLS 发材也不实现/证明在线 FD authentication。`CONDITIONAL_LOCAL_UID_MTLS / EXPERIMENTAL`，不建立 secure alias、不改变 M6A→M6B 正式验收次序、不开展正式 V4 LAN/WAN 矩阵或六方案排名。详见 [S20 决策](docs/decisions/BMW16_S20_PRIVATE_TLS_DELIVERY_AND_JOINT_VIEW_GATE_2026-10-07.md)。
 
 ### 4.1 Agarwal 四个协议名称
 

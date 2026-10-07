@@ -18,6 +18,8 @@
 
 #include <fcntl.h>
 #include <grp.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/random.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -30,6 +32,8 @@ namespace {
 constexpr uid_t kUid0 = 22012, kUid1 = 22013;
 constexpr std::size_t kChannels = 13;  // Twelve API channels plus the pre-protocol ready barrier.
 void require(bool ok, const char* why) { if (!ok) throw std::runtime_error(why); }
+std::vector<std::int32_t> extended_scores(std::uint32_t n);
+std::vector<std::int32_t> seeded_scores(std::uint32_t n, std::uint64_t seed);
 
 void write_all(int fd, const std::uint8_t* p, std::size_t n) {
   while (n) {
@@ -87,6 +91,77 @@ int exec_capture(const std::vector<std::string>& args, const fs::path& output,
   }
   return wait_status(pid);
 }
+
+int run_tool(const std::vector<std::string>& args) {
+  const auto pid=::fork();require(pid>=0,"fork test utility");
+  if(pid==0){const int nullfd=::open("/dev/null",O_WRONLY|O_CLOEXEC);if(nullfd>=0){::dup2(nullfd,STDOUT_FILENO);::dup2(nullfd,STDERR_FILENO);}
+    std::vector<char*> av;for(const auto& a:args)av.push_back(const_cast<char*>(a.c_str()));av.push_back(nullptr);
+    ::execvp(av[0],av.data());::_exit(127);}
+  return wait_status(pid);
+}
+
+struct TestTlsCredentials {
+  fs::path ca_cert,dealer_cert,dealer_key,p0_cert,p0_key,p1_cert,p1_key,rogue_ca,rogue_cert,rogue_key;
+};
+
+void make_signed_cert(const fs::path& dir,const std::string& name,const std::string& dns,
+                      const fs::path& ca_cert,const fs::path& ca_key,fs::path& cert,fs::path& key) {
+  const auto csr=dir/(name+".csr"),ext=dir/(name+".ext");key=dir/(name+".key");cert=dir/(name+".crt");
+  {std::ofstream out(ext);require(static_cast<bool>(out),"write test cert extensions");
+    out<<"subjectAltName=DNS:"<<dns<<"\nextendedKeyUsage=serverAuth,clientAuth\nkeyUsage=digitalSignature,keyEncipherment\n";}
+  require(run_tool({"openssl","req","-new","-newkey","rsa:2048","-nodes","-keyout",key.string(),
+      "-out",csr.string(),"-subj","/CN="+dns})==0,"generate test TLS key/csr");
+  require(run_tool({"openssl","x509","-req","-in",csr.string(),"-CA",ca_cert.string(),"-CAkey",ca_key.string(),
+      "-CAcreateserial","-out",cert.string(),"-days","2","-extfile",ext.string()})==0,"sign test TLS certificate");
+}
+
+TestTlsCredentials make_test_tls_credentials(const fs::path& root) {
+  const auto dir=root/"tls-test-ca";require(::mkdir(dir.c_str(),0700)==0,"create TLS test CA directory");
+  TestTlsCredentials c;const auto ca_key=dir/"ca.key";c.ca_cert=dir/"ca.crt";
+  require(run_tool({"openssl","req","-x509","-newkey","rsa:2048","-nodes","-keyout",ca_key.string(),
+      "-out",c.ca_cert.string(),"-subj","/CN=BMW16-S20-test-CA","-days","2"})==0,"generate test CA");
+  fs::path ignored;
+  make_signed_cert(dir,"dealer","dealer",c.ca_cert,ca_key,c.dealer_cert,c.dealer_key);
+  make_signed_cert(dir,"party0","party0",c.ca_cert,ca_key,c.p0_cert,c.p0_key);
+  make_signed_cert(dir,"party1","party1",c.ca_cert,ca_key,c.p1_cert,c.p1_key);
+  c.rogue_ca=dir/"rogue-ca.crt";const auto rogue_key=dir/"rogue-ca.key";
+  require(run_tool({"openssl","req","-x509","-newkey","rsa:2048","-nodes","-keyout",rogue_key.string(),
+      "-out",c.rogue_ca.string(),"-subj","/CN=BMW16-S20-rogue-CA","-days","2"})==0,"generate rogue test CA");
+  make_signed_cert(dir,"rogue-dealer","dealer",c.rogue_ca,rogue_key,c.rogue_cert,c.rogue_key);
+  return c;
+}
+
+int listen_loopback(std::uint16_t& port) {
+  const int fd=::socket(AF_INET,SOCK_STREAM,0);require(fd>=0,"TLS test socket create");
+  int one=1;(void)::setsockopt(fd,SOL_SOCKET,SO_REUSEADDR,&one,sizeof(one));
+  sockaddr_in address{};address.sin_family=AF_INET;address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);address.sin_port=0;
+  require(::bind(fd,reinterpret_cast<sockaddr*>(&address),sizeof(address))==0&&::listen(fd,4)==0,"TLS test bind/listen");
+  socklen_t size=sizeof(address);require(::getsockname(fd,reinterpret_cast<sockaddr*>(&address),&size)==0,"TLS test bound port");
+  port=ntohs(address.sin_port);return fd;
+}
+
+pid_t spawn_as(const std::vector<std::string>& args,const fs::path& output,uid_t uid,
+               const std::vector<int>& close_fds={},const std::string& failpoint={}) {
+  const auto pid=::fork();require(pid>=0,"fork independent TLS role");
+  if(pid==0){for(const auto fd:close_fds)::close(fd);
+    if(!failpoint.empty()&&::setenv("MOE_BMW16_TEST_FAILPOINT",failpoint.c_str(),1)!=0)::_exit(125);
+    if(::setgroups(0,nullptr)!=0||::setgid(uid)!=0||::setuid(uid)!=0)::_exit(126);
+    const int out=::open(output.c_str(),O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC,0600);
+    if(out<0||::dup2(out,STDOUT_FILENO)<0||::dup2(out,STDERR_FILENO)<0)::_exit(126);::close(out);
+    std::vector<char*> av;for(const auto& a:args)av.push_back(const_cast<char*>(a.c_str()));av.push_back(nullptr);
+    ::execv(av[0],av.data());::_exit(127);}
+  return pid;
+}
+void require_unreadable_as(uid_t uid,const fs::path& path) {
+  const auto pid=::fork();require(pid>=0,"fork cross-UID file access check");
+  if(pid==0){
+    if(::setgroups(0,nullptr)!=0||::setgid(uid)!=0||::setuid(uid)!=0)::_exit(126);
+    const int fd=::open(path.c_str(),O_RDONLY|O_CLOEXEC);
+    if(fd>=0){::close(fd);::_exit(1);}
+    ::_exit(errno==EACCES||errno==EPERM?0:2);
+  }
+  require(wait_status(pid)==0,"party UID read another party private file");
+}
 void append_u32(std::vector<std::uint8_t>& bytes, std::uint32_t value) {
   for (unsigned i=0; i<4; ++i) bytes.push_back(static_cast<std::uint8_t>(value >> (8U*i)));
 }
@@ -121,7 +196,7 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
 
   const std::uint32_t n = static_cast<std::uint32_t>(scores.size());
   const std::uint64_t fingerprint = session ^ UINT64_C(0x535331375f465052);
-  const auto targs = std::vector<std::string>{node, "t", std::to_string(n), std::to_string(k),
+  const auto targs = std::vector<std::string>{node, "t-local-test-only", std::to_string(n), std::to_string(k),
       std::to_string(session), std::to_string(fingerprint), (p0/"claims").string(), (p1/"claims").string(),
       (p0/"material.shell").string(), (p1/"material.shell").string(),
       (p0/"ucmp.stream").string(), (p1/"ucmp.stream").string(), (p0/"aead.key").string(),
@@ -207,6 +282,233 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
             << " p0_exit=" << e0 << " p1_exit=" << e1 << " T_online=false\n";
 }
 
+void run_tls_case(const std::string& node,const std::vector<std::int32_t>& scores,std::uint32_t k,
+                  std::uint64_t session,const TestTlsCredentials& tls,
+                  const std::string& t_failpoint={},bool expect_delivery_abort=false,
+                  const std::string& conflict={}, bool use_rogue_t=false) {
+  require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
+  static std::uint64_t serial=0;
+  const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+std::to_string(serial++));
+  require(::mkdir(root.c_str(),0700)==0&&::chmod(root.c_str(),0711)==0,"TLS case root");
+  auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){
+    std::error_code ec;fs::remove_all(root,ec);
+  });
+  const auto p0=root/"p0",p1=root/"p1",td=root/"t";
+  for(const auto& p:{p0,p1,td})require(::mkdir(p.c_str(),0700)==0,"TLS role directory");
+  for(const auto& pair:{std::pair<fs::path,uid_t>{p0,kUid0},{p1,kUid1},{td,22011}})
+    require(::chown(pair.first.c_str(),pair.second,pair.second)==0&&::chmod(pair.first.c_str(),0700)==0,"TLS role ownership");
+  const auto claims0=p0/"claims",claims1=p1/"claims",spool=td/"spool";
+  for(const auto& p:{claims0,claims1,spool})require(::mkdir(p.c_str(),0700)==0,"TLS package/claim directory");
+  require(::chown(claims0.c_str(),kUid0,kUid0)==0&&::chown(claims1.c_str(),kUid1,kUid1)==0&&
+          ::chown(spool.c_str(),22011,22011)==0,"TLS private directory ownership");
+  require(::chmod(claims0.c_str(),0700)==0&&::chmod(claims1.c_str(),0700)==0&&::chmod(spool.c_str(),0700)==0,"TLS private directory mode");
+
+  const auto key0=os_key(),key1=os_key();
+  write_private(p0/"aead.key",{key0.begin(),key0.end()},kUid0);
+  write_private(p1/"aead.key",{key1.begin(),key1.end()},kUid1);
+  write_private(td/"wrap0.key",{key0.begin(),key0.end()},22011);
+  write_private(td/"wrap1.key",{key1.begin(),key1.end()},22011);
+  write_private(td/"dealer.crt",read_all(tls.dealer_cert),22011);
+  write_private(td/"dealer.key",read_all(tls.dealer_key),22011);
+  write_private(td/"ca.pem",read_all(tls.ca_cert),22011);
+  write_private(td/"rogue.crt",read_all(tls.rogue_cert),22011);
+  write_private(td/"rogue.key",read_all(tls.rogue_key),22011);
+  write_private(td/"rogue-ca.pem",read_all(tls.rogue_ca),22011);
+  write_private(p0/"party.crt",read_all(tls.p0_cert),kUid0);
+  write_private(p0/"party.key",read_all(tls.p0_key),kUid0);
+  write_private(p0/"ca.pem",read_all(tls.ca_cert),kUid0);
+  write_private(p1/"party.crt",read_all(tls.p1_cert),kUid1);
+  write_private(p1/"party.key",read_all(tls.p1_key),kUid1);
+  write_private(p1/"ca.pem",read_all(tls.ca_cert),kUid1);
+
+  const auto n=static_cast<std::uint32_t>(scores.size());
+  const auto fingerprint=session^UINT64_C(0x5332305f544c5346);
+  struct stat st0{},st1{};require(::stat(claims0.c_str(),&st0)==0&&::stat(claims1.c_str(),&st1)==0,"TLS claim identity stat");
+  std::uint16_t port0=0,port1=0;const int listen0=listen_loopback(port0),listen1=listen_loopback(port1);
+  const auto shell0=claims0/"material.shell",side0=claims0/"ucmp.stream",ready0=claims0/"pair.ready";
+  const auto shell1=claims1/"material.shell",side1=claims1/"ucmp.stream",ready1=claims1/"pair.ready";
+  const auto t_shell0=spool/"p0.material.shell",t_side0=spool/"p0.ucmp.stream";
+  const auto t_shell1=spool/"p1.material.shell",t_side1=spool/"p1.ucmp.stream";
+  fs::path protected_path;
+  if(conflict=="existing-p0-shell")protected_path=shell0;
+  else if(conflict=="existing-p1-sidecar")protected_path=side1;
+  if(!protected_path.empty()){
+    const std::vector<std::uint8_t> sentinel{'S','2','0','-','P','R','E','E','X','I','S','T'};
+    const int fd=::open(protected_path.c_str(),O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC,0600);
+    require(fd>=0,"TLS preexisting package fixture");write_all(fd,sentinel.data(),sentinel.size());
+    require(::fdatasync(fd)==0&&::close(fd)==0,"TLS preexisting package sync");
+  }
+  const std::vector<std::uint8_t> preexisting_sentinel{'S','2','0','-','P','R','E','E','X','I','S','T'};
+  auto receiver_args=[&](std::uint8_t party,std::uint16_t /*port*/,int listen_fd){
+    const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
+    const auto& side=party?side1:side0;const auto& ready=party?ready1:ready0;const auto& dir=party?p1:p0;
+    return std::vector<std::string>{node,"recv-tls",std::to_string(party),std::to_string(n),std::to_string(k),
+      std::to_string(session),std::to_string(fingerprint),claim.string(),shell.string(),side.string(),ready.string(),
+      (dir/"aead.key").string(),(dir/"party.crt").string(),(dir/"party.key").string(),(dir/"ca.pem").string(),
+      "dealer",expect_delivery_abort?"2500":(n>=1000?"600000":"30000"),std::to_string(listen_fd)};
+  };
+  const auto receiver_failpoint=t_failpoint=="receiver_fsync"?t_failpoint:
+      t_failpoint=="receiver_publish"?t_failpoint:
+      t_failpoint=="receiver_silent"?t_failpoint:std::string{};
+  const auto recv0=spawn_as(receiver_args(0,port0,listen0),p0/"receive.log",kUid0,{listen1},
+      (receiver_failpoint=="receiver_fsync"||receiver_failpoint=="receiver_silent")?receiver_failpoint:std::string{});
+  const auto recv1=spawn_as(receiver_args(1,port1,listen1),p1/"receive.log",kUid1,{listen0},
+      receiver_failpoint=="receiver_publish"?receiver_failpoint:std::string{});
+  std::vector<std::string> targs{node,"t-tls",std::to_string(n),std::to_string(k),std::to_string(session),
+      std::to_string(fingerprint),std::to_string(st0.st_dev),std::to_string(st0.st_ino),
+      std::to_string(st1.st_dev),std::to_string(st1.st_ino),t_side0.string(),t_side1.string(),
+      t_shell0.string(),t_shell1.string(),(td/"wrap0.key").string(),(td/"wrap1.key").string(),
+      (td/(use_rogue_t?"rogue.crt":"dealer.crt")).string(),
+      (td/(use_rogue_t?"rogue.key":"dealer.key")).string(),
+      (td/(use_rogue_t?"rogue-ca.pem":"ca.pem")).string(),
+      "127.0.0.1",std::to_string(port0),"party0","127.0.0.1",std::to_string(port1),"party1"};
+  const auto tpid=spawn_as(targs,td/"t.log",22011,{listen0,listen1},t_failpoint);
+  ::close(listen0);::close(listen1);
+  const int t_exit=wait_status(tpid);
+  // A failed T is not allowed to trigger the online phase. The listeners have
+  // bounded receives; collect their local status independently.
+  const int r0=wait_status(recv0),r1=wait_status(recv1);
+  const auto shell_exists=fs::exists(shell0)||fs::exists(shell1);
+  const auto marker_exists=fs::exists(ready0)||fs::exists(ready1);
+  if(expect_delivery_abort){
+    require(t_exit!=0&&!fs::exists(p0/"mask.share")&&!fs::exists(p1/"mask.share"),"failed TLS delivery reached online/mask output");
+    require((t_exit==20||t_exit==30||t_exit==71)&&
+            (r0==0||r0==20||r0==30)&&(r1==0||r1==20||r1==30),
+            "TLS failure escaped the structured material/transport/crash status contract");
+    if(!protected_path.empty())require(fs::exists(protected_path)&&read_all(protected_path)==preexisting_sentinel,
+                                       "TLS failure overwrote or removed preexisting package");
+    if(t_failpoint!="receiver_publish"&&t_failpoint!="crash_t_tls_after_prepare0"&&
+       t_failpoint!="crash_t_tls_after_commit0")
+      require(!marker_exists,"failed TLS transfer exposed ready marker");
+    std::cout<<"tls_delivery_abort n="<<n<<" K="<<k<<" failpoint="<<(t_failpoint.empty()?"none":t_failpoint)
+             <<" credential="<<(use_rogue_t?"untrusted-T":"provisioned-test-T")
+             <<" conflict="<<(conflict.empty()?"none":conflict)<<" T_exit="<<t_exit<<" P0_receive_exit="<<r0
+             <<" P1_receive_exit="<<r1<<" final_files="<<(shell_exists?"present":"none")
+             <<" ready_p0="<<(fs::exists(ready0)?"present":"none")<<" ready_p1="<<(fs::exists(ready1)?"present":"none")
+             <<" orphan_policy=ONLINE_FORBIDDEN_UNLESS_T_AND_BOTH_RECEIVERS_EXIT_ZERO"
+             <<" mask=NONE startup=BLOCKED_BY_T_STATUS\n";
+    return;
+  }
+  if(t_exit!=0||r0!=0||r1!=0){
+    for(const auto& path:{td/"t.log",p0/"receive.log",p1/"receive.log"})if(fs::exists(path)){
+      const auto bytes=read_all(path);std::cerr<<"tls_failure_log "<<path.filename().string()<<" "
+        <<std::string(bytes.begin(),bytes.end());}
+    std::cerr<<"tls_failure_status T="<<t_exit<<" P0="<<r0<<" P1="<<r1<<" fixture="<<root<<"\n";
+  }
+  require(t_exit==0&&r0==0&&r1==0,"mutual TLS offline package delivery failed");
+  const auto tlog=read_all(td/"t.log"),log0=read_all(p0/"receive.log"),log1=read_all(p1/"receive.log");
+  require(fs::exists(shell0)&&fs::exists(side0)&&fs::exists(ready0)&&fs::exists(shell1)&&fs::exists(side1)&&fs::exists(ready1),
+          "TLS delivery missing one package component");
+  std::cout<<"tls_T "<<std::string(tlog.begin(),tlog.end());
+  std::cout<<"tls_P0_receive "<<std::string(log0.begin(),log0.end());
+  std::cout<<"tls_P1_receive "<<std::string(log1.begin(),log1.end());
+
+  // Inputs are deliberately created only after T exited successfully and both
+  // recipients durably committed their own packages.
+  std::mt19937_64 split_rng(session^UINT64_C(0x534841524553));
+  std::array<std::vector<std::uint8_t>,2> shares;
+  for(const auto score:scores){const auto word=static_cast<std::uint32_t>(score);const auto a=static_cast<std::uint32_t>(split_rng());
+    append_u32(shares[0],a);append_u32(shares[1],word-a);}
+  write_private(p0/"raw-share.bin",shares[0],kUid0);write_private(p1/"raw-share.bin",shares[1],kUid1);
+  for(const auto& path:{p1/"aead.key",p1/"party.key",claims1/"material.shell",claims1/"ucmp.stream",p1/"raw-share.bin"})
+    require_unreadable_as(kUid0,path);
+  for(const auto& path:{p0/"aead.key",p0/"party.key",claims0/"material.shell",claims0/"ucmp.stream",p0/"raw-share.bin"})
+    require_unreadable_as(kUid1,path);
+  for(const auto& path:{p0/"raw-share.bin",p1/"raw-share.bin",claims0/"ucmp.stream",claims1/"ucmp.stream"})
+    require_unreadable_as(22011,path);
+  std::cout<<"tls_uid_isolation n="<<n<<" P0_cannot_read_P1=PASS P1_cannot_read_P0=PASS T_cannot_read_online_input=PASS scope=LOCAL_TEST_UIDS\n";
+  std::array<std::array<int,2>,kChannels> channels{};for(auto& pair:channels)require(::socketpair(AF_UNIX,SOCK_STREAM,0,pair.data())==0,"TLS case online channels");
+  std::array<pid_t,2> children{};
+  for(int party=0;party<2;++party){const auto child=::fork();require(child>=0,"TLS case fork online party");children[party]=child;
+    if(child==0){for(const auto& pair:channels)::close(pair[1-party]);
+      const auto uid=party?kUid1:kUid0;if(::setgroups(0,nullptr)!=0||::setgid(uid)!=0||::setuid(uid)!=0)::_exit(126);
+      const auto& dir=party?p1:p0;const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
+      const auto& side=party?side1:side0;const auto& ready=party?ready1:ready0;
+      std::vector<std::string> args{node,"party",std::to_string(party),std::to_string(n),std::to_string(k),
+        std::to_string(session),std::to_string(fingerprint),claim.string(),(dir/"raw-share.bin").string(),
+        shell.string(),side.string(),(dir/"aead.key").string(),(dir/"mask.share").string(),
+        n>=1000?"600000":"30000",ready.string()};
+      for(const auto& pair:channels)args.push_back(std::to_string(pair[party]));
+      std::vector<char*> av;for(auto& a:args)av.push_back(a.data());av.push_back(nullptr);::execv(node.c_str(),av.data());::_exit(127);}}
+  for(auto& pair:channels){::close(pair[0]);::close(pair[1]);}
+  const auto e0=wait_status(children[0]),e1=wait_status(children[1]);
+  if(e0!=0||e1!=0){
+    const bool mask0=fs::exists(p0/"mask.share"),mask1=fs::exists(p1/"mask.share");
+    std::cout<<"tls_online_failure n="<<n<<" K="<<k<<" session="<<session<<" P0_exit="<<e0
+             <<" P1_exit="<<e1<<" P0_mask="<<(mask0?"present":"none")<<" P1_mask="<<(mask1?"present":"none")
+             <<" abort_scope=LOCAL_ONLY_OR_PEER_OBSERVED\n";
+    require(!mask0&&!mask1,"TLS E2E failure published a partial mask share");
+    throw std::runtime_error("TLS-delivered parties failed online E2E");
+  }
+  const auto m0=read_all(p0/"mask.share"),m1=read_all(p1/"mask.share");require(m0.size()==n&&m1.size()==n,"TLS E2E mask share length");
+  std::vector<std::uint8_t> mask(n);for(std::size_t i=0;i<n;++i)mask[i]=m0[i]^m1[i];
+  std::vector<std::uint32_t> words;for(auto score:scores)words.push_back(static_cast<std::uint32_t>(score));
+  require(mask==moe_topk::top_k_mask(words,k),"TLS E2E frozen oracle mismatch");
+  std::array<std::array<int,2>,kChannels> replay_channels{};
+  for(auto& pair:replay_channels)require(::socketpair(AF_UNIX,SOCK_STREAM,0,pair.data())==0,"TLS replay channels");
+  std::array<pid_t,2> replay_children{};
+  for(int party=0;party<2;++party){const auto child=::fork();require(child>=0,"TLS replay process fork");replay_children[party]=child;
+    if(child==0){for(const auto& pair:replay_channels)::close(pair[1-party]);
+      const auto uid=party?kUid1:kUid0;if(::setgroups(0,nullptr)!=0||::setgid(uid)!=0||::setuid(uid)!=0)::_exit(126);
+      const auto& dir=party?p1:p0;const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
+      const auto& side=party?side1:side0;const auto& ready=party?ready1:ready0;
+      std::vector<std::string> args{node,"party",std::to_string(party),std::to_string(n),std::to_string(k),
+        std::to_string(session),std::to_string(fingerprint),claim.string(),(dir/"raw-share.bin").string(),
+        shell.string(),side.string(),(dir/"aead.key").string(),(dir/"replay.mask.share").string(),
+        n>=1000?"600000":"30000",ready.string()};
+      for(const auto& pair:replay_channels)args.push_back(std::to_string(pair[party]));
+      std::vector<char*> av;for(auto& a:args)av.push_back(a.data());av.push_back(nullptr);::execv(node.c_str(),av.data());::_exit(127);}}
+  for(auto& pair:replay_channels){::close(pair[0]);::close(pair[1]);}
+  const auto replay0=wait_status(replay_children[0]),replay1=wait_status(replay_children[1]);
+  require(replay0==20&&replay1==20&&!fs::exists(p0/"replay.mask.share")&&!fs::exists(p1/"replay.mask.share"),
+          "durable bundle claim did not reject process replay without a mask");
+  std::cout<<"tls_replay n="<<n<<" K="<<k<<" P0_exit="<<replay0<<" P1_exit="<<replay1
+           <<" status=DURABLE_CLAIM_REJECTED mask=NONE\n";
+  std::cout<<"tls_e2e n="<<n<<" K="<<k<<" session="<<session<<" T_exit="<<t_exit
+           <<" P0_receive_exit="<<r0<<" P1_receive_exit="<<r1<<" P0_online_exit="<<e0
+           <<" P1_online_exit="<<e1<<" status=SUCCESS_ORACLE_CHECKED mask=original_order_weight_K\n";
+}
+
+void run_tls_suite(const std::string& node) {
+  require(::geteuid()==0,"TLS E2E suite requires distinct OS identities");
+  const auto root=fs::path("/tmp")/("bmw16-s20-tls-certs-"+std::to_string(::getpid()));
+  require(::mkdir(root.c_str(),0700)==0,"create TLS certificate fixture root");
+  auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){
+    std::error_code ec;fs::remove_all(root,ec);
+  });
+  const auto tls=make_test_tls_credentials(root);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x20201001),tls);
+  run_tls_case(node,{INT32_MIN,7,7,INT32_MAX,-4},5,UINT64_C(0x20201005),tls);
+  run_tls_case(node,extended_scores(8),4,UINT64_C(0x20201008),tls);
+  run_tls_case(node,seeded_scores(64,UINT64_C(0x20206401)),8,UINT64_C(0x20206401),tls);
+  run_tls_case(node,seeded_scores(128,UINT64_C(0x20212880)),128,UINT64_C(0x20212880),tls);
+  run_tls_case(node,seeded_scores(256,UINT64_C(0x20225602)),2,UINT64_C(0x20225602),tls);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a001),tls,"",true,"",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a002),tls,"delivery_wrong_party",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a003),tls,"delivery_wrong_session",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00c),tls,"delivery_wrong_stream",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a004),tls,"receiver_publish",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a005),tls,"receiver_fsync",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00d),tls,"receiver_silent",true);
+  run_tls_case(node,extended_scores(64),8,UINT64_C(0x2020a006),tls,"delivery_reorder_chunks",true);
+  run_tls_case(node,extended_scores(64),8,UINT64_C(0x2020a007),tls,"delivery_truncate_sidecar",true);
+  run_tls_case(node,extended_scores(64),8,UINT64_C(0x2020a008),tls,"delivery_corrupt_sidecar_chunk",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a009),tls,"",true,"existing-p1-sidecar");
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00a),tls,"crash_t_tls_after_prepare0",true);
+  run_tls_case(node,{INT32_MIN,INT32_MAX},1,UINT64_C(0x2020a00b),tls,"crash_t_tls_after_commit0",true);
+}
+
+void run_tls_n1000(const std::string& node) {
+  require(::geteuid()==0,"n=1000 TLS E2E requires distinct OS identities");
+  const auto root=fs::path("/tmp")/("bmw16-s20-tls-n1000-certs-"+std::to_string(::getpid()));
+  require(::mkdir(root.c_str(),0700)==0,"create n=1000 TLS certificate fixture root");
+  auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){
+    std::error_code ec;fs::remove_all(root,ec);
+  });
+  const auto tls=make_test_tls_credentials(root);
+  run_tls_case(node,seeded_scores(1000,UINT64_C(0x2020100080)),80,UINT64_C(0x2020100080),tls);
+}
+
 void verify_publication_failures(const std::string& node) {
   require(::geteuid() == 0, "publication failure tests require root for test UID setup");
   static std::uint64_t serial = 0;
@@ -233,7 +535,7 @@ void verify_publication_failures(const std::string& node) {
     write_private(p0 / "aead.key", {key0.begin(), key0.end()}, kUid0);
     write_private(p1 / "aead.key", {key1.begin(), key1.end()}, kUid1);
     const auto fingerprint = session ^ UINT64_C(0x535331375f465052);
-    auto args = std::vector<std::string>{node, "t", "2", "1", std::to_string(session),
+    auto args = std::vector<std::string>{node, "t-local-test-only", "2", "1", std::to_string(session),
         std::to_string(fingerprint), (p0/"claims").string(), (p1/"claims").string(),
         (p0/"material.shell").string(), (p1/"material.shell").string(),
         (p0/"ucmp.stream").string(), (p1/"ucmp.stream").string(),
@@ -351,10 +653,19 @@ std::vector<std::int32_t> seeded_scores(std::uint32_t n, std::uint64_t seed) {
 
 int main(int argc, char** argv) {
   try {
-    require(argc == 2 || argc == 3, "pass party node executable path [--extended|--n1000]");
+    require(argc == 2 || argc == 3, "pass party node executable path [--extended|--n1000|--tls|--tls-n1000]");
+    const auto node = fs::canonical(argv[1]).string();
+    if(argc==3&&std::string(argv[2])=="--tls") {
+      run_case(node,{INT32_MIN},1,UINT64_C(0x20201000));
+      run_tls_suite(node);
+      return 0;
+    }
+    if(argc==3&&std::string(argv[2])=="--tls-n1000") {
+      run_tls_n1000(node);
+      return 0;
+    }
     require(argc == 2 || std::string(argv[2]) == "--extended" || std::string(argv[2]) == "--n1000",
             "unknown party node E2E option");
-    const auto node = fs::canonical(argv[1]).string();
     run_case(node, {INT32_MIN}, 1, UINT64_C(0x171700));
     run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x171702));
     run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x1717e0), "missing");

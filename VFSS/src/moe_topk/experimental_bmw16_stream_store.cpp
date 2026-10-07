@@ -218,8 +218,13 @@ bool same_file_at(const std::string& path, std::uint64_t device,
 }
 
 bool injected_failure(const std::string& point) {
+#if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
   const char* configured = std::getenv("MOE_BMW16_TEST_FAILPOINT");
   return configured && point == configured;
+#else
+  (void)point;
+  return false;
+#endif
 }
 
 std::uint64_t expected_slot_count(const ProtocolIBmw16ExperimentalPartyConfig& c) {

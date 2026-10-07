@@ -25,6 +25,11 @@ option(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER
     "Build opt-in EXPERIMENTAL BMW16-derived Select adapter and party composition (not secure)" OFF)
 option(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS
     "Instrument ordinary DCF KeyGen/Eval AES expansion call sites for research measurements" OFF)
+option(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS
+    "TEST_ONLY: compile BMW16 publication/TLS fault injection hooks (never enable in deployable builds)" OFF)
+if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS AND NOT BUILD_TESTING)
+  message(FATAL_ERROR "BMW16 failpoints are TEST_ONLY and require BUILD_TESTING=ON")
+endif()
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
@@ -83,15 +88,19 @@ PUBLIC
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
 
 if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
-  find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto)
+  find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto SSL)
   target_sources(${PROJECT_NAME} PRIVATE
       src/moe_topk/experimental_bmw16_select_adapter.cpp
       src/moe_topk/experimental_bmw16_material_bundle.cpp
+      src/moe_topk/experimental_bmw16_material_delivery.cpp
       src/moe_topk/experimental_bmw16_select_party.cpp
       src/moe_topk/experimental_bmw16_stream_store.cpp)
   target_compile_definitions(${PROJECT_NAME} PUBLIC
       MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER=1)
-  target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
+  target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto OpenSSL::SSL)
+  if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS=1)
+  endif()
 endif()
 
 if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
@@ -104,6 +113,9 @@ if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
   add_executable(moe_topk_bmw16_experimental_party_node
       src/apps/moe_topk_bmw16_experimental_party_node.cpp)
   target_link_libraries(moe_topk_bmw16_experimental_party_node PRIVATE ${PROJECT_NAME})
+  if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    target_compile_definitions(moe_topk_bmw16_experimental_party_node PRIVATE MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS=1)
+  endif()
   add_executable(moe_topk_bmw16_experimental_party_node_e2e_test
       tests/moe_topk/experimental_bmw16_party_node_e2e_test.cpp)
   target_link_libraries(moe_topk_bmw16_experimental_party_node_e2e_test PRIVATE ${PROJECT_NAME})

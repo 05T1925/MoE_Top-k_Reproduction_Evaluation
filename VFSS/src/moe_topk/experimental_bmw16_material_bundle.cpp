@@ -524,9 +524,13 @@ ProtocolIBmw16PublishedFileIdentity protocol_i_bmw16_bundle_write_atomic(
     const int dir = ::open(directory.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
     if (dir < 0) throw std::runtime_error("BMW16 bundle parent open");
     bool synced = true;
+#if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
     const char* failpoint = std::getenv("MOE_BMW16_TEST_FAILPOINT");
     if (failpoint && std::string(failpoint) == "bundle_dir_fsync") synced = false;
     else synced = ::fsync(dir) == 0;
+#else
+    synced = ::fsync(dir) == 0;
+#endif
     ::close(dir);
     if (!synced) throw std::runtime_error("BMW16 bundle directory sync");
     return {path, static_cast<std::uint64_t>(owned.st_dev),
