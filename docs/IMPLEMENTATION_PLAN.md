@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-10-07
+更新日期：2026-10-08
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -14,6 +14,8 @@
 **2026-10-07 S18 用户授权的提前 EXPERIMENTAL 研发附注：**从 S17 `6f0ac1b` 隔离继续复用同一 VFSS C++ party API、稳定 Select 与原序 mask 路径；新增逐槽 KeyGen→分方 AEAD sidecar writer、紧凑 shell bundle 和 party 随机访问验证，使 T 不再先物化九池全部 uCMP/DCF keys、P0/P1 不再解密并常驻完整 key pool。固定 claim-root 的一次性合同沿用 S17，流式 API 与旧 n≤256/512MiB 内存 bundle 分开。S18 的 n≤256 与 n=1000 有界运行、外部记录及安全审查见 [S18 决策](decisions/BMW16_S18_STREAMED_KEYGEN_PARTY_READ_AND_SECURITY_REVIEW_2026-10-07.md) 和 [S18 验证报告](reproduction/BMW16_S18_STREAMED_KEYGEN_E2E_AND_SECURITY_REVIEW_2026-10-07.md)。此工作是用户明确授权的提前 `EXPERIMENTAL` 代码研发，不改写“前置条件”中的正式 M6A→M6B 次序，不表示 V3 完成、V4 正式 LAN/WAN 验收可开始或六方案比较完成。整池相关 DCF 自适应安全和 Protocol I shuffle 的联合 simulator 仍未闭合，无 secure alias。
 
 **2026-10-07 S22 已授权公开字段及执行合同附注：**S22 依据本轮用户转述的学姐答复，把 P0/P1 可见的置换后比较端点/bit、pivot/U/V/W、masked operands/public_z、匿名 selected position、实际 key ID/order、比较次数、通信长度和统一算法 abort 状态列为 PROJECT_DECISION；这不是安全证明，也不追认 S21 当时的历史授权。BMW16 strict TLS 路径现在显式要求注册的 authenticated byte stream，缺流/重复消费失败且不回退裸 FD；旧 Protocol I FD 模式仍须显式选择。最终状态 1 是双方确认的正常算法概率 abort，状态 2 是工程/不变量错误并 exit 70，二者均无 mask。S22 给出以单 key comparison-FSS privacy 为条件的 N 槽 hybrid 草案，待独立核对当前 dcf.cpp 与定理构造；shuffle/inverse 与本方输出 share 联合模拟仍未闭合。此提前研发保持 `PROJECT_DERIVED / EXPERIMENTAL`，不改正式 M6A→M6B 验收次序，不开放 secure alias，也不启动 V4 LAN/WAN 正式矩阵；见 [S22 决策](decisions/BMW16_S22_APPROVED_LEAKAGE_ABORT_AND_JOINT_VIEW_2026-10-07.md) 与 [S22 独立报告](reproduction/BMW16_S22_INDEPENDENT_ACCEPTANCE_ABORT_TLS_FAILCLOSED_AND_SECURITY_REVIEW_2026-10-07.md)。
+
+**2026-10-08 S23 独立复核附注：**从 S22 精确提交 `9210c11a7a877f8fe3687e0509c1722440cf63fe` 独立重建并复跑；39/39 S4/C++ common-tape、8/8 定向 CTest、不同 UID TLS 与 non-TLS 有界 E2E 通过。实际 DCF KeyGen 次数核为 `N_DCF=2p+9·C(n,2)`，其中流式 Select/membership sidecar 是 `9·C(n,2)`，与计入 raw/shuffle 的 `offline_material_slots_per_party` 不是同一口径。BGI15 Theorem 6 到 `dcf.cpp` 的 Gen/Eval 构造桥接未证；同一许可泄露下的 `N·ε` 向量 hybrid 是明确条件推导，不是当前原语结论。实际 Protocol I shuffle/inverse 与最终本方输出 share 的联合模拟缺 `ProtocolIForwardInverseViewSimulator_L`，未发现反例也不记 PASS。S16 理想无放回 abort 界复核通过；当前公开 XOR coin + SHA-256 sampler 仅在 ROM 抽样模型中等价，具体 SHA-256 到 ROM 优势未量化。S23 未改协议源码，未重跑 n=1000、未运行正式 LAN/WAN/九指标矩阵；正式验收顺序和 V4 门禁不变，候选继续 `PROJECT_DERIVED / EXPERIMENTAL`。证据与逐门裁决见 [S23 决策](decisions/BMW16_S23_INDEPENDENT_DCF_POOL_SHUFFLE_AND_ABORT_REVIEW_2026-10-08.md) 与 [S23 独立复核报告](reproduction/BMW16_S23_INDEPENDENT_ACCEPTANCE_SECURITY_AND_SAMPLER_REVIEW_2026-10-08.md)。
 
 当前状态：M2 已完成；三轮 C-INSTANTIATION、独立评审与 Theorem 4.1 逻辑通信匹配不改变 `AUTHOR_EXACT = NOT_PROVEN` 的证据边界。接收方复跑后 M5 已完成，M6A 为当前阶段。M5-H1 通过用户指定的数量级门槛，但 Theorem 4.2 精确逻辑成本仍相差 `254n` bits。F1 经 PR #25 合入；接收方在 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过 F2/G3 和 41/41 回归。dated strict-gate 与 H2 初始 FAIL 记录保留为历史。M5-FIX-F1 = COMPLETED；F2 / G3 = PASS。详见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
 

@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-10-07
+更新日期：2026-10-08
 
 ## 1. 项目目标与当前边界
 
@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S20 建离线 mTLS T→P0/P1 分块交付，S21 增加在线 TLS 数据通道与本地 T/P0/P1 退出门。S22 依据 2026-10-07 用户转述的学姐答复登记允许公开字段，并修复一致算法中止码分类及 TLS stream 缺失时裸 FD 降级；独立复跑 S21 精确源码和 S22 修改后 n≤256 有界 E2E、39 common-tape traces。S22 对相关多 key DCF 给出基于 BGI15 Theorem 6 的条件性 N·ε hybrid，待独立核对本仓库实现与定理构造的等价；真实 forward/inverse shuffle 与输出 share 的联合模拟仍未闭合。安全门未通过，不创建 secure alias；V3/V4 与正式六方案性能验收未完成 |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S20 增离线 mTLS 发材，S21 增在线 TLS 与本地 T/P0/P1 退出门，S22 登记用户转述批准的匿名 transcript 候选泄露并修复统一算法 abort/TLS fail-closed。S23 独立复建 S22，39 common-tape、定向 CTest 8/8、不同 UID TLS/non-TLS 有界 E2E 通过；复核 DCF 的 `N=2p+9·C(n,2)` KeyGen 公式及 S16 理想无放回 abort 界。BGI15 Theorem 6 到仓库 `keyGenDCF/evalDCF` 的逐变量/PRG 桥接仍未证明；基于相同公开泄露的 `N·ε` 多 key hybrid 仅为条件推导；Protocol I forward/inverse shuffle 与 output-share 联合模拟仍未闭合。SHA-256 sampler 的随机预言机到具体实现优势未量化。维持 EXPERIMENTAL、无 secure alias；正式 V4/六方案性能验收未完成。见 [S23 决策](docs/decisions/BMW16_S23_INDEPENDENT_DCF_POOL_SHUFFLE_AND_ABORT_REVIEW_2026-10-08.md) 与 [S23 独立复核报告](docs/reproduction/BMW16_S23_INDEPENDENT_ACCEPTANCE_SECURITY_AND_SAMPLER_REVIEW_2026-10-08.md) |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -33,6 +33,7 @@
 - M2 增加 Protocol I 精确核心完成后的通信核验与接口交接。
 - M5 增加 Protocol III 精确核心完成后的通信核验。
 - M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 当前候选为 BMW16-derived Select，Protocol III 保留 BB90+DCF 研究目标。S18 增加逐槽流式 KeyGen 与密文随机访问；S19 修复成对材料发布/重试，独立复核并实跑到 n=1000。S20 为同一默认 opt-in EXPERIMENTAL 入口增加 TLS 1.3 相互认证的离线发材代码与独立 UID 测试；S21 再增加在线全数据路径 mTLS 与本地可信退出门。跨主机生产监督/凭据运维及联合隐私证明仍未完成。此候选仍无 secure alias；V3/V4 与正式六方案性能验收未完成。
+- S22 登记用户转述批准的候选匿名 transcript 泄露、修复统一算法 abort 分类与 TLS stream fail-closed；S23 独立复核 S22 并复跑有界 C++/S4 差分及独立进程功能。S23 的多 key DCF 归约只在 BGI15 构造等价、相同泄露条件化和随机带替换前提下成立，实际 DCF 桥接与 Protocol I shuffle/output 联合模拟未闭合；SHA-256 sampler 的具体实现概率仍是 ROM 条件性。S23 没有改协议源码，也没有运行 n=1000 或正式性能矩阵。详见 S23 决策与验证报告。
 - M7 保留为最终统一汇总与横向报告，不把 M6A、M6B 的性能测试全部推迟到 M7。
 - CryptoMoE 保留为 M7 之后的独立工作负载方向，不属于本轮六种方案的完成条件。
 - 历史 `Direct Top-K` 原型保留其原有身份，不直接改名为 BB90+DCF，也不自动成为额外实施任务。
