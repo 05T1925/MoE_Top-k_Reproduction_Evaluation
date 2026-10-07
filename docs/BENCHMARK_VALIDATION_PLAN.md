@@ -715,3 +715,11 @@ V3、V4 报告额外包含：
 ### 2026-10-07 M6B-I-BMW16-S15 有界诊断补充
 
 S15 对 `Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL` 做的 n=64/128/256 同机 loopback 1 warmup + 5 attempt 只作为研究性 pilot。其输入、计时和材料边界没有与 Protocol I 全对全及 Protocol I+AAV86 在同一被测 revision/环境下配对，因此不得横向拼接中位数、不得写入 V4 正式验收表。汇总必须保留每次 attempt（包括概率 abort、材料 abort、通信错误及其成本），并将条件于 SUCCESS 的耗时与每次尝试总成本分栏。S15 增加普通 DCF KeyGen/Eval AES 扩展调用字段；该计数不覆盖 shuffle 或 FSS 全库 PRG，未覆盖字段仍记 `NOT_MEASURED`。详见 [S15 验证报告](reproduction/BMW16_S15_INDEPENDENT_ACCEPTANCE_AND_N256_DIAGNOSTICS_2026-10-07.md)。
+
+### 2026-10-07 M6B-I-BMW16-S16 独立接收与计数器诊断补充
+
+S16 复核发现 S15 原始归档虽完整，但 12 行源清单中 7 个 C++ hash 不对应声明 Git revision，也不匹配可达 Git 历史。因此历史 S15 pilot 必须标为 source identity 未核实，不得作为精确被测 revision 的性能数据。S16 从声明 Git tree 新构建并独立运行 6 项相关 CTest、61 行 T/P0/P1 E2E 和 n=256/K=2、8 common-tape differential；这些结果也仅为有界功能/计数证据。
+
+S16 对默认 DCF 扩展计数的 ON/OFF 额外开销采用相同 TEST_ONLY 固定 tape、相同输入、相同边图和 fresh materials 配对；报告的约 28.27% median overhead 只指导未来 instrumentation 选择，不进入 V4。计数 `online_prg_calls_total` 在本方案证据中精确定义为普通 DCF `evalDCF` 内 `ecbEncTwoBlocks` node expansion 数，AES blocks 为其两倍；sampler PRF words 独立。未由 hook 覆盖的系统库/AES 指令、正式 LAN/WAN、跨路线对照和全库 PRG 字段仍 `NOT_MEASURED`。严禁把 61 例无自然 abort 解释为抽样概率界。
+
+S15 来源身份复核、抽样数学界修正、相关 DCF 全池安全 hybrid 首缺口、计数器开销和容量门的完整限制见 [S16 报告](reproduction/BMW16_S16_INDEPENDENT_ACCEPTANCE_PROBABILITY_SECURITY_AND_METRICS_2026-10-07.md) 与[证据索引](reproduction/evidence/BMW16_S16_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。V4 正式 LAN/WAN 矩阵继续等待 V3 完成、该候选安全门及统一计量/发材合同独立接收；S16 不改变验收顺序。
