@@ -72,9 +72,12 @@ int wait_status(pid_t pid) {
   int status = 0; require(::waitpid(pid, &status, 0) == pid, "wait child");
   return WIFEXITED(status) ? WEXITSTATUS(status) : 128;
 }
-int exec_capture(const std::vector<std::string>& args, const fs::path& output) {
+int exec_capture(const std::vector<std::string>& args, const fs::path& output,
+                 const std::string& failpoint = {}) {
   const auto pid = ::fork(); require(pid >= 0, "fork child");
   if (pid == 0) {
+    if (!failpoint.empty() && ::setenv("MOE_BMW16_TEST_FAILPOINT", failpoint.c_str(), 1) != 0)
+      ::_exit(125);
     const int fd = ::open(output.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
     if (fd < 0 || ::dup2(fd, STDOUT_FILENO) < 0 || ::dup2(fd, STDERR_FILENO) < 0) ::_exit(126);
     ::close(fd);
@@ -96,7 +99,7 @@ std::string find_field(const std::string& line, const std::string& key) {
 }
 
 void run_case(const std::string& node, const std::vector<std::int32_t>& scores, std::uint32_t k,
-              std::uint64_t session) {
+              std::uint64_t session, const std::string& marker_failure = {}) {
   require(::geteuid() == 0, "party node E2E requires root to provision distinct OS identities");
   const auto root = fs::path("/tmp") / ("bmw16-s18-node-" + std::to_string(::getpid()) + "-" + std::to_string(session));
   require(::mkdir(root.c_str(), 0700) == 0 && ::chmod(root.c_str(), 0711) == 0, "node fixture root");
@@ -122,14 +125,19 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
       std::to_string(session), std::to_string(fingerprint), (p0/"claims").string(), (p1/"claims").string(),
       (p0/"material.shell").string(), (p1/"material.shell").string(),
       (p0/"ucmp.stream").string(), (p1/"ucmp.stream").string(), (p0/"aead.key").string(),
-      (p1/"aead.key").string(), std::to_string(kUid0), std::to_string(kUid1)};
+      (p1/"aead.key").string(), std::to_string(kUid0), std::to_string(kUid1),
+      (root/"pair.ready").string()};
   const int t_exit = exec_capture(targs, root / "t.log");
   require(t_exit == 0, "offline T node failed");
   const auto t_log_bytes = read_all(root / "t.log");
   const std::string t_log(t_log_bytes.begin(), t_log_bytes.end());
   const auto expected_t_status = n == 1 ? "status=SINGLETON_NO_MATERIAL" : "status=OFFLINE_MATERIAL_READY";
   require(t_log.find(expected_t_status) != std::string::npos &&
-          t_log.find("T_online=false") != std::string::npos, "T did not finish offline material role");
+      t_log.find("T_online=false") != std::string::npos, "T did not finish offline material role");
+  const auto ready_path = root / "pair.ready";
+  if (n > 1) require(fs::exists(ready_path) && fs::file_size(ready_path) == 132,
+                     "T did not publish the paired completion marker");
+  else require(!fs::exists(ready_path), "singleton unexpectedly published a paired-ready marker");
   std::cout << "node_T " << t_log;
 
   // The clear TEST_ONLY driver creates and writes shares only after T exits.
@@ -142,6 +150,15 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
   }
   write_private(p0 / "raw-share.bin", shares[0], kUid0);
   write_private(p1 / "raw-share.bin", shares[1], kUid1);
+  if (marker_failure == "missing") require(::unlink(ready_path.c_str()) == 0,
+                                            "remove completion marker for early-party test");
+  else if (marker_failure == "truncate") fs::resize_file(ready_path, 131);
+  else if (marker_failure == "tamper") {
+    std::fstream marker(ready_path, std::ios::binary | std::ios::in | std::ios::out);
+    require(static_cast<bool>(marker), "open ready marker tamper fixture");
+    char byte = 0; marker.read(&byte, 1); byte ^= 1; marker.seekp(0); marker.write(&byte, 1);
+    marker.flush(); require(static_cast<bool>(marker), "tamper ready marker");
+  } else require(marker_failure.empty(), "unknown ready marker failure fixture");
 
   std::array<std::array<int, 2>, kChannels> channels{};
   for (auto& pair : channels) require(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.data()) == 0, "party channels");
@@ -157,7 +174,7 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
           std::to_string(session), std::to_string(fingerprint), (dir/"claims").string(),
           (dir/"raw-share.bin").string(), (dir/"material.shell").string(),
           (dir/"ucmp.stream").string(), (dir/"aead.key").string(),
-          (dir/"mask.share").string(), "30000"};
+          (dir/"mask.share").string(), "30000", ready_path.string()};
       for (const auto& pair : channels) args.push_back(std::to_string(pair[party]));
       std::vector<char*> av; for (auto& arg : args) av.push_back(arg.data()); av.push_back(nullptr);
       ::execv(node.c_str(), av.data()); ::_exit(127);
@@ -168,7 +185,11 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
   // to perform the frozen-oracle differential.
   const auto e0 = wait_status(children[0]), e1 = wait_status(children[1]);
   require(e0 == e1, "independent node exit codes differ");
-  if (e0 == 0) {
+  if (!marker_failure.empty()) {
+    require(e0 == 20 && e1 == 20 && !fs::exists(p0 / "mask.share") &&
+            !fs::exists(p1 / "mask.share"),
+            "parties accepted invalid paired completion marker");
+  } else if (e0 == 0) {
     const auto m0 = read_all(p0 / "mask.share"), m1 = read_all(p1 / "mask.share");
     require(m0.size() == n && m1.size() == n, "independent node output share size");
     std::vector<std::uint8_t> mask(n);
@@ -180,9 +201,126 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
             !fs::exists(p1 / "mask.share"), "independent node failure status/mask contract");
   }
   std::cout << "node_e2e n=" << n << " K=" << k << " session=" << session
-            << " status=" << (e0 == 0 ? "SUCCESS_ORACLE_CHECKED" : e0 == 10 ? "AGREED_ALGORITHM_ABORT" :
+            << " ready_failure=" << (marker_failure.empty() ? "none" : marker_failure)
+            << " status=" << (!marker_failure.empty() ? "INVALID_READY_REJECTED" : e0 == 0 ? "SUCCESS_ORACLE_CHECKED" : e0 == 10 ? "AGREED_ALGORITHM_ABORT" :
                 e0 == 20 ? "MATERIAL_ABORT" : "COMMUNICATION_ABORT")
             << " p0_exit=" << e0 << " p1_exit=" << e1 << " T_online=false\n";
+}
+
+void verify_publication_failures(const std::string& node) {
+  require(::geteuid() == 0, "publication failure tests require root for test UID setup");
+  static std::uint64_t serial = 0;
+  auto run = [&](const std::string& failpoint, const std::string& conflict,
+                 bool crash, bool retry_same_paths, bool retry_new_paths) {
+    const auto session = UINT64_C(0x191900) + serial++;
+    const auto root = fs::path("/tmp") / ("bmw16-s19-publish-" + std::to_string(::getpid()) + "-" + std::to_string(session));
+    require(::mkdir(root.c_str(), 0700) == 0 && ::chmod(root.c_str(), 0711) == 0,
+            "publication fixture root");
+    auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(reinterpret_cast<void*>(1), [root](void*) {
+      std::error_code ec; fs::remove_all(root, ec);
+    });
+    const auto p0 = root / "p0", p1 = root / "p1";
+    for (const auto& p : {p0, p1}) require(::mkdir(p.c_str(), 0700) == 0, "publication party dir");
+    for (const auto& pair : {std::pair<fs::path, uid_t>{p0, kUid0}, {p1, kUid1}}) {
+      require(::chown(pair.first.c_str(), pair.second, pair.second) == 0 &&
+              ::chmod(pair.first.c_str(), 0700) == 0, "publication party ownership");
+      const auto claims = pair.first / "claims";
+      require(::mkdir(claims.c_str(), 0700) == 0 &&
+              ::chown(claims.c_str(), pair.second, pair.second) == 0 &&
+              ::chmod(claims.c_str(), 0700) == 0, "publication claim dir");
+    }
+    const auto key0 = os_key(), key1 = os_key();
+    write_private(p0 / "aead.key", {key0.begin(), key0.end()}, kUid0);
+    write_private(p1 / "aead.key", {key1.begin(), key1.end()}, kUid1);
+    const auto fingerprint = session ^ UINT64_C(0x535331375f465052);
+    auto args = std::vector<std::string>{node, "t", "2", "1", std::to_string(session),
+        std::to_string(fingerprint), (p0/"claims").string(), (p1/"claims").string(),
+        (p0/"material.shell").string(), (p1/"material.shell").string(),
+        (p0/"ucmp.stream").string(), (p1/"ucmp.stream").string(),
+        (p0/"aead.key").string(), (p1/"aead.key").string(),
+        std::to_string(kUid0), std::to_string(kUid1), (root/"pair.ready").string()};
+    fs::path protected_path;
+    const std::vector<std::uint8_t> sentinel{'S','1','9','-','P','R','E','E','X','I','S','T'};
+    if (conflict == "sidecar1") protected_path = p1 / "ucmp.stream";
+    else if (conflict == "shell1") protected_path = p1 / "material.shell";
+    else if (conflict == "ready") protected_path = root / "pair.ready";
+    if (!protected_path.empty()) {
+      const int fd = ::open(protected_path.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
+      require(fd >= 0, "preexisting publication sentinel create");
+      write_all(fd, sentinel.data(), sentinel.size());
+      require(::fdatasync(fd) == 0 && ::close(fd) == 0, "preexisting publication sentinel sync");
+    }
+    const auto exit = exec_capture(args, root / "t.log", failpoint);
+    const int expected_exit = crash ? 71 : 70;
+    require(exit == expected_exit, "publication failpoint exit classification");
+    if (protected_path != root / "pair.ready") {
+      if (crash && failpoint == "crash_after_ready") {
+        struct stat marker_stat{};
+        require(::lstat((root/"pair.ready").c_str(), &marker_stat) == 0 &&
+                S_ISREG(marker_stat.st_mode) && (marker_stat.st_mode & 0777) == 0600 &&
+                marker_stat.st_uid == 0,
+                "crash-left marker is private and cannot authorize party start");
+      } else if (crash && failpoint == "crash_after_ready_durable") {
+        struct stat marker_stat{};
+        require(::lstat((root/"pair.ready").c_str(), &marker_stat) == 0 &&
+                S_ISREG(marker_stat.st_mode) && (marker_stat.st_mode & 0777) == 0444 &&
+                marker_stat.st_uid == 0 && marker_stat.st_size == 132,
+                "durable marker crash fixture shape");
+        // This TEST_ONLY launcher deliberately does not launch P0/P1 when T
+        // exits nonzero, even though all material and the marker are durable.
+      } else require(!fs::exists(root / "pair.ready"), "failed T published paired-ready marker");
+    }
+    if (!protected_path.empty()) require(read_all(protected_path) == sentinel,
+                                         "failed T changed a preexisting destination");
+    if (!crash) {
+      for (const auto& path : {p0/"material.shell", p1/"material.shell",
+                               p0/"ucmp.stream", p1/"ucmp.stream"})
+        if (path != protected_path) require(!fs::exists(path), "failed T left its owned final file");
+    }
+    std::cout << "publication_fault failpoint=" << failpoint
+              << " conflict=" << (conflict.empty() ? "none" : conflict)
+              << " exit=" << exit << " ready_state_checked=true"
+              << " party_start=" << (crash && failpoint == "crash_after_ready_durable"
+                    ? "blocked_by_nonzero_T_exit" : "not_attempted")
+              << " preexisting_preserved=" << (!protected_path.empty() ? "true" : "n/a")
+              << " own_finals_rolled_back=" << (!crash ? "true" :
+                    failpoint == "crash_after_ready_durable" ? "durable_orphan_quarantined" :
+                    "crash_orphan_nonready") << '\n';
+    if (retry_same_paths) {
+      // A preexisting conflict is retained by T. The TEST_ONLY operator then
+      // moves that unrelated sentinel away before explicitly retrying.
+      if (!protected_path.empty()) require(::unlink(protected_path.c_str()) == 0,
+                                           "test operator removes retained sentinel before retry");
+      require(exec_capture(args, root / "t-retry.log") == 0 && fs::exists(root / "pair.ready"),
+              "same-session retry after handled T failure");
+      std::cout << "publication_retry mode=same_paths same_session=true status=ready\n";
+    }
+    if (retry_new_paths) {
+      auto retry = args;
+      retry[8] = (p0/"retry.shell").string(); retry[9] = (p1/"retry.shell").string();
+      retry[10] = (p0/"retry.stream").string(); retry[11] = (p1/"retry.stream").string();
+      retry[16] = (root/"retry.ready").string();
+      require(exec_capture(retry, root / "t-retry-new-paths.log") == 0 &&
+              fs::exists(root / "retry.ready"), "same-session retry with fresh paths after crash");
+      std::cout << "publication_retry mode=fresh_paths same_session=true status=ready\n";
+    }
+  };
+
+  for (const auto& point : {"after_sidecar0", "after_sidecar1", "after_shell0", "after_shell1",
+       "chown_shell0", "chown_shell1", "chown_sidecar0",
+       "chown_sidecar1", "before_ready", "bundle_dir_fsync", "sidecar0_dir_fsync",
+       "sidecar1_dir_fsync", "ready_dir_fsync", "after_ready"})
+    run(point, "", false, std::string(point) == "after_shell0", false);
+  run("", "sidecar1", false, true, false);
+  run("", "shell1", false, true, false);
+  run("", "ready", false, true, false);
+  run("crash_after_sidecar0", "", true, false, true);
+  run("crash_after_sidecar1", "", true, false, false);
+  run("crash_after_shell0", "", true, false, false);
+  run("crash_after_shell1", "", true, false, false);
+  run("crash_after_ready", "", true, false, false);
+  run("crash_after_ready_durable", "", true, false, true);
+  run("crash_before_ready", "", true, false, false);
 }
 
 std::vector<std::int32_t> extended_scores(std::uint32_t n) {
@@ -219,8 +357,12 @@ int main(int argc, char** argv) {
     const auto node = fs::canonical(argv[1]).string();
     run_case(node, {INT32_MIN}, 1, UINT64_C(0x171700));
     run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x171702));
+    run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x1717e0), "missing");
+    run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x1717e1), "truncate");
+    run_case(node, {INT32_MIN, INT32_MAX}, 1, UINT64_C(0x1717e2), "tamper");
     run_case(node, {INT32_MIN, 13, -5, INT32_MAX, 13}, 2, UINT64_C(0x171703));
     run_case(node, {INT32_MIN, 19, -4, 19, INT32_MAX, 1, -99, 8}, 3, UINT64_C(0x171701));
+    verify_publication_failures(node);
     if (argc == 3) {
       if (std::string(argv[2]) == "--extended") {
         run_case(node, extended_scores(64), 8, UINT64_C(0x171740));
@@ -228,7 +370,9 @@ int main(int argc, char** argv) {
         run_case(node, seeded_scores(64, UINT64_C(0x18D2)), 64, UINT64_C(0x171742));
         run_case(node, extended_scores(128), 8, UINT64_C(0x171780));
         run_case(node, seeded_scores(128, UINT64_C(0x18D3)), 80, UINT64_C(0x171781));
+        run_case(node, seeded_scores(256, UINT64_C(0x19D1)), 1, UINT64_C(0x1718f1));
         run_case(node, extended_scores(256), 2, UINT64_C(0x171800));
+        run_case(node, seeded_scores(256, UINT64_C(0x19D2)), 256, UINT64_C(0x1718ff));
       } else {
         run_case(node, seeded_scores(1000, UINT64_C(0x18D1000)), 80, UINT64_C(0x1711000));
       }

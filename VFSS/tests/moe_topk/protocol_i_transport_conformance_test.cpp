@@ -320,11 +320,84 @@ void expect_chunked_io(std::size_t chunk) {
     ::close(sockets[0]);
 }
 
+void expect_bounded_chunk_message(std::size_t message_size) {
+  constexpr std::size_t chunk_data = (1U << 20U) - 16U;
+  int sockets[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0, "bounded chunk socketpair");
+  const auto child = ::fork();
+  require(child >= 0, "bounded chunk fork");
+  if (child == 0) {
+    ::close(sockets[0]);
+    try {
+      ProtocolIFramedChannel peer(sockets[1], config(1, 0));
+      const auto received = protocol_i_receive_framed_chunks(peer, message_size);
+      require(received.size() == message_size, "bounded chunks reconstructed length");
+      for (std::size_t i = 0; i < received.size(); ++i)
+        require(received[i] == static_cast<std::uint8_t>((i * 131U + 7U) & 0xffU),
+                "bounded chunks reconstructed bytes");
+      const std::uint64_t frames = (message_size + chunk_data - 1U) / chunk_data;
+      require(peer.received_bytes() == frames * (kHeaderBytes + 16U) + message_size,
+              "bounded chunks receive byte conservation");
+      peer.send(Bytes{0x5a});
+      _exit(0);
+    } catch (...) { _exit(3); }
+  }
+  ::close(sockets[1]);
+  ProtocolIFramedChannel sender(sockets[0], config(0, 1));
+  Bytes message(message_size);
+  for (std::size_t i = 0; i < message.size(); ++i)
+    message[i] = static_cast<std::uint8_t>((i * 131U + 7U) & 0xffU);
+  protocol_i_send_framed_chunks(sender, message);
+  const std::uint64_t frames = (message_size + chunk_data - 1U) / chunk_data;
+  require(sender.sent_bytes() == frames * (kHeaderBytes + 16U) + message_size,
+          "bounded chunks send byte conservation");
+  require(sender.receive() == Bytes{0x5a}, "bounded chunk acknowledgement");
+  wait_child(child);
+  ::close(sockets[0]);
+}
+
+void expect_chunk_sequence_rejected(bool duplicate_offset, bool truncate_after_first = false) {
+  int sockets[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0, "malformed chunk socketpair");
+  const auto child = ::fork();
+  require(child >= 0, "malformed chunk fork");
+  if (child == 0) {
+    ::close(sockets[0]);
+    ProtocolIFramedChannel sender(sockets[1], config(0, 1));
+    auto make = [](std::uint64_t total, std::uint64_t offset, std::size_t n) {
+      Bytes frame;
+      for (int shift = 56; shift >= 0; shift -= 8) frame.push_back(static_cast<std::uint8_t>(total >> shift));
+      for (int shift = 56; shift >= 0; shift -= 8) frame.push_back(static_cast<std::uint8_t>(offset >> shift));
+      frame.insert(frame.end(), n, 0x31);
+      return frame;
+    };
+    sender.send(make(32, 0, 16));
+    if (!truncate_after_first) sender.send(make(32, duplicate_offset ? 0 : 17, 16));
+    _exit(0);
+  }
+  ::close(sockets[1]);
+  ProtocolIFramedChannel receiver(sockets[0], config(1, 0));
+  bool rejected = false;
+  try { (void)protocol_i_receive_framed_chunks(receiver, 64); }
+  catch (const ProtocolITransportError&) { rejected = true; }
+  require(rejected, truncate_after_first ? "truncated chunk sequence rejected" :
+      duplicate_offset ? "duplicate chunk offset rejected" : "chunk gap rejected");
+  wait_child(child);
+  ::close(sockets[0]);
+}
+
 int main() {
   try {
     for (const auto chunk : {std::size_t{1}, std::size_t{2}, std::size_t{3}, std::size_t{7}}) {
       expect_chunked_io(chunk);
     }
+    constexpr std::size_t kSingleFrameData = (1U << 20U) - 16U;
+    expect_bounded_chunk_message(kSingleFrameData - 1U);
+    expect_bounded_chunk_message(kSingleFrameData);
+    expect_bounded_chunk_message(kSingleFrameData + 1U);
+    expect_chunk_sequence_rejected(true);
+    expect_chunk_sequence_rejected(false);
+    expect_chunk_sequence_rejected(false, true);
 
     expect_bad_header([](RawHeader& header) { header.magic ^= 1U; });
     expect_bad_header([](RawHeader& header) { ++header.version; });
@@ -333,6 +406,7 @@ int main() {
     expect_bad_header([](RawHeader& header) { header.fingerprint = 100; });
     expect_bad_header([](RawHeader& header) { header.sender = 0; });
     expect_bad_header([](RawHeader& header) { header.sequence = 1; });
+    expect_bad_header([](RawHeader& header) { ++header.phase; });
     expect_bad_header([](RawHeader& header) { header.length = kMaxPayload + 1; });
     expect_truncated_header();
     expect_truncated_payload();

@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <limits>
@@ -497,15 +498,78 @@ ProtocolIBmw16StreamBundleOpenResult protocol_i_bmw16_bundle_open_stream_shell_p
   return result;
 }
 
-void protocol_i_bmw16_bundle_write_atomic(const std::string& path,const std::vector<std::uint8_t>& bytes) {
-  if(bytes.size()>kMaxBundleBytes||path.empty())throw std::invalid_argument("BMW16 bundle output bounds");
-  const auto temp=path+".tmp."+std::to_string(::getpid());const int fd=::open(temp.c_str(),O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);
-  if(fd<0)throw std::runtime_error("BMW16 bundle temp create");bool okay=true;
-  try{write_all(fd,bytes.data(),bytes.size());okay=::fdatasync(fd)==0;}catch(...){::close(fd);::unlink(temp.c_str());throw;}
-  okay=::close(fd)==0&&okay;if(!okay){::unlink(temp.c_str());throw std::runtime_error("BMW16 bundle sync");}
-  if(::rename(temp.c_str(),path.c_str())!=0){::unlink(temp.c_str());throw std::runtime_error("BMW16 bundle atomic rename");}
-  const auto parent=std::filesystem::path(path).parent_path();const int dir=::open(parent.empty()?".":parent.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
-  if(dir<0)throw std::runtime_error("BMW16 bundle parent open");okay=::fsync(dir)==0;::close(dir);check(okay,"BMW16 bundle directory sync");
+ProtocolIBmw16PublishedFileIdentity protocol_i_bmw16_bundle_write_atomic(
+    const std::string& path, const std::vector<std::uint8_t>& bytes) {
+  if (bytes.size() > kMaxBundleBytes || path.empty())
+    throw std::invalid_argument("BMW16 bundle output bounds");
+  const auto temp = path + ".tmp." + std::to_string(::getpid());
+  int fd = ::open(temp.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+  if (fd < 0) throw std::runtime_error("BMW16 bundle temp create");
+  struct stat owned{};
+  bool have_identity = false;
+  bool linked = false;
+  try {
+    write_all(fd, bytes.data(), bytes.size());
+    if (::fdatasync(fd) != 0 || ::fstat(fd, &owned) != 0 || !S_ISREG(owned.st_mode))
+      throw std::runtime_error("BMW16 bundle temp sync/identity");
+    have_identity = true;
+    const int closing = fd; fd = -1;
+    if (::close(closing) != 0) throw std::runtime_error("BMW16 bundle temp close");
+    if (::link(temp.c_str(), path.c_str()) != 0)
+      throw std::runtime_error("BMW16 bundle no-replace publish");
+    linked = true;
+    if (::unlink(temp.c_str()) != 0) throw std::runtime_error("BMW16 bundle temp unlink");
+    const auto parent = std::filesystem::path(path).parent_path();
+    const auto directory = parent.empty() ? std::string(".") : parent.string();
+    const int dir = ::open(directory.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+    if (dir < 0) throw std::runtime_error("BMW16 bundle parent open");
+    bool synced = true;
+    const char* failpoint = std::getenv("MOE_BMW16_TEST_FAILPOINT");
+    if (failpoint && std::string(failpoint) == "bundle_dir_fsync") synced = false;
+    else synced = ::fsync(dir) == 0;
+    ::close(dir);
+    if (!synced) throw std::runtime_error("BMW16 bundle directory sync");
+    return {path, static_cast<std::uint64_t>(owned.st_dev),
+            static_cast<std::uint64_t>(owned.st_ino)};
+  } catch (...) {
+    // A failed publish may roll back only the exact inode created above.
+    if (!have_identity && fd >= 0 && ::fstat(fd, &owned) == 0 && S_ISREG(owned.st_mode))
+      have_identity = true;
+    if (linked && have_identity) {
+      struct stat current{};
+      if (::lstat(path.c_str(), &current) == 0 && S_ISREG(current.st_mode) &&
+          current.st_dev == owned.st_dev && current.st_ino == owned.st_ino)
+        (void)::unlink(path.c_str());
+    }
+    if (have_identity) {
+      struct stat current{};
+      if (::lstat(temp.c_str(), &current) == 0 && S_ISREG(current.st_mode) &&
+          current.st_dev == owned.st_dev && current.st_ino == owned.st_ino)
+        (void)::unlink(temp.c_str());
+    } else {
+      // The O_EXCL temporary was opened by this invocation. Before an inode
+      // could be recorded it is safe to remove it only while the fd is ours;
+      // leave it for offline quarantine if identity acquisition failed.
+    }
+    if (fd >= 0) (void)::close(fd);
+    throw;
+  }
+}
+
+bool protocol_i_bmw16_remove_published_if_owned(
+    const ProtocolIBmw16PublishedFileIdentity& file) noexcept {
+  if (file.path.empty() || file.device == 0 || file.inode == 0) return false;
+  struct stat current{};
+  if (::lstat(file.path.c_str(), &current) != 0 || !S_ISREG(current.st_mode) ||
+      static_cast<std::uint64_t>(current.st_dev) != file.device ||
+      static_cast<std::uint64_t>(current.st_ino) != file.inode)
+    return false;
+  if (::unlink(file.path.c_str()) != 0) return false;
+  const auto parent = std::filesystem::path(file.path).parent_path();
+  const auto directory = parent.empty() ? std::string(".") : parent.string();
+  const int dir = ::open(directory.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+  if (dir >= 0) { (void)::fsync(dir); (void)::close(dir); }
+  return true;
 }
 
 std::vector<std::uint8_t> protocol_i_bmw16_bundle_read(const std::string& path) {

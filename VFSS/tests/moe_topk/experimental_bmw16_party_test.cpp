@@ -6,6 +6,7 @@
 #include <FSS/prng.h>
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <exception>
 #include <cstdlib>
@@ -107,7 +108,9 @@ void run_case(const Case& test,int tape_pattern=0,
   std::array<std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore>, 2> stream_stores;
   if (use_stream_store) {
     stream_root = std::filesystem::temp_directory_path() /
-        ("bmw16-s17-stream-" + std::to_string(::getpid()) + "-" + std::to_string(configs[0].session));
+        ("bmw16-s19-stream-" + std::to_string(::getpid()) + "-" +
+         std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + "-" +
+         std::to_string(configs[0].session));
     std::filesystem::create_directories(stream_root / "p0");
     std::filesystem::create_directories(stream_root / "p1");
     std::filesystem::permissions(stream_root / "p0", std::filesystem::perms::owner_all);

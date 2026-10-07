@@ -21,6 +21,12 @@ struct ProtocolIBmw16BundleStats {
   std::array<std::uint8_t, 32> manifest_sha256{};
 };
 
+struct ProtocolIBmw16PublishedFileIdentity {
+  std::string path;
+  std::uint64_t device = 0;
+  std::uint64_t inode = 0;
+};
+
 struct ProtocolIBmw16StreamBundleBinding {
   std::array<std::uint8_t, 32> stream_id{};
   std::array<std::uint8_t, 32> sidecar_sha256{};
@@ -73,8 +79,13 @@ ProtocolIBmw16StreamBundleOpenResult protocol_i_bmw16_bundle_open_stream_shell_p
     const std::vector<std::uint8_t>& envelope,
     const std::array<std::uint8_t, 32>& recipient_key);
 
-void protocol_i_bmw16_bundle_write_atomic(const std::string& path,
-                                         const std::vector<std::uint8_t>& bytes);
+// Publish one file atomically without replacing an existing path. The return
+// value identifies the exact inode created by this call; rollback must compare
+// device+inode before unlinking so a retry never deletes someone else's file.
+ProtocolIBmw16PublishedFileIdentity protocol_i_bmw16_bundle_write_atomic(
+    const std::string& path, const std::vector<std::uint8_t>& bytes);
+bool protocol_i_bmw16_remove_published_if_owned(
+    const ProtocolIBmw16PublishedFileIdentity& file) noexcept;
 std::vector<std::uint8_t> protocol_i_bmw16_bundle_read(const std::string& path);
 
 class ProtocolIBmw16PersistentClaimStore {

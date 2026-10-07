@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <exception>
 #include <filesystem>
 #include <fcntl.h>
@@ -78,7 +79,11 @@ void require_party_owned_private_file(const std::string& path, bool directory) {
     throw std::runtime_error("party file ownership/permission contract");
 }
 
-void chown_bundle_for_party(const std::string& path, uid_t owner) {
+void chown_bundle_for_party(const std::string& path, uid_t owner,
+                            const std::string& test_failpoint) {
+  const char* configured = std::getenv("MOE_BMW16_TEST_FAILPOINT");
+  if (configured && test_failpoint == configured)
+    throw std::runtime_error("TEST_ONLY injected chown EPERM at " + test_failpoint);
   if (::chown(path.c_str(), owner, owner) != 0 || ::chmod(path.c_str(), 0400) != 0)
     throw std::runtime_error("T cannot deliver sealed bundle to configured party owner");
   const auto parent = std::filesystem::path(path).parent_path();
@@ -88,6 +93,49 @@ void chown_bundle_for_party(const std::string& path, uid_t owner) {
   const bool synced = ::fsync(dfd) == 0;
   ::close(dfd);
   if (!synced) throw std::runtime_error("T bundle delivery directory sync");
+}
+
+void make_ready_marker_public_read_only(const std::string& path) {
+  if (::chmod(path.c_str(), 0444) != 0)
+    throw std::runtime_error("T cannot set paired-ready marker permissions");
+  const auto parent = std::filesystem::path(path).parent_path();
+  const int dfd = ::open(parent.empty() ? "." : parent.c_str(),
+                         O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+  if (dfd < 0) throw std::runtime_error("T ready-marker directory open");
+  const char* configured = std::getenv("MOE_BMW16_TEST_FAILPOINT");
+  const bool injected = configured && std::string(configured) == "ready_dir_fsync";
+  const bool synced = !injected && ::fsync(dfd) == 0;
+  ::close(dfd);
+  if (!synced) throw std::runtime_error("T ready-marker directory sync");
+}
+
+void t_failpoint(const std::string& point) {
+  const char* configured = std::getenv("MOE_BMW16_TEST_FAILPOINT");
+  if (!configured) return;
+  const std::string value(configured);
+  if (value == "crash_" + point) ::_exit(71);
+  if (value == point) throw std::runtime_error("TEST_ONLY injected T failure: " + point);
+}
+
+void append_u32(std::vector<std::uint8_t>& out, std::uint32_t value) {
+  for (unsigned i = 0; i < 4; ++i) out.push_back(static_cast<std::uint8_t>(value >> (8U * i)));
+}
+void append_u64(std::vector<std::uint8_t>& out, std::uint64_t value) {
+  for (unsigned i = 0; i < 8; ++i) out.push_back(static_cast<std::uint8_t>(value >> (8U * i)));
+}
+
+std::vector<std::uint8_t> ready_marker_bytes(
+    std::uint64_t session, std::uint64_t fingerprint, std::uint32_t n,
+    std::uint32_t k, const std::array<std::uint8_t, 32>& stream_id,
+    const std::array<std::uint8_t, 32>& manifest0,
+    const std::array<std::uint8_t, 32>& manifest1) {
+  std::vector<std::uint8_t> bytes{'B','M','W','1','6','R','D','Y'};
+  append_u32(bytes, 1); append_u64(bytes, session); append_u64(bytes, fingerprint);
+  append_u32(bytes, n); append_u32(bytes, k);
+  bytes.insert(bytes.end(), stream_id.begin(), stream_id.end());
+  bytes.insert(bytes.end(), manifest0.begin(), manifest0.end());
+  bytes.insert(bytes.end(), manifest1.begin(), manifest1.end());
+  return bytes;
 }
 
 struct ReadyBarrierStats { std::uint64_t sent = 0, received = 0, elapsed_us = 0; };
@@ -132,6 +180,41 @@ std::vector<std::uint8_t> read_bytes(const std::string& path,
   if (!input || static_cast<std::size_t>(input.gcount()) != bytes.size())
     throw std::runtime_error("party input file truncated");
   return bytes;
+}
+
+void verify_ready_marker(const std::string& path,
+    const ProtocolIBmw16ExperimentalPartyConfig& c, std::uint8_t party,
+    const ProtocolIBmw16StreamBundleOpenResult& shell) {
+  const int fd = ::open(path.c_str(), O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+  if (fd < 0) throw std::runtime_error("BMW16 paired completion marker unavailable");
+  struct stat st{};
+  if (::fstat(fd, &st) != 0 || !S_ISREG(st.st_mode) || st.st_uid != 0 ||
+      (st.st_mode & 0777) != 0444 || st.st_size != 132) {
+    ::close(fd);
+    throw std::runtime_error("BMW16 paired completion marker ownership/shape");
+  }
+  std::vector<std::uint8_t> bytes(132);
+  std::size_t offset = 0;
+  while (offset < bytes.size()) {
+    const auto got = ::read(fd, bytes.data() + offset, bytes.size() - offset);
+    if (got < 0 && errno == EINTR) continue;
+    if (got <= 0) { ::close(fd); throw std::runtime_error("BMW16 paired completion marker truncated"); }
+    offset += static_cast<std::size_t>(got);
+  }
+  std::uint8_t extra = 0;
+  const auto extra_count = ::read(fd, &extra, 1);
+  ::close(fd);
+  if (extra_count != 0) throw std::runtime_error("BMW16 paired completion marker trailing bytes");
+  const auto expected = ready_marker_bytes(c.session, c.fingerprint, c.n, c.k,
+      shell.stream.stream_id,
+      party == 0 ? shell.stats.manifest_sha256 : std::array<std::uint8_t, 32>{},
+      party == 1 ? shell.stats.manifest_sha256 : std::array<std::uint8_t, 32>{});
+  if (expected.size() != 132 ||
+      !std::equal(bytes.begin(), bytes.begin() + 68, expected.begin()) ||
+      !std::equal(bytes.begin() + 68 + 32U * party,
+                  bytes.begin() + 100 + 32U * party,
+                  expected.begin() + 68 + 32U * party))
+    throw std::runtime_error("BMW16 paired material completion marker mismatch");
 }
 
 void write_mask_exclusive(const std::string& path,
@@ -207,8 +290,8 @@ int t_offline(int argc, char** argv) {
   const auto t_start = std::chrono::steady_clock::now();
   // T is a one-shot offline process. Root is required only to place each
   // sealed package into its pre-provisioned, party-owned local drop directory.
-  // t n k session fingerprint claim0 claim1 shell0 shell1 slots0 slots1 key0 key1 uid0 uid1
-  require(argc == 16, "usage: node t n k session fingerprint claim0 claim1 shell0 shell1 slots0 slots1 key0 key1 uid0 uid1");
+  // t n k session fingerprint claim0 claim1 shell0 shell1 slots0 slots1 key0 key1 uid0 uid1 pair-ready
+  require(argc == 17, "usage: node t n k session fingerprint claim0 claim1 shell0 shell1 slots0 slots1 key0 key1 uid0 uid1 pair-ready");
   require(::geteuid() == 0, "offline T delivery requires the configured local privileged drop service");
   const auto n = static_cast<std::uint32_t>(std::stoul(argv[2]));
   const auto k = static_cast<std::uint32_t>(std::stoul(argv[3]));
@@ -230,13 +313,10 @@ int t_offline(int argc, char** argv) {
         writer1.append(slot, key1);
       });
   ProtocolIBmw16StreamStoreStats stream0{}, stream1{};
-  try {
-    stream0 = writer0.finalize();
-    stream1 = writer1.finalize();
-  } catch (...) {
-    ::unlink(argv[10]); ::unlink(argv[11]);
-    throw;
-  }
+  stream0 = writer0.finalize();
+  t_failpoint("after_sidecar0");
+  stream1 = writer1.finalize();
+  t_failpoint("after_sidecar1");
   require(stream0.stream_id == stream1.stream_id && stream0.ucmp_slots == stream1.ucmp_slots &&
           stream0.sealed_file_bytes == stream1.sealed_file_bytes, "party stream sidecar mismatch");
   ProtocolIBmw16StreamBundleBinding binding0, binding1;
@@ -247,17 +327,33 @@ int t_offline(int argc, char** argv) {
   binding0.sealed_sidecar_bytes = stream0.sealed_file_bytes;
   binding1.sealed_sidecar_bytes = stream1.sealed_file_bytes;
   ProtocolIBmw16BundleStats b0{}, b1{};
+  std::vector<ProtocolIBmw16PublishedFileIdentity> owned_shells;
   try {
     const auto e0 = protocol_i_bmw16_bundle_seal_stream_shell_party(c0, 0, materials.party0, binding0, read_key(argv[12]), &b0);
     const auto e1 = protocol_i_bmw16_bundle_seal_stream_shell_party(c1, 1, materials.party1, binding1, read_key(argv[13]), &b1);
-    protocol_i_bmw16_bundle_write_atomic(argv[8], e0);
-    protocol_i_bmw16_bundle_write_atomic(argv[9], e1);
-    chown_bundle_for_party(argv[8], static_cast<uid_t>(std::stoul(argv[14])));
-    chown_bundle_for_party(argv[9], static_cast<uid_t>(std::stoul(argv[15])));
-    chown_bundle_for_party(argv[10], static_cast<uid_t>(std::stoul(argv[14])));
-    chown_bundle_for_party(argv[11], static_cast<uid_t>(std::stoul(argv[15])));
+    owned_shells.push_back(protocol_i_bmw16_bundle_write_atomic(argv[8], e0));
+    t_failpoint("after_shell0");
+    owned_shells.push_back(protocol_i_bmw16_bundle_write_atomic(argv[9], e1));
+    t_failpoint("after_shell1");
+    chown_bundle_for_party(argv[8], static_cast<uid_t>(std::stoul(argv[14])), "chown_shell0");
+    chown_bundle_for_party(argv[9], static_cast<uid_t>(std::stoul(argv[15])), "chown_shell1");
+    chown_bundle_for_party(argv[10], static_cast<uid_t>(std::stoul(argv[14])), "chown_sidecar0");
+    chown_bundle_for_party(argv[11], static_cast<uid_t>(std::stoul(argv[15])), "chown_sidecar1");
+    t_failpoint("before_ready");
+    const auto marker = ready_marker_bytes(session, fingerprint, n, k, stream_id,
+                                            b0.manifest_sha256, b1.manifest_sha256);
+    owned_shells.push_back(protocol_i_bmw16_bundle_write_atomic(argv[16], marker));
+    t_failpoint("after_ready");
+    make_ready_marker_public_read_only(argv[16]);
+    // An orchestrator is required to wait for this process to exit zero before
+    // it starts either party. A crash here leaves a complete-looking marker,
+    // but a nonzero T exit must prevent the launch transition.
+    t_failpoint("after_ready_durable");
+    writer0.commit_published();
+    writer1.commit_published();
   } catch (...) {
-    ::unlink(argv[8]); ::unlink(argv[9]); ::unlink(argv[10]); ::unlink(argv[11]);
+    for (auto it = owned_shells.rbegin(); it != owned_shells.rend(); ++it)
+      (void)protocol_i_bmw16_remove_published_if_owned(*it);
     throw;
   }
   std::cout << "role=T status=OFFLINE_MATERIAL_READY"
@@ -272,14 +368,14 @@ int t_offline(int argc, char** argv) {
             << " shell_bytes_p1=" << b1.envelope_bytes
             << " offline_elapsed_us=" << elapsed_us(t_start)
             << " peak_rss_kb=" << peak_rss_kb()
-            << " shell_version=4 root_bound=true T_online=false\n";
+            << " shell_version=4 root_bound=true pair_ready=true T_online=false\n";
   return kSuccess;
 }
 
 int party_online(int argc, char** argv) {
-  // party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout fd[12] ready-fd
-  require(argc == 27,
-      "usage: node party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout fd0..fd11 ready-fd");
+  // party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready fd[12] ready-fd
+  require(argc == 28,
+      "usage: node party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready fd0..fd11 ready-fd");
   const auto party = static_cast<std::uint8_t>(std::stoul(argv[2]));
   const auto n = static_cast<std::uint32_t>(std::stoul(argv[3]));
   const auto k = static_cast<std::uint32_t>(std::stoul(argv[4]));
@@ -303,6 +399,7 @@ int party_online(int argc, char** argv) {
       auto shell = protocol_i_bmw16_bundle_open_stream_shell_party(c, party, package_bytes,
                                                                     read_key(argv[11]));
       shell_open_us = elapsed_us(open_start);
+      verify_ready_marker(argv[14], c, party, shell);
       claim = std::make_unique<ProtocolIBmw16PersistentClaimStore>(argv[7], session, party,
           ProtocolIBmw16ClaimRootIdentity{c.claim_root_device, c.claim_root_inode});
       const auto claim_start = std::chrono::steady_clock::now();
@@ -332,14 +429,14 @@ int party_online(int argc, char** argv) {
 
   // The caller injects twelve already-connected descriptors from its private,
   // authenticated transport. Each phase descriptor is consumed by the API.
-  std::array<int, 2> score{{std::stoi(argv[14]), std::stoi(argv[15])}};
-  std::array<int, 2> forward{{std::stoi(argv[16]), std::stoi(argv[17])}};
-  std::array<int, 4> select{{std::stoi(argv[18]), std::stoi(argv[19]),
-                             std::stoi(argv[20]), std::stoi(argv[21])}};
-  std::array<int, 2> inverse{{std::stoi(argv[22]), std::stoi(argv[23])}};
-  const int agreement = std::stoi(argv[24]);
-  const int coin = std::stoi(argv[25]);
-  const int ready_fd = std::stoi(argv[26]);
+  std::array<int, 2> score{{std::stoi(argv[15]), std::stoi(argv[16])}};
+  std::array<int, 2> forward{{std::stoi(argv[17]), std::stoi(argv[18])}};
+  std::array<int, 4> select{{std::stoi(argv[19]), std::stoi(argv[20]),
+                             std::stoi(argv[21]), std::stoi(argv[22])}};
+  std::array<int, 2> inverse{{std::stoi(argv[23]), std::stoi(argv[24])}};
+  const int agreement = std::stoi(argv[25]);
+  const int coin = std::stoi(argv[26]);
+  const int ready_fd = std::stoi(argv[27]);
   auto raw = decode_raw_share(read_bytes(argv[8]), n);
   const auto ready = exchange_ready(ready_fd, c);
   auto result = protocol_i_bmw16_experimental_raw_score_mask_party(

@@ -32,6 +32,9 @@ class ProtocolIBmw16StreamedUcmpSlotWriter {
   void append(const ProtocolIBmw16MaterialSlot& slot,
               const ProtocolIUcmpPartyMaterial& key);
   ProtocolIBmw16StreamStoreStats finalize();
+  // Keep the no-clobber published sidecar only after the pair-ready marker is
+  // durably published. Until then the writer removes only the inode it made.
+  void commit_published() noexcept { committed_ = true; }
 
  private:
   int fd_ = -1;
@@ -43,8 +46,11 @@ class ProtocolIBmw16StreamedUcmpSlotWriter {
   std::uint8_t party_ = 0;
   std::uint32_t key_bytes_ = 0, record_bytes_ = 0;
   std::uint64_t expected_slots_ = 0, written_slots_ = 0, plaintext_bytes_ = 0;
+  std::uint64_t temporary_device_ = 0, temporary_inode_ = 0;
+  std::uint64_t published_device_ = 0, published_inode_ = 0;
   void* digest_context_ = nullptr;
-  bool finalized_ = false;
+  bool finalized_ = false, published_ = false, committed_ = false;
+  void rollback_owned_files() noexcept;
 };
 
 // Legacy adapter retained for differential tests. It serializes an already

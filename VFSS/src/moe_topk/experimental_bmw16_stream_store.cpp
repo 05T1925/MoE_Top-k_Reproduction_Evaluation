@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <limits>
@@ -208,6 +209,19 @@ void validate_config(const ProtocolIBmw16ExperimentalPartyConfig& c, std::uint8_
     throw std::invalid_argument("BMW16 stream dimensions");
 }
 
+bool same_file_at(const std::string& path, std::uint64_t device,
+                  std::uint64_t inode) noexcept {
+  struct stat st{};
+  return !path.empty() && ::lstat(path.c_str(), &st) == 0 && S_ISREG(st.st_mode) &&
+      static_cast<std::uint64_t>(st.st_dev) == device &&
+      static_cast<std::uint64_t>(st.st_ino) == inode;
+}
+
+bool injected_failure(const std::string& point) {
+  const char* configured = std::getenv("MOE_BMW16_TEST_FAILPOINT");
+  return configured && point == configured;
+}
+
 std::uint64_t expected_slot_count(const ProtocolIBmw16ExperimentalPartyConfig& c) {
   const auto p = pair_count(c.n);
   if (p > std::numeric_limits<std::uint64_t>::max() / 9U) throw std::overflow_error("BMW16 stream slots");
@@ -263,6 +277,11 @@ ProtocolIBmw16StreamedUcmpSlotWriter::ProtocolIBmw16StreamedUcmpSlotWriter(
   if (fd < 0) throw std::runtime_error("BMW16 stream writer pending file create");
   fd_ = fd;
   try {
+    struct stat temporary_stat{};
+    require(::fstat(fd_, &temporary_stat) == 0 && S_ISREG(temporary_stat.st_mode),
+            "BMW16 stream writer pending file identity");
+    temporary_device_ = static_cast<std::uint64_t>(temporary_stat.st_dev);
+    temporary_inode_ = static_cast<std::uint64_t>(temporary_stat.st_ino);
     auto* digest = EVP_MD_CTX_new();
     if (!digest || EVP_DigestInit_ex(digest, EVP_sha256(), nullptr) != 1) {
       if (digest) EVP_MD_CTX_free(digest);
@@ -284,8 +303,22 @@ ProtocolIBmw16StreamedUcmpSlotWriter::ProtocolIBmw16StreamedUcmpSlotWriter(
 ProtocolIBmw16StreamedUcmpSlotWriter::~ProtocolIBmw16StreamedUcmpSlotWriter() {
   if (fd_ >= 0) ::close(fd_);
   if (digest_context_) EVP_MD_CTX_free(static_cast<EVP_MD_CTX*>(digest_context_));
-  if (!finalized_ && !temporary_path_.empty()) ::unlink(temporary_path_.c_str());
+  rollback_owned_files();
   OPENSSL_cleanse(data_key_.data(), data_key_.size());
+}
+
+void ProtocolIBmw16StreamedUcmpSlotWriter::rollback_owned_files() noexcept {
+  if (temporary_device_ && temporary_inode_ &&
+      same_file_at(temporary_path_, temporary_device_, temporary_inode_))
+    (void)::unlink(temporary_path_.c_str());
+  if (published_ && !committed_ && published_device_ && published_inode_ &&
+      same_file_at(final_path_, published_device_, published_inode_)) {
+    (void)::unlink(final_path_.c_str());
+    const auto parent = std::filesystem::path(final_path_).parent_path();
+    const auto dir = parent.empty() ? std::string(".") : parent.string();
+    const int dfd = ::open(dir.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+    if (dfd >= 0) { (void)::fsync(dfd); (void)::close(dfd); }
+  }
 }
 
 void ProtocolIBmw16StreamedUcmpSlotWriter::append(
@@ -325,16 +358,25 @@ ProtocolIBmw16StreamStoreStats ProtocolIBmw16StreamedUcmpSlotWriter::finalize() 
           file_digest.data(), &digest_size) == 1 && digest_size == file_digest.size(),
           "BMW16 stream writer SHA-256 final");
   EVP_MD_CTX_free(static_cast<EVP_MD_CTX*>(digest_context_)); digest_context_ = nullptr;
+  struct stat temporary_stat{};
+  require(::fstat(fd_, &temporary_stat) == 0 && S_ISREG(temporary_stat.st_mode),
+          "BMW16 stream writer pending inode before publish");
+  temporary_device_ = static_cast<std::uint64_t>(temporary_stat.st_dev);
+  temporary_inode_ = static_cast<std::uint64_t>(temporary_stat.st_ino);
   const bool closed = ::close(fd_) == 0; fd_ = -1;
   require(closed, "BMW16 stream writer close");
   if (::link(temporary_path_.c_str(), final_path_.c_str()) != 0)
     throw std::runtime_error("BMW16 stream writer no-replace publish");
+  published_device_ = temporary_device_;
+  published_inode_ = temporary_inode_;
+  published_ = true;
   require(::unlink(temporary_path_.c_str()) == 0, "BMW16 stream writer pending unlink");
   const auto parent = std::filesystem::path(final_path_).parent_path();
   const auto dir = parent.empty() ? std::string(".") : parent.string();
   const int dfd = ::open(dir.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
   require(dfd >= 0, "BMW16 stream writer directory open");
-  const bool synced = ::fsync(dfd) == 0; ::close(dfd);
+  const auto failpoint = std::string("sidecar") + std::to_string(party_) + "_dir_fsync";
+  const bool synced = !injected_failure(failpoint) && ::fsync(dfd) == 0; ::close(dfd);
   require(synced, "BMW16 stream writer directory fsync");
   finalized_ = true;
   ProtocolIBmw16StreamStoreStats stats;

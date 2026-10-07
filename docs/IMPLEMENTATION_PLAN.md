@@ -318,6 +318,8 @@ M6A 完成两种路线的性能验收后，再进入 M6B 依赖实现及正式�
 
 资料核对、明文算法 oracle 和不依赖未冻结接口的设计可以提前开展。
 
+用户在 S10 后又逐项明确授权将 BMW16-derived Select 的隔离 EXPERIMENTAL 代码研发提前；S19 属于该授权下的复核、发布修复和有界功能验证。此授权不改正式顺序：M6A、V3/V4 门禁与同口径正式性能矩阵状态不提前标记完成，也不把 S19 冒烟数字写入正式比较表。
+
 ### 3.5 性能状态与失败配置
 
 每个配置区分：
@@ -757,6 +759,8 @@ S11 在 S10 后新增 C++ `EXPERIMENTAL` 全链 party 函数与 T 的输入无�
 S12 在 S11 原 C++ party API 上完成本机三进程实验路径：T 使用公开参数预发 party-only AES-GCM bundles 并在 raw input shares 产生前退出；P0/P1 以 UID 22012/22013 运行，使用正式 raw adapter、真实 Protocol I shuffle/uCMP/DCF、C++ 四层控制、membership、逆路由和 mask shares。52/53 次 E2E 为成功并通过 oracle；失败的 1/53 是显式注入 abort，不观察到自然 abort。外部共同 tape 对 n=2..8 所有 K 共 35 条 C++/S4 控制轨迹通过。bundle 与 slot claim 通过本地测试负例，但 recipient credential provisioning 与跨主机认证交付未实现；实际 shuffle 与相关整池 FSS/DCF 自适应联合模拟仍 NO-GO。完整源码仍 opt-in 且明确 `EXPERIMENTAL`，无 secure API；此提前研发不改变 V3→V4 正式验收顺序，也不启动性能矩阵。见 [S12 决策](decisions/BMW16_S12_THREE_PROCESS_MATERIAL_AND_PARTY_VIEW_GATE_2026-10-06.md)、[S12 实施/验证报告](reproduction/BMW16_S12_IMPLEMENTATION_AND_VALIDATION_2026-10-06.md)。
 
 S13 独立接收 S12 `646f71c`，修正 party API 对意外异常的宽泛吞错、transport/material 字符串分类和 runner 的 `return 0` abort 问题；结构化状态与 exit code 对齐，启动器验证退出码、双方报告、状态 scope 和 mask 文件。独立复建 S12 的 52 SUCCESS/1 注入 abort 与 39 tape matrix 均复现；本轮加双 bundle 篡改、错误 API 输入、peer close 负例。实验计量显示 n=64 单次约 8.95 s API 时间主要由 5,935 次持久 slot claim callback 的 fdatasync/目录 fsync 路径占用；FSS Eval 和网络交换均为毫秒级。本次另给 n=64..1e6 checked-arithmetic 全池下界，n=128 仍因当前硬 cap 和缺少完整验证未运行。复合联合安全第一个失败步骤是共享节点 mask 相关的完整 DCF key pool（含未用槽）、shuffle 辅助状态与自适应 Eval transcript 的 H0→H1 simulator 缺失；当前仍 NO-GO、EXPERIMENTAL、不开始 V4。见 [S13 决策](decisions/BMW16_S13_RECEIVE_EXECUTION_EVIDENCE_SECURITY_CAPACITY_GATE_2026-10-06.md) 与 [S13 报告](reproduction/BMW16_S13_INDEPENDENT_ACCEPTANCE_VALIDATION_2026-10-06.md)。
+
+S14–S18 决策与验证细节见各自 dated 文档。S18 将原全池内存路径改为逐槽流式离线 KeyGen 与 sidecar 随机读取，并在其源码上完成 n=1000/K=80 路径；但多文件 no-clobber 发布及失败重试合同仍需后续修复。S19（2026-10-07）接收 S18 精确提交 `9e25411027a01bcf47b9c316e3c463c2f7c72127`，从其 tree 在隔离分支重建；将 bundle shell 发布改为 no-clobber 并按 inode 只清理本次拥有产物，增加绑定双方 shell manifest 的 paired-ready marker、要求 launcher 等待 T exit 0 后才启动 parties，以及相应普通失败/崩溃/既存文件/同 session 重试注入。TEST_ONLY 三进程通过 n=1/2/5/8/64/128/256 和 n=1000/K=80 冻结 oracle；S4/C++ common-tape 本轮 39 条 n≤8 和 2 条 n=256 轨迹通过。全部结果为本地 WSL/有限样本，非性能验收。当前候选仍 `PROJECT_DERIVED / EXPERIMENTAL`：相关阈值的整池、输出感知、自适应多 key DCF simulator（H1→H2）先缺，Protocol I shuffle/inverse/output share 联合 simulator 随后缺；候选匿名 transcript 泄露尚未由所有者批准，生产 party 凭据及跨主机私有认证交付也未实现。正式 V4 五次 LAN/WAN 矩阵与六方案排序 `NOT_RUN`。见 [S19 决策](decisions/BMW16_S19_PUBLICATION_RETRY_AND_PARTY_VIEW_DECISION_2026-10-07.md)、[验证报告](reproduction/BMW16_S19_INDEPENDENT_ACCEPTANCE_AND_PUBLICATION_FAULT_REPORT_2026-10-07.md) 与[外部证据索引](reproduction/evidence/BMW16_S19_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。
 
 #### 前置条件
 
