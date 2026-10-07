@@ -36,24 +36,52 @@ std::uint64_t elapsed_us(SteadyClock::time_point start) {
 std::uint64_t find_slot_id(const ProtocolIBmw16ExperimentalPartyMaterial& material,
     ProtocolIBmw16MaterialStage stage, std::uint8_t task, std::uint8_t round,
     std::uint32_t left, std::uint32_t right) {
-  const auto it = std::find_if(material.slot_manifest.begin(), material.slot_manifest.end(),
-      [&](const auto& s) { return s.stage==stage&&s.task==task&&s.round==round&&s.left==left&&s.right==right; });
-  if(it==material.slot_manifest.end())throw ProtocolIBmw16ExpectedFailure(
-      ProtocolIBmw16ExpectedFailureKind::Material,"BMW16 slot not in authenticated manifest");
-  return it->id;
+  if (!material.slot_manifest.empty()) {
+    const auto it = std::find_if(material.slot_manifest.begin(), material.slot_manifest.end(),
+        [&](const auto& s) { return s.stage==stage&&s.task==task&&s.round==round&&s.left==left&&s.right==right; });
+    if(it==material.slot_manifest.end())throw ProtocolIBmw16ExpectedFailure(
+        ProtocolIBmw16ExpectedFailureKind::Material,"BMW16 slot not in authenticated manifest");
+    return it->id;
+  }
+  const auto n=material.forward_shuffle.n;
+  const auto padded=material.score_input.n;
+  if(stage==ProtocolIBmw16MaterialStage::RawCarry&&task==0xff&&round==0&&left==right&&left<padded)
+    return left;
+  if(stage==ProtocolIBmw16MaterialStage::RawSign&&task==0xff&&round==0&&left==right&&left<padded)
+    return static_cast<std::uint64_t>(padded)+left;
+  if(stage==ProtocolIBmw16MaterialStage::ForwardShuffle&&task==0xff&&round==0&&left==0&&right+1U==n)
+    return static_cast<std::uint64_t>(2U)*padded;
+  if(stage==ProtocolIBmw16MaterialStage::InverseShuffle&&task==0xff&&round==0&&left==0&&right+1U==n)
+    return static_cast<std::uint64_t>(2U)*padded+1U;
+  if(n<2||left>=n||right>=n||left==right)
+    throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                        "BMW16 streamed slot endpoint");
+  const auto lo=std::min(left,right),hi=std::max(left,right);
+  const auto pair_count=static_cast<std::uint64_t>(n)*(n-1U)/2U;
+  const auto pair_index=static_cast<std::uint64_t>(lo)*n-
+      static_cast<std::uint64_t>(lo)*(lo+1U)/2U+(hi-lo-1U);
+  const auto base=static_cast<std::uint64_t>(2U)*padded+2U;
+  if(stage==ProtocolIBmw16MaterialStage::Select&&task<2&&round>=1&&round<=4)
+    return base+(static_cast<std::uint64_t>(task)*4U+round-1U)*pair_count+pair_index;
+  if(stage==ProtocolIBmw16MaterialStage::Membership)
+    return base+8U*pair_count+pair_index;
+  throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                      "BMW16 streamed slot tuple");
 }
 
-void claim_slot(ProtocolIBmw16ExperimentalPartyMaterial& material,
+std::uint64_t claim_slot(ProtocolIBmw16ExperimentalPartyMaterial& material,
     ProtocolIBmw16MaterialStage stage,std::uint8_t task,std::uint8_t round,
     std::uint32_t left,std::uint32_t right,ProtocolIBmw16ExperimentalMetrics& metrics) {
-  if(!material.process_slot_claim_once)return;
   const auto lookup_start=SteadyClock::now();
   const auto slot=find_slot_id(material,stage,task,round,left,right);
   metrics.slot_lookup_time_us+=elapsed_us(lookup_start);
-  const auto claim_start=SteadyClock::now();
-  material.process_slot_claim_once(slot);
-  metrics.process_slot_claim_time_us+=elapsed_us(claim_start);
-  ++metrics.process_slots_claimed;
+  if(material.process_slot_claim_once) {
+    const auto claim_start=SteadyClock::now();
+    material.process_slot_claim_once(slot);
+    metrics.process_slot_claim_time_us+=elapsed_us(claim_start);
+    ++metrics.process_slots_claimed;
+  }
+  return slot;
 }
 
 struct Item {
@@ -355,21 +383,29 @@ struct Runtime {
         const CacheKey ck{batch->task, lo, hi};
         auto it = cache.find(ck);
         if (it == cache.end()) {
-          const auto slot = pair_index(c.n, lo, hi);
-          auto& pool = m.select_keys[batch->task][round - 1];
-          if (pool.size() != static_cast<std::size_t>(c.n) * (c.n - 1U) / 2U)
-            throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
-                                                "Select offline pool coverage");
-          auto& key = pool.at(slot);
-          if (key.party_id() != c.party || key.comparison_bits() != c.comparison_bits)
+          const auto material_slot=claim_slot(m,ProtocolIBmw16MaterialStage::Select,
+              static_cast<std::uint8_t>(batch->task),static_cast<std::uint8_t>(round),lo,hi,metrics);
+          ProtocolIUcmpPartyMaterial streamed_key;
+          ProtocolIUcmpPartyMaterial* key=nullptr;
+          if(m.load_ucmp_slot) {
+            streamed_key=m.load_ucmp_slot({material_slot,ProtocolIBmw16MaterialStage::Select,
+                static_cast<std::uint8_t>(batch->task),static_cast<std::uint8_t>(round),lo,hi});
+            key=&streamed_key;
+          } else {
+            const auto index=pair_index(c.n,lo,hi);
+            auto& pool=m.select_keys[batch->task][round-1];
+            if(pool.size()!=static_cast<std::size_t>(c.n)*(c.n-1U)/2U)
+              throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
+                                                  "Select offline pool coverage");
+            key=&pool.at(index);
+          }
+          if (key->party_id() != c.party || key->comparison_bits() != c.comparison_bits)
             throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
                                                 "Select offline key binding");
-          claim_slot(m, ProtocolIBmw16MaterialStage::Select,
-              static_cast<std::uint8_t>(batch->task), static_cast<std::uint8_t>(round), lo, hi, metrics);
           const auto offset = static_cast<std::uint64_t>(low_pad + 1U);
           const auto eval_start=SteadyClock::now();
-          const auto value = key.eval_strict_lt((z[lo] + offset) & ring_mask,
-                                                (z[hi] + offset) & ring_mask);
+          const auto value = key->eval_strict_lt((z[lo] + offset) & ring_mask,
+                                                 (z[hi] + offset) & ring_mask);
           metrics.select_eval_time_us[round-1]+=elapsed_us(eval_start);
           it = cache.emplace(ck, value).first;
           ++metrics.unique_select_slots_consumed[round - 1];
@@ -884,16 +920,25 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
     for (std::uint32_t i = 0; i < c.n; ++i) {
       if (i == chosen) { membership[i] = c.party == 0 ? 1U : 0U; continue; }
       const auto lo = std::min<ItemId>(i, chosen), hi = std::max<ItemId>(i, chosen);
-      const auto slot = Runtime::pair_index(c.n, lo, hi);
-      if(slot>=material.membership_keys.size())throw ProtocolIBmw16ExpectedFailure(
-          ProtocolIBmw16ExpectedFailureKind::Material,"membership offline pool coverage");
-      auto& key = material.membership_keys[slot];
-      if (key.party_id() != c.party || key.comparison_bits() != c.comparison_bits)
+      const auto material_slot=claim_slot(material,ProtocolIBmw16MaterialStage::Membership,
+          0xff,1,lo,hi,output.metrics);
+      ProtocolIUcmpPartyMaterial streamed_key;
+      ProtocolIUcmpPartyMaterial* key=nullptr;
+      if(material.load_ucmp_slot) {
+        streamed_key=material.load_ucmp_slot({material_slot,ProtocolIBmw16MaterialStage::Membership,
+            0xff,1,lo,hi});
+        key=&streamed_key;
+      } else {
+        const auto slot=Runtime::pair_index(c.n,lo,hi);
+        if(slot>=material.membership_keys.size())throw ProtocolIBmw16ExpectedFailure(
+            ProtocolIBmw16ExpectedFailureKind::Material,"membership offline pool coverage");
+        key=&material.membership_keys[slot];
+      }
+      if (key->party_id() != c.party || key->comparison_bits() != c.comparison_bits)
         throw ProtocolIBmw16ExpectedFailure(ProtocolIBmw16ExpectedFailureKind::Material,
                                             "membership material binding");
-      claim_slot(material,ProtocolIBmw16MaterialStage::Membership,0xff,1,lo,hi,output.metrics);
       const auto eval_start=SteadyClock::now();
-      auto share = key.eval_strict_lt(public_z[lo], public_z[hi]);
+      auto share = key->eval_strict_lt(public_z[lo], public_z[hi]);
       output.metrics.membership_eval_time_us+=elapsed_us(eval_start);
       ++output.metrics.membership_slots_consumed;
       ++output.metrics.ucmp_party_evaluations; output.metrics.dcf_party_evaluations += 2U;

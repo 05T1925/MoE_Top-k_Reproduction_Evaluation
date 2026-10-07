@@ -24,7 +24,8 @@ namespace {
 constexpr std::size_t kMaxBundleBytes = 512U * 1024U * 1024U;
 constexpr std::size_t kTagBytes = 16;
 constexpr std::size_t kNonceBytes = 12;
-constexpr std::size_t kHeaderBytes = 100;
+constexpr std::size_t kHeaderV2Bytes = 100;
+constexpr std::size_t kHeaderV3Bytes = 116;
 constexpr std::array<std::uint8_t, 8> kEnvelopeMagic{'B','M','W','1','6','S','1','4'};
 constexpr std::array<std::uint8_t, 8> kPayloadMagic{'B','M','W','1','6','P','1','4'};
 using Digest = std::array<std::uint8_t, 32>;
@@ -220,10 +221,14 @@ ProtocolIBmw16ExperimentalPartyMaterial decode_payload(const ProtocolIBmw16Exper
 
 std::vector<std::uint8_t> make_header(const ProtocolIBmw16ExperimentalPartyConfig& c,
     std::uint8_t party,const Digest& digest,const Nonce& nonce,std::uint64_t plain_len) {
-  Writer w;w.raw(kEnvelopeMagic.data(),kEnvelopeMagic.size());w.u32(2);w.u8(party);w.u8(0);w.u8(0);w.u8(0);
+  const bool root_bound = c.claim_root_device != 0 && c.claim_root_inode != 0;
+  if ((c.claim_root_device == 0) != (c.claim_root_inode == 0))
+    throw std::invalid_argument("BMW16 partial claim-root identity");
+  Writer w;w.raw(kEnvelopeMagic.data(),kEnvelopeMagic.size());w.u32(root_bound ? 3U : 2U);w.u8(party);w.u8(0);w.u8(0);w.u8(0);
   w.u64(c.session);w.u64(c.fingerprint);w.u32(c.n);w.u32(c.k);w.u32(c.padded_n);w.u8(c.index_bits);w.u8(c.comparison_bits);w.u8(0);w.u8(0);
   w.raw(digest.data(),digest.size());w.raw(nonce.data(),nonce.size());w.u64(plain_len);
-  check(w.bytes.size()==kHeaderBytes,"BMW16 envelope header size");return std::move(w.bytes);
+  if (root_bound) { w.u64(c.claim_root_device); w.u64(c.claim_root_inode); }
+  check(w.bytes.size()==(root_bound?kHeaderV3Bytes:kHeaderV2Bytes),"BMW16 envelope header size");return std::move(w.bytes);
 }
 
 std::vector<std::uint8_t> encrypt(const Key& key,const Nonce& nonce,const std::vector<std::uint8_t>& aad,const std::vector<std::uint8_t>& plain) {
@@ -277,19 +282,41 @@ std::vector<std::uint8_t> protocol_i_bmw16_bundle_seal_party(
 ProtocolIBmw16ExperimentalPartyMaterial protocol_i_bmw16_bundle_open_party(
     const ProtocolIBmw16ExperimentalPartyConfig& expected,std::uint8_t party,
     const std::vector<std::uint8_t>& envelope,const Key& key,ProtocolIBmw16BundleStats* stats) {
-  validate_config(expected,party);if(envelope.size()<kHeaderBytes+kTagBytes||envelope.size()>kMaxBundleBytes)throw std::runtime_error("BMW16 envelope length");
-  const std::vector<std::uint8_t> header_bytes(envelope.begin(),envelope.begin()+kHeaderBytes);Reader h(header_bytes);
-  if(h.raw(kEnvelopeMagic.size())!=std::vector<std::uint8_t>(kEnvelopeMagic.begin(),kEnvelopeMagic.end())||h.u32()!=2)throw std::runtime_error("BMW16 envelope version");
+  validate_config(expected,party);if(envelope.size()<kHeaderV2Bytes+kTagBytes||envelope.size()>kMaxBundleBytes)throw std::runtime_error("BMW16 envelope length");
+  const std::vector<std::uint8_t> base_header(envelope.begin(),envelope.begin()+kHeaderV2Bytes);Reader base(base_header);
+  if(base.raw(kEnvelopeMagic.size())!=std::vector<std::uint8_t>(kEnvelopeMagic.begin(),kEnvelopeMagic.end()))throw std::runtime_error("BMW16 envelope magic");
+  const auto version=base.u32();if(version!=2&&version!=3)throw std::runtime_error("BMW16 envelope version");
+  const auto header_size=version==3?kHeaderV3Bytes:kHeaderV2Bytes;
+  if(envelope.size()<header_size+kTagBytes)throw std::runtime_error("BMW16 envelope v3 length");
+  Reader h(base_header);
+  (void)h.raw(kEnvelopeMagic.size());(void)h.u32();
   const auto got_party=h.u8();(void)h.u8();(void)h.u8();(void)h.u8();const auto session=h.u64(),fingerprint=h.u64();const auto n=h.u32(),k=h.u32(),padded=h.u32();const auto index=h.u8(),bits=h.u8();(void)h.u8();(void)h.u8();
   Digest digest{};auto d=h.raw(digest.size());std::copy(d.begin(),d.end(),digest.begin());Nonce nonce{};auto no=h.raw(nonce.size());std::copy(no.begin(),no.end(),nonce.begin());const auto plain_len=h.u64();h.done();
-  if(got_party!=party||session!=expected.session||fingerprint!=expected.fingerprint||n!=expected.n||k!=expected.k||padded!=expected.padded_n||index!=expected.index_bits||bits!=expected.comparison_bits||plain_len!=envelope.size()-kHeaderBytes-kTagBytes)throw std::runtime_error("BMW16 envelope identity mismatch");
-  const std::vector<std::uint8_t> header(envelope.begin(),envelope.begin()+kHeaderBytes), encrypted(envelope.begin()+kHeaderBytes,envelope.end());
+  std::uint64_t root_device=0,root_inode=0;
+  if(version==3){
+    const std::vector<std::uint8_t> root_bytes(envelope.begin()+kHeaderV2Bytes,envelope.begin()+kHeaderV3Bytes);
+    Reader root_header(root_bytes);
+    root_device=root_header.u64();root_inode=root_header.u64();root_header.done();
+  }
+  if(got_party!=party)throw std::runtime_error("BMW16 envelope party mismatch");
+  if(session!=expected.session)throw std::runtime_error("BMW16 envelope session mismatch");
+  if(fingerprint!=expected.fingerprint)throw std::runtime_error("BMW16 envelope fingerprint mismatch");
+  if(n!=expected.n||k!=expected.k||padded!=expected.padded_n||index!=expected.index_bits||bits!=expected.comparison_bits)
+    throw std::runtime_error("BMW16 envelope parameter mismatch");
+  if(plain_len!=envelope.size()-header_size-kTagBytes)throw std::runtime_error("BMW16 envelope payload length mismatch");
+  if(version==2&&(expected.claim_root_device!=0||expected.claim_root_inode!=0))
+    throw std::runtime_error("BMW16 unbound envelope rejected for persistent claim root");
+  if(version==3&&(root_device==0||root_inode==0||root_device!=expected.claim_root_device||root_inode!=expected.claim_root_inode))
+    throw std::runtime_error("BMW16 envelope claim-root identity mismatch got="+
+        std::to_string(root_device)+":"+std::to_string(root_inode)+" expected="+
+        std::to_string(expected.claim_root_device)+":"+std::to_string(expected.claim_root_inode));
+  const std::vector<std::uint8_t> header(envelope.begin(),envelope.begin()+header_size), encrypted(envelope.begin()+header_size,envelope.end());
   auto plain=decrypt(key,nonce,header,encrypted);
   // Validate the authenticated manifest digest before constructing any key objects.
   Reader r(plain);(void)r.raw(kPayloadMagic.size());(void)r.u32();(void)r.u64();(void)r.u64();(void)r.u8();(void)r.u32();(void)r.u32();(void)r.u32();(void)r.u8();(void)r.u8();
   auto manifest=r.blob();if(sha256(manifest)!=digest)throw std::runtime_error("BMW16 authenticated manifest digest mismatch");
   const auto slots=enumerate_slots(expected);auto material=decode_payload(expected,party,plain,slots);material.slot_manifest=slots;
-  if(stats){stats->plaintext_bytes=plain.size();stats->manifest_bytes=manifest.size();stats->ciphertext_bytes=encrypted.size();stats->envelope_bytes=envelope.size();stats->authenticated_metadata_bytes=kHeaderBytes+kTagBytes;stats->slot_count=slots.size();stats->manifest_sha256=digest;}
+  if(stats){stats->plaintext_bytes=plain.size();stats->manifest_bytes=manifest.size();stats->ciphertext_bytes=encrypted.size();stats->envelope_bytes=envelope.size();stats->authenticated_metadata_bytes=header_size+kTagBytes;stats->slot_count=slots.size();stats->manifest_sha256=digest;}
   return material;
 }
 
@@ -312,12 +339,35 @@ std::vector<std::uint8_t> protocol_i_bmw16_bundle_read(const std::string& path) 
   ::close(fd);return bytes;
 }
 
-ProtocolIBmw16PersistentClaimStore::ProtocolIBmw16PersistentClaimStore(const std::string& directory,std::uint64_t session,std::uint8_t party)
-    :session_(session),party_(party){if(!session||party>1)throw std::invalid_argument("BMW16 claim identity");directory_fd_=::open(directory.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);if(directory_fd_<0)throw std::runtime_error("BMW16 claim directory");struct stat st{};if(::fstat(directory_fd_,&st)!=0||!S_ISDIR(st.st_mode)||(st.st_mode&077)!=0){::close(directory_fd_);directory_fd_=-1;throw std::runtime_error("BMW16 claim directory permissions");}}
-ProtocolIBmw16PersistentClaimStore::ProtocolIBmw16PersistentClaimStore(ProtocolIBmw16PersistentClaimStore&& x) noexcept:directory_fd_(x.directory_fd_),session_(x.session_),party_(x.party_){x.directory_fd_=-1;}
-ProtocolIBmw16PersistentClaimStore& ProtocolIBmw16PersistentClaimStore::operator=(ProtocolIBmw16PersistentClaimStore&& x) noexcept {if(this!=&x){if(directory_fd_>=0)::close(directory_fd_);directory_fd_=x.directory_fd_;session_=x.session_;party_=x.party_;x.directory_fd_=-1;}return *this;}
+ProtocolIBmw16ClaimRootIdentity protocol_i_bmw16_claim_root_identity(const std::string& directory) {
+  const int fd=::open(directory.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
+  if(fd<0)throw std::runtime_error("BMW16 claim-root identity open");
+  struct stat st{};const bool okay=::fstat(fd,&st)==0&&S_ISDIR(st.st_mode);
+  ::close(fd);if(!okay)throw std::runtime_error("BMW16 claim-root identity stat");
+  return {static_cast<std::uint64_t>(st.st_dev),static_cast<std::uint64_t>(st.st_ino)};
+}
+
+ProtocolIBmw16PersistentClaimStore::ProtocolIBmw16PersistentClaimStore(
+    const std::string& directory,std::uint64_t session,std::uint8_t party,
+    ProtocolIBmw16ClaimRootIdentity expected_root)
+    :session_(session),party_(party){
+  if(!session||party>1||(expected_root.device==0)!=(expected_root.inode==0))
+    throw std::invalid_argument("BMW16 claim identity");
+  directory_fd_=::open(directory.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
+  if(directory_fd_<0)throw std::runtime_error("BMW16 claim directory");
+  struct stat st{};
+  if(::fstat(directory_fd_,&st)!=0||!S_ISDIR(st.st_mode)||(st.st_mode&077)!=0){
+    ::close(directory_fd_);directory_fd_=-1;throw std::runtime_error("BMW16 claim directory permissions");
+  }
+  root_={static_cast<std::uint64_t>(st.st_dev),static_cast<std::uint64_t>(st.st_ino)};
+  if(expected_root.device!=0&&(root_.device!=expected_root.device||root_.inode!=expected_root.inode)){
+    ::close(directory_fd_);directory_fd_=-1;throw std::runtime_error("BMW16 claim root identity mismatch");
+  }
+}
+ProtocolIBmw16PersistentClaimStore::ProtocolIBmw16PersistentClaimStore(ProtocolIBmw16PersistentClaimStore&& x) noexcept:directory_fd_(x.directory_fd_),session_(x.session_),party_(x.party_),root_(x.root_){x.directory_fd_=-1;}
+ProtocolIBmw16PersistentClaimStore& ProtocolIBmw16PersistentClaimStore::operator=(ProtocolIBmw16PersistentClaimStore&& x) noexcept {if(this!=&x){if(directory_fd_>=0)::close(directory_fd_);directory_fd_=x.directory_fd_;session_=x.session_;party_=x.party_;root_=x.root_;x.directory_fd_=-1;}return *this;}
 ProtocolIBmw16PersistentClaimStore::~ProtocolIBmw16PersistentClaimStore(){if(directory_fd_>=0)::close(directory_fd_);}
-void ProtocolIBmw16PersistentClaimStore::claim_bundle(const Digest& digest){Writer w;w.u64(session_);w.u8(party_);w.raw(digest.data(),digest.size());durable_marker(directory_fd_,"bundle-"+std::to_string(session_)+".claim",w.bytes);}
+void ProtocolIBmw16PersistentClaimStore::claim_bundle(const Digest& digest){Writer w;w.u64(session_);w.u8(party_);w.u64(root_.device);w.u64(root_.inode);w.raw(digest.data(),digest.size());durable_marker(directory_fd_,"bundle-"+std::to_string(session_)+".claim",w.bytes);}
 
 ProtocolIBmw16ProcessSlotClaimSet::ProtocolIBmw16ProcessSlotClaimSet()
     : owner_process_id_(static_cast<std::uint64_t>(::getpid())) {}

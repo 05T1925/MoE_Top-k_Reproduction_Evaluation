@@ -161,6 +161,23 @@ void run_material_negative_tests() {
   auto changed=b0;changed.back()^=1;expect_reject("ciphertext_or_slot_manifest_tamper",[&]{(void)protocol_i_bmw16_bundle_open_party(cfg0,0,changed,k0);});
   auto wrong_width=cfg0;++wrong_width.comparison_bits;expect_reject("wrong_comparison_width",[&]{(void)protocol_i_bmw16_bundle_open_party(wrong_width,0,b0,k0);});
 
+  const auto root_case=fs::path("/tmp")/("bmw16-s17-root-bind-"+std::to_string(::getpid()));
+  require(::mkdir(root_case.c_str(),0700)==0,"root-bind test mkdir");
+  require(::mkdir((root_case/"claims-a").c_str(),0700)==0&&::mkdir((root_case/"claims-b").c_str(),0700)==0,
+          "root-bind claim-root mkdir");
+  auto bound=cfg0;
+  const auto id_a=protocol_i_bmw16_claim_root_identity((root_case/"claims-a").string());
+  const auto id_b=protocol_i_bmw16_claim_root_identity((root_case/"claims-b").string());
+  bound.claim_root_device=id_a.device;bound.claim_root_inode=id_a.inode;
+  const auto bound_bundle=protocol_i_bmw16_bundle_seal_party(bound,0,pair.party0,k0);
+  auto wrong_root=bound;wrong_root.claim_root_device=id_b.device;wrong_root.claim_root_inode=id_b.inode;
+  expect_reject("bundle_copy_to_different_claim_root",[&]{(void)protocol_i_bmw16_bundle_open_party(wrong_root,0,bound_bundle,k0);});
+  expect_reject("wrong_claim_root_store_identity",[&]{
+    ProtocolIBmw16PersistentClaimStore store((root_case/"claims-b").string(),bound.session,0,id_a);
+    (void)store;
+  });
+  std::error_code root_ec;fs::remove_all(root_case,root_ec);
+
   const auto claimdir=fs::path("/tmp")/("bmw16-s14-claim-"+std::to_string(::getpid()));
   require(::mkdir(claimdir.c_str(),0700)==0,"claim negative mkdir");
   {
@@ -231,6 +248,16 @@ int run_dealer(int argc,char** argv) {
   // T gets public n/K/session metadata plus recipient delivery credentials, never input shares.
   require(argc==7,"dealer args");const fs::path root=argv[2];Case t{{},static_cast<std::uint32_t>(std::stoul(argv[4])),std::stoull(argv[5]),std::stoi(argv[6])!=0};
   t.scores.resize(static_cast<std::size_t>(std::stoul(argv[3])));std::array<ProtocolIBmw16ExperimentalPartyConfig,2> c{config_for(t,0),config_for(t,1)};
+  if(c[0].n>1)for(int p=0;p<2;++p){
+    const auto root_id=protocol_i_bmw16_claim_root_identity((root/(p?"p1":"p0")/"claims").string());
+    c[p].claim_root_device=root_id.device;c[p].claim_root_inode=root_id.inode;
+  }
+  if(c[0].n>1){
+    c[0].claim_root_device=protocol_i_bmw16_claim_root_identity((root/"p0"/"claims").string()).device;
+    c[0].claim_root_inode=protocol_i_bmw16_claim_root_identity((root/"p0"/"claims").string()).inode;
+    c[1].claim_root_device=protocol_i_bmw16_claim_root_identity((root/"p1"/"claims").string()).device;
+    c[1].claim_root_inode=protocol_i_bmw16_claim_root_identity((root/"p1"/"claims").string()).inode;
+  }
   if(c[0].n==1){std::ofstream report(root/"dealer.metrics",std::ios::trunc);report<<"singleton_no_material=true\ngeneration_us=0\nseal_us=0\ndelivery_us=0\noffline_total_us=0\npeak_rss_kb="<<peak_rss_kb()<<"\n";return 0;}
   const auto start=std::chrono::steady_clock::now();
   resetDcfPrgCallCounts();
@@ -279,7 +306,11 @@ int run_party(int argc,char** argv) {
   std::array<int,kChannelCount> fd{};for(std::size_t i=0;i<fd.size();++i)fd[i]=std::stoi(argv[8+i]);
   if(fault=="unexpected_api")fd[11]=-1;  // Invalid API input must propagate to the process error contract.
   if(fault=="peer_closed"&&party==0&&::close(fd[0])!=0)throw std::runtime_error("TEST_ONLY close channel fault");
-  Case test{{},k,seed,force};test.scores.resize(n);const auto c=config_for(test,party);
+  Case test{{},k,seed,force};test.scores.resize(n);auto c=config_for(test,party);
+  if(n>1){
+    const auto root_identity=protocol_i_bmw16_claim_root_identity((dir/"claims").string());
+    c.claim_root_device=root_identity.device;c.claim_root_inode=root_identity.inode;
+  }
   ProtocolIBmw16ExperimentalPartyMaterial material;
   std::shared_ptr<ProtocolIBmw16PersistentClaimStore> claims;
   std::shared_ptr<ProtocolIBmw16ProcessSlotClaimSet> process_slots;
@@ -291,7 +322,8 @@ int run_party(int argc,char** argv) {
       ProtocolIBmw16BundleStats stats;material=protocol_i_bmw16_bundle_open_party(c,party,envelope,key_from(dir/"aead.key"),&stats);
       bundle_open_us=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-open_start).count();
       const auto claim_start=std::chrono::steady_clock::now();
-      claims=std::make_shared<ProtocolIBmw16PersistentClaimStore>((dir/"claims").string(),c.session,static_cast<std::uint8_t>(party));
+      claims=std::make_shared<ProtocolIBmw16PersistentClaimStore>((dir/"claims").string(),c.session,static_cast<std::uint8_t>(party),
+          ProtocolIBmw16ClaimRootIdentity{c.claim_root_device,c.claim_root_inode});
       claims->claim_bundle(stats.manifest_sha256);
       bundle_claim_us=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-claim_start).count();
       process_slots=std::make_shared<ProtocolIBmw16ProcessSlotClaimSet>();
@@ -534,7 +566,7 @@ int main(int argc,char** argv) {
       try { return run_party(argc,argv); }
       catch(const ProtocolIBmw16ExpectedFailure& e) {
         if(argc>=4)write_party_result(fs::path(argv[3]),"ABORT_MATERIAL","LOCAL_ONLY","LOCAL_MATERIAL_ABORT",e.what(),kExitMaterialAbort);
-        std::cerr<<"party-local-material-abort\n";return kExitMaterialAbort;
+        std::cerr<<"party-local-material-abort="<<e.what()<<"\n";return kExitMaterialAbort;
       }
       catch(const ProtocolITransportError& e) {
         if(argc>=4)write_party_result(fs::path(argv[3]),"ABORT_COMMUNICATION","LOCAL_ONLY","LOCAL_COMMUNICATION_ABORT",e.what(),kExitCommunicationAbort);

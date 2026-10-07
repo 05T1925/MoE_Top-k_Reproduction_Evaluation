@@ -87,7 +87,8 @@ if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
   target_sources(${PROJECT_NAME} PRIVATE
       src/moe_topk/experimental_bmw16_select_adapter.cpp
       src/moe_topk/experimental_bmw16_material_bundle.cpp
-      src/moe_topk/experimental_bmw16_select_party.cpp)
+      src/moe_topk/experimental_bmw16_select_party.cpp
+      src/moe_topk/experimental_bmw16_stream_store.cpp)
   target_compile_definitions(${PROJECT_NAME} PUBLIC
       MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER=1)
   target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)
@@ -100,6 +101,12 @@ if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
   add_executable(moe_topk_bmw16_experimental_3proc_test
       tests/moe_topk/experimental_bmw16_3proc_test.cpp)
   target_link_libraries(moe_topk_bmw16_experimental_3proc_test PRIVATE ${PROJECT_NAME})
+  add_executable(moe_topk_bmw16_experimental_party_node
+      src/apps/moe_topk_bmw16_experimental_party_node.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_party_node PRIVATE ${PROJECT_NAME})
+  add_executable(moe_topk_bmw16_experimental_party_node_e2e_test
+      tests/moe_topk/experimental_bmw16_party_node_e2e_test.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_party_node_e2e_test PRIVATE ${PROJECT_NAME})
 endif()
 
 

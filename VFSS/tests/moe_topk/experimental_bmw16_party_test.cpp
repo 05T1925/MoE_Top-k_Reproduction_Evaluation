@@ -1,5 +1,6 @@
 #include <moe_topk/experimental_bmw16_select_party.h>
 #include <moe_topk/experimental_bmw16_material_bundle.h>
+#include <moe_topk/experimental_bmw16_stream_store.h>
 #include <moe_topk/topk_oracle.h>
 #include <FSS/dcf.h>
 #include <FSS/prng.h>
@@ -89,10 +90,118 @@ std::array<int, 2> socket_pair() {
 }
 
 void run_case(const Case& test,int tape_pattern=0,
-              const ProtocolIBmw16TestOnlyRandomTape* provided_tape=nullptr) {
+              const ProtocolIBmw16TestOnlyRandomTape* provided_tape=nullptr,
+              bool use_stream_store=false) {
   std::array<ProtocolIBmw16ExperimentalPartyConfig, 2> configs{
       config_for(test, 0), config_for(test, 1)};
+  if (use_stream_store) {
+    // Preserve the input/algorithm tape while giving this independently
+    // generated material a fresh protocol session identity.
+    for (auto& c : configs) {
+      c.session ^= UINT64_C(0x5331375354524541);
+      c.fingerprint = c.session ^ UINT64_C(0x533137465052494e);
+    }
+  }
+  std::filesystem::path stream_root;
+  std::array<std::shared_ptr<ProtocolIBmw16StreamedUcmpSlotStore>, 2> stream_stores;
+  if (use_stream_store) {
+    stream_root = std::filesystem::temp_directory_path() /
+        ("bmw16-s17-stream-" + std::to_string(::getpid()) + "-" + std::to_string(configs[0].session));
+    std::filesystem::create_directories(stream_root / "p0");
+    std::filesystem::create_directories(stream_root / "p1");
+    std::filesystem::permissions(stream_root / "p0", std::filesystem::perms::owner_all);
+    std::filesystem::permissions(stream_root / "p1", std::filesystem::perms::owner_all);
+    for (int party = 0; party < 2; ++party) {
+      const auto root_id = protocol_i_bmw16_claim_root_identity((stream_root / (party ? "p1" : "p0")).string());
+      configs[party].claim_root_device = root_id.device;
+      configs[party].claim_root_inode = root_id.inode;
+    }
+  }
   auto materials = protocol_i_bmw16_experimental_material_generate(configs[0]);
+  std::array<ProtocolIBmw16StreamStoreStats, 2> stream_stats{};
+  if (use_stream_store) {
+    std::array<std::array<std::uint8_t, 32>, 2> recipient_keys{};
+    for (std::size_t party = 0; party < 2; ++party) {
+      for (std::size_t i = 0; i < recipient_keys[party].size(); ++i)
+        recipient_keys[party][i] = static_cast<std::uint8_t>((configs[party].session >> (i % 8U)) ^ (party * 71U + i));
+      const auto path = (stream_root / (party ? "p1" : "p0") / "ucmp.pool").string();
+      const auto& material = party ? materials.party1 : materials.party0;
+      protocol_i_bmw16_stream_store_seal_party(path, configs[party], static_cast<std::uint8_t>(party),
+          material, recipient_keys[party], &stream_stats[party]);
+      stream_stores[party] = ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+          path, configs[party], static_cast<std::uint8_t>(party), recipient_keys[party]);
+      require(stream_stats[party].ucmp_slots == 9U * (test.scores.size() * (test.scores.size() - 1U) / 2U) &&
+              stream_stats[party].sealed_file_bytes == stream_stores[party]->file_bytes(),
+              "stream store size accounting");
+    }
+    const auto n = static_cast<std::uint32_t>(test.scores.size());
+    const auto first_id = static_cast<std::uint64_t>(2U) * configs[0].padded_n + 2U;
+    const ProtocolIBmw16MaterialSlot first_slot{first_id, ProtocolIBmw16MaterialStage::Select, 0, 1, 0, 1};
+    auto byte_audit = ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+        (stream_root / "p0" / "ucmp.pool").string(), configs[0], 0,
+        [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }());
+    std::uint64_t expected_id = first_id;
+    auto require_same_slot_bytes = [&](const ProtocolIBmw16MaterialSlot& slot,
+                                       const ProtocolIUcmpPartyMaterial& source) {
+      require(slot.id == expected_id++, "stream sequential ID audit");
+      const auto streamed = byte_audit->load_once(slot).serialize();
+      require(streamed == source.serialize(), "streamed key bytes differ from in-memory source");
+    };
+    const auto pairs = static_cast<std::size_t>(n) * (n - 1U) / 2U;
+    for (std::uint8_t task = 0; task < 2; ++task) for (std::uint8_t round = 1; round <= 4; ++round) {
+      const auto& keys = materials.party0.select_keys[task][round - 1U];
+      require(keys.size() == pairs, "stream byte audit source pool size");
+      std::size_t pair = 0;
+      for (std::uint32_t left = 0; left < n; ++left) for (std::uint32_t right = left + 1U; right < n; ++right)
+        require_same_slot_bytes({expected_id, ProtocolIBmw16MaterialStage::Select, task, round, left, right}, keys[pair++]);
+    }
+    for (std::uint32_t left = 0; left < n; ++left) for (std::uint32_t right = left + 1U; right < n; ++right) {
+      const auto pair = static_cast<std::size_t>(left) * n - static_cast<std::size_t>(left) * (left + 1U) / 2U + right - left - 1U;
+      require_same_slot_bytes({expected_id, ProtocolIBmw16MaterialStage::Membership, 0xff, 1, left, right},
+                              materials.party0.membership_keys[pair]);
+    }
+    require(expected_id == first_id + stream_stats[0].ucmp_slots, "stream byte audit slot count");
+    auto duplicate_probe = ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+        (stream_root / "p0" / "ucmp.pool").string(), configs[0], 0,
+        [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }());
+    require(n >= 2, "stream duplicate fixture n");
+    (void)duplicate_probe->load_once(first_slot);
+    bool duplicate_rejected = false;
+    try { (void)duplicate_probe->load_once(first_slot); }
+    catch (const std::exception&) { duplicate_rejected = true; }
+    require(duplicate_rejected, "stream duplicate slot read rejected");
+    auto wrong_root = configs[0]; wrong_root.claim_root_inode ^= 1U;
+    bool root_rejected = false;
+    try { (void)ProtocolIBmw16StreamedUcmpSlotStore::open_party(
+        (stream_root / "p0" / "ucmp.pool").string(), wrong_root, 0,
+        [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }()); }
+    catch (const std::exception&) { root_rejected = true; }
+    require(root_rejected, "stream wrong claim-root binding rejected");
+    const auto tampered_path = (stream_root / "p0" / "tampered.pool").string();
+    std::filesystem::copy_file(stream_root / "p0" / "ucmp.pool", tampered_path);
+    {
+      std::fstream f(tampered_path, std::ios::binary | std::ios::in | std::ios::out);
+      require(static_cast<bool>(f), "open stream tamper fixture");
+      constexpr std::streamoff stream_header_bytes = 132;
+      f.seekg(stream_header_bytes, std::ios::beg); char byte = 0; f.read(&byte, 1); byte ^= 0x40;
+      f.seekp(stream_header_bytes, std::ios::beg); f.write(&byte, 1); f.flush();
+      require(static_cast<bool>(f), "write stream tamper fixture");
+    }
+    auto tampered_store = ProtocolIBmw16StreamedUcmpSlotStore::open_party(tampered_path, configs[0], 0,
+        [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }());
+    bool tamper_rejected = false;
+    try { (void)tampered_store->load_once(first_slot); }
+    catch (const std::exception&) { tamper_rejected = true; }
+    require(tamper_rejected, "stream corrupted record rejected by AEAD");
+    const auto truncated_path = (stream_root / "p0" / "truncated.pool").string();
+    std::filesystem::copy_file(stream_root / "p0" / "ucmp.pool", truncated_path);
+    std::filesystem::resize_file(truncated_path, std::filesystem::file_size(truncated_path) - 1U);
+    bool truncation_rejected = false;
+    try { (void)ProtocolIBmw16StreamedUcmpSlotStore::open_party(truncated_path, configs[0], 0,
+        [&] { std::array<std::uint8_t, 32> k{}; for (std::size_t i=0;i<k.size();++i) k[i]=static_cast<std::uint8_t>((configs[0].session>>(i%8U))^(i)); return k; }()); }
+    catch (const std::exception&) { truncation_rejected = true; }
+    require(truncation_rejected, "stream truncated file rejected");
+  }
   ProtocolIBmw16TestOnlyRandomTape tape; std::vector<std::string> trace_lines; tape.trace_lines=&trace_lines;
   const auto handle_to_original=protocol_i_compose_permutation(
       materials.party0.forward_shuffle.tau,materials.party1.forward_shuffle.sigma);
@@ -137,6 +246,15 @@ void run_case(const Case& test,int tape_pattern=0,
         std::array<int, 4> select_fds{}; for (int i = 0; i < 4; ++i) select_fds[i] = select[i][party];
         const std::array<int, 2> inverse_fds{inverse[0][party], inverse[1][party]};
         auto party_material = party == 0 ? std::move(materials.party0) : std::move(materials.party1);
+        if (use_stream_store) {
+          auto& store = stream_stores[party];
+          party_material.slot_manifest.clear();
+          for (auto& task : party_material.select_keys) for (auto& round : task) round.clear();
+          party_material.membership_keys.clear();
+          party_material.load_ucmp_slot = [store](const ProtocolIBmw16MaterialSlot& slot) {
+            return store->load_once(slot);
+          };
+        }
         auto process_slots = std::make_shared<ProtocolIBmw16ProcessSlotClaimSet>();
         party_material.process_slot_claim_once = [process_slots](std::uint64_t id) {
           process_slots->claim_once(id);
@@ -246,7 +364,11 @@ void run_case(const Case& test,int tape_pattern=0,
             << " online_prg_calls_total=" << (online_dcf_counts.enabled ?
                    std::to_string(online_dcf_counts.eval_node_expansions) : "NOT_MEASURED")
             << " online_aes_blocks_total=" << (online_dcf_counts.enabled ?
-                   std::to_string(2U * online_dcf_counts.eval_node_expansions) : "NOT_MEASURED") << '\n';
+                   std::to_string(2U * online_dcf_counts.eval_node_expansions) : "NOT_MEASURED")
+            << " streamed_ucmp=" << (use_stream_store ? 1 : 0)
+            << " stream_slots=" << (use_stream_store ? stream_stats[0].ucmp_slots : 0)
+            << " stream_file_bytes_p0=" << (use_stream_store ? stream_stats[0].sealed_file_bytes : 0)
+            << " stream_file_bytes_p1=" << (use_stream_store ? stream_stats[1].sealed_file_bytes : 0) << '\n';
   if(const char* dir=std::getenv("BMW16_COMMON_TAPE_TRACE_DIR")){
     std::filesystem::create_directories(dir);
     std::ofstream tape_out(std::filesystem::path(dir)/"common_tape.json",std::ios::trunc);
@@ -343,6 +465,12 @@ int main(int argc,char** argv) {
     run_case({{6, -7, 4}, 2, UINT64_C(0x1105)});
     run_case({{-8, 3}, 1, UINT64_C(0x1106)});
     run_case({{12, 1, 9, -4, 2}, 2, UINT64_C(0x1107), true});
+    const Case stream_equivalence_case{{INT32_MIN, 13, -5, INT32_MAX, 13}, 2, UINT64_C(0x1717)};
+    // Same frozen input and deterministic TEST_ONLY algorithm tape. Offline
+    // material is fresh per run; the separate exhaustive key-byte audit above
+    // checks that sidecar serialization is exact for its source pool.
+    run_case(stream_equivalence_case);
+    run_case(stream_equivalence_case, 0, nullptr, true);
     std::vector<std::int32_t> scores64;
     for (int i = 0; i < 64; ++i) scores64.push_back((i * 17) % 23 - 11);
     run_case({std::move(scores64), 8, UINT64_C(0x1108)});

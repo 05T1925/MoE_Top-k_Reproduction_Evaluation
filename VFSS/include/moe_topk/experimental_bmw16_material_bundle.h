@@ -21,6 +21,16 @@ struct ProtocolIBmw16BundleStats {
   std::array<std::uint8_t, 32> manifest_sha256{};
 };
 
+struct ProtocolIBmw16ClaimRootIdentity {
+  std::uint64_t device = 0;
+  std::uint64_t inode = 0;
+};
+
+// Resolve an already provisioned local claim root without following a final
+// symlink. The identity is public metadata and is authenticated in bundle v3.
+ProtocolIBmw16ClaimRootIdentity protocol_i_bmw16_claim_root_identity(
+    const std::string& directory);
+
 // EXPERIMENTAL bundle v2 (S14 shuffle-only profile): whole-party payload sealed with AES-256-GCM.
 // Recipient keys must be provisioned out of band; this API does not implement PKI.
 std::vector<std::uint8_t> protocol_i_bmw16_bundle_seal_party(
@@ -43,7 +53,8 @@ class ProtocolIBmw16PersistentClaimStore {
  public:
   ProtocolIBmw16PersistentClaimStore(const std::string& directory,
                                      std::uint64_t session,
-                                     std::uint8_t party);
+                                     std::uint8_t party,
+                                     ProtocolIBmw16ClaimRootIdentity expected_root = {});
   ProtocolIBmw16PersistentClaimStore(const ProtocolIBmw16PersistentClaimStore&) = delete;
   ProtocolIBmw16PersistentClaimStore& operator=(const ProtocolIBmw16PersistentClaimStore&) = delete;
   ProtocolIBmw16PersistentClaimStore(ProtocolIBmw16PersistentClaimStore&&) noexcept;
@@ -57,6 +68,7 @@ class ProtocolIBmw16PersistentClaimStore {
   int directory_fd_ = -1;
   std::uint64_t session_ = 0;
   std::uint8_t party_ = 0;
+  ProtocolIBmw16ClaimRootIdentity root_{};
 };
 
 // EXPERIMENTAL runtime guard. It detects duplicate slot use while this process

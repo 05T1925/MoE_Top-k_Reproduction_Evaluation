@@ -62,6 +62,10 @@ struct ProtocolIBmw16ExperimentalPartyMaterial {
   // Independent one-shot keys indexed by the canonical real pair.
   std::vector<ProtocolIUcmpPartyMaterial> membership_keys;
   std::vector<ProtocolIBmw16MaterialSlot> slot_manifest;
+  // Optional authenticated random-access source for a BMW16 stream bundle.
+  // One returned slot key is consumed by one comparison and is never cached
+  // across round/task/stage. The source is an EXPERIMENTAL storage adapter.
+  std::function<ProtocolIUcmpPartyMaterial(const ProtocolIBmw16MaterialSlot&)> load_ucmp_slot;
   // Process-local duplicate guard. The durable one-shot boundary is the
   // manifest-bound bundle claim performed before entering this API.
   std::function<void(std::uint64_t)> process_slot_claim_once;
@@ -83,6 +87,9 @@ struct ProtocolIBmw16ExperimentalPartyConfig {
   std::uint64_t test_only_algorithm_seed = 0;
   // This hook exists only in the opt-in experimental/test interface.
   bool test_only_force_probability_abort_after_select = false;
+  // v3 party bundles bind to the pre-provisioned claim-root directory inode.
+  // Zero values are retained only for in-memory TEST_ONLY fixtures.
+  std::uint64_t claim_root_device = 0, claim_root_inode = 0;
 };
 
 struct ProtocolIBmw16ExperimentalMetrics {

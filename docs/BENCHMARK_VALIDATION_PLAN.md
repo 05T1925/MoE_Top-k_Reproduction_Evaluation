@@ -723,3 +723,7 @@ S16 复核发现 S15 原始归档虽完整，但 12 行源清单中 7 个 C++ ha
 S16 对默认 DCF 扩展计数的 ON/OFF 额外开销采用相同 TEST_ONLY 固定 tape、相同输入、相同边图和 fresh materials 配对；报告的约 28.27% median overhead 只指导未来 instrumentation 选择，不进入 V4。计数 `online_prg_calls_total` 在本方案证据中精确定义为普通 DCF `evalDCF` 内 `ecbEncTwoBlocks` node expansion 数，AES blocks 为其两倍；sampler PRF words 独立。未由 hook 覆盖的系统库/AES 指令、正式 LAN/WAN、跨路线对照和全库 PRG 字段仍 `NOT_MEASURED`。严禁把 61 例无自然 abort 解释为抽样概率界。
 
 S15 来源身份复核、抽样数学界修正、相关 DCF 全池安全 hybrid 首缺口、计数器开销和容量门的完整限制见 [S16 报告](reproduction/BMW16_S16_INDEPENDENT_ACCEPTANCE_PROBABILITY_SECURITY_AND_METRICS_2026-10-07.md) 与[证据索引](reproduction/evidence/BMW16_S16_EXTERNAL_EVIDENCE_INDEX_2026-10-07.md)。V4 正式 LAN/WAN 矩阵继续等待 V3 完成、该候选安全门及统一计量/发材合同独立接收；S16 不改变验收顺序。
+
+### 2026-10-07 M6B-I-BMW16-S17 计量与性能边界补充
+
+S17 的 party-node/stream-store 功能复核与 n=64/128/256 有界 E2E、n=256 common-tape differential 均为 EXPERIMENTAL 功能证据。ready barrier 的本地 socketpair bytes/us、各规模包长及 n=64 的实验 DCF expansion 均不得填入正式 V4/LAN/WAN 表；stream-store sidecar 实测只覆盖 Select/membership key file，不含原始 KeyGen 峰值 RAM 或 raw/shuffle 侧车。当前安全门与可比性均未过，正式矩阵未运行。n=1000 的 4.99 GB/party 是 checked 容量下界，不是 package 或 IO 实测，记 `PRECHECK_REJECTED / NOT_RUN`。未来配对实验必须同一输入/输出/网络/计时/材料边界，保留 abort 尝试并区分成功条件耗时与全部尝试成本。详见 [S17 验证报告](reproduction/BMW16_S17_INDEPENDENT_ACCEPTANCE_AND_STREAM_STORE_2026-10-07.md)。
