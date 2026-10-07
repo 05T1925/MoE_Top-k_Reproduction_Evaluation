@@ -127,6 +127,8 @@ void run_case(const Case& test,int tape_pattern=0,
   std::array<ProtocolIBmw16ExperimentalPartyOutput, 2> result;
   std::array<std::exception_ptr, 2> errors{};
   std::array<std::thread, 2> parties;
+  // Isolate online DCF expansion counts from the fresh offline material generation.
+  resetDcfPrgCallCounts();
   for (int party = 0; party < 2; ++party) {
     parties[party] = std::thread([&, party] {
       try {
@@ -150,6 +152,20 @@ void run_case(const Case& test,int tape_pattern=0,
   }
   for (auto& party : parties) party.join();
   for (const auto& error : errors) if (error) std::rethrow_exception(error);
+  const auto online_dcf_counts = getDcfPrgCallCounts();
+  if (online_dcf_counts.enabled && n > 1) {
+    const auto eval_calls = result[0].metrics.dcf_party_evaluations +
+                            result[1].metrics.dcf_party_evaluations;
+    require(online_dcf_counts.eval_calls == eval_calls,
+            "online DCF call counter does not match both parties");
+    const auto raw_eval_calls = UINT64_C(8) * configs[0].padded_n;
+    require(eval_calls >= raw_eval_calls,
+            "online DCF call counter is smaller than raw-score adapter work");
+    const auto expected_expansions = raw_eval_calls * 34U +
+        (eval_calls - raw_eval_calls) * configs[0].comparison_bits;
+    require(online_dcf_counts.eval_node_expansions == expected_expansions,
+            "online DCF expansion count does not match raw/Select widths");
+  }
 
   require(std::string(result[0].status) == result[1].status, "party status disagreement");
   if (std::string(result[0].status) == "SUCCESS") {
@@ -219,7 +235,18 @@ void run_case(const Case& test,int tape_pattern=0,
             << " primitive_key_and_shuffle_bytes_per_party=" << materials.primitive_key_and_shuffle_bytes_per_party[0]
             << " unused_shuffle_cmpagg=" << result[0].metrics.forward_shuffle_cmpagg_slots_unused +
                                                    result[0].metrics.inverse_shuffle_cmpagg_slots_unused
-            << " omitted_shuffle_cmpagg=" << result[0].metrics.shuffle_cmpagg_slots_omitted << '\n';
+            << " omitted_shuffle_cmpagg=" << result[0].metrics.shuffle_cmpagg_slots_omitted
+            << " online_us_p0=" << result[0].metrics.online_time_us
+            << " online_us_p1=" << result[1].metrics.online_time_us
+            << " sampler_prf_words_total=" << result[0].metrics.sampler_prf_words +
+                                                result[1].metrics.sampler_prf_words
+            << " dcf_counter_enabled=" << (online_dcf_counts.enabled ? 1 : 0)
+            << " online_dcf_eval_calls_total=" << (online_dcf_counts.enabled ?
+                   std::to_string(online_dcf_counts.eval_calls) : "NOT_MEASURED")
+            << " online_prg_calls_total=" << (online_dcf_counts.enabled ?
+                   std::to_string(online_dcf_counts.eval_node_expansions) : "NOT_MEASURED")
+            << " online_aes_blocks_total=" << (online_dcf_counts.enabled ?
+                   std::to_string(2U * online_dcf_counts.eval_node_expansions) : "NOT_MEASURED") << '\n';
   if(const char* dir=std::getenv("BMW16_COMMON_TAPE_TRACE_DIR")){
     std::filesystem::create_directories(dir);
     std::ofstream tape_out(std::filesystem::path(dir)/"common_tape.json",std::ios::trunc);
@@ -287,6 +314,12 @@ int main(int argc,char** argv) {
       const auto n=static_cast<std::size_t>(std::stoul(argv[4]));const auto k=static_cast<std::uint32_t>(std::stoul(argv[5]));const auto seed=std::stoull(argv[6]);
       require(argc==7+static_cast<int>(n),"trace-case score count");std::vector<std::int32_t> scores;for(std::size_t i=0;i<n;++i)scores.push_back(static_cast<std::int32_t>(std::stoll(argv[7+i])));
       if(::setenv("BMW16_COMMON_TAPE_TRACE_DIR",argv[2],1)!=0)throw std::runtime_error("set trace output directory");
+      run_case({std::move(scores),k,seed},mode);return 0;
+    }
+    if(argc>=7&&std::string(argv[1])=="--counter-bench-pattern"){
+      const std::string pattern=argv[2];const int mode=pattern=="zero"?1:pattern=="max"?2:pattern=="alternating"?3:0;require(mode!=0,"unknown counter-bench tape pattern");
+      const auto n=static_cast<std::size_t>(std::stoul(argv[3]));const auto k=static_cast<std::uint32_t>(std::stoul(argv[4]));const auto seed=std::stoull(argv[5]);
+      require(argc==6+static_cast<int>(n),"counter-bench score count");std::vector<std::int32_t> scores;for(std::size_t i=0;i<n;++i)scores.push_back(static_cast<std::int32_t>(std::stoll(argv[6+i])));
       run_case({std::move(scores),k,seed},mode);return 0;
     }
     if(argc>=6&&std::string(argv[1])=="--trace-case"){
