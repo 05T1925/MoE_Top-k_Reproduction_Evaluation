@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <cstdint>
 #include <vector>
 #include <utility>
 #include <cryptoTools/Common/Defines.h>
@@ -10,6 +11,20 @@
 #include <FSS/dpf.h> // half-tree需要
 
 void clearAESevals();
+
+// TEST/measurement counters for the ordinary DCF tree expansion call sites.
+// A key-generation node expansion is one ecbEncFourBlocks call; an evaluation
+// node expansion is one ecbEncTwoBlocks call. These count calls, not AES blocks.
+struct DcfPrgCallCounts {
+    bool enabled = false;
+    std::uint64_t keygen_calls = 0;
+    std::uint64_t keygen_node_expansions = 0;
+    std::uint64_t eval_calls = 0;
+    std::uint64_t eval_node_expansions = 0;
+};
+void resetDcfPrgCallCounts();
+DcfPrgCallCounts getDcfPrgCallCounts();
+
 inline osuCrypto::u8 lsb(const osuCrypto::block &b)
 {
     return _mm_cvtsi128_si64x(b) & 1;

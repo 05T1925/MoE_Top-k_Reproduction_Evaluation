@@ -2,6 +2,7 @@
 
 #include <moe_topk/protocol_i_transport.h>
 
+#include <chrono>
 #include <limits>
 #include <stdexcept>
 
@@ -28,16 +29,25 @@ std::vector<std::uint64_t> decode_words(const std::vector<std::uint8_t>& bytes,
 
 std::vector<std::uint64_t> exchange(const ProtocolIScoreInputConfig& config, int fd,
                                     std::uint8_t phase, const std::vector<std::uint64_t>& local,
-                                    std::uint64_t* sent, std::uint64_t* received) {
+                                    std::uint64_t* sent, std::uint64_t* received,
+                                    std::uint64_t* elapsed_us) {
+  const auto started=std::chrono::steady_clock::now();
   const auto peer = static_cast<std::uint8_t>(1U - config.party);
   ProtocolIFramedChannel channel(fd, {config.session, config.fingerprint, config.padded_n,
-      config.k, config.comparison_bits, config.party, peer, phase, 2}, config.timeout_ms);
+      config.k, config.comparison_bits, config.party, peer, phase, 2},
+      ProtocolIFramedChannelOptions{config.timeout_ms,
+          std::numeric_limits<std::size_t>::max(),
+          config.require_authenticated_transport
+              ? ProtocolITransportMode::RequireAuthenticatedStream
+              : ProtocolITransportMode::CallerOwnedFd});
   std::vector<std::uint8_t> remote;
   const auto encoded = encode_words(local);
   if (config.party == 0) { channel.send(encoded); remote = channel.receive(); }
   else { remote = channel.receive(); channel.send(encoded); }
   *sent += channel.sent_bytes();
   *received += channel.received_bytes();
+  if(elapsed_us)*elapsed_us=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now()-started).count());
   return decode_words(remote, local.size());
 }
 
@@ -77,13 +87,17 @@ std::vector<std::uint64_t> protocol_i_raw_score_input_party(
   }
   std::vector<std::uint64_t> carry_peer;
   try { carry_peer = exchange(config, stage_fds[0], 4, carry_local,
-                              &local_metrics.carry_sent_bytes, &local_metrics.carry_received_bytes); }
-  catch (const std::exception&) { throw std::runtime_error("score carry exchange"); }
+                              &local_metrics.carry_sent_bytes, &local_metrics.carry_received_bytes,
+                              &local_metrics.carry_exchange_time_us); }
+  catch (const ProtocolITransportError&) { throw; }
   std::vector<std::uint64_t> lift(config.padded_n), carry(config.padded_n);
   for (std::uint32_t slot = 0; slot < config.padded_n; ++slot) {
     auto& item = package.carry_materials[slot];
+    const auto eval_started=std::chrono::steady_clock::now();
     carry[slot] = item.material.eval_strict_lt((carry_local[2U * slot] + carry_peer[2U * slot]) & kScoreMask,
         (carry_local[2U * slot + 1U] + carry_peer[2U * slot + 1U]) & kScoreMask);
+    local_metrics.ucmp_eval_time_us+=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now()-eval_started).count());
     lift[slot] = (x[slot] - ((carry[slot] & 3U) << 32U)) & kScoreMask;
   }
 
@@ -98,14 +112,18 @@ std::vector<std::uint64_t> protocol_i_raw_score_input_party(
   }
   std::vector<std::uint64_t> sign_peer;
   try { sign_peer = exchange(config, stage_fds[1], 5, sign_local,
-                             &local_metrics.sign_sent_bytes, &local_metrics.sign_received_bytes); }
-  catch (const std::exception&) { throw std::runtime_error("score sign exchange"); }
+                             &local_metrics.sign_sent_bytes, &local_metrics.sign_received_bytes,
+                             &local_metrics.sign_exchange_time_us); }
+  catch (const ProtocolITransportError&) { throw; }
   const auto key_mask = (UINT64_C(1) << config.comparison_bits) - 1U;
   std::vector<std::uint64_t> keys(config.padded_n);
   for (std::uint32_t slot = 0; slot < config.padded_n; ++slot) {
     auto& item = package.sign_materials[slot];
+    const auto eval_started=std::chrono::steady_clock::now();
     const auto sign = item.material.eval_strict_lt((sign_local[2U * slot] + sign_peer[2U * slot]) & kScoreMask,
         (sign_local[2U * slot + 1U] + sign_peer[2U * slot + 1U]) & kScoreMask);
+    local_metrics.ucmp_eval_time_us+=static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now()-eval_started).count());
     const auto q_share = config.party == 0
         ? (UINT64_C(0x7fffffff) - lift[slot] + ((sign & 3U) << 32U))
         : (UINT64_C(0) - lift[slot] + ((sign & 3U) << 32U));

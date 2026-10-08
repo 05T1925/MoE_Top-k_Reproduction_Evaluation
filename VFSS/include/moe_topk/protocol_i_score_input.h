@@ -15,12 +15,15 @@ struct ProtocolIScoreInputConfig {
   std::uint32_t logical_n = 0, padded_n = 0, k = 0;
   std::uint8_t index_bits = 0, comparison_bits = 0, party = 0;
   int timeout_ms = 0;
+  bool require_authenticated_transport = false;
 };
 
 struct ProtocolIScoreInputMetrics {
   std::uint64_t carry_sent_bytes = 0, carry_received_bytes = 0;
   std::uint64_t sign_sent_bytes = 0, sign_received_bytes = 0;
   std::uint64_t ucmp_calls = 0, raw_dcf_calls = 0;
+  std::uint64_t carry_exchange_time_us = 0, sign_exchange_time_us = 0;
+  std::uint64_t ucmp_eval_time_us = 0;
   std::uint64_t rounds = 2;
 };
 
