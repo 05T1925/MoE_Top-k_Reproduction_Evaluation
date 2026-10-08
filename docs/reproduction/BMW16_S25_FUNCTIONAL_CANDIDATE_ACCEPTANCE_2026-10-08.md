@@ -1,9 +1,12 @@
 # M6B-I-BMW16-S25：实验功能候选复核与运行报告
 
-日期：2026-10-08  
-方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL**  
-候选分支：`codex/m6b-i-bmw16-s25`  
-实现提交：`112cd8a6d641ded1be5244b317ffb5c42f3b86d1`  
+日期：2026-10-08
+
+方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL**
+
+候选分支：`codex/m6b-i-bmw16-s25`
+
+实现提交：`112cd8a6d641ded1be5244b317ffb5c42f3b86d1`
 报告前 HEAD：`ae803851996e866365b2a97b75f327dab127eb55`（仅修正决策文档格式）
 
 本报告是当前执行聊天对隔离候选的工程与功能检查，不是另一聊天/接收者的独立签收。协议身份保持 EXPERIMENTAL；成功样本与稳定 Top-K oracle 一致不构成 DCF、整池联合视图或 shuffle 的安全证明。BMW16 Theorem 8 的概率和比较常数不适用于本项目实现。
