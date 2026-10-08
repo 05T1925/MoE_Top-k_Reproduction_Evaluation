@@ -1,9 +1,12 @@
 # BMW16 S25：Protocol I 功能候选冻结决策
 
-日期：2026-10-08  
-实现身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL**  
-本地候选分支：`codex/m6b-i-bmw16-s25`  
-起点：`origin/main` / merge-base `c3926c68fd14f270faa8b55234311071947fa080`  
+日期：2026-10-08
+
+实现身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL**
+
+本地候选分支：`codex/m6b-i-bmw16-s25`
+
+起点：`origin/main` / merge-base `c3926c68fd14f270faa8b55234311071947fa080`
 实验实现来源：S22 runtime tree `9210c11a7a877f8fe3687e0509c1722440cf63fe`；S24 `efafcd69f9d73b4386e8147df7fb5395afc78720` 是后续文档审计提交，未改 runtime。
 
 ## 决策
@@ -39,4 +42,3 @@ S25 的范围是工程接收和有界功能证据。S24 对实际压缩 DCF key 
 ## 证据和门禁
 
 最终候选 revision、源码/二进制哈希、命令、运行矩阵和证据索引写入同日期 S25 接收报告。报告必须分别判定实验功能、默认关闭与基线隔离、材料和传输合同、源码到二进制 provenance、DCF 单 key 隐私、整池/shuffle view、安全 alias 和正式性能资格。S25 的功能测试不能关闭密码学或 V4 门。
-
