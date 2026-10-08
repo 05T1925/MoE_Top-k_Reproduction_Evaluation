@@ -17,6 +17,8 @@
 
 **2026-10-08 S23 独立复核附注：**从 S22 精确提交 `9210c11a7a877f8fe3687e0509c1722440cf63fe` 独立重建并复跑；39/39 S4/C++ common-tape、8/8 定向 CTest、不同 UID TLS 与 non-TLS 有界 E2E 通过。实际 DCF KeyGen 次数核为 `N_DCF=2p+9·C(n,2)`，其中流式 Select/membership sidecar 是 `9·C(n,2)`，与计入 raw/shuffle 的 `offline_material_slots_per_party` 不是同一口径。BGI15 Theorem 6 到 `dcf.cpp` 的 Gen/Eval 构造桥接未证；同一许可泄露下的 `N·ε` 向量 hybrid 是明确条件推导，不是当前原语结论。实际 Protocol I shuffle/inverse 与最终本方输出 share 的联合模拟缺 `ProtocolIForwardInverseViewSimulator_L`，未发现反例也不记 PASS。S16 理想无放回 abort 界复核通过；当前公开 XOR coin + SHA-256 sampler 仅在 ROM 抽样模型中等价，具体 SHA-256 到 ROM 优势未量化。S23 未改协议源码，未重跑 n=1000、未运行正式 LAN/WAN/九指标矩阵；正式验收顺序和 V4 门禁不变，候选继续 `PROJECT_DERIVED / EXPERIMENTAL`。证据与逐门裁决见 [S23 决策](decisions/BMW16_S23_INDEPENDENT_DCF_POOL_SHUFFLE_AND_ABORT_REVIEW_2026-10-08.md) 与 [S23 独立复核报告](reproduction/BMW16_S23_INDEPENDENT_ACCEPTANCE_SECURITY_AND_SAMPLER_REVIEW_2026-10-08.md)。
 
+**2026-10-08 S24 DCF 源码桥接附注：**从 S23 文档提交 `7b781168161a488b156353acf1623100fe59b1f7` 的隔离 worktree 检查；S23 被审运行时仍是 S22 `9210c11a7a877f8fe3687e0509c1722440cf63fe`，S24 未改 VFSS runtime/material ABI。对 `dcf.cpp` 的 `keyGenDCF/evalDCF` 给出源码递推，推出 `g·[x<a]` 的函数语义与 `Z/(2^64)` 输出；但把 VFSS 单一 common seed-CW 直接映射为 BGI15 Alg.5 两份独立 target correction 的事件分布不一致，故不能直接把 Theorem 6 移植到当前完整序列化 party key。该反例否定直接字段映射，不是对压缩 key 的攻击；当前 ABI 单 key 隐私仍 `UNPROVEN`，整池自适应 `N_DCF·ε` 只为条件推导，shuffle/output simulator 仍未闭合。增加的 TEST_ONLY 小字宽转录测试仅检查函数递推和该映射事件，不能作为密码学证明。以新 Release build 运行的四个 DCF/uCMP/party 定向 CTest 通过；未重跑 S4 差分、三进程 E2E 或 n=1000，引用 S23 历史接收时明确区分。候选继续 `PROJECT_DERIVED / EXPERIMENTAL`，无 secure alias；正式 V4/六方案性能矩阵 `NOT_RUN`。见 [S24 决策](decisions/BMW16_S24_DCF_SOURCE_BRIDGE_DECISION_2026-10-08.md)、[功能交接](reproduction/BMW16_DERIVED_EXPERIMENTAL_FUNCTIONAL_HANDOFF_2026-10-08.md) 与[验证报告](reproduction/BMW16_S24_DCF_SOURCE_BRIDGE_AND_FUNCTIONAL_HANDOFF_2026-10-08.md)。
+
 当前状态：M2 已完成；三轮 C-INSTANTIATION、独立评审与 Theorem 4.1 逻辑通信匹配不改变 `AUTHOR_EXACT = NOT_PROVEN` 的证据边界。接收方复跑后 M5 已完成，M6A 为当前阶段。M5-H1 通过用户指定的数量级门槛，但 Theorem 4.2 精确逻辑成本仍相差 `254n` bits。F1 经 PR #25 合入；接收方在 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过 F2/G3 和 41/41 回归。dated strict-gate 与 H2 初始 FAIL 记录保留为历史。M5-FIX-F1 = COMPLETED；F2 / G3 = PASS。详见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
@@ -103,7 +105,7 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 2. Protocol III。
 3. Protocol I + AAV86。
 4. Protocol III + AAV86。
-5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S16 独立重建复跑的 opt-in EXPERIMENTAL VFSS C++ 三进程全链；S15 历史 C++ source identity 未接收；party-view/生产凭据发材仍 NO-GO；非正式性能数据）。
+5. Protocol I + BMW16-derived Select + DCF（PROJECT_DERIVED；S23 独立复建的 S22 opt-in EXPERIMENTAL VFSS C++ 三进程全链有界复跑到 n≤256；S24 新构建复跑 DCF/uCMP/party 定向 conformance，并定位 BGI15 完整 key 分布桥接未证；不改运行时、不重跑 n=1000；party-view/生产交付安全门仍未通过；非正式性能数据）。
 6. Protocol III + BB90+DCF。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。

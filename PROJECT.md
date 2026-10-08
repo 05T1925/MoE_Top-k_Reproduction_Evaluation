@@ -18,7 +18,7 @@
 | Protocol III | 全对全 CmpAgg + 压缩 DPF routing | 论文精确核心及统一 Top-K mask 适配 |
 | Protocol I + AAV86 | AAV86 比较图 + Protocol I 路线 | 图算法升级方案 |
 | Protocol III + AAV86 | AAV86 比较图 + Protocol III 路线 | 需单独论证的组合升级方案 |
-| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S20 增离线 mTLS 发材，S21 增在线 TLS 与本地 T/P0/P1 退出门，S22 登记用户转述批准的匿名 transcript 候选泄露并修复统一算法 abort/TLS fail-closed。S23 独立复建 S22，39 common-tape、定向 CTest 8/8、不同 UID TLS/non-TLS 有界 E2E 通过；复核 DCF 的 `N=2p+9·C(n,2)` KeyGen 公式及 S16 理想无放回 abort 界。BGI15 Theorem 6 到仓库 `keyGenDCF/evalDCF` 的逐变量/PRG 桥接仍未证明；基于相同公开泄露的 `N·ε` 多 key hybrid 仅为条件推导；Protocol I forward/inverse shuffle 与 output-share 联合模拟仍未闭合。SHA-256 sampler 的随机预言机到具体实现优势未量化。维持 EXPERIMENTAL、无 secure alias；正式 V4/六方案性能验收未完成。见 [S23 决策](docs/decisions/BMW16_S23_INDEPENDENT_DCF_POOL_SHUFFLE_AND_ABORT_REVIEW_2026-10-08.md) 与 [S23 独立复核报告](docs/reproduction/BMW16_S23_INDEPENDENT_ACCEPTANCE_SECURITY_AND_SAMPLER_REVIEW_2026-10-08.md) |
+| Protocol I + BMW16-derived Select + DCF | BMW16-derived Select 候选 + DCF 成员选择，接入 Protocol I 路线 | PROJECT_DERIVED / EXPERIMENTAL；S20 增离线 mTLS 发材，S21 增在线 TLS 与 T/P0/P1 退出门，S22 登记获准的候选匿名 transcript 泄露并修复统一 abort/TLS fail-closed。S23 独立复建 S22，39 common-tape、定向 CTest 8/8、不同 UID TLS/non-TLS 有界 E2E 到 n=256 通过。S24 对实际 DCF 源码做逐变量桥接：函数语义对应 `x<a`，但 BGI15 target seed-correction 独立采样与 VFSS common gated `scw` 的直接映射被精确分布事件否定；没有据此攻击 serialized key，也没有 source-specific 单 key隐私证明。整池 `N·ε` 继续有条件，Protocol I forward/inverse shuffle 与 output-share 联合模拟仍未闭合。SHA-256 sampler 的具体随机预言机优势未量化。opt-in 三进程功能候选可单独交接；维持 EXPERIMENTAL、无 secure alias；正式 V4/六方案性能验收未完成。见 [S24 决策](docs/decisions/BMW16_S24_DCF_SOURCE_BRIDGE_DECISION_2026-10-08.md) 与 [S24 验证报告](docs/reproduction/BMW16_S24_DCF_SOURCE_BRIDGE_AND_FUNCTIONAL_HANDOFF_2026-10-08.md) |
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
@@ -34,6 +34,7 @@
 - M5 增加 Protocol III 精确核心完成后的通信核验。
 - M6 拆分为 M6A AAV86 和 M6B 选择算法+DCF；Protocol I 当前候选为 BMW16-derived Select，Protocol III 保留 BB90+DCF 研究目标。S18 增加逐槽流式 KeyGen 与密文随机访问；S19 修复成对材料发布/重试，独立复核并实跑到 n=1000。S20 为同一默认 opt-in EXPERIMENTAL 入口增加 TLS 1.3 相互认证的离线发材代码与独立 UID 测试；S21 再增加在线全数据路径 mTLS 与本地可信退出门。跨主机生产监督/凭据运维及联合隐私证明仍未完成。此候选仍无 secure alias；V3/V4 与正式六方案性能验收未完成。
 - S22 登记用户转述批准的候选匿名 transcript 泄露、修复统一算法 abort 分类与 TLS stream fail-closed；S23 独立复核 S22 并复跑有界 C++/S4 差分及独立进程功能。S23 的多 key DCF 归约只在 BGI15 构造等价、相同泄露条件化和随机带替换前提下成立，实际 DCF 桥接与 Protocol I shuffle/output 联合模拟未闭合；SHA-256 sampler 的具体实现概率仍是 ROM 条件性。S23 没有改协议源码，也没有运行 n=1000 或正式性能矩阵。详见 S23 决策与验证报告。
+- S24（2026-10-08）在 S23 指定的首个缺口上逐式审查 `dcf.cpp`：源码输出函数可代数化为 BGI 比较 DCF，但直接把 VFSS `Tβ·scw` 指认成 BGI Alg.5 两个独立 target `c_s` 的映射存在精确事件分布差异；该反例仅否定字段级直接映射，未攻击压缩序列化 key。当前代码的单 key privacy lemma 因此仍未建立，整池归约仍 conditional；没有 runtime/material ABI 改动。新增 TEST_ONLY 小字宽转录模型和功能交接说明；保持无 secure alias。S24 的新构建定向 C++ 结果见 [S24 验证报告](docs/reproduction/BMW16_S24_DCF_SOURCE_BRIDGE_AND_FUNCTIONAL_HANDOFF_2026-10-08.md)，完整安全裁决见 [S24 决策](docs/decisions/BMW16_S24_DCF_SOURCE_BRIDGE_DECISION_2026-10-08.md)。
 - M7 保留为最终统一汇总与横向报告，不把 M6A、M6B 的性能测试全部推迟到 M7。
 - CryptoMoE 保留为 M7 之后的独立工作负载方向，不属于本轮六种方案的完成条件。
 - 历史 `Direct Top-K` 原型保留其原有身份，不直接改名为 BB90+DCF，也不自动成为额外实施任务。
@@ -252,7 +253,7 @@ Protocol III + AAV86 的 `2r` 保留为团队组合目标；实现前必须补�
 
 M6B 在 M6A 两种升级实现及完整性能验收完成后推进，分别交付：
 
-1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED`；S14 party-view/生产发材门 `NO-GO`；存在 opt-in EXPERIMENTAL VFSS C++ 三进程全链与 n≤128 有界 pilot，不是 secure 入口或 V4 正式性能结果）。
+1. Protocol I + BMW16-derived Select + DCF（`PROJECT_DERIVED / EXPERIMENTAL`；存在默认关闭的 VFSS C++ 三进程功能候选，S23 独立复核到 n≤256；S24 新建 Release build 并复跑 DCF/uCMP/party 定向测试，证明源码比较函数递推并定位 BGI15 完整 key 分布桥接的首个变量级差异；当前单 key隐私与 shuffle/output 联合模拟未闭合；不是 secure 入口，正式 V4 性能 `NOT_RUN`）。
 2. Protocol III + BB90+DCF。
 
 以下 BB90 原文和比较图要求只适用于 Protocol III 路线。Protocol I 候选来源、TEST_ONLY 功能证据和安全阻塞见 S7 决策与验证报告；不得继承 BMW16 Theorem 8 的失败概率或比较常数。
