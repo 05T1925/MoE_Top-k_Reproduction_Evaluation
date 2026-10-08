@@ -41,6 +41,21 @@
 
 party 状态码合同在实现中区分 `SUCCESS=0`、正常算法 abort `10`、材料错误 `20`、通信错误 `30`、未预期/工程错误 `70`。协议正常抽样失败只在最终双方状态一致时记 `PEER_AGREED`，mask 为空；断连、TLS 认证失败、静默和工程不一致按本地或 peer-observed 状态记录，不能冒充双方一致 abort。
 
+### 可见字段合同（许可不等于证明）
+
+按此前明确给出的项目答复，P0/P1 当前候选被允许看到下列匿名协议 transcript；这只是协议设计的泄露许可，不是这些字段对输入隐私的模拟证明：
+
+| 字段 | 实际可见方/时点 | 含义与边界 |
+|---|---|---|
+| 匿名比较端点、比较 bit、pivot/集合位置 | P0/P1，Select 的各层比较后 | 端点属于同一洗牌命名空间；允许看到比较边及公开比较结果，可能推断算法失败所在阶段。 |
+| `public_z` / masked operands | P0/P1，score adapter 与 shuffle 后 | 仅协议所定义的 masked/置换值；原始 score 不进入 transcript。 |
+| 两 task 共用的真实匿名 handle 关系和 selected anonymous handle | P0/P1，Select 输出/交集后 | 句柄是置换后位置；不得携带原始 index 或将映射表发给 party。 |
+| key/slot ID 与领取顺序 | 对应 party 在材料访问时；双方通过 transcript 可看到协议使用顺序 | ID 只编码 session、用途、task、round、匿名端点等公开上下文，不编码原始 index/score；允许公开不等于允许跨调用复用 key。 |
+| 比较次数、消息长度、阶段及统一算法 abort | P0/P1，在运行期间/最终状态协商 | 抽样 abort 可由轨迹推测发生阶段；不声称 abort 原因统计上不可区分。无 ACK 时仅本地/peer-observed。 |
+| T 视图 | 仅离线 | T 得到公开参数、材料及交付状态，不得得到 raw shares、排名、阈值或输出。 |
+
+原始 score、original_index、原 index 到匿名 handle 的映射、阈值/原序 rank 及完整明文 mask 不在允许公开集合中。P0/P1 仅取得各自输入和输出 shares。测试控制器为核对 oracle 重构的值不属于任一 party view。候选允许打开的比较位、相关 DCF pool、shuffle 本地状态和输出 share 的联合模拟仍未证明；详见下表安全门。
+
 ## 3. 构建和验证
 
 ### 环境与构建
