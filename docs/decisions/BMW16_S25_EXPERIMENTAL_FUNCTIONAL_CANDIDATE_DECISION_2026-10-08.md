@@ -41,4 +41,4 @@ S25 的范围是工程接收和有界功能证据。S24 对实际压缩 DCF key 
 
 ## 证据和门禁
 
-最终候选 revision、源码/二进制哈希、命令、运行矩阵和证据索引写入同日期 S25 接收报告。报告必须分别判定实验功能、默认关闭与基线隔离、材料和传输合同、源码到二进制 provenance、DCF 单 key 隐私、整池/shuffle view、安全 alias 和正式性能资格。S25 的功能测试不能关闭密码学或 V4 门。
+S25 实现候选提交为 `112cd8a6d641ded1be5244b317ffb5c42f3b86d1`；有界运行、源码/二进制哈希、命令、失败样本和证据索引见[独立功能交接报告](../reproduction/BMW16_S25_FUNCTIONAL_CANDIDATE_ACCEPTANCE_2026-10-08.md)。候选实际运行到 fresh-material n=1000/K=80 的 loopback E2E。功能测试不能关闭密码学或 V4 门；必须由另一接收者从最终 HEAD 独立复核。
