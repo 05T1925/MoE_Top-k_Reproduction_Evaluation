@@ -1,8 +1,8 @@
 # BMW16 S29：条件安全入口验证报告
 
-日期：2026-10-09  
-方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL**  
-报告源码基线：S29 功能/接口提交 `08e96d393da6f102bb047d230e8845da4509814d`  
+日期：2026-10-09
+方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL**
+报告源码基线：S29 功能/接口提交 `08e96d393da6f102bb047d230e8845da4509814d`
 运行时被复用源码：S26 `2818bce20f30719eaccf0bc5df586cce4fe78c84`，运行时修复 `ded433d636a3df929380bdce0ff22f4ce6121453`
 
 ## 1. 结论摘要
