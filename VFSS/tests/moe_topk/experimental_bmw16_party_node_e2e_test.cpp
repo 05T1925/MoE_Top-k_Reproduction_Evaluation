@@ -338,7 +338,9 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                   bool expect_tls_stream_failure=false,
                   bool expect_final_disagreement=false,
                   bool expect_mask_publish_failure=false,
-                  bool conditional_secure_v1=false) {
+                  bool conditional_secure_v1=false,
+                  bool allow_natural_algorithm_abort=false,
+                  bool conditional_secure_v2=false) {
   require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
   static std::uint64_t serial=0;
   const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+std::to_string(serial++));
@@ -497,7 +499,8 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   const std::string online_timeout =
       (!online_failpoint.empty() || !p1_only_failpoint.empty()) ? "1500" :
       (n>=1000 ? "1800000" : "30000");
-  const auto party_mode=conditional_secure_v1?"party-conditional-secure-v1":"party-tls";
+  const auto party_mode=conditional_secure_v1?"party-conditional-secure-v1":
+      (conditional_secure_v2?"party-conditional-secure-v2":"party-tls");
   const auto p1_args=std::vector<std::string>{node,party_mode,"1",std::to_string(n),std::to_string(k),
     std::to_string(session),std::to_string(fingerprint),claims1.string(),(p1/"raw-share.bin").string(),
     shell1.string(),side1.string(),(p1/"aead.key").string(),(p1/"mask.share").string(),
@@ -531,6 +534,13 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
              <<" P1_exit="<<e1<<" P0_mask="<<(mask0?"present":"none")<<" P1_mask="<<(mask1?"present":"none")
              <<" abort_scope=LOCAL_ONLY_OR_PEER_OBSERVED\n";
     require(!mask0&&!mask1,"TLS E2E failure published a partial mask share");
+    if (allow_natural_algorithm_abort && e0 == 10 && e1 == 10) {
+      require(gate.gate_open, "natural probability abort occurred before offline startup gate");
+      std::cout << "tls_natural_algorithm_abort n=" << n << " K=" << k
+                << " P0_exit=" << e0 << " P1_exit=" << e1
+                << " scope=PEER_AGREED mask=NONE injected=NO\n";
+      return;
+    }
     if (expect_algorithm_abort) {
       require(e0 == 10 && e1 == 10 && gate.gate_open,
               "forced probability abort did not agree across TLS parties");
@@ -582,8 +592,12 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   std::array<pid_t,2> replay_children{};
   for(int party=0;party<2;++party){const auto child=::fork();require(child>=0,"TLS replay process fork");replay_children[party]=child;
     if(child==0){for(const auto& pair:replay_channels)::close(pair[1-party]);
+      const auto& dir=party?p1:p0;
+      const int replay_log=::open((dir/"replay.log").c_str(),O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC,0600);
+      if(replay_log<0||::dup2(replay_log,STDOUT_FILENO)<0||::dup2(replay_log,STDERR_FILENO)<0)::_exit(126);
+      ::close(replay_log);
       const auto uid=party?kUid1:kUid0;if(::setgroups(0,nullptr)!=0||::setgid(uid)!=0||::setuid(uid)!=0)::_exit(126);
-      const auto& dir=party?p1:p0;const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
+      const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
       const auto& side=party?side1:side0;const auto& ready=party?ready1:ready0;
       std::vector<std::string> args{node,"party",std::to_string(party),std::to_string(n),std::to_string(k),
         std::to_string(session),std::to_string(fingerprint),claim.string(),(dir/"raw-share.bin").string(),
@@ -595,9 +609,18 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   const auto replay0=wait_status(replay_children[0]),replay1=wait_status(replay_children[1]);
   require(replay0==20&&replay1==20&&!fs::exists(p0/"replay.mask.share")&&!fs::exists(p1/"replay.mask.share"),
           "durable bundle claim did not reject process replay without a mask");
+  const auto replay_log0=read_all(p0/"replay.log"),replay_log1=read_all(p1/"replay.log");
+  const auto replay_text0=std::string(replay_log0.begin(),replay_log0.end());
+  const auto replay_text1=std::string(replay_log1.begin(),replay_log1.end());
+  require(replay_text0.find("status=ABORT_MATERIAL")!=std::string::npos&&
+              replay_text1.find("status=ABORT_MATERIAL")!=std::string::npos&&
+              replay_text0.find("persistent claim replay")!=std::string::npos&&
+              replay_text1.find("persistent claim replay")!=std::string::npos,
+          "durable replay child logs did not contain the expected material abort");
   std::cout<<"tls_replay n="<<n<<" K="<<k<<" P0_exit="<<replay0<<" P1_exit="<<replay1
            <<" status=DURABLE_CLAIM_REJECTED mask=NONE\n";
-  std::cout<<(conditional_secure_v1?"conditional_secure_v1_e2e":"tls_e2e")
+  std::cout<<(conditional_secure_v1?"conditional_secure_v1_e2e":
+              (conditional_secure_v2?"conditional_secure_v2_e2e":"tls_e2e"))
            <<" n="<<n<<" K="<<k<<" session="<<session<<" T_exit="<<t_exit
            <<" P0_receive_exit="<<r0<<" P1_receive_exit="<<r1<<" P0_online_exit="<<e0
            <<" P1_online_exit="<<e1<<" status=SUCCESS_ORACLE_CHECKED mask=original_order_weight_K\n";
@@ -647,6 +670,90 @@ void run_tls_suite(const std::string& node) {
                "",false,"mask_unlink_after_publish",false,false,"",false,false,false,true);
   run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a015),tls,"",false,"",false,
                "",false,"mask_dir_fsync_after_publish",false,false,"",false,false,false,true);
+}
+
+void run_conditional_secure_v1_case(const std::string& node,
+                                    const std::vector<std::int32_t>& scores,
+                                    std::uint32_t k, std::uint64_t session,
+                                    const TestTlsCredentials& tls,
+                                    bool allow_natural_algorithm_abort = true) {
+  run_tls_case(node, scores, k, session, tls, "", false, "", false, "", false,
+               "", false, false, "", false, false, false, false, true,
+               allow_natural_algorithm_abort);
+}
+
+void run_conditional_secure_v1_matrix(const std::string& node) {
+  require(::geteuid() == 0,
+          "conditional secure v1 matrix requires distinct OS identities");
+  const auto root = fs::path("/tmp") /
+      ("bmw16-s30-conditional-tls-certs-" + std::to_string(::getpid()));
+  require(::mkdir(root.c_str(), 0700) == 0,
+          "create S30 conditional v1 TLS certificate fixture root");
+  auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(
+      reinterpret_cast<void*>(1), [root](void*) {
+        std::error_code ec;
+        fs::remove_all(root, ec);
+      });
+  const auto tls = make_test_tls_credentials(root);
+
+  // The n=1 API shortcut needs neither T material nor a peer channel, so it is
+  // tested directly by the conditional-entry conformance executable. For
+  // n=2..8, every K uses fresh offline material and the independent-process
+  // harness below records any peer-agreed natural sampling abort separately.
+  for (std::uint32_t n = 2; n <= 8; ++n) {
+    const auto scores = extended_scores(n);
+    for (std::uint32_t k = 1; k <= n; ++k) {
+      const auto session = UINT64_C(0x20300000) +
+          static_cast<std::uint64_t>(n) * 256U + k;
+      run_conditional_secure_v1_case(node, scores, k, session, tls);
+    }
+  }
+
+  // Larger sizes use low, middle and high K. Inputs contain signed extremes,
+  // negative values and repeated scores; all party runs still use fresh T
+  // material and independent process UIDs.
+  for (const auto& [n, ks] : std::array<std::pair<std::uint32_t,
+                                      std::array<std::uint32_t, 3>>, 3>{{
+           {64, {1, 32, 64}}, {128, {1, 64, 128}}, {256, {1, 128, 256}}}}) {
+    for (std::size_t j = 0; j < ks.size(); ++j) {
+      const auto k = ks[j];
+      const auto seed = UINT64_C(0x2030000000) +
+          static_cast<std::uint64_t>(n) * 16U + j;
+      run_conditional_secure_v1_case(node, seeded_scores(n, seed), k,
+                                     seed ^ UINT64_C(0x43415345), tls);
+    }
+  }
+
+  // Exercise the tied-score boundary in the same conditional entry.
+  for (const auto k : {1U, 4U, 8U}) {
+    run_conditional_secure_v1_case(node, std::vector<std::int32_t>(8, 7), k,
+        UINT64_C(0x20300800) + k, tls);
+  }
+
+  // The party-node must reject the wrong mTLS peer identity in this entry too.
+  run_tls_case(node, {INT32_MIN, 0, INT32_MAX}, 2,
+      UINT64_C(0x2030ff01), tls, "", false, "", false,
+      "wrong-party1", true, "", false, false, "", false, false,
+      false, false, true, false);
+}
+
+void run_conditional_secure_v2_n1000(const std::string& node) {
+  require(::geteuid() == 0,
+          "conditional v2 n=1000 E2E requires distinct OS identities");
+  const auto root = fs::path("/tmp") /
+      ("bmw16-s30-conditional-v2-n1000-certs-" + std::to_string(::getpid()));
+  require(::mkdir(root.c_str(), 0700) == 0,
+          "create conditional v2 n=1000 TLS certificate fixture root");
+  auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(
+      reinterpret_cast<void*>(1), [root](void*) {
+        std::error_code ec;
+        fs::remove_all(root, ec);
+      });
+  const auto tls = make_test_tls_credentials(root);
+  const auto session = UINT64_C(0x2030100080);
+  run_tls_case(node, seeded_scores(1000, session), 80, session, tls,
+      "", false, "", false, "", false, "", false, false, "", false,
+      false, false, false, false, true, true);
 }
 
 void run_tls_n1000(const std::string& node) {
@@ -817,14 +924,11 @@ int main(int argc, char** argv) {
       return 0;
     }
     if(argc==3&&std::string(argv[2])=="--conditional-secure-v1") {
-      const auto root=fs::path("/tmp")/("bmw16-s29-conditional-tls-certs-"+std::to_string(::getpid()));
-      require(::mkdir(root.c_str(),0700)==0,"create conditional v1 TLS certificate fixture root");
-      auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){
-        std::error_code ec;fs::remove_all(root,ec);
-      });
-      const auto tls=make_test_tls_credentials(root);
-      run_tls_case(node,extended_scores(8),4,UINT64_C(0x2026100908),tls,
-                   "",false,"",false,"",false,"",false,false,"",false,false,false,false,true);
+      run_conditional_secure_v1_matrix(node);
+      return 0;
+    }
+    if(argc==3&&std::string(argv[2])=="--conditional-secure-v2-n1000") {
+      run_conditional_secure_v2_n1000(node);
       return 0;
     }
     require(argc == 2 || std::string(argv[2]) == "--extended" ||

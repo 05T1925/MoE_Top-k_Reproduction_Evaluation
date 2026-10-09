@@ -22,6 +22,21 @@ bool rejects(const ProtocolIBmw16ConditionalSecureV1Config& config,
 void require(bool ok, const char* message) {
   if (!ok) throw std::runtime_error(message);
 }
+
+std::vector<std::uint8_t> singleton_share(std::uint8_t party) {
+  ProtocolIBmw16ConditionalSecureV1Config config{};
+  config.n = 1; config.k = 1; config.padded_n = 2;
+  config.index_bits = 1; config.comparison_bits = 34;
+  config.party = party; config.timeout_ms = 100;
+  config.require_authenticated_transport = true;
+  ProtocolIBmw16ConditionalSecureV1Material material;
+  const auto result = protocol_i_bmw16_conditional_secure_v1_raw_score_mask_party(
+      config, std::move(material), {0}, {}, {}, {}, {}, -1, -1);
+  require(std::string(result.status) == "SUCCESS" &&
+              std::string(result.abort_scope) == "NONE",
+          "conditional v1 n=1 did not use its exact shortcut");
+  return result.xor_mask_share;
+}
 }  // namespace
 
 int main() {
@@ -41,7 +56,13 @@ int main() {
     require(rejects(config, "TEST_ONLY fault controls are forbidden by conditional BMW16 v1"),
             "conditional v1 accepted a TEST_ONLY fault control");
 
-    std::cout << "conditional_secure_v1_conformance=PASS tls_required=1 n_max=256 test_hooks=REJECTED\n";
+    const auto share0 = singleton_share(0), share1 = singleton_share(1);
+    require(share0 == std::vector<std::uint8_t>{1} &&
+                share1 == std::vector<std::uint8_t>{0} &&
+                (share0[0] ^ share1[0]) == 1,
+            "conditional v1 n=1 XOR shortcut shares");
+
+    std::cout << "conditional_secure_v1_conformance=PASS tls_required=1 n_max=256 test_hooks=REJECTED n1_shortcut=PASS\n";
     return 0;
   } catch (const std::exception& error) {
     std::cerr << "conditional_secure_v1_conformance=FAIL reason=" << error.what() << '\n';
