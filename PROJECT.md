@@ -96,8 +96,11 @@ S29 增加默认关闭、显式版本化的 `conditional_secure_v1` party 入口
 直接委托给唯一经接收的 S26/S28 party 实现，不复制 Select 或改变材料 ABI。只有在上述条件配置下
 可使用其安全候选标签；全池/密钥和 shuffle 假设仍为 CONDITIONAL，正式 V4 性能未运行。该安全配置
 不改变 M6A → M6B → M7 顺序，也不把实验候选记为正式六方案 BB90 实现。详见 S29 决策与验证报告。
-S28 报告中“Draft PR 尚未创建”是当时状态；S29 重新核对发现 PR #29 当前为 Open、源分支仍停在
-`codex/m6b-i-bmw16-s26` / `2818bce...`，没有包含 S27/S28/S29 证据，也没有合并到 main。
+S28 报告中“Draft PR 尚未创建”是当时状态；S29 核对并快进更新现有 PR #29 的源分支后，
+远端 head 为 `096ee6aa790a5d7244c3ae5ec1a4d657354d129a`，已包含 S27/S28/S29；PR 仍为 Open 而非
+Draft，因 GitHub 元数据连接器未登录，标题/正文和 Draft 状态未能更新。候选仍未合并到 main。
+详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 与
+[main 比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 

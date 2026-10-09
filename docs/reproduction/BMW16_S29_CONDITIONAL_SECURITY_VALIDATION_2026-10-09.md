@@ -17,7 +17,7 @@ S26 功能候选已经异会话接收；S28 是未参与 S27 证明撰写的独�
 
 核验时 `main = origin/main = merge-base = c3926c68fd14f270faa8b55234311071947fa080`。S26 源码分支远端 head 为 `2818bce...`。S26、S27、S28 的独立报告身份不与 S29 源码 revision 混用。桌面主工作区及其他 worktree 未修改；`VFSS-baseline/`、`Papers/`、参考工程、E20/E21 和 PR #28 未进入差异。
 
-GitHub 页面在 2026-10-09 核验到 PR #29 是 Open，源分支 `codex/m6b-i-bmw16-s26`、head `2818bce20f30719eaccf0bc5df586cce4fe78c84`，目标为 `main`；它尚未包含 S27/S28/S29，也未合入 main。PR 页面为 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29)。PR #28 是 AAV86 项，S29 未改变它。S29 仅在本地提交；是否将该提交纳入 PR #29/设为 Draft，应以最终远端 ref 更新结果为准，不能将本地 commit 写成远端 head。
+GitHub 页面最初核验到 PR #29 是 Open，源分支 `codex/m6b-i-bmw16-s26`、head `2818bce...`。S29 验证完成后，将该分支快进到 `096ee6aa790a5d7244c3ae5ec1a4d657354d129a`，故该 PR 现在包含 S26 独立功能接收、S27/S28 安全记录和 S29 条件入口。PR #29 仍是 Open 而非 Draft，且未合入 main。更新 PR 元数据时 GitHub connector 返回 `USER_NOT_LOGGED_IN`，所以不能改标题/正文或转换 Draft。可查看 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和 [compare link](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。PR #28 是 AAV86 项，S29 未改变它。
 
 ## 3. S28 条件性证明接收与 S29 项目假设
 
@@ -130,3 +130,21 @@ cmake --build /tmp/moe_bmw16_s29_v1_release --target \
 | `FORMAL_PERFORMANCE_STATUS` | NOT_RUN | M6A→M6B→M7 正式顺序未变，未运行 V4 LAN/WAN 或统一九指标。 |
 
 后续接收只需针对 S29 增加的版本化入口、本文的假设边界和最终源码 provenance 作异会话审查；不能将审查对象扩大为“重新发现一般 DCF 安全证明”，也不能把条件性结论升级为无条件 PASS。若项目要求标准模型 SHA-256 sampler、标准 AES-128 直接定理或生产凭据/跨主机部署保证，需另立门禁与对应原语/部署合同。
+
+### PR 元数据交接
+
+S29 已将当前分支快进推到 PR #29 源 ref；元数据连接器 `github_update_pull_request` 返回 `USER_NOT_LOGGED_IN`，故没有更新 PR 标题/正文或转换 Draft。当前准确远端 head 为 `096ee6aa790a5d7244c3ae5ec1a4d657354d129a`。可直接打开 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 或 [main...candidate 比较页](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
+
+建议标题：`S29: Conditional-security Protocol I + BMW16-derived Select candidate`
+
+建议正文：
+
+```markdown
+PROJECT_DERIVED / EXPERIMENTAL Protocol I + BMW16-derived Select + DCF. This is not a BB90 implementation or a line-for-line BMW16 Algorithm 7 implementation, and it does not inherit BMW16 Theorem 8 guarantees.
+
+S29 adds a default-off, versioned conditional_secure_v1 API that requires the existing opt-in implementation and authenticated TLS streams, rejects TEST_ONLY fault controls, caps n at 256, and delegates to the sole independently received S26/S28 runtime. No second Select, material ABI, plaintext fallback, or online Dealer is added.
+
+Validation on source 08e96d393da6f102bb047d230e8845da4509814d: 8/8 targeted CTests passed; 39/39 common-tape cases passed; fresh-material T/P0/P1 mTLS E2E through the new entry passed at n=8,K=4. The reused core was independently received through n<=256 by S26/S28. Final-source n=1000 was not run and lies outside the new API scope.
+
+Security conclusions remain conditional on the reviewed G126/restricted 126-bit AES key-family PRG/PRP assumption, cryptoTools AES-CTR root-stream assumption, OS CSPRNG, trusted offline non-colluding T, one semi-honest corrupt online party, the documented leakage L, and ROM sampling with at least one honest OS-random contribution. No standard-model SHA-256 sampler guarantee, production credentials/deployment acceptance, or unconditional/default secure alias is claimed. Formal V4 LAN/WAN and unified nine-metric performance remain NOT_RUN.
+```
