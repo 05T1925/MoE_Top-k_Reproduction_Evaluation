@@ -240,6 +240,11 @@ void run_case(const std::string& node, const std::vector<std::int32_t>& scores, 
       (p1/"aead.key").string(), std::to_string(kUid0), std::to_string(kUid1),
       (root/"pair.ready").string()};
   const int t_exit = exec_capture(targs, root / "t.log");
+  if (t_exit != 0) {
+    const auto failed_t_log = read_all(root / "t.log");
+    std::cerr << "offline T child exit=" << t_exit << " output="
+              << std::string(failed_t_log.begin(), failed_t_log.end()) << '\n';
+  }
   require(t_exit == 0, "offline T node failed");
   const auto t_log_bytes = read_all(root / "t.log");
   const std::string t_log(t_log_bytes.begin(), t_log_bytes.end());
