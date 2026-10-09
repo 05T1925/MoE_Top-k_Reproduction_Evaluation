@@ -97,7 +97,7 @@ S29 增加默认关闭、显式版本化的 `conditional_secure_v1` party 入口
 可使用其安全候选标签；全池/密钥和 shuffle 假设仍为 CONDITIONAL，正式 V4 性能未运行。该安全配置
 不改变 M6A → M6B → M7 顺序，也不把实验候选记为正式六方案 BB90 实现。详见 S29 决策与验证报告。
 S28 报告中“Draft PR 尚未创建”是当时状态；S29 核对并快进更新现有 PR #29 的源分支后，
-远端 head 为 `096ee6aa790a5d7244c3ae5ec1a4d657354d129a`，已包含 S27/S28/S29；PR 仍为 Open 而非
+远端 head 在 S29 文档同步后核验为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`，已包含 S27/S28/S29；PR 仍为 Open 而非
 Draft，因 GitHub 元数据连接器未登录，标题/正文和 Draft 状态未能更新。候选仍未合并到 main。
 详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 与
 [main 比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。

@@ -111,7 +111,7 @@ BMW16_S28 dated 决策/复现报告。
 原唯一 party 实现。它不是无条件或标准模型安全声明，不是 BB90/BMW16 原算法复现、生产部署批准
 或正式性能验收。具体假设、优势项、L 和实测边界见 S29 决策/复现报告。
 S28 报告中的“Draft PR 未创建”只描述其核对时点；S29 将候选快进推至现有 PR #29 的源分支，
-远端 head 为 `096ee6aa790a5d7244c3ae5ec1a4d657354d129a`，包括 S27/S28/S29 证据。PR 仍 Open
+远端 head 在 S29 文档同步后核验为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`，包括 S27/S28/S29 证据。PR 仍 Open
 而非 Draft；GitHub 元数据连接器未登录，无法更新其标题/正文或 Draft 状态，且尚未合并 main。
 详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和
 [比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。

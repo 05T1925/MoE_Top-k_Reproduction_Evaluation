@@ -224,7 +224,7 @@ oracle、明文 fallback 或在线 Dealer。
 
 S26 接收者给 `DRAFT_PR_READY=PASS`；此状态本身不是 PR 存在或已合并的证据。S28 报告当时
 记录尚未创建 PR；S29 后来核对发现 PR #29 已存在，随后将 S29 集成分支快进推到它的源分支。
-当前远端源分支为 `codex/m6b-i-bmw16-s26`，head `096ee6aa790a5d7244c3ae5ec1a4d657354d129a`，
+当前远端源分支为 `codex/m6b-i-bmw16-s26`，S29 状态文档同步后最后核验 head 为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`，
 目标仍为 `main`。PR #29 仍为 Open（非 Draft）；GitHub 元数据连接器返回
 `USER_NOT_LOGGED_IN`，因此本任务没有修改 PR 标题/正文或 Draft 状态。远端 main 仍未包含该候选。
 可查看 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和
