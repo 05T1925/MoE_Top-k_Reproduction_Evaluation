@@ -73,6 +73,7 @@ S4 哈希验证对 CRLF 做字节规范化后与固定 Git blob SHA 对齐；修
 - 工作树：`C:\Users\28641\.codex\worktrees\m6b-i-bmw16-s26\MoE_Top-k_Reproduction_Evaluation`。
 - Linux：WSL Ubuntu 24.04，GCC 13.3，CMake 3.28.3，x86_64。OFF/ON/TEST_ONLY 构建各自使用独立目录 `/tmp/moe_bmw16_s26_off`、`..._on`、`..._test`。
 - ON Release：实验开关 ON、TEST_ONLY failpoints OFF、DCF diagnostic counters OFF。TEST_ONLY 构建：实验开关 ON、测试 failpoints ON、DCF counters ON，仅用于差分与负例。
+- 二进制/目标隔离复核：default-OFF target-help 没有 BMW16 experimental party/E2E target；ON Release CMake cache 为 adapter `ON`、failpoints `OFF`，对 Release party-node 执行 `strings` 未发现两个发布 failpoint 名；TEST_ONLY party-node 中可见这两个名字。failpoint 负例只在测试构建运行。
 - 资源预检：运行前可用内存约 7.5 GB，`/tmp` 可用约 987 GB；n=1000 产生的所有材料留在 harness 临时目录，结束后清理。它是功能性 loopback 运行，不能作为 LAN/WAN 性能数据。
 
 S25 38 路径清单与 S26 关键源文件基准/最终哈希、二进制哈希、证据日志 SHA-256 集中登记在仓库外 `C:\Users\28641\.codex\artifacts\BMW16_S26_20261008\sha256_index.txt`；密钥、bundle、证书私钥和真实 shares 未进入该报告或 Git。最终关键哈希如下：
@@ -85,6 +86,7 @@ S25 38 路径清单与 S26 关键源文件基准/最终哈希、二进制哈希�
 | Release party-node | `ba605cbb9970f0365320099b5a5e006cbb6b2fcb489d085d440bcce91a44ee1d` |
 | Release E2E harness | `0780004c368cedd2503b87051ac572b3dcc7eceea2fbe82977d867c86481968a` |
 | TEST_ONLY party-node（failpoints/counters ON） | `b025214d7498df6aa78989e5a62ea66341a9ba006eb6057bc6e1fa9f70f4e279` |
+| TEST_ONLY Select party/conformance binary | `eff85c871bfd35a571c20a9af6c0dd28657b70f0d5ee994b7347e5055620f9aa` |
 | common-tape matrix JSON | `DD2D4AC9D45E1E149B322E87EF37B9FF7CAE9A392A60CA4D2E4DBE600E840976` |
 | cross-protocol targeted CTest log | `093D311E060D4D72A1A69EE26E2F6C020B49AC6A827AFB4662CE4B387E5BE453` |
 | full OFF CTest log | `B1AE1D360C1FC6232A775EDE5176436B5AAFFE20B6FE5E80D8402FEE550F0515` |
