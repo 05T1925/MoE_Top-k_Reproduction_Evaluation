@@ -105,6 +105,14 @@ S25 38 路径清单与 S26 关键源文件基准/最终哈希、二进制哈希�
 | `docs/decisions/BMW16_S26_POST_CANDIDATE_REVIEW_DECISION_2026-10-09.md` | 记录可复现缺陷、修正范围和独立性边界。 |
 | `docs/reproduction/BMW16_S26_POST_CANDIDATE_REVIEW_2026-10-09.md` | 本轮技术复核、执行矩阵、哈希与交接报告。 |
 
+## 9. Draft PR 状态
+
+提交 `597519f7bef7cfd05daaeedc36e6d8426beac9d5` 已推送到 `origin/codex/m6b-i-bmw16-s26`。本轮请求 GitHub MCP 创建 Draft PR 时，connector 返回 `connector ... is not connected`；浏览器创建页虽被打开，但获取页面状态连续超时。因此**Draft PR 未实际创建**，也没有把 compare/create URL 误报成 PR。候选分支可从以下 GitHub 页面创建独立 Draft PR：
+
+`https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26?expand=1`
+
+建议标题：`Add opt-in BMW16-derived Protocol I Select candidate`。创建时需保留本文中 EXPERIMENTAL 身份、未关闭的 DCF/联合视图安全门、正式性能 NOT_RUN，以及本执行聊天参与 S25、不能自称异聊天接收的说明。
+
 ## 6. 门禁状态
 
 | 门 | 状态 | 本轮含义 |
