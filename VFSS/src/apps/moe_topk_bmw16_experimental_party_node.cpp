@@ -2,6 +2,9 @@
 #include <moe_topk/experimental_bmw16_material_delivery.h>
 #include <moe_topk/experimental_bmw16_online_tls.h>
 #include <moe_topk/experimental_bmw16_select_party.h>
+#if defined(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+#include <moe_topk/protocol_i_bmw16_conditional_secure_v1.h>
+#endif
 #include <moe_topk/experimental_bmw16_startup_gate.h>
 #include <moe_topk/experimental_bmw16_stream_store.h>
 #include <moe_topk/protocol_i_transport.h>
@@ -542,7 +545,8 @@ int receive_tls(int argc,char** argv) {
   return kSuccess;
 }
 
-int party_online(int argc, char** argv, bool online_tls = false) {
+int party_online(int argc, char** argv, bool online_tls = false,
+                 bool conditional_secure_v1 = false) {
   // party id n k session fingerprint claim-root raw-share shell sidecar key mask timeout pair-ready fd[12] ready-fd
   if (online_tls) {
     require(argc == 24,
@@ -557,6 +561,8 @@ int party_online(int argc, char** argv, bool online_tls = false) {
   const auto session = std::stoull(argv[5]);
   const auto fingerprint = std::stoull(argv[6]);
   const auto timeout = std::stoi(argv[13]);
+  require(!conditional_secure_v1 || online_tls,
+          "conditional BMW16 v1 requires the authenticated TLS party mode");
   auto c = config(n, k, session, fingerprint, party, timeout, argv[7]);
   c.require_authenticated_transport = online_tls;
 #if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
@@ -659,8 +665,18 @@ int party_online(int argc, char** argv, bool online_tls = false) {
   const int agreement = all_fds[10];
   const int coin = all_fds[11];
   auto raw = decode_raw_share(read_bytes(argv[8]), n);
-  auto result = protocol_i_bmw16_experimental_raw_score_mask_party(
-      c, std::move(material), raw, score, forward, select, inverse, agreement, coin, nullptr);
+  auto result = [&] {
+    if (conditional_secure_v1) {
+#if defined(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+      return protocol_i_bmw16_conditional_secure_v1_raw_score_mask_party(
+          c, std::move(material), raw, score, forward, select, inverse, agreement, coin);
+#else
+      throw std::runtime_error("conditional BMW16 security v1 was not compiled");
+#endif
+    }
+    return protocol_i_bmw16_experimental_raw_score_mask_party(
+        c, std::move(material), raw, score, forward, select, inverse, agreement, coin, nullptr);
+  }();
   const std::string status = result.status ? result.status : "ERROR_UNEXPECTED";
   const std::string scope = result.abort_scope ? result.abort_scope : "PROCESS_ERROR";
   int exit_code = kUnexpected;
@@ -710,8 +726,15 @@ int main(int argc, char** argv) {
     if (argc > 1 && std::string(argv[1]) == "recv-tls") return receive_tls(argc, argv);
     if (argc > 1 && std::string(argv[1]) == "party") return party_online(argc, argv);
     if (argc > 1 && std::string(argv[1]) == "party-tls") return party_online(argc, argv, true);
+#if defined(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+    if (argc > 1 && std::string(argv[1]) == "party-conditional-secure-v1")
+      return party_online(argc, argv, true, true);
+#endif
     std::cerr << "BMW16-derived Select / PROJECT_DERIVED / EXPERIMENTAL\n"
               << "usage: node t-tls ... | node recv-tls ... | node party ... | node party-tls ...";
+#if defined(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+    std::cerr << " | node party-conditional-secure-v1 ...";
+#endif
 #if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
     std::cerr << " | node t-local-test-only ...";
 #endif

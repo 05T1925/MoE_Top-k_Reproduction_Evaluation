@@ -337,7 +337,8 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                   bool expect_engineering_failure=false,
                   bool expect_tls_stream_failure=false,
                   bool expect_final_disagreement=false,
-                  bool expect_mask_publish_failure=false) {
+                  bool expect_mask_publish_failure=false,
+                  bool conditional_secure_v1=false) {
   require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
   static std::uint64_t serial=0;
   const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+std::to_string(serial++));
@@ -496,7 +497,8 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   const std::string online_timeout =
       (!online_failpoint.empty() || !p1_only_failpoint.empty()) ? "1500" :
       (n>=1000 ? "1800000" : "30000");
-  const auto p1_args=std::vector<std::string>{node,"party-tls","1",std::to_string(n),std::to_string(k),
+  const auto party_mode=conditional_secure_v1?"party-conditional-secure-v1":"party-tls";
+  const auto p1_args=std::vector<std::string>{node,party_mode,"1",std::to_string(n),std::to_string(k),
     std::to_string(session),std::to_string(fingerprint),claims1.string(),(p1/"raw-share.bin").string(),
     shell1.string(),side1.string(),(p1/"aead.key").string(),(p1/"mask.share").string(),
     online_timeout,ready1.string(),"127.0.0.1",std::to_string(online_port_base),"","0",
@@ -515,7 +517,7 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
       get_be16(8)==1&&get_be64(10)==session&&get_be64(18)==fingerprint&&
       get_be32(26)==n&&get_be32(30)==k&&get_be16(34)==online_port_base,
       "online TLS listener readiness binding");
-  const auto p0_args=std::vector<std::string>{node,"party-tls","0",std::to_string(n),std::to_string(k),
+  const auto p0_args=std::vector<std::string>{node,party_mode,"0",std::to_string(n),std::to_string(k),
     std::to_string(session),std::to_string(fingerprint),claims0.string(),(p0/"raw-share.bin").string(),
     shell0.string(),side0.string(),(p0/"aead.key").string(),(p0/"mask.share").string(),
     online_timeout,ready0.string(),"127.0.0.1","0","127.0.0.1",
@@ -595,7 +597,8 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
           "durable bundle claim did not reject process replay without a mask");
   std::cout<<"tls_replay n="<<n<<" K="<<k<<" P0_exit="<<replay0<<" P1_exit="<<replay1
            <<" status=DURABLE_CLAIM_REJECTED mask=NONE\n";
-  std::cout<<"tls_e2e n="<<n<<" K="<<k<<" session="<<session<<" T_exit="<<t_exit
+  std::cout<<(conditional_secure_v1?"conditional_secure_v1_e2e":"tls_e2e")
+           <<" n="<<n<<" K="<<k<<" session="<<session<<" T_exit="<<t_exit
            <<" P0_receive_exit="<<r0<<" P1_receive_exit="<<r1<<" P0_online_exit="<<e0
            <<" P1_online_exit="<<e1<<" status=SUCCESS_ORACLE_CHECKED mask=original_order_weight_K\n";
 }
@@ -811,6 +814,17 @@ int main(int argc, char** argv) {
     }
     if(argc==3&&std::string(argv[2])=="--tls-n1000") {
       run_tls_n1000(node);
+      return 0;
+    }
+    if(argc==3&&std::string(argv[2])=="--conditional-secure-v1") {
+      const auto root=fs::path("/tmp")/("bmw16-s29-conditional-tls-certs-"+std::to_string(::getpid()));
+      require(::mkdir(root.c_str(),0700)==0,"create conditional v1 TLS certificate fixture root");
+      auto cleanup=std::unique_ptr<void,std::function<void(void*)>>(reinterpret_cast<void*>(1),[root](void*){
+        std::error_code ec;fs::remove_all(root,ec);
+      });
+      const auto tls=make_test_tls_credentials(root);
+      run_tls_case(node,extended_scores(8),4,UINT64_C(0x2026100908),tls,
+                   "",false,"",false,"",false,"",false,false,"",false,false,false,false,true);
       return 0;
     }
     require(argc == 2 || std::string(argv[2]) == "--extended" ||

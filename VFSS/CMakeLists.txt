@@ -23,12 +23,18 @@ find_package(OpenMP COMPONENTS CXX REQUIRED)
 option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
 option(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER
     "Build opt-in EXPERIMENTAL BMW16-derived Select adapter and party composition (not secure)" OFF)
+option(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1
+    "Build the explicitly assumption-scoped BMW16 conditional-security v1 entry point (default OFF)" OFF)
 option(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS
     "Instrument ordinary DCF KeyGen/Eval AES expansion call sites for research measurements" OFF)
 option(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS
     "TEST_ONLY: compile BMW16 publication/TLS fault injection hooks (never enable in deployable builds)" OFF)
 if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS AND NOT BUILD_TESTING)
   message(FATAL_ERROR "BMW16 failpoints are TEST_ONLY and require BUILD_TESTING=ON")
+endif()
+if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1 AND
+   NOT MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  message(FATAL_ERROR "Conditional BMW16 security v1 requires the opt-in BMW16 implementation")
 endif()
 # find_package(CUDAToolkit REQUIRED)
 
@@ -103,6 +109,12 @@ if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
   if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS=1)
   endif()
+  if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/moe_topk/protocol_i_bmw16_conditional_secure_v1.cpp)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1=1)
+  endif()
 endif()
 
 if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
@@ -121,6 +133,11 @@ if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
   add_executable(moe_topk_bmw16_experimental_party_node_e2e_test
       tests/moe_topk/experimental_bmw16_party_node_e2e_test.cpp)
   target_link_libraries(moe_topk_bmw16_experimental_party_node_e2e_test PRIVATE ${PROJECT_NAME})
+  if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+    add_executable(moe_topk_bmw16_conditional_secure_v1_conformance_test
+        tests/moe_topk/protocol_i_bmw16_conditional_secure_v1_conformance_test.cpp)
+    target_link_libraries(moe_topk_bmw16_conditional_secure_v1_conformance_test PRIVATE ${PROJECT_NAME})
+  endif()
 endif()
 
 
@@ -707,6 +724,10 @@ if(BUILD_TESTING)
     if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
         add_test(NAME moe_topk_bmw16_experimental_party_test
                  COMMAND moe_topk_bmw16_experimental_party_test)
+    endif()
+    if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+        add_test(NAME moe_topk_bmw16_conditional_secure_v1_conformance_test
+                 COMMAND moe_topk_bmw16_conditional_secure_v1_conformance_test)
     endif()
     # Protocol III primitive and runtime tests.
     add_test(

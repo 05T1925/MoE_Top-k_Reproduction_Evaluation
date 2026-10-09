@@ -103,6 +103,16 @@ conformance、39 项 common-tape 和独立三进程 mTLS E2E 至 n=256；n=1000�
 此用户授权的提前 EXPERIMENTAL 研究复核不改变 M6A → M6B → M7 正式顺序。详情见
 BMW16_S28 dated 决策/复现报告。
 
+2026-10-09 S29 在该提前候选上建立限定的条件安全配置，而不改变 M6A→M6B→M7
+正式执行顺序：S26 的完整功能入口已由异会话接收者独立接收；S28 对实际 M2UC v1 单 key、
+相关整池 transcript 与 shuffle/output-share 推导完成了条件性独立复核。S29 以明确的单方半诚实、
+可信离线静默 T、泄露函数 L、126-bit restricted-AES/G126 扩展、cryptoTools AES-CTR/OS
+随机源及 ROM sampler 条件定义 `conditional_secure_v1`，新增的 API 默认关闭、强制 TLS，并调用
+原唯一 party 实现。它不是无条件或标准模型安全声明，不是 BB90/BMW16 原算法复现、生产部署批准
+或正式性能验收。具体假设、优势项、L 和实测边界见 S29 决策/复现报告。
+S28 报告中的“Draft PR 未创建”只描述其核对时点；S29 当前复查发现 PR #29 已 Open，源仍为
+`codex/m6b-i-bmw16-s26@2818bce...`，尚无 S27/S28/S29 证据且未合并 main。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。
@@ -111,6 +121,10 @@ BMW16_S28 dated 决策/复现报告。
 4. Protocol III + AAV86。
 5. Protocol I + BB90+DCF。
 6. Protocol III + BB90+DCF。
+
+第 5 项仍是原始论文目标。当前 Protocol I + BMW16-derived Select + DCF 仅作为经接收的
+PROJECT_DERIVED 实验候选占位；任何报告、指标和 API 都必须使用其完整身份标签，不能把这一候选
+改称 BB90+DCF 或拿 BMW16 定理覆盖其保证。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
 
