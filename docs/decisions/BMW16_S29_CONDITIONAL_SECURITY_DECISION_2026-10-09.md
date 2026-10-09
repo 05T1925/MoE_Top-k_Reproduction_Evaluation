@@ -223,10 +223,12 @@ oracle、明文 fallback 或在线 Dealer。
 ## 7. PR 与性能状态
 
 S26 接收者给 `DRAFT_PR_READY=PASS`；此状态本身不是 PR 存在或已合并的证据。S28 报告当时
-记录尚未创建 PR；S29 后来核对发现 PR #29 已存在，随后将 S29 集成分支快进推到它的源分支。
-当前远端源分支为 `codex/m6b-i-bmw16-s26`，S29 状态文档同步后最后核验 head 为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`，
-目标仍为 `main`。PR #29 仍为 Open（非 Draft）；GitHub 元数据连接器返回
-`USER_NOT_LOGGED_IN`，因此本任务没有修改 PR 标题/正文或 Draft 状态。远端 main 仍未包含该候选。
+记录尚未创建 PR；S29 后来核对发现 PR #29 已存在，随后将集成分支快进推到其源分支。
+S29 文档记录的 `915fbbdd7e96bdd34f97f4d414b335f3b3951935` 是当时同步过程的中间 ref
+核验点，不是 S29 最终 head。S30 从 S29 最终文档 head `871b6683d15a34d117eb24353611d8ef48434aca`
+独立复核：`refs/heads/codex/m6b-i-bmw16-s26` 与 `refs/pull/29/head` 均指向 `871b668...`；
+目标仍为 `main`，其 head 仍为 `c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍为 Open
+（非 Draft）；S30 核对的网页标题/模板正文尚未更新。远端 main 仍未包含该候选。
 可查看 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和
 [main 与候选分支比较](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
 S29 不合并 main、不改 PR #28，也不把远端功能分支写成 main 状态。

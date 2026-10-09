@@ -17,7 +17,7 @@ S26 功能候选已经异会话接收；S28 是未参与 S27 证明撰写的独�
 
 核验时 `main = origin/main = merge-base = c3926c68fd14f270faa8b55234311071947fa080`。S26 源码分支远端 head 为 `2818bce...`。S26、S27、S28 的独立报告身份不与 S29 源码 revision 混用。桌面主工作区及其他 worktree 未修改；`VFSS-baseline/`、`Papers/`、参考工程、E20/E21 和 PR #28 未进入差异。
 
-GitHub 页面最初核验到 PR #29 是 Open，源分支 `codex/m6b-i-bmw16-s26`、head `2818bce...`。S29 验证完成后，先将该分支快进到 `096ee6aa...`，再同步状态文档；随后 `refs/heads/codex/m6b-i-bmw16-s26` 与 `refs/pull/29/head` 在最终文档同步前均核验到 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`。PR #29 包含 S26 独立功能接收、S27/S28 安全记录和 S29 条件入口。PR #29 仍是 Open 而非 Draft，且未合入 main。更新 PR 元数据时 GitHub connector 返回 `USER_NOT_LOGGED_IN`，所以不能改标题/正文或转换 Draft。可查看 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和 [compare link](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。PR #28 是 AAV86 项，S29 未改变它。
+GitHub 页面最初核验到 PR #29 是 Open，源分支 `codex/m6b-i-bmw16-s26`、head `2818bce...`。S29 验证完成后，先将该分支快进到 `096ee6aa...`，再同步状态文档；S29 当时的中间 ref 核验为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`。**S30 更正**：该中间 hash 不是 S29 最终 head；S30 从 S29 最终文档提交 `871b6683d15a34d117eb24353611d8ef48434aca` 检查后，`refs/heads/codex/m6b-i-bmw16-s26` 和 `refs/pull/29/head` 均指向 `871b668...`，`main/origin/main` 为 `c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍 Open、目标为 main、未合并；当前网页标题和模板正文未更新。S29 更新元数据时 GitHub connector 返回 `USER_NOT_LOGGED_IN`，没有修改标题/正文或转换 Draft。可查看 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和 [compare link](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。PR #28 是 AAV86 项，S29 未改变它。
 
 ## 3. S28 条件性证明接收与 S29 项目假设
 

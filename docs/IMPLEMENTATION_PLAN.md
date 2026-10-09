@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-26
+更新日期：2026-10-10（S30 状态同步；阶段顺序未改变）
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -110,11 +110,24 @@ BMW16_S28 dated 决策/复现报告。
 随机源及 ROM sampler 条件定义 `conditional_secure_v1`，新增的 API 默认关闭、强制 TLS，并调用
 原唯一 party 实现。它不是无条件或标准模型安全声明，不是 BB90/BMW16 原算法复现、生产部署批准
 或正式性能验收。具体假设、优势项、L 和实测边界见 S29 决策/复现报告。
-S28 报告中的“Draft PR 未创建”只描述其核对时点；S29 将候选快进推至现有 PR #29 的源分支，
-远端 head 在 S29 文档同步后核验为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`，包括 S27/S28/S29 证据。PR 仍 Open
-而非 Draft；GitHub 元数据连接器未登录，无法更新其标题/正文或 Draft 状态，且尚未合并 main。
+S28 报告中的“Draft PR 未创建”只描述其核对时点。S29 文档中记录的
+`915fbbdd7e96bdd34f97f4d414b335f3b3951935` 是同步过程中的中间 ref 核验点；S30 从 S29
+最终文档 head `871b6683d15a34d117eb24353611d8ef48434aca` 独立核对后，PR #29 源分支与
+`refs/pull/29/head` 均为 `871b668...`，main/origin/main 仍为
+`c3926c68fd14f270faa8b55234311071947fa080`。PR 仍 Open、目标为 main，页面标题/模板正文未更新，
+且候选尚未合并 main。见 S30 独立接收报告的远端核验记录。
 详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和
 [比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
+
+2026-10-10 S30 对 S29 v1 入口作异会话独立源码接收及 47 个 fresh-material mTLS E2E，
+n≤256 范围通过。S28 的 DCF 单 key、adaptive full-pool、shuffle/output 与 ROM sampler
+结论已是独立条件性复核；n≤256 设计范围记 `CONDITIONALLY_ACCEPTED / CLOSED`，适用前提和
+完整 L 见 S29/S30 dated 决策。S30 新增 `conditional_secure_v2`，单独 opt-in，admission n≤1000，
+复用唯一 S26/S28 party runtime 和材料 ABI；(1000,80) fresh-material E2E 通过。v2 wrapper 需
+下一接收者复核；该运行只属研究性功能/容量试验，不是正式性能数据。n≥10^4 不生成全池材料；
+M6A→M6B→M7 正式顺序、V4 LAN/WAN 门及九指标要求不变。S30 被测源码 commit 为
+`eac5151e96f3cc67d2bc664c0d300b51ef672e10`；详见
+[S30 接收报告](reproduction/BMW16_S30_INDEPENDENT_ACCEPTANCE_2026-10-10.md)。
 
 ### 1.4 最终六种方案
 

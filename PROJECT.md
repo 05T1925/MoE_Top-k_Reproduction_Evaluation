@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-10-09（S29）
+更新日期：2026-10-10（S30）
 
 ## 1. 项目目标与当前边界
 
@@ -96,11 +96,27 @@ S29 增加默认关闭、显式版本化的 `conditional_secure_v1` party 入口
 直接委托给唯一经接收的 S26/S28 party 实现，不复制 Select 或改变材料 ABI。只有在上述条件配置下
 可使用其安全候选标签；全池/密钥和 shuffle 假设仍为 CONDITIONAL，正式 V4 性能未运行。该安全配置
 不改变 M6A → M6B → M7 顺序，也不把实验候选记为正式六方案 BB90 实现。详见 S29 决策与验证报告。
-S28 报告中“Draft PR 尚未创建”是当时状态；S29 核对并快进更新现有 PR #29 的源分支后，
-远端 head 在 S29 文档同步后核验为 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`，已包含 S27/S28/S29；PR 仍为 Open 而非
-Draft，因 GitHub 元数据连接器未登录，标题/正文和 Draft 状态未能更新。候选仍未合并到 main。
+S28 报告中“Draft PR 尚未创建”是当时状态。S29 报告记载的 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`
+是文档同步过程中的中间 ref 核验点；S30 从精确 S29 最终文档 head
+`871b6683d15a34d117eb24353611d8ef48434aca` 独立核对后，当前
+`refs/heads/codex/m6b-i-bmw16-s26` 与 `refs/pull/29/head` 均为 `871b668...`，而
+`main = origin/main = c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍 Open、目标为 main，
+未合并；GitHub 页面标题和模板正文未更新。该候选仍不属于 main。
 详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 与
 [main 比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
+
+**2026-10-10 S30 独立接收与规模门**：从 S29 最终 head 独立复核后，`conditional_secure_v1`
+入口在 n≤256 的范围完成本轮源码检查和 47/47 fresh-material 三进程 mTLS/oracle E2E；S28
+已独立接收的条件安全论证在明确的 G126/受限 AES key family、AES-CTR root stream、OS CSPRNG、
+ROM sampler、可信离线 T、单方半诚实与完整泄露 L 假设内继续适用。该 n≤256 设计门记为
+`CONDITIONALLY_ACCEPTED / 范围关闭`，不再重复打开同一引理。
+S30 新增默认 OFF 的 `conditional_secure_v2`，仅把有界入口扩展到 n≤1000 并复用同一 runtime/材料；
+fresh-material `(1000,80)` 独立 UID、mTLS E2E 与冻结 oracle 通过。v2 wrapper 仍待下一异会话接收；
+该单次功能/资源运行不是正式性能数据。n≥10^4 全池材料不准入本机；正式 LAN/WAN 1+5、九指标、
+六方案排名仍 `NOT_RUN / NOT_MEASURED`。S30 源码 commit `eac5151e96f3cc67d2bc664c0d300b51ef672e10`
+留在本地 `codex/m6b-i-bmw16-s30`，不改 main 或 PR #29。详见
+[S30 条件安全与规模决策](docs/decisions/BMW16_S30_CONDITIONAL_SECURITY_AND_SCALE_DECISION_2026-10-10.md)
+和 [S30 独立接收报告](docs/reproduction/BMW16_S30_INDEPENDENT_ACCEPTANCE_2026-10-10.md)。
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
