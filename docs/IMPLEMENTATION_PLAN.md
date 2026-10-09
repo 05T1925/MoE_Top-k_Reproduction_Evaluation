@@ -86,13 +86,22 @@ PROJECT_DERIVED / EXPERIMENTAL` 的 Protocol I 三进程功能候选。该工作
 目录 fsync，并扩大了复跑证据；它不是异聊天独立接收，不改变 M6A→M6B 正式验收门，
 也没有关闭 DCF/整池/shuffle 安全证明或 V4 正式性能门。交接状态见 S26 dated report。
 
-2026-10-09 的 S27 源码级安全分析对实际 `M2UC v1` 完整 party key 给出基于
-126-bit→382-bit source expansion PRG 的条件性模拟，并展开相关 key pool、自适应公开
-transcript 与 forward/inverse shuffle 的 simulator。该证明仍需独立审查；受限 AES key
-族及 OS CSPRNG 假设不是无条件结论。实际 SHA-256 counter sampler 的 S16 理想无放回界
-仅在明确随机预言机假设下套用。S27 没有改动运行时、没有创建 secure alias、没有完成
-异会话 S26 功能接收或正式 V4 性能测量。当前正式阶段仍是 M6A；提前候选仍为默认关闭的
-`PROJECT_DERIVED / EXPERIMENTAL`。详见 S27 dated 决策/报告。
+2026-10-09 的 S27 源码级安全分析对实际 M2UC v1 完整 party key 给出基于
+126-bit→382-bit source expansion PRG 假设的条件性模拟，并展开相关 key pool、自适应公开
+transcript 与 forward/inverse shuffle simulator。S27 没有改变运行时代码，也未直接移用
+BGI15 Theorem 6；受限 AES key 族及 OS CSPRNG 假设不是无条件结论。实际 SHA-256 counter
+sampler 的 S16 理想无放回界仍需明确随机预言机假设。详见 S27 dated 决策/报告。
+
+2026-10-09 的 S28 异会话复核对上述推导、相关全池 hybrid、实际 shuffle/inverse
+output-share 模拟和 sampler 模型作了源码级复算。没有发现完整 party key 攻击；理想
+G126 扩展器下的单方 key 分布归纳可闭合，但实际安全仍 CONDITIONAL，依赖受限 AES key
+子族 PRG、cryptoTools AES-CTR 根流、OS 熵与候选 leakage L。标准模型 SHA-256 counter
+sampler 界仍未证明，因此不创建 secure alias。S28 在未改 runtime 的 S26 源上完成相关
+conformance、39 项 common-tape 和独立三进程 mTLS E2E 至 n=256；n=1000、全仓 CTest、正式
+性能矩阵均未运行。S26 异会话功能接收已由并行任务完成，报告提交 32f7f0b 并推送到
+独立分支；Draft PR 尚未创建，GitHub connector 未连接且浏览器回退失败，main 没有合并证据。
+此用户授权的提前 EXPERIMENTAL 研究复核不改变 M6A → M6B → M7 正式顺序。详情见
+BMW16_S28 dated 决策/复现报告。
 
 ### 1.4 最终六种方案
 

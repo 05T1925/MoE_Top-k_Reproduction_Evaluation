@@ -68,6 +68,19 @@ VFSS 字段；restricted-key AES/OS 随机流假设与异会话复审仍待完�
 `PROJECT_DERIVED / EXPERIMENTAL`；不建 secure alias、不启动正式性能矩阵，也不改变
 M6A → M6B → M7 的正式验收顺序。详见 S27 决策与报告。
 
+**2026-10-09 独立复核注记（S28）**：异会话接收者对 S27 实际 M2UC v1 DCF
+完整 party-key 推导、逐槽相关 key pool hybrid、公开自适应 transcript 和
+forward/inverse shuffle-output 条件模拟作了独立复核。没有发现完整 key 攻击；
+理想 126→382 扩展器下的递推闭合，实际安全仍是条件结论，依赖 126-bit 受限 AES
+key 子族 PRG、AES-CTR 根流、OS 随机源和准确的 leakage L。pool、shuffle 和 sampler
+门仍为 CONDITIONAL，secure alias 未就绪。S28 对当前 S26 runtime 完成 39 项 common-tape
+和独立三进程 mTLS 功能复跑至 n=256；n=1000 与正式 LAN/WAN 指标未运行。
+S28 未改运行时，只增加 TEST_ONLY 一层代数枚举及 E2E 子进程失败诊断。
+S26 的异聊天独立功能接收已在并行接收任务完成并推送报告分支，接收报告提交为
+32f7f0b；Draft PR 因 GitHub connector 未连接且浏览器回退失败而未创建。该候选仍不在
+main，没有合并证据。
+M6A → M6B → M7 正式顺序保持不变。详见 S28 独立复核决策与报告。
+
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
 M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已合入 main。M5-H1 按用户指定的数量级门槛通过（n=2–128，Fselect/Fsort）；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits，且没有作者精确复现记录。M5-H2 独立评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 已完成，F2 / G3 = PASS。详见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，精确成本及其他已记录限制仍然有效。F1 是四轮 bit-mask 项目实例化；通用 ring-to-field 与 field-to-XOR 转换仍未实现。
