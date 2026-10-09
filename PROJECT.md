@@ -60,6 +60,14 @@ mask-share 文件在发布后清理失败时仍残留的错误路径，并补上
 仍为默认关闭的 EXPERIMENTAL。S26 同聊天承接了 S25 工作，故本记录不冒充用户要求的
 异聊天独立签收；该 Draft PR 仍需未参与实现的接收者审查。密码学安全和正式性能门未通过。
 
+**2026-10-09 安全分析注记（S27）**：对实际压缩 DCF `M2UC v1` party key 给出
+`G126` 安全扩展器假设下的 source-specific 完整序列化 key 模拟，并给出相关全池自适应
+查询及当前 forward/inverse shuffle 的条件性 simulator。它不把 BGI15 Theorem 6 直接移植到
+VFSS 字段；restricted-key AES/OS 随机流假设与异会话复审仍待完成。采样概率只在理想无放回
+模型（实际 SHA-256 counter 另需随机预言机假设）有 S16 已复核界。方案仍为默认关闭的
+`PROJECT_DERIVED / EXPERIMENTAL`；不建 secure alias、不启动正式性能矩阵，也不改变
+M6A → M6B → M7 的正式验收顺序。详见 S27 决策与报告。
+
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
 M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已合入 main。M5-H1 按用户指定的数量级门槛通过（n=2–128，Fselect/Fsort）；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits，且没有作者精确复现记录。M5-H2 独立评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 已完成，F2 / G3 = PASS。详见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，精确成本及其他已记录限制仍然有效。F1 是四轮 bit-mask 项目实例化；通用 ring-to-field 与 field-to-XOR 转换仍未实现。
