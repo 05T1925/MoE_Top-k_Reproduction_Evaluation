@@ -82,6 +82,10 @@ PROJECT_DERIVED / EXPERIMENTAL` 的 Protocol I 三进程功能候选。该工作
 联合视图或 shuffle/output 安全门，也不构成 V4 性能验收。M6A → M6B → M7 正式
 顺序及其前置条件保持不变。
 
+2026-10-09 的 S26 后续技术复核修复了 EXPERIMENTAL party mask-share 发布失败回滚与
+目录 fsync，并扩大了复跑证据；它不是异聊天独立接收，不改变 M6A→M6B 正式验收门，
+也没有关闭 DCF/整池/shuffle 安全证明或 V4 正式性能门。交接状态见 S26 dated report。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。

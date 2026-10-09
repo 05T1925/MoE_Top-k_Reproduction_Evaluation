@@ -55,6 +55,11 @@ M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验
 不继承 BMW16 定理保证，也不改变上面的 M6A → M6B → M7 正式执行顺序；该候选
 不构成六方案安全验收或性能验收。
 
+**2026-10-09 状态注记（S26）**：对 S25 候选的后续技术复核发现并修复了
+mask-share 文件在发布后清理失败时仍残留的错误路径，并补上输出目录持久化；候选
+仍为默认关闭的 EXPERIMENTAL。S26 同聊天承接了 S25 工作，故本记录不冒充用户要求的
+异聊天独立签收；该 Draft PR 仍需未参与实现的接收者审查。密码学安全和正式性能门未通过。
+
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
 M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已合入 main。M5-H1 按用户指定的数量级门槛通过（n=2–128，Fselect/Fsort）；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits，且没有作者精确复现记录。M5-H2 独立评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 已完成，F2 / G3 = PASS。详见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，精确成本及其他已记录限制仍然有效。F1 是四轮 bit-mask 项目实例化；通用 ring-to-field 与 field-to-XOR 转换仍未实现。
