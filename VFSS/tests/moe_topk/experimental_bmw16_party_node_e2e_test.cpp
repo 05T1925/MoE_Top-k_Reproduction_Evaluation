@@ -331,7 +331,8 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                   const std::string& p1_only_failpoint={},
                   bool expect_engineering_failure=false,
                   bool expect_tls_stream_failure=false,
-                  bool expect_final_disagreement=false) {
+                  bool expect_final_disagreement=false,
+                  bool expect_mask_publish_failure=false) {
   require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
   static std::uint64_t serial=0;
   const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+std::to_string(serial++));
@@ -389,13 +390,15 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
     require(::fdatasync(fd)==0&&::close(fd)==0,"TLS preexisting package sync");
   }
   const std::vector<std::uint8_t> preexisting_sentinel{'S','2','0','-','P','R','E','E','X','I','S','T'};
+  // Full-pool n=1000 KeyGen may run longer than 10 minutes before T opens
+  // its first delivery connection; keep receivers alive for the bounded 30m run.
   auto receiver_args=[&](std::uint8_t party,std::uint16_t /*port*/,int listen_fd){
     const auto& claim=party?claims1:claims0;const auto& shell=party?shell1:shell0;
     const auto& side=party?side1:side0;const auto& ready=party?ready1:ready0;const auto& dir=party?p1:p0;
     return std::vector<std::string>{node,"recv-tls",std::to_string(party),std::to_string(n),std::to_string(k),
       std::to_string(session),std::to_string(fingerprint),claim.string(),shell.string(),side.string(),ready.string(),
       (dir/"aead.key").string(),(dir/"party.crt").string(),(dir/"party.key").string(),(dir/"ca.pem").string(),
-      "dealer",expect_delivery_abort?"2500":(n>=1000?"600000":"30000"),std::to_string(listen_fd)};
+      "dealer",expect_delivery_abort?"2500":(n>=1000?"1800000":"30000"),std::to_string(listen_fd)};
   };
   const auto receiver_failpoint=t_failpoint=="receiver_fsync"?t_failpoint:
       t_failpoint=="receiver_publish"?t_failpoint:
@@ -487,7 +490,7 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   int listener_ready[2]{};require(::pipe(listener_ready)==0,"online TLS listener-ready pipe");
   const std::string online_timeout =
       (!online_failpoint.empty() || !p1_only_failpoint.empty()) ? "1500" :
-      (n>=1000 ? "600000" : "30000");
+      (n>=1000 ? "1800000" : "30000");
   const auto p1_args=std::vector<std::string>{node,"party-tls","1",std::to_string(n),std::to_string(k),
     std::to_string(session),std::to_string(fingerprint),claims1.string(),(p1/"raw-share.bin").string(),
     shell1.string(),side1.string(),(p1/"aead.key").string(),(p1/"mask.share").string(),
@@ -550,12 +553,15 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                 << " mode=REQUIRE_AUTHENTICATED_STREAM fallback=NONE mask=NONE\n";
       return;
     }
-    if (expect_engineering_failure || expect_final_disagreement) {
+    if (expect_engineering_failure || expect_final_disagreement || expect_mask_publish_failure) {
       require(e0 == 70 && e1 == 70 && gate.gate_open,
               "algorithm invariant or final status disagreement was not classified as engineering failure");
-      std::cout << (expect_engineering_failure ? "tls_engineering_fault" : "tls_final_status_disagreement")
+      const auto label = expect_mask_publish_failure ? "tls_mask_publish_failure" :
+          expect_engineering_failure ? "tls_engineering_fault" : "tls_final_status_disagreement";
+      std::cout << label
                 << " n=" << n << " K=" << k << " P0_exit=" << e0 << " P1_exit=" << e1
-                << " scope=PEER_AGREED_OR_OBSERVED mask=NONE\n";
+                << " scope=" << (expect_mask_publish_failure ? "LOCAL_OUTPUT_ERROR" : "PEER_AGREED_OR_OBSERVED")
+                << " mask=NONE\n";
       return;
     }
     throw std::runtime_error("TLS-delivered parties failed online E2E");
@@ -629,6 +635,10 @@ void run_tls_suite(const std::string& node) {
                "",false,"online_missing_tls_stream",false,false,"",false,true);
   run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a013),tls,"",false,"",false,
                "",false,"",false,false,"force_final_status_disagreement",false,false,true);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a014),tls,"",false,"",false,
+               "",false,"mask_unlink_after_publish",false,false,"",false,false,false,true);
+  run_tls_case(node,{INT32_MIN,0,INT32_MAX},2,UINT64_C(0x2020a015),tls,"",false,"",false,
+               "",false,"mask_dir_fsync_after_publish",false,false,"",false,false,false,true);
 }
 
 void run_tls_n1000(const std::string& node) {

@@ -244,26 +244,52 @@ void write_mask_exclusive(const std::string& path,
                           const std::vector<std::uint8_t>& bytes) {
   if (path.empty() || bytes.empty()) throw std::invalid_argument("mask output path/length");
   const auto temp = path + ".tmp." + std::to_string(::getpid());
-  const int fd = ::open(temp.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+  const std::filesystem::path output_path(path);
+  const auto parent = output_path.has_parent_path() ? output_path.parent_path() : std::filesystem::path(".");
+  const auto sync_parent = [&]() {
+    const int dir_fd = ::open(parent.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+    if (dir_fd < 0) return false;
+    const bool synced = ::fsync(dir_fd) == 0;
+    const bool closed = ::close(dir_fd) == 0;
+    return synced && closed;
+  };
+  int fd = ::open(temp.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
   if (fd < 0) throw std::runtime_error("mask output create");
-  std::size_t offset = 0;
-  while (offset < bytes.size()) {
-    const auto wrote = ::write(fd, bytes.data() + offset, bytes.size() - offset);
-    if (wrote < 0 && errno == EINTR) continue;
-    if (wrote <= 0) {
-      ::close(fd);
-      ::unlink(temp.c_str());
-      throw std::runtime_error("mask output write");
+  bool published = false;
+  bool temp_exists = true;
+  try {
+    std::size_t offset = 0;
+    while (offset < bytes.size()) {
+      const auto wrote = ::write(fd, bytes.data() + offset, bytes.size() - offset);
+      if (wrote < 0 && errno == EINTR) continue;
+      if (wrote <= 0) throw std::runtime_error("mask output write");
+      offset += static_cast<std::size_t>(wrote);
     }
-    offset += static_cast<std::size_t>(wrote);
+    if (::fdatasync(fd) != 0) throw std::runtime_error("mask output data sync");
+    const int close_result = ::close(fd);
+    fd = -1;
+    if (close_result != 0) throw std::runtime_error("mask output close");
+    if (::link(temp.c_str(), path.c_str()) != 0) throw std::runtime_error("mask output no-clobber publish");
+    published = true;
+#if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    if (test_failpoint_is("mask_unlink_after_publish"))
+      throw std::runtime_error("TEST_ONLY mask temp unlink failure after publish");
+#endif
+    if (::unlink(temp.c_str()) != 0) throw std::runtime_error("mask output temp unlink");
+    temp_exists = false;
+#if defined(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    if (test_failpoint_is("mask_dir_fsync_after_publish"))
+      throw std::runtime_error("TEST_ONLY mask directory sync failure after publish");
+#endif
+    if (!sync_parent()) throw std::runtime_error("mask output directory sync");
+    published = false;
+  } catch (...) {
+    if (fd >= 0) ::close(fd);
+    if (published) ::unlink(path.c_str());
+    if (temp_exists) ::unlink(temp.c_str());
+    (void)sync_parent();
+    throw;
   }
-  bool okay = ::fdatasync(fd) == 0;
-  okay = ::close(fd) == 0 && okay;
-  if (!okay || ::link(temp.c_str(), path.c_str()) != 0) {
-    ::unlink(temp.c_str());
-    throw std::runtime_error("mask output durable publish");
-  }
-  if (::unlink(temp.c_str()) != 0) throw std::runtime_error("mask output temp unlink");
 }
 
 ProtocolIBmw16ExperimentalPartyConfig config_base(std::uint32_t n, std::uint32_t k,

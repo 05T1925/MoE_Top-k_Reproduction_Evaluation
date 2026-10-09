@@ -50,7 +50,11 @@ def main() -> int:
     ap.add_argument("--report", required=True, type=Path)
     args = ap.parse_args()
     s4_bytes = args.s4.read_bytes()
-    digest = hashlib.sha256(s4_bytes).hexdigest()
+    # Git stores this frozen TEST_ONLY oracle with LF line endings. Windows
+    # checkouts may expand those bytes to CRLF; hash the canonical Git-blob
+    # content so line-ending policy does not masquerade as a source change.
+    canonical_s4_bytes = s4_bytes.replace(b"\r\n", b"\n")
+    digest = hashlib.sha256(canonical_s4_bytes).hexdigest()
     if digest != EXPECTED_S4_SHA256:
         raise SystemExit(f"S4 source hash mismatch: {digest}")
     spec = importlib.util.spec_from_file_location("s4_frozen", args.s4)
