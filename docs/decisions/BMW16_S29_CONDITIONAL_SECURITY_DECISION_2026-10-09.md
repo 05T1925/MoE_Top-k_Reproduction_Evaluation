@@ -1,8 +1,8 @@
 # BMW16 S29：条件安全配置与版本化入口决策
 
-日期：2026-10-09  
-身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**  
-决策对象：S26 独立接收的 VFSS C++ 运行时及 S27/S28 安全复核  
+日期：2026-10-09
+身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**
+决策对象：S26 独立接收的 VFSS C++ 运行时及 S27/S28 安全复核
 本次边界：接受一个明确的**条件安全候选配置**供实现与审查；不作无条件、标准模型或生产部署安全声明。
 
 ## 1. 决策摘要与来源身份
