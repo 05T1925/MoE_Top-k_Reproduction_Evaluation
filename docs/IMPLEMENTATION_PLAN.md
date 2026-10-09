@@ -86,6 +86,14 @@ PROJECT_DERIVED / EXPERIMENTAL` 的 Protocol I 三进程功能候选。该工作
 目录 fsync，并扩大了复跑证据；它不是异聊天独立接收，不改变 M6A→M6B 正式验收门，
 也没有关闭 DCF/整池/shuffle 安全证明或 V4 正式性能门。交接状态见 S26 dated report。
 
+2026-10-09 的 S27 源码级安全分析对实际 `M2UC v1` 完整 party key 给出基于
+126-bit→382-bit source expansion PRG 的条件性模拟，并展开相关 key pool、自适应公开
+transcript 与 forward/inverse shuffle 的 simulator。该证明仍需独立审查；受限 AES key
+族及 OS CSPRNG 假设不是无条件结论。实际 SHA-256 counter sampler 的 S16 理想无放回界
+仅在明确随机预言机假设下套用。S27 没有改动运行时、没有创建 secure alias、没有完成
+异会话 S26 功能接收或正式 V4 性能测量。当前正式阶段仍是 M6A；提前候选仍为默认关闭的
+`PROJECT_DERIVED / EXPERIMENTAL`。详见 S27 dated 决策/报告。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。
