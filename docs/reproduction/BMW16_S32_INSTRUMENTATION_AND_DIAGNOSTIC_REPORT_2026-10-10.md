@@ -135,11 +135,14 @@ SHA-256 分别仍为 `e895cff05e85a18d314b1fcbc2c41226fbc99342952de380253863afbc
 | Protocol I + AAV86 | E15/E17/E20 历史数据口径/源码 revision 不同 | 否 | 历史数字不得拼接；需 schema-v2 同组重跑 |
 | Protocol I + BMW16-derived Select + DCF | 本报告工具实际采集 | 尚无同期全对全/AAV86 配对运行 | EXPERIMENTAL_DIAGNOSTIC only |
 
-Git 远端状态：PR #29 connector 查询返回 `USER_NOT_LOGGED_IN`；GitHub CLI 未安装。公开 PR 页面核对为
-Open、base `main`、head `codex/m6b-i-bmw16-s26`、旧标题仍为 S26、旧模板正文仍未填 S32 结果。Git remote
-可见该分支和 `refs/pull/29/head` 仍指向 `a1a90cb2...`，main=`c3926c68...`。S32 commit 和报告尚未推送，
-因此 PR head/body 均未更新，也没有合入。需要已认证 PR 编辑/分支写权限后，先确认 source ref 仍为
-`a1a90cb2...`，仅快进更新至 S32 最终提交，再按下列信息更新 PR，不 force-push、不合并：
+Git 远端状态：S32 文档提交后，通过普通非强制快进成功将 PR 源分支
+`codex/m6b-i-bmw16-s26` 从 `a1a90cb2...` 推至 `d5489ca1be132399e7420bfce4b067bda9feb871`；随后 `git ls-remote`
+确认该分支与 `refs/pull/29/head` 均为此 revision，`main` 仍为
+`c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍 Open、base `main`，公开页显示 26 commits；标题仍是旧 S26
+标题，正文仍为未填写 S32 结果的仓库模板。Checks 页没有显示已配置/已运行的 GitHub Actions 检查。
+GitHub PR 元数据连接器返回 `USER_NOT_LOGGED_IN`，GitHub CLI 未安装，浏览器页面也未登录；因此本轮无法改 PR 标题/正文。
+分支代码和 S32 文档已推送，但 PR 元数据未更新，也没有合入。取得 GitHub 元数据编辑登录后，只需更新标题/正文，
+不需要重写提交历史或再推送；不 force-push、不合并：
 
 建议标题：`Protocol I BMW16-derived Select + DCF: conditional n≤1000 candidate and S32 metrics`
 
@@ -147,7 +150,8 @@ Open、base `main`、head `codex/m6b-i-bmw16-s26`、旧标题仍为 S26、旧模
 root stream、OS CSPRNG、ROM sampler、可信离线静默 T、至多一个半诚实腐化方、理想私有认证通道及明示
 leakage L；非 BB90 原算法、非 BMW16 Algorithm 7 逐字实现，不继承定理常数/概率。报告 S32 schema-v2
 九指标和 n=8/128/256/1000 各一次成功 loopback mTLS oracle 诊断；说明 `0/4` 自然 abort 只是观察，
-不是概率界。列出 CTest 3/3、common tape 39/39、Protocol I/III 定向 13/13；明确全仓 CTest、同期全对全/
+不是概率界。列出本轮 CTest 6/6（含 S32 auditor、party、v2 conformance、DCF 与 Protocol III 三进程目标）、
+common tape 39/39、Protocol I/III 定向 13/13；明确全仓 CTest、同期全对全/
 I+AAV86 配对、TLS wire/RSS/root PRG、正式 V4 LAN/WAN 1+5 与六方案排名未完成/NOT_MEASURED。V3 前置
 保持不变。
 
