@@ -168,7 +168,9 @@ void validate_material(const ProtocolIParallelShufflePartyMaterial& material) {
   validate_records(material.comparison_bits, material.a, material.n);
   validate_records(material.comparison_bits, material.e, material.n);
   validate_records(material.comparison_bits, material.r_share, material.n);
-  require(material.edge_materials.size() == edge_count(material.n),
+  require(material.has_cmpagg_material
+              ? material.edge_materials.size() == edge_count(material.n)
+              : material.edge_materials.empty(),
           "parallel shuffle edge material count");
   for (const auto& edge : material.edge_materials)
     require(edge.party_id() == material.party &&
@@ -247,11 +249,29 @@ struct ExchangeResult {
 
 ExchangeResult exchange_payload(int fd, const ProtocolIParallelShufflePartyConfig& config,
                                 std::uint8_t phase, const std::vector<std::uint8_t>& outbound) {
-  const auto send_fd = ::dup(fd);
-  if (send_fd < 0) throw std::runtime_error("parallel shuffle dup");
   ProtocolIFrameConfig framing{config.session, config.fingerprint, config.n, config.k,
                                config.comparison_bits, config.party,
                                static_cast<std::uint8_t>(1U - config.party), phase, 7};
+  if (config.require_authenticated_transport) {
+    // A dup() of a TLS socket is not an SSL stream. The authenticated path
+    // therefore uses one registered stream and role-ordered I/O; the peer
+    // with id 1 receives while id 0 sends, avoiding both TLS bypass and a
+    // second concurrent operation on one SSL object.
+    ProtocolIFramedChannel channel(fd, framing, ProtocolIFramedChannelOptions{
+        config.timeout_ms, std::numeric_limits<std::size_t>::max(),
+        ProtocolITransportMode::RequireAuthenticatedStream});
+    std::vector<std::uint8_t> incoming;
+    if (config.party == 0) {
+      channel.send(outbound);
+      incoming = channel.receive();
+    } else {
+      incoming = channel.receive();
+      channel.send(outbound);
+    }
+    return {std::move(incoming), channel.sent_bytes(), channel.received_bytes()};
+  }
+  const auto send_fd = ::dup(fd);
+  if (send_fd < 0) throw std::runtime_error("parallel shuffle dup");
   ProtocolIFramedChannel sender(send_fd, framing, config.timeout_ms);
   ProtocolIFramedChannel receiver(fd, framing, config.timeout_ms);
   std::exception_ptr send_error;
@@ -328,22 +348,25 @@ ProtocolIParallelShuffleDealerOutput protocol_i_parallel_shuffle_dealer_generate
     material.session = config.session; material.fingerprint = config.fingerprint;
     material.material_id = config.material_id; material.n = config.n; material.k = config.k;
     material.comparison_bits = config.comparison_bits; material.party = party;
+    material.has_cmpagg_material = config.include_cmpagg_material;
     material.sigma = sigma; material.tau = tau; material.a = a; material.e = e;
     material.r_share = r;
   };
   initialize(output.party0, 0, sigma0, tau0, a0, e0, r0);
   initialize(output.party1, 1, sigma1, tau1, a1, e1, r1);
-  const auto full_r = add_vectors(config.comparison_bits, r0, r1);
   std::uint64_t key_wire_bytes = 0;
-  for (std::uint32_t left = 0; left < config.n; ++left) {
-    for (std::uint32_t right = left + 1U; right < config.n; ++right) {
-      ProtocolIUcmpMaterial edge(config.comparison_bits, full_r[left].word0,
-                                  full_r[right].word0);
-      auto key0 = edge.export_party_material(0);
-      auto key1 = edge.export_party_material(1);
-      key_wire_bytes += key0.serialize().size() + key1.serialize().size();
-      output.party0.edge_materials.push_back(std::move(key0));
-      output.party1.edge_materials.push_back(std::move(key1));
+  if (config.include_cmpagg_material) {
+    const auto full_r = add_vectors(config.comparison_bits, r0, r1);
+    for (std::uint32_t left = 0; left < config.n; ++left) {
+      for (std::uint32_t right = left + 1U; right < config.n; ++right) {
+        ProtocolIUcmpMaterial edge(config.comparison_bits, full_r[left].word0,
+                                    full_r[right].word0);
+        auto key0 = edge.export_party_material(0);
+        auto key1 = edge.export_party_material(1);
+        key_wire_bytes += key0.serialize().size() + key1.serialize().size();
+        output.party0.edge_materials.push_back(std::move(key0));
+        output.party1.edge_materials.push_back(std::move(key1));
+      }
     }
   }
   const auto record_bits = static_cast<std::uint64_t>(config.comparison_bits) + 128U;
@@ -360,7 +383,8 @@ std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_material(
     const ProtocolIParallelShufflePartyMaterial& material) {
   validate_material(material);
   std::vector<std::uint8_t> output{'M','2','C','P',1,material.party,
-                                   material.comparison_bits,0};
+                                   material.comparison_bits,
+                                   static_cast<std::uint8_t>(material.has_cmpagg_material ? 0 : 1)};
   put_u64(output, material.session); put_u64(output, material.fingerprint);
   put_u64(output, material.material_id); put_u64(output, material.n); put_u64(output, material.k);
   for (const auto value : material.sigma) put_u32(output, value);
@@ -387,10 +411,11 @@ ProtocolIParallelShufflePartyMaterial protocol_i_parallel_shuffle_deserialize_ma
   require(expected_party >= 0 && expected_party <= 1 && bytes.size() >= 48U &&
               bytes.size() <= kMaxMaterialBytes && bytes[0]=='M' && bytes[1]=='2' &&
               bytes[2]=='C' && bytes[3]=='P' && bytes[4]==1 && bytes[5]==expected_party &&
-              bytes[7]==0,
+              bytes[7]<=1,
           "parallel shuffle material header");
   ProtocolIParallelShufflePartyMaterial material;
   material.party = bytes[5]; material.comparison_bits = bytes[6];
+  material.has_cmpagg_material = bytes[7] == 0;
   std::size_t offset = 8;
   material.session = get_u64(bytes, offset); material.fingerprint = get_u64(bytes, offset);
   material.material_id = get_u64(bytes, offset);
@@ -409,7 +434,8 @@ ProtocolIParallelShufflePartyMaterial protocol_i_parallel_shuffle_deserialize_ma
   };
   get_records(material.a); get_records(material.e); get_records(material.r_share);
   const auto edges = get_u64(bytes, offset);
-  require(edges == edge_count(material.n), "parallel shuffle serialized edge count");
+  require(edges == (material.has_cmpagg_material ? edge_count(material.n) : 0U),
+          "parallel shuffle serialized edge count");
   material.edge_materials.reserve(static_cast<std::size_t>(edges));
   for (std::uint64_t index = 0; index < edges; ++index) {
     const auto length = get_u64(bytes, offset);
@@ -472,6 +498,7 @@ ProtocolIParallelShuffleRound2Output ProtocolIParallelShuffleParty::receive_roun
 std::vector<std::uint64_t>
 ProtocolIParallelShuffleParty::evaluate_cmpagg_prepare_round3() {
   require(phase_ == 3, "parallel shuffle CmpAgg state");
+  require(material_.has_cmpagg_material, "parallel shuffle material is shuffle-only");
   std::vector<std::uint64_t> masked_keys(config_.n);
   for (std::size_t index = 0; index < masked_keys.size(); ++index)
     masked_keys[index] = public_masked_[index].word0;

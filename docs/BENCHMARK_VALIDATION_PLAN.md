@@ -2,7 +2,7 @@
 
 状态：**已采纳**。
 
-更新日期：2026-09-13。
+更新日期：2026-10-10（S31 状态同步；正式验收顺序未变）。
 
 本文统一规定两次基础协议通信核验和两次升级算法完整性能验收的方法、参数、计量边界、交付物及通过条件。
 
@@ -13,6 +13,22 @@
 - [双人分工与交接计划](TEAM_WORK_PLAN.md)
 - [M3 及后续分工计划](M3_ONWARD_TEAM_WORK_PLAN.md)
 - [2026-09-13 路线决策](decisions/ROADMAP_PRIORITY_2026-09-13.md)
+
+2026-10-10 S30 只增加了 default-off 的 BMW16-derived `conditional_secure_v2` 研究入口，
+把已条件接收的 v1 范围从 n≤256 版本化扩到 n≤1000，并完成一个 `(1000,80)` fresh-material
+loopback E2E。该单次功能/容量结果不是 V4 性能测量；不填 LAN/WAN 表，也不改变 M6A→M6B→M7
+正式验收顺序。服务器阶段仍须统一输入/网络/材料/计时边界，1 次预热+5 次运行，失败尝试同样留档。
+`conditional_secure_v2` 是 PROJECT_DERIVED，不是 BB90 原算法复现，不继承 BMW16 定理保证；
+其独立入口接收和正式性能资格仍为单独门禁。
+
+**S31 服务器准备注记（2026-10-10）**：S31 独立接收 `conditional_secure_v2` 的版本化入口，
+功能范围为 `1≤n≤1000`，并提供逐次原始记录 schema、同输入/oracle/随机性合同、证书/身份
+准备清单、资源预检表及九项主指标的采集边界，见 [S31 服务器实验包](reproduction/BMW16_S31_SERVER_BENCHMARK_PACKAGE_2026-10-10.md)
+和 [JSON schema](reproduction/BMW16_S31_RUN_RECORD_SCHEMA.json)。S31 的 loopback n=1000 运行
+仅是条件入口功能接收证据；不表示 V3 已关闭，也不是 LAN/WAN 或正式 V4 测量。offline/online
+wire bytes、全路径 PRG、RSS 等九指标中尚未真实覆盖的字段必须保持 `NOT_MEASURED`；当前代码布局
+推导的 12 个应用消息相位与 Select 四层分栏记录，不以四层代替完整入口轮数。正式 V4 仍需
+V3 前置、每配置 1 次预热+5 次、同 revision/输入/材料边界和失败尝试全量留存。
 
 本文定义验收要求，不表示相关实验已经执行，也不改变历史结果的统计边界。
 
@@ -34,6 +50,23 @@ V1 → 接口交接 → V2 → 基础接口交接 → V3 → V4 → M7 汇总
 ```
 
 资料核对、实验脚本设计和失败用例可以提前开展。V3 未完成前，不推进 V4 的依赖实现和正式实验。
+
+**S25 范围注记（2026-10-08）**：用户授权的提前工作仅整理默认关闭的
+`Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL`
+功能候选并执行有界正确性/接口验证。该工作不是 V4 正式实验，不满足 V3 前置
+条件，不得写入六方案正式性能比较；其耗时、通信和单次材料数字均不替代本计划的
+重复次数、LAN/WAN、完整指标或独立接收要求。
+
+**S29 候选身份注记（2026-10-09）**：V4 表中的 BB90+DCF 仍是原论文目标。已接收的
+Protocol I + BMW16-derived Select + DCF 候选仅占该比较位置的 PROJECT_DERIVED 实验候选，
+不等价于 BB90。S29 的条件安全 API 和局部 E2E 也不满足 V3 前置、V4 五次 LAN/WAN 与完整
+九指标；候选的正式性能状态保持 NOT_RUN。
+
+**S30 条件入口与规模注记（2026-10-10）**：`conditional_secure_v1` 的适用范围仍固定为
+`1≤n≤256`。为 n=1000 准入而新增的 `conditional_secure_v2` 是独立默认关闭的版本化入口，
+继续委托同一 S26/S28 party runtime 和材料 ABI；其容量诊断、同主机 mTLS E2E 或单次耗时均为
+研究性功能证据，不能填入正式 V4 表。M6A/V3 前置、LAN/WAN 1 次预热+5 次、全部统一指标和
+跨方案相同输入/计时边界仍需另行通过；本注记不改变 V1→V2→V3→V4 顺序。
 
 ### 1.2 两类验收的区别
 

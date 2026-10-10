@@ -21,15 +21,42 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(OpenMP COMPONENTS CXX REQUIRED)
 option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
+option(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER
+    "Build opt-in EXPERIMENTAL BMW16-derived Select adapter and party composition (not secure)" OFF)
+option(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1
+    "Build the explicitly assumption-scoped BMW16 conditional-security v1 entry point (default OFF)" OFF)
+option(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V2
+    "Build the explicitly assumption-scoped BMW16 conditional-security v2 entry point, n<=1000 (default OFF)" OFF)
+option(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS
+    "Instrument ordinary DCF KeyGen/Eval AES expansion call sites for research measurements" OFF)
+option(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS
+    "TEST_ONLY: compile BMW16 publication/TLS fault injection hooks (never enable in deployable builds)" OFF)
+if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS AND NOT BUILD_TESTING)
+  message(FATAL_ERROR "BMW16 failpoints are TEST_ONLY and require BUILD_TESTING=ON")
+endif()
+if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1 AND
+   NOT MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  message(FATAL_ERROR "Conditional BMW16 security v1 requires the opt-in BMW16 implementation")
+endif()
+if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V2 AND
+   NOT MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  message(FATAL_ERROR "Conditional BMW16 security v2 requires the opt-in BMW16 implementation")
+endif()
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
 add_subdirectory(ext/bitpack)
 add_subdirectory(ext/FSS)
+if(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+  target_compile_definitions(FSS PUBLIC MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS=1)
+endif()
 # add_subdirectory(ext/sci)
 # add_subdirectory(../SCI ext/sci)
 
 add_library(${PROJECT_NAME} STATIC)
+if(MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC MOE_TOPK_ENABLE_FSS_DCF_PRG_COUNTERS=1)
+endif()
 target_sources(${PROJECT_NAME} 
 PRIVATE
     src/random.cpp
@@ -71,6 +98,64 @@ PUBLIC
 )
 
 target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
+
+if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  find_package(OpenSSL 3 REQUIRED COMPONENTS Crypto SSL)
+  target_sources(${PROJECT_NAME} PRIVATE
+      src/moe_topk/experimental_bmw16_select_adapter.cpp
+      src/moe_topk/experimental_bmw16_material_bundle.cpp
+      src/moe_topk/experimental_bmw16_material_delivery.cpp
+      src/moe_topk/experimental_bmw16_select_party.cpp
+      src/moe_topk/experimental_bmw16_stream_store.cpp
+      src/moe_topk/experimental_bmw16_online_tls.cpp
+      src/moe_topk/experimental_bmw16_startup_gate.cpp)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+      MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER=1)
+  target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto OpenSSL::SSL)
+  if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS=1)
+  endif()
+  if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/moe_topk/protocol_i_bmw16_conditional_secure_v1.cpp)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1=1)
+  endif()
+  if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V2)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/moe_topk/protocol_i_bmw16_conditional_secure_v2.cpp)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V2=1)
+  endif()
+endif()
+
+if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+  add_executable(moe_topk_bmw16_experimental_party_test
+      tests/moe_topk/experimental_bmw16_party_test.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_party_test PRIVATE ${PROJECT_NAME})
+  add_executable(moe_topk_bmw16_experimental_3proc_test
+      tests/moe_topk/experimental_bmw16_3proc_test.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_3proc_test PRIVATE ${PROJECT_NAME})
+  add_executable(moe_topk_bmw16_experimental_party_node
+      src/apps/moe_topk_bmw16_experimental_party_node.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_party_node PRIVATE ${PROJECT_NAME})
+  if(MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS)
+    target_compile_definitions(moe_topk_bmw16_experimental_party_node PRIVATE MOE_TOPK_ENABLE_TEST_ONLY_BMW16_FAILPOINTS=1)
+  endif()
+  add_executable(moe_topk_bmw16_experimental_party_node_e2e_test
+      tests/moe_topk/experimental_bmw16_party_node_e2e_test.cpp)
+  target_link_libraries(moe_topk_bmw16_experimental_party_node_e2e_test PRIVATE ${PROJECT_NAME})
+  if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+    add_executable(moe_topk_bmw16_conditional_secure_v1_conformance_test
+        tests/moe_topk/protocol_i_bmw16_conditional_secure_v1_conformance_test.cpp)
+    target_link_libraries(moe_topk_bmw16_conditional_secure_v1_conformance_test PRIVATE ${PROJECT_NAME})
+  endif()
+  if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V2)
+    add_executable(moe_topk_bmw16_conditional_secure_v2_conformance_test
+        tests/moe_topk/protocol_i_bmw16_conditional_secure_v2_conformance_test.cpp)
+    target_link_libraries(moe_topk_bmw16_conditional_secure_v2_conformance_test PRIVATE ${PROJECT_NAME})
+  endif()
+endif()
 
 
 # === Benchmarks ===
@@ -653,6 +738,18 @@ target_compile_definitions(
 )
 
 if(BUILD_TESTING)
+    if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
+        add_test(NAME moe_topk_bmw16_experimental_party_test
+                 COMMAND moe_topk_bmw16_experimental_party_test)
+    endif()
+    if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
+        add_test(NAME moe_topk_bmw16_conditional_secure_v1_conformance_test
+                 COMMAND moe_topk_bmw16_conditional_secure_v1_conformance_test)
+    endif()
+    if(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V2)
+        add_test(NAME moe_topk_bmw16_conditional_secure_v2_conformance_test
+                 COMMAND moe_topk_bmw16_conditional_secure_v2_conformance_test)
+    endif()
     # Protocol III primitive and runtime tests.
     add_test(
         NAME moe_topk_dpf_conformance_test

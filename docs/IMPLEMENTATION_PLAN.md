@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-26
+更新日期：2026-10-10（S31 状态同步；阶段顺序未改变）
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -73,6 +73,77 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 
 资料研究、设计、失败用例整理可以提前进行；依赖未冻结接口的实现和正式验收必须遵循上述顺序。
 
+#### S25 用户授权的提前功能候选
+
+用户另行授权整理并验证 `Protocol I + BMW16-derived Select + DCF /
+PROJECT_DERIVED / EXPERIMENTAL` 的 Protocol I 三进程功能候选。该工作可在上述
+正式顺序之前进行，但仅涵盖默认关闭的实验实现、其有界功能测试和代码交接；它
+不等于 BB90 原算法复现，不继承 BMW16 概率或比较常数，不关闭 DCF 单 key、整池
+联合视图或 shuffle/output 安全门，也不构成 V4 性能验收。M6A → M6B → M7 正式
+顺序及其前置条件保持不变。
+
+2026-10-09 的 S26 后续技术复核修复了 EXPERIMENTAL party mask-share 发布失败回滚与
+目录 fsync，并扩大了复跑证据；它不是异聊天独立接收，不改变 M6A→M6B 正式验收门，
+也没有关闭 DCF/整池/shuffle 安全证明或 V4 正式性能门。交接状态见 S26 dated report。
+
+2026-10-09 的 S27 源码级安全分析对实际 M2UC v1 完整 party key 给出基于
+126-bit→382-bit source expansion PRG 假设的条件性模拟，并展开相关 key pool、自适应公开
+transcript 与 forward/inverse shuffle simulator。S27 没有改变运行时代码，也未直接移用
+BGI15 Theorem 6；受限 AES key 族及 OS CSPRNG 假设不是无条件结论。实际 SHA-256 counter
+sampler 的 S16 理想无放回界仍需明确随机预言机假设。详见 S27 dated 决策/报告。
+
+2026-10-09 的 S28 异会话复核对上述推导、相关全池 hybrid、实际 shuffle/inverse
+output-share 模拟和 sampler 模型作了源码级复算。没有发现完整 party key 攻击；理想
+G126 扩展器下的单方 key 分布归纳可闭合，但实际安全仍 CONDITIONAL，依赖受限 AES key
+子族 PRG、cryptoTools AES-CTR 根流、OS 熵与候选 leakage L。标准模型 SHA-256 counter
+sampler 界仍未证明，因此不创建 secure alias。S28 在未改 runtime 的 S26 源上完成相关
+conformance、39 项 common-tape 和独立三进程 mTLS E2E 至 n=256；n=1000、全仓 CTest、正式
+性能矩阵均未运行。S26 异会话功能接收已由并行任务完成，报告提交 32f7f0b 并推送到
+独立分支；Draft PR 尚未创建，GitHub connector 未连接且浏览器回退失败，main 没有合并证据。
+此用户授权的提前 EXPERIMENTAL 研究复核不改变 M6A → M6B → M7 正式顺序。详情见
+BMW16_S28 dated 决策/复现报告。
+
+2026-10-09 S29 在该提前候选上建立限定的条件安全配置，而不改变 M6A→M6B→M7
+正式执行顺序：S26 的完整功能入口已由异会话接收者独立接收；S28 对实际 M2UC v1 单 key、
+相关整池 transcript 与 shuffle/output-share 推导完成了条件性独立复核。S29 以明确的单方半诚实、
+可信离线静默 T、泄露函数 L、126-bit restricted-AES/G126 扩展、cryptoTools AES-CTR/OS
+随机源及 ROM sampler 条件定义 `conditional_secure_v1`，新增的 API 默认关闭、强制 TLS，并调用
+原唯一 party 实现。它不是无条件或标准模型安全声明，不是 BB90/BMW16 原算法复现、生产部署批准
+或正式性能验收。具体假设、优势项、L 和实测边界见 S29 决策/复现报告。
+S28 报告中的“Draft PR 未创建”只描述其核对时点。S29 文档中记录的
+`915fbbdd7e96bdd34f97f4d414b335f3b3951935` 是同步过程中的中间 ref 核验点；S30 从 S29
+最终文档 head `871b6683d15a34d117eb24353611d8ef48434aca` 独立核对后，PR #29 源分支与
+`refs/pull/29/head` 均为 `871b668...`，main/origin/main 仍为
+`c3926c68fd14f270faa8b55234311071947fa080`。PR 仍 Open、目标为 main，页面标题/模板正文未更新，
+且候选尚未合并 main。见 S30 独立接收报告的远端核验记录。
+详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 和
+[比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
+
+2026-10-10 S30 对 S29 v1 入口作异会话独立源码接收及 47 个 fresh-material mTLS E2E，
+n≤256 范围通过。S28 的 DCF 单 key、adaptive full-pool、shuffle/output 与 ROM sampler
+结论已是独立条件性复核；n≤256 设计范围记 `CONDITIONALLY_ACCEPTED / CLOSED`，适用前提和
+完整 L 见 S29/S30 dated 决策。S30 新增 `conditional_secure_v2`，单独 opt-in，admission n≤1000，
+复用唯一 S26/S28 party runtime 和材料 ABI；(1000,80) fresh-material E2E 通过。v2 wrapper 需
+下一接收者复核；该运行只属研究性功能/容量试验，不是正式性能数据。n≥10^4 不生成全池材料；
+M6A→M6B→M7 正式顺序、V4 LAN/WAN 门及九指标要求不变。S30 被测源码 commit 为
+`eac5151e96f3cc67d2bc664c0d300b51ef672e10`；详见
+[S30 接收报告](reproduction/BMW16_S30_INDEPENDENT_ACCEPTANCE_2026-10-10.md)。
+
+**2026-10-10 S31 v2 接收状态**：S30 的“v2 wrapper 需下一接收者复核”是 S30 报告时点的状态；
+S31 已在新构建中独立复核 CMake/CLI/API admission、TLS 强制、TEST_ONLY 拒绝、唯一 runtime
+委托、n=0/1001 边界和对应 conformance，并按 conformance→common-tape→独立进程顺序复跑。
+S31 v2 E2E、证据哈希及条件安全的 n=1000 全 K 失败界见 dated S31 报告/决策。v1 的
+`n≤256` 安全设计门继续沿用 S30 已关闭结论；v2 在同一已独立接收条件下只扩展范围，不改变
+DCF、Select、shuffle、材料 ABI 或泄露。正式验收顺序没有改变：M6A/V3 未完成前不开始 V4
+正式性能矩阵。S31 的服务器 runbook 与 JSON schema 是实验准备资产，不构成 V4 执行或验收。
+方案名始终为 Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED；不把项目候选记为
+BB90 原算法复现、BMW16 Algorithm 7 逐字实现或其定理保证。
+
+S31 将当前 server package 冻结为 `READY_FOR_FUTURE_V4` 准备资产。正式 V4 仍受 M6A/V3
+前置约束；在其关闭前允许准备租赁主机配置、材料预检、输入/oracle 和逐次数据合同，
+但不启动正式 LAN/WAN 1+5 矩阵或将 loopback 数据写入性能验收表。S31 对 `conditional_secure_v2`
+的独立接收仅覆盖条件模型下 n≤1000；不代表生产凭据部署、跨主机运维接收或六方案验收。
+
 ### 1.4 最终六种方案
 
 1. Protocol I。
@@ -81,6 +152,10 @@ M3 作为已完成前置条件保留，不重新安排实现。M4 标记取消�
 4. Protocol III + AAV86。
 5. Protocol I + BB90+DCF。
 6. Protocol III + BB90+DCF。
+
+第 5 项仍是原始论文目标。当前 Protocol I + BMW16-derived Select + DCF 仅作为经接收的
+PROJECT_DERIVED 实验候选占位；任何报告、指标和 API 都必须使用其完整身份标签，不能把这一候选
+改称 BB90+DCF 或拿 BMW16 定理覆盖其保证。
 
 已完成的 I 四轮核心和 III 三轮核心作为工程对照另列，不替代六种方案中的精确基线。
 

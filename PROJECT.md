@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-26
+更新日期：2026-10-10（S31）
 
 ## 1. 项目目标与当前边界
 
@@ -22,6 +22,11 @@
 | Protocol III + BB90+DCF | BB90 第 K 大选择 + DCF 成员选择，接入 Protocol III 路线 | 选择算法与 Top-K 输出组合扩展 |
 
 上述名称表示目标方案，不表示对应实现已经完成，也不自动赋予论文一致性标签。每种方案必须有独立的实现标签、协议阶段表、正确性证据、安全边界和性能记录。
+
+**M6B 候选名称边界**：第 5/6 行保留原始 `BB90+DCF` 研究目标名称。当前已独立接收的
+`Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL` 仅占据
+Protocol I 选择路线的实验性比较位置；它不是 BB90 原算法、BMW16 Algorithm 7 的逐字实现，
+也不继承 BMW16 Theorem 8 的成功概率或比较常数。该候选不能反向把规划目标改写成“BB90 已完成”。
 
 已完成的 Protocol I 四轮核心工程基线、Protocol III 三轮核心工程基线继续保留，用于回归、差分和开销对照；它们不替代最终六种方案中的论文精确核心目标。
 
@@ -48,6 +53,85 @@ M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验
   → M6B：I+BB90+DCF、III+BB90+DCF 实现与完整性能测试
   → M7：六种方案统一汇总与报告
 ```
+
+**2026-10-08 范围注记（S25）**：用户授权在 M6A/V3 正式验收顺序之前整理
+`Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED / EXPERIMENTAL`
+功能候选并做有界功能验证。这是提前的实验性代码交付，不是 BB90 原算法复现，
+不继承 BMW16 定理保证，也不改变上面的 M6A → M6B → M7 正式执行顺序；该候选
+不构成六方案安全验收或性能验收。
+
+**2026-10-09 状态注记（S26）**：对 S25 候选的后续技术复核发现并修复了
+mask-share 文件在发布后清理失败时仍残留的错误路径，并补上输出目录持久化；候选
+仍为默认关闭的 EXPERIMENTAL。S26 同聊天承接了 S25 工作，故本记录不冒充用户要求的
+异聊天独立签收；该 Draft PR 仍需未参与实现的接收者审查。密码学安全和正式性能门未通过。
+
+**2026-10-09 安全分析注记（S27）**：对实际压缩 DCF `M2UC v1` party key 给出
+`G126` 安全扩展器假设下的 source-specific 完整序列化 key 模拟，并给出相关全池自适应
+查询及当前 forward/inverse shuffle 的条件性 simulator。它不把 BGI15 Theorem 6 直接移植到
+VFSS 字段；restricted-key AES/OS 随机流假设与异会话复审仍待完成。采样概率只在理想无放回
+模型（实际 SHA-256 counter 另需随机预言机假设）有 S16 已复核界。方案仍为默认关闭的
+`PROJECT_DERIVED / EXPERIMENTAL`；不建 secure alias、不启动正式性能矩阵，也不改变
+M6A → M6B → M7 的正式验收顺序。详见 S27 决策与报告。
+
+**2026-10-09 独立复核注记（S28）**：异会话接收者对 S27 实际 M2UC v1 DCF
+完整 party-key 推导、逐槽相关 key pool hybrid、公开自适应 transcript 和
+forward/inverse shuffle-output 条件模拟作了独立复核。没有发现完整 key 攻击；
+理想 126→382 扩展器下的递推闭合，实际安全仍是条件结论，依赖 126-bit 受限 AES
+key 子族 PRG、AES-CTR 根流、OS 随机源和准确的 leakage L。pool、shuffle 和 sampler
+门仍为 CONDITIONAL，secure alias 未就绪。S28 对当前 S26 runtime 完成 39 项 common-tape
+和独立三进程 mTLS 功能复跑至 n=256；n=1000 与正式 LAN/WAN 指标未运行。
+S28 未改运行时，只增加 TEST_ONLY 一层代数枚举及 E2E 子进程失败诊断。
+S26 的异聊天独立功能接收已在并行接收任务完成并推送报告分支，接收报告提交为
+32f7f0b；Draft PR 因 GitHub connector 未连接且浏览器回退失败而未创建。该候选仍不在
+main，没有合并证据。
+M6A → M6B → M7 正式顺序保持不变。详见 S28 独立复核决策与报告。
+
+**2026-10-09 S29 条件安全配置**：S26 功能候选已有异会话独立接收；S28 已独立复核 S27
+对完整 `M2UC v1` party key、相关全池自适应 hybrid、shuffle/output-share 条件模拟和 sampler
+模型的推导。S29 将一个限定的条件安全配置作为该候选的可审查范围：单方半诚实腐化、可信且离线
+静默的 T、明确的匿名 transcript 泄露函数 L、126-bit 受限 AES key 子族扩展假设、cryptoTools
+AES-CTR 根流和 OS CSPRNG 假设，以及 SHA-256 counter sampler 的随机预言机模型和至少一个诚实
+随机贡献。该结论不是标准模型/无条件安全，也不解决生产凭据注册、跨主机部署或管理员/快照回滚。
+S29 增加默认关闭、显式版本化的 `conditional_secure_v1` party 入口；它强制已认证 TLS 字节通道并
+直接委托给唯一经接收的 S26/S28 party 实现，不复制 Select 或改变材料 ABI。只有在上述条件配置下
+可使用其安全候选标签；全池/密钥和 shuffle 假设仍为 CONDITIONAL，正式 V4 性能未运行。该安全配置
+不改变 M6A → M6B → M7 顺序，也不把实验候选记为正式六方案 BB90 实现。详见 S29 决策与验证报告。
+S28 报告中“Draft PR 尚未创建”是当时状态。S29 报告记载的 `915fbbdd7e96bdd34f97f4d414b335f3b3951935`
+是文档同步过程中的中间 ref 核验点；S30 从精确 S29 最终文档 head
+`871b6683d15a34d117eb24353611d8ef48434aca` 独立核对后，当前
+`refs/heads/codex/m6b-i-bmw16-s26` 与 `refs/pull/29/head` 均为 `871b668...`，而
+`main = origin/main = c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍 Open、目标为 main，
+未合并；GitHub 页面标题和模板正文未更新。该候选仍不属于 main。
+详见 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29) 与
+[main 比较链接](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/compare/main...codex/m6b-i-bmw16-s26)。
+
+**2026-10-10 S30 独立接收与规模门**：从 S29 最终 head 独立复核后，`conditional_secure_v1`
+入口在 n≤256 的范围完成本轮源码检查和 47/47 fresh-material 三进程 mTLS/oracle E2E；S28
+已独立接收的条件安全论证在明确的 G126/受限 AES key family、AES-CTR root stream、OS CSPRNG、
+ROM sampler、可信离线 T、单方半诚实与完整泄露 L 假设内继续适用。该 n≤256 设计门记为
+`CONDITIONALLY_ACCEPTED / 范围关闭`，不再重复打开同一引理。
+S30 新增默认 OFF 的 `conditional_secure_v2`，仅把有界入口扩展到 n≤1000 并复用同一 runtime/材料；
+fresh-material `(1000,80)` 独立 UID、mTLS E2E 与冻结 oracle 通过。v2 wrapper 仍待下一异会话接收；
+该单次功能/资源运行不是正式性能数据。n≥10^4 全池材料不准入本机；正式 LAN/WAN 1+5、九指标、
+六方案排名仍 `NOT_RUN / NOT_MEASURED`。S30 源码 commit `eac5151e96f3cc67d2bc664c0d300b51ef672e10`
+留在本地 `codex/m6b-i-bmw16-s30`，不改 main 或 PR #29。详见
+[S30 条件安全与规模决策](docs/decisions/BMW16_S30_CONDITIONAL_SECURITY_AND_SCALE_DECISION_2026-10-10.md)
+和 [S30 独立接收报告](docs/reproduction/BMW16_S30_INDEPENDENT_ACCEPTANCE_2026-10-10.md)。
+
+**2026-10-10 S31 v2 独立接收与实验包**：S31 从 S30 报告 head 独立检查 `conditional_secure_v2`
+的默认关闭构建、入口/参数/TLS/fail-closed 合同及对唯一 runtime/材料 ABI 的委托关系。v1
+`n≤256` 条件安全门沿用 S30 已关闭结论；v2 仅将同一有条件模型下的准入范围扩展至 `n≤1000`，
+没有重开或改写 v1 的 DCF/全池/shuffle 证明。S31 本轮 Release 定向 CTest、39 项 common-tape、
+v1 47 个 fresh-material E2E 及 v2 `(1000,80)` 的新鲜材料三进程 mTLS E2E 结果以 S31 报告为准；
+它们是条件配置的功能接收，不是无条件/恶意安全或正式性能验收。v2 的 n=1000 抽样界按其
+实际全 K 参数域单独计算，并继续依赖 ROM 与至少一方诚实 OS 熵贡献；受限 `G126`、AES-CTR
+root stream、OS CSPRNG、可信离线非合谋 T、单方半诚实腐化与完整泄露函数 L 保持明确前提。
+服务器实验 runbook 和逐次 JSON schema 已准备；V3→V4 前置未关闭，正式 1+5 LAN/WAN、九指标
+性能表与六方案排名仍 `NOT_RUN / NOT_MEASURED`。PR #29 的远端状态和是否成功快进更新，以
+S31 报告记录为准；没有合入 main 的结论。
+详见 [S31 条件安全与规模决策](docs/decisions/BMW16_S31_CONDITIONAL_V2_ACCEPTANCE_AND_SERVER_PACKAGE_2026-10-10.md)、
+[S31 独立接收报告](docs/reproduction/BMW16_S31_INDEPENDENT_ACCEPTANCE_2026-10-10.md) 与
+[服务器实验包](docs/reproduction/BMW16_S31_SERVER_BENCHMARK_PACKAGE_2026-10-10.md)。
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
