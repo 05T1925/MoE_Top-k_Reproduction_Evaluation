@@ -105,6 +105,8 @@ struct ProtocolIBmw16ExperimentalMetrics {
   std::array<std::uint64_t, 4> repeated_logical_calls{};
   std::array<std::uint64_t, 4> edge_plan_fnv64{};
   std::uint64_t membership_slots_consumed = 0;
+  std::uint64_t raw_adapter_ucmp_calls = 0;
+  std::uint64_t raw_adapter_dcf_evaluations = 0;
   std::uint64_t ucmp_party_evaluations = 0;
   std::uint64_t dcf_party_evaluations = 0;
   std::uint64_t online_message_phases = 0;

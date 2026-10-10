@@ -11,6 +11,7 @@
 #include <moe_topk/experimental_bmw16_startup_gate.h>
 #include <moe_topk/experimental_bmw16_stream_store.h>
 #include <moe_topk/protocol_i_transport.h>
+#include <FSS/dcf.h>
 
 #include <openssl/evp.h>
 
@@ -457,11 +458,13 @@ int t_tls_offline(int argc,char** argv) {
   c0.claim_root_device=std::stoull(argv[6]);c0.claim_root_inode=std::stoull(argv[7]);
   c1.claim_root_device=std::stoull(argv[8]);c1.claim_root_inode=std::stoull(argv[9]);
   std::array<std::uint8_t,32> stream_id{};random_bytes(stream_id.data(),stream_id.size());
+  resetDcfPrgCallCounts();
   ProtocolIBmw16StreamedUcmpSlotWriter writer0(argv[10],c0,0,read_key(argv[14]),stream_id);
   ProtocolIBmw16StreamedUcmpSlotWriter writer1(argv[11],c1,1,read_key(argv[15]),stream_id);
   auto materials=protocol_i_bmw16_experimental_material_generate_streaming(c0,
       [&](const ProtocolIBmw16MaterialSlot& slot,const ProtocolIUcmpPartyMaterial& key0,
           const ProtocolIUcmpPartyMaterial& key1){writer0.append(slot,key0);writer1.append(slot,key1);});
+  const auto dcf_keygen_counts = getDcfPrgCallCounts();
   const auto stream0=writer0.finalize(),stream1=writer1.finalize();
   require(stream0.stream_id==stream1.stream_id&&stream0.ucmp_slots==stream1.ucmp_slots&&
           stream0.sealed_file_bytes==stream1.sealed_file_bytes,"BMW16 TLS sidecar pair mismatch");
@@ -503,10 +506,26 @@ int t_tls_offline(int argc,char** argv) {
       {argv[12],argv[10],""},{argv[13],argv[11],""}}};
     ProtocolIBmw16TlsDeliveryStats delivery{};
     protocol_i_bmw16_tls_deliver_pair(dealer,endpoints,manifests,paths,marker,&delivery);
+    constexpr std::uint64_t stream_shell_fixed_wrapper_bytes = 44;
+    require(b0.plaintext_bytes >= stream_shell_fixed_wrapper_bytes + b0.manifest_bytes &&
+            b1.plaintext_bytes >= stream_shell_fixed_wrapper_bytes + b1.manifest_bytes,
+            "BMW16 stream shell payload accounting underflow");
+    const auto shell_material0 = b0.plaintext_bytes - stream_shell_fixed_wrapper_bytes - b0.manifest_bytes;
+    const auto shell_material1 = b1.plaintext_bytes - stream_shell_fixed_wrapper_bytes - b1.manifest_bytes;
     std::cout<<"role=T status=OFFLINE_MATERIAL_DELIVERED scheme=Protocol_I_BMW16_DERIVED_SELECT_DCF"
              <<" label=PROJECT_DERIVED/EXPERIMENTAL session="<<session<<" n="<<n<<" K="<<k
              <<" slots_per_party="<<b0.slot_count<<" sidecar_bytes_per_party="<<stream0.sealed_file_bytes
              <<" shell_bytes_p0="<<shell0.size()<<" shell_bytes_p1="<<shell1.size()
+             <<" material_payload_bytes_p0="<<(shell_material0+stream0.plaintext_key_bytes)
+             <<" material_payload_bytes_p1="<<(shell_material1+stream1.plaintext_key_bytes)
+             <<" shell_serialized_material_bytes_p0="<<shell_material0
+             <<" shell_serialized_material_bytes_p1="<<shell_material1
+             <<" dcf_plaintext_key_bytes_per_party="<<stream0.plaintext_key_bytes
+             <<" dcf_keygen_calls="<<dcf_keygen_counts.keygen_calls
+             <<" dcf_keygen_node_expansions="<<dcf_keygen_counts.keygen_node_expansions
+             <<" dcf_keygen_counter_enabled="<<(dcf_keygen_counts.enabled?"true":"false")
+             <<" shell_plaintext_bytes_p0="<<b0.plaintext_bytes
+             <<" shell_plaintext_bytes_p1="<<b1.plaintext_bytes
              <<" tls_sent_bytes="<<delivery.bytes_sent<<" tls_received_bytes="<<delivery.bytes_received
              <<" delivery_elapsed_us="<<delivery.elapsed_us<<" offline_elapsed_us="<<elapsed_us(started)
              <<" T_online=false delivery=mutual_TLS_1.3\n";
@@ -671,6 +690,7 @@ int party_online(int argc, char** argv, bool online_tls = false,
   const int agreement = all_fds[10];
   const int coin = all_fds[11];
   auto raw = decode_raw_share(read_bytes(argv[8]), n);
+  resetDcfPrgCallCounts();
   auto result = [&] {
     if (conditional_secure_v1) {
 #if defined(MOE_TOPK_ENABLE_CONDITIONAL_BMW16_SECURITY_V1)
@@ -691,6 +711,7 @@ int party_online(int argc, char** argv, bool online_tls = false,
     return protocol_i_bmw16_experimental_raw_score_mask_party(
         c, std::move(material), raw, score, forward, select, inverse, agreement, coin, nullptr);
   }();
+  const auto dcf_counts = getDcfPrgCallCounts();
   const std::string status = result.status ? result.status : "ERROR_UNEXPECTED";
   const std::string scope = result.abort_scope ? result.abort_scope : "PROCESS_ERROR";
   int exit_code = kUnexpected;
@@ -706,6 +727,10 @@ int party_online(int argc, char** argv, bool online_tls = false,
   } else if (status == "ABORT_ALGORITHM_INVALID" && result.engineering_failure) {
     exit_code = kUnexpected;
   }
+  const auto emit_array = [](const char* name, const std::array<std::uint64_t, 4>& values) {
+    std::cout << ' ' << name << "=[" << values[0] << ',' << values[1] << ','
+              << values[2] << ',' << values[3] << ']';
+  };
   std::cout << "role=P" << static_cast<unsigned>(party) << " status=" << status
             << " scope=" << scope << " exit_code=" << exit_code
             << " local_reason=" << result.abort_reason
@@ -715,6 +740,20 @@ int party_online(int argc, char** argv, bool online_tls = false,
                                result.metrics.logical_comparison_calls.end(), UINT64_C(0))
             << " ucmp_eval=" << result.metrics.ucmp_party_evaluations
             << " dcf_eval=" << result.metrics.dcf_party_evaluations
+            << " raw_adapter_ucmp_calls=" << result.metrics.raw_adapter_ucmp_calls
+            << " raw_adapter_dcf_evaluations=" << result.metrics.raw_adapter_dcf_evaluations
+            << " online_message_phases=" << result.metrics.online_message_phases
+            << " online_bytes_sent=" << result.metrics.online_bytes_sent
+            << " online_bytes_received=" << result.metrics.online_bytes_received
+            << " online_time_us=" << result.metrics.online_time_us
+            << " membership_slots_consumed=" << result.metrics.membership_slots_consumed
+            << " sampler_sha256_counter_words=" << result.metrics.sampler_prf_words
+            << " process_slots_claimed=" << result.metrics.process_slots_claimed
+            << " dcf_counter_enabled=" << (dcf_counts.enabled ? "true" : "false")
+            << " dcf_eval_calls_counted=" << dcf_counts.eval_calls
+            << " dcf_eval_node_expansions=" << dcf_counts.eval_node_expansions
+            << " dcf_eval_counter_matches_runtime="
+            << (dcf_counts.enabled && dcf_counts.eval_calls == result.metrics.dcf_party_evaluations ? "true" : "false")
             << " shell_open_us=" << shell_open_us
             << " bundle_claim_us=" << bundle_claim_us
             << " sidecar_validate_us=" << sidecar_validate_us
@@ -723,7 +762,21 @@ int party_online(int argc, char** argv, bool online_tls = false,
             << " ready_sent_bytes=" << ready.sent
             << " ready_received_bytes=" << ready.received
             << " online_transport=" << (online_tls ? "mutual_TLS_1.3_data_path" : "caller_FD")
-            << " online_tls_channels=" << (online_tls ? kChannelCount : 0U) << "\n";
+            << " online_tls_channels=" << (online_tls ? kChannelCount : 0U);
+  emit_array("select_logical_calls_r1_r4", result.metrics.logical_comparison_calls);
+  emit_array("select_unique_slots_r1_r4", result.metrics.unique_select_slots_consumed);
+  emit_array("select_dummy_calls_r1_r4", result.metrics.dummy_related_calls);
+  emit_array("select_repeated_calls_r1_r4", result.metrics.repeated_logical_calls);
+  emit_array("select_round_time_us_r1_r4", result.metrics.select_round_time_us);
+  emit_array("select_eval_time_us_r1_r4", result.metrics.select_eval_time_us);
+  emit_array("select_exchange_time_us_r1_r4", result.metrics.select_exchange_time_us);
+  std::cout << " raw_adapter_time_us=" << result.metrics.raw_adapter_time_us
+            << " forward_shuffle_time_us=" << result.metrics.forward_shuffle_time_us
+            << " sampling_coin_exchange_time_us=" << result.metrics.sampling_coin_exchange_time_us
+            << " membership_time_us=" << result.metrics.membership_time_us
+            << " inverse_shuffle_time_us=" << result.metrics.inverse_shuffle_time_us
+            << " status_coordination_time_us=" << result.metrics.status_coordination_time_us;
+  std::cout << '\n';
   return exit_code;
 }
 }  // namespace

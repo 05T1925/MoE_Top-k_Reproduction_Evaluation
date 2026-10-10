@@ -738,6 +738,13 @@ target_compile_definitions(
 )
 
 if(BUILD_TESTING)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_test(NAME moe_topk_bmw16_run_record_audit_test
+                 COMMAND ${Python3_EXECUTABLE} -m unittest discover
+                         -s ${CMAKE_CURRENT_SOURCE_DIR}/tests/bench
+                         -p test_bmw16_run_record.py -v)
+    endif()
     if(MOE_TOPK_ENABLE_EXPERIMENTAL_BMW16_SELECT_ADAPTER)
         add_test(NAME moe_topk_bmw16_experimental_party_test
                  COMMAND moe_topk_bmw16_experimental_party_test)

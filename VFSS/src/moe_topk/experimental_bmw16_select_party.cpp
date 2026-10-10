@@ -990,6 +990,8 @@ static void protocol_i_bmw16_experimental_raw_score_mask_party_impl(
   output.metrics.raw_adapter_time_us=elapsed_us(raw_start);
   output.metrics.raw_adapter_eval_time_us=score_metrics.ucmp_eval_time_us;
   output.metrics.raw_adapter_exchange_time_us=score_metrics.carry_exchange_time_us+score_metrics.sign_exchange_time_us;
+  output.metrics.raw_adapter_ucmp_calls=score_metrics.ucmp_calls;
+  output.metrics.raw_adapter_dcf_evaluations=score_metrics.raw_dcf_calls;
   const auto ring = (UINT64_C(1) << c.comparison_bits) - 1U;
   std::vector<ProtocolIBlock192> input(c.n);
   for (std::size_t i = 0; i < input.size(); ++i) input[i] = {stable_share[i] & ring, 0, 0};
