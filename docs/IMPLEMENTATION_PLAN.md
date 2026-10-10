@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-10-10（S30 状态同步；阶段顺序未改变）
+更新日期：2026-10-10（S31 状态同步；阶段顺序未改变）
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -128,6 +128,21 @@ n≤256 范围通过。S28 的 DCF 单 key、adaptive full-pool、shuffle/output
 M6A→M6B→M7 正式顺序、V4 LAN/WAN 门及九指标要求不变。S30 被测源码 commit 为
 `eac5151e96f3cc67d2bc664c0d300b51ef672e10`；详见
 [S30 接收报告](reproduction/BMW16_S30_INDEPENDENT_ACCEPTANCE_2026-10-10.md)。
+
+**2026-10-10 S31 v2 接收状态**：S30 的“v2 wrapper 需下一接收者复核”是 S30 报告时点的状态；
+S31 已在新构建中独立复核 CMake/CLI/API admission、TLS 强制、TEST_ONLY 拒绝、唯一 runtime
+委托、n=0/1001 边界和对应 conformance，并按 conformance→common-tape→独立进程顺序复跑。
+S31 v2 E2E、证据哈希及条件安全的 n=1000 全 K 失败界见 dated S31 报告/决策。v1 的
+`n≤256` 安全设计门继续沿用 S30 已关闭结论；v2 在同一已独立接收条件下只扩展范围，不改变
+DCF、Select、shuffle、材料 ABI 或泄露。正式验收顺序没有改变：M6A/V3 未完成前不开始 V4
+正式性能矩阵。S31 的服务器 runbook 与 JSON schema 是实验准备资产，不构成 V4 执行或验收。
+方案名始终为 Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED；不把项目候选记为
+BB90 原算法复现、BMW16 Algorithm 7 逐字实现或其定理保证。
+
+S31 将当前 server package 冻结为 `READY_FOR_FUTURE_V4` 准备资产。正式 V4 仍受 M6A/V3
+前置约束；在其关闭前允许准备租赁主机配置、材料预检、输入/oracle 和逐次数据合同，
+但不启动正式 LAN/WAN 1+5 矩阵或将 loopback 数据写入性能验收表。S31 对 `conditional_secure_v2`
+的独立接收仅覆盖条件模型下 n≤1000；不代表生产凭据部署、跨主机运维接收或六方案验收。
 
 ### 1.4 最终六种方案
 

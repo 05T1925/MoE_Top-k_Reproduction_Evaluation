@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-10-10（S30）
+更新日期：2026-10-10（S31）
 
 ## 1. 项目目标与当前边界
 
@@ -117,6 +117,21 @@ fresh-material `(1000,80)` 独立 UID、mTLS E2E 与冻结 oracle 通过。v2 wr
 留在本地 `codex/m6b-i-bmw16-s30`，不改 main 或 PR #29。详见
 [S30 条件安全与规模决策](docs/decisions/BMW16_S30_CONDITIONAL_SECURITY_AND_SCALE_DECISION_2026-10-10.md)
 和 [S30 独立接收报告](docs/reproduction/BMW16_S30_INDEPENDENT_ACCEPTANCE_2026-10-10.md)。
+
+**2026-10-10 S31 v2 独立接收与实验包**：S31 从 S30 报告 head 独立检查 `conditional_secure_v2`
+的默认关闭构建、入口/参数/TLS/fail-closed 合同及对唯一 runtime/材料 ABI 的委托关系。v1
+`n≤256` 条件安全门沿用 S30 已关闭结论；v2 仅将同一有条件模型下的准入范围扩展至 `n≤1000`，
+没有重开或改写 v1 的 DCF/全池/shuffle 证明。S31 本轮 Release 定向 CTest、39 项 common-tape、
+v1 47 个 fresh-material E2E 及 v2 `(1000,80)` 的新鲜材料三进程 mTLS E2E 结果以 S31 报告为准；
+它们是条件配置的功能接收，不是无条件/恶意安全或正式性能验收。v2 的 n=1000 抽样界按其
+实际全 K 参数域单独计算，并继续依赖 ROM 与至少一方诚实 OS 熵贡献；受限 `G126`、AES-CTR
+root stream、OS CSPRNG、可信离线非合谋 T、单方半诚实腐化与完整泄露函数 L 保持明确前提。
+服务器实验 runbook 和逐次 JSON schema 已准备；V3→V4 前置未关闭，正式 1+5 LAN/WAN、九指标
+性能表与六方案排名仍 `NOT_RUN / NOT_MEASURED`。PR #29 的远端状态和是否成功快进更新，以
+S31 报告记录为准；没有合入 main 的结论。
+详见 [S31 条件安全与规模决策](docs/decisions/BMW16_S31_CONDITIONAL_V2_ACCEPTANCE_AND_SERVER_PACKAGE_2026-10-10.md)、
+[S31 独立接收报告](docs/reproduction/BMW16_S31_INDEPENDENT_ACCEPTANCE_2026-10-10.md) 与
+[服务器实验包](docs/reproduction/BMW16_S31_SERVER_BENCHMARK_PACKAGE_2026-10-10.md)。
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
