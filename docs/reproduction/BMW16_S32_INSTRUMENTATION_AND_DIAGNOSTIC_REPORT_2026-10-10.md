@@ -70,26 +70,23 @@ python3 VFSS/tests/bench/bmw16_run_record.py collect \
 在 WSL 中由隔离 root TEST_ONLY collector 启动不同 UID 进程；正常 party runtime 不使用 root 控制器、
 不重构明文。收集器在子进程结束后重构并调用冻结 C++ oracle。每个配置 fresh session/material。
 
-| n,K | 输入 seed / session | 状态与正确性 | offline ms | material payload bits | package bytes | online ms | app comm total / per party bits | rounds | online PRG calls | comparison edges | total ms | raw evidence manifest SHA-256 |
-|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| 8,3 | 603201 / 6032001 | SUCCESS, oracle exact, weight K | 78.451 | 3,967,968 | 505,018 | 1,141.160 | 50,192 / 25,096 | 12 | 15,568 | 109 | 1,219.611 | `a6a6873a7c90d6b22105bc835e16c4710affffcdc6ab865891de634fbad207c9` |
-| 128,8 | 603202 / 6032002 | SUCCESS, oracle exact, weight K | 2,003.618 | 1,194,366,240 | 151,637,602 | 1,261.173 | 5,344,272 / 2,672,136 | 12 | 1,846,816 | 11,581 | 3,264.792 | `5cc89a9349f5884eb14142fac88a984ba34755f82659c768cc33b245728e0834` |
-| 256,80 | 603203 / 6032003 | SUCCESS, oracle exact, weight K | 6,909.491 | 4,900,938,016 | 622,018,530 | 1,944.843 | 8,335,120 / 4,167,560 | 12 | 7,071,612 | 43,207 | 8,854.335 | `3be86eb29089fb118b893e9f91ca74037393cf28eb0f698b8c91cd9f3e6dbfe3` |
-| 1000,80 | 603204 / 6032004 | SUCCESS, oracle exact, weight K | 581,921.123 | 78,361,809,376 | 9,939,083,130 | 54,753.717 | 48,047,120 / 24,023,560 | 12 | 19,688,900 | 114,899 | 636,674.840 | `d9ae4cbcf127c4ce32b21cede0dc1c199f6680d81460752336a91ee622eea675` |
+| n,K | 输入 seed / session | 状态与正确性 | offline ms | payload bits | package bytes | online ms | app comm total / per party bits | rounds | online PRG | comparison edges | total ms | evidence manifest SHA-256 | run_record SHA-256 |
+|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 8,3 | 603201 / 6033002 | SUCCESS, oracle exact, weight K | 55.514 | 3,967,968 | 505,018 | 1,115.812 | 50,192 / 25,096 | 12 | 15,568 | 109 | 1,171.326 | `04e620cd8b6b72ebcfeb466aa4d9052c162a1b634dc2e66d1afa7ac7d780c4a9` | `82c04163458f0602a9712387acd84e56ba999615270ba20a1a2448f716accdb5` |
+| 128,8 | 603202 / 6033003 | SUCCESS, oracle exact, weight K | 1,356.148 | 1,194,366,240 | 151,637,602 | 1,224.713 | 5,432,720 / 2,716,360 | 12 | 1,928,736 | 12,093 | 2,580.862 | `49d9e18672a1f87c028ac04a809366f214c42dea103a12af85b4650447116733` | `3495086a82608dbd11f92eece867cd9425dafcb0bb83a9d0a130248a25ef05f4` |
+| 256,80 | 603203 / 6033004 | SUCCESS, oracle exact, weight K | 5,392.165 | 4,900,938,016 | 622,018,530 | 1,781.751 | 8,718,864 / 4,359,432 | 12 | 6,624,548 | 40,481 | 7,173.917 | `7671c796794fdb38d56b282b76c020392a5eff71afbda3bccd4870d9df112f05` | `25d1fcd73b7c2c75d44ce78a13d2f9d09f59abce9b8616c413075c8a4739e58c` |
+| 1000,80 | 603204 / 6033005 | SUCCESS, oracle exact, weight K | 462,953.841 | 78,361,809,376 | 9,939,083,130 | 79,360.450 | 49,577,872 / 24,788,936 | 12 | 23,011,768 | 134,218 | 542,314.291 | `6fd32688c838d49aa6f37145ed781d6f55a62845c31920548328af38b3260f5a` | `95c96f3998d811a9c2071d8695bffaf53fa99111a6a578251a3ebfc0bf34edd1` |
 
-四个 `run_record.json` 本身 SHA-256（对应上表顺序）为：
-`cd88650606c3f6c546779a1fe80cf8aec1a663194a6cbae6f3315eaed84ef787`、
-`7a72222d3d36e8d068425cbf71c365e8e12e0f1ba30db0acdf339d72d68b09e6`、
-`fe7979b635e90ef6cd73e129dfd365d1e9b14e3251883f23839de861f3920e98`、
-`851219d9f55d89f503c4dee8c14eb8513e6b5273c42abd99eaf0454b3375f689`。
+这组归档复跑记录位于仓库外 `C:\Users\28641\.codex\evidence\m6b-s32-final-diagnostics\{n8_k3,n128_k8,n256_k80,n1000_k80}`；每目录含 `run_record.json`、`evidence_manifest.json` 和脱敏进程日志。独立 `audit` 命令对四条 JSON 均返回 PASS；manifest SHA 与对应记录的 `raw_record_sha256` 一致。临时 shares、key、证书、sidecar 已由 TEST_ONLY collector 清理。运行种子复用首轮报告，session 与 OS CSPRNG 材料均新鲜，因此结果/随机轨迹和首轮可能不同。首轮数值及 hash 留在先前 S32 报告提交 `d5489ca` 的 Git 历史；其 WSL `/tmp` 原始目录现已清理，本表改以当前持久归档复跑作为可直接复核的数据源。
 
 说明：package bytes = 两方 sidecar ciphertext 文件 + 两方 shell 文件；TLS app delivery 为辅助值，不等于 TLS wire。
-四次是每配置单次诊断，不是预热+5重复；自然算法 abort 观察为 `0/4`，注入 abort 计数也是 `0/4`，不据此
-推导理论失败率。n=1000 本机试跑约 10.61 分钟，其中 offline 9.70 分钟；不得当 LAN/WAN 结论。
+这四次为每配置单次诊断，不是预热+5重复；自然算法 abort 为 `0/4`、注入 abort 为 `0/4`（四条 E2E 均为正常执行），不据此推导理论失败率。n=1000 本次全链约 9.04 分钟，其中 offline 7.72 分钟；不得当 LAN/WAN 结论。
 
-独立边/计数对账：例如 n=1000：raw 2,048 uCMP calls（2,000 real + 48 pad）+ Select 111,852
- unique real edges + membership 999 = 114,899；DCF Eval 两方合计 459,596，PRG node expansions
- 两方合计 19,688,900，AES blocks 辅助数 39,377,800。上述量纲相互独立，不可互换。
+另有一次非 root harness 启动尝试在创建输入 fixture/party 进程前被 `distinct OS identities` 前置条件拒绝；它没有产生协议消息、材料或输出，不计入 E2E/abort 分母。该启动拒绝的原始终端输出未写入上述持久证据目录，本报告保留其分类和限制，不把它伪装成协议失败或成功样本。
+
+独立边/计数对账：当前归档 n=1000：raw 2,048 uCMP calls（2,000 real + 48 pad）+ Select 131,171
+ unique real edges + membership 999 = 134,218；DCF Eval 两方合计 536,872，PRG node expansions
+两方合计 23,011,768，AES blocks 辅助数 46,023,536。上述量纲相互独立，不可互换。
 
 ## 回归、ON/OFF 与默认关闭
 
@@ -122,6 +119,8 @@ SHA-256 分别仍为 `e895cff05e85a18d314b1fcbc2c41226fbc99342952de380253863afbc
 该复核 CMakeCache SHA-256 为 `cb0848a35e5f57b1fe02855e0c5de55df0b77f7f2b21c6ec25104b8fcdab92f7`。
 前表 n=1000 仍是 runtime commit `f2db098...` 上本任务此前保存的独立 fresh-material 诊断。全仓 CTest 仍 NOT_RUN。
 
+最终复核时第一次从 PowerShell 直接调用 WSL，含竖线的 CTest regex 被外层 shell 拆成多个命令，测试未启动；随后改用显式 `bash -lc` 引号重跑，才得到上述 6/6。该次调用错误不是测试失败，也未纳入测试分母。
+
 另以所有 BMW16 选项与 `BUILD_TESTING` OFF 在 `/tmp/m6b-s32-final-off` 重新配置并构建 `sytorch`，
 构建成功；`cmake --build /tmp/m6b-s32-final-off --target help` 未列出 BMW16 party、E2E 或 conditional
 入口。该次 `libsytorch.a` SHA-256 为 `a2a9bb816a1cd7a82e7ddf92c42148e113de91eacb9951ca1021771479b47be7`；
@@ -137,24 +136,66 @@ SHA-256 分别仍为 `e895cff05e85a18d314b1fcbc2c41226fbc99342952de380253863afbc
 
 Git 远端状态：S32 首次文档提交后，通过普通非强制快进将 PR 源分支
 `codex/m6b-i-bmw16-s26` 从 `a1a90cb2...` 推至 `d5489ca1be132399e7420bfce4b067bda9feb871`；修正 PR 状态说明后，
-又以非强制快进推送报告专用提交。最近一次 `git ls-remote` 核对时该分支与 `refs/pull/29/head` 均为
-`12eb42ea753a660b9755c1e269ce17619c2b40b4`，`main` 仍为
+又以非强制快进推送报告专用提交。S32 归档复跑前最近一次 `git ls-remote` 核对时该分支与
+`refs/pull/29/head` 均为 `b446061478b76b32342964a61ce672dc7195e0c3`，`main` 仍为
 `c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍 Open、base `main`，公开页显示 26 commits；标题仍是旧 S26
 标题，正文仍为未填写 S32 结果的仓库模板。Checks 页没有显示已配置/已运行的 GitHub Actions 检查。
-GitHub PR 元数据连接器返回 `USER_NOT_LOGGED_IN`，GitHub CLI 未安装，浏览器页面也未登录；因此本轮无法改 PR 标题/正文。
+GitHub PR 元数据连接器返回 `USER_NOT_LOGGED_IN`，GitHub CLI 未安装，浏览器页面也未登录；本轮结束前再次调用 `github_fetch_pr`，连接器仍返回 `USER_NOT_LOGGED_IN`，因此未改 PR 标题/正文。
 分支代码和 S32 文档已推送，但 PR 元数据未更新，也没有合入。取得 GitHub 元数据编辑登录后，只需更新标题/正文，
 不需要重写提交历史或再推送；不 force-push、不合并：
 
 建议标题：`Protocol I BMW16-derived Select + DCF: conditional n≤1000 candidate and S32 metrics`
 
-建议正文重点：PROJECT_DERIVED；S31 条件安全接收适用 n≤1000，假设为 G126/restricted AES 子族、AES-CTR
-root stream、OS CSPRNG、ROM sampler、可信离线静默 T、至多一个半诚实腐化方、理想私有认证通道及明示
-leakage L；非 BB90 原算法、非 BMW16 Algorithm 7 逐字实现，不继承定理常数/概率。报告 S32 schema-v2
-九指标和 n=8/128/256/1000 各一次成功 loopback mTLS oracle 诊断；说明 `0/4` 自然 abort 只是观察，
-不是概率界。列出本轮 CTest 6/6（含 S32 auditor、party、v2 conformance、DCF 与 Protocol III 三进程目标）、
-common tape 39/39、Protocol I/III 定向 13/13；明确全仓 CTest、同期全对全/
-I+AAV86 配对、TLS wire/RSS/root PRG、正式 V4 LAN/WAN 1+5 与六方案排名未完成/NOT_MEASURED。V3 前置
-保持不变。
+以下正文可直接用于 PR #29：
+
+```markdown
+## Summary
+
+This PR packages the **Protocol I + BMW16-derived Select + DCF** route as a
+`PROJECT_DERIVED` candidate and adds schema-v2 instrumentation for its
+diagnostic runs. It is not a reproduction of the original BB90 algorithm or a
+line-by-line implementation of BMW16 Algorithm 7, and it does not inherit
+BMW16's comparison constants or probability theorem.
+
+The conditional-security design accepted in S31 applies only under its stated
+assumptions: the source-specific G126/restricted AES-key PRG/PRP assumption,
+AES-CTR root streams, OS CSPRNG, ROM sampler, a trusted offline and non-colluding
+T, at most one semi-honest online-party corruption, an ideal private
+authenticated channel, and the documented leakage function L. This is a
+conditional candidate, not an unconditional or malicious-secure claim and not
+a claim that the complete raw-score-to-mask protocol takes four rounds.
+
+## S32 diagnostic evidence
+
+The current S32 report records one fresh-material loopback mTLS end-to-end run
+for each of n=8/K=3, n=128/K=8, n=256/K=80, and n=1000/K=80. Each SUCCESS
+reconstructed in the isolated TEST_ONLY collector matched the frozen oracle,
+had output length n, and had mask weight K. These are diagnostic observations,
+not the formal V4 LAN/WAN matrix. The observed natural-abort count was 0/4;
+this is not a probability bound.
+
+Schema-v2 records the nine planned metrics with provenance and separates
+application bytes, package bytes, payload bits, DCF Eval, PRG expansions, AES
+blocks, logical comparison calls, and unordered comparison edges. The report
+includes per-attempt hashes and the audit command.
+
+## Validation
+
+- BMW16 run-record auditor, party path, conditional-v2 conformance, DCF and
+  priority-DCF conformance, and Protocol III three-process target: 6/6 CTest
+  tests passed in the targeted build.
+- Python run-record tests: 10/10 passed.
+- S4/C++ common-tape differential: 39/39 passed.
+- Related Protocol I/III targeted regressions: 13/13 passed.
+- Default-off build: passed; BMW16 experiment targets were absent.
+- Full-repository CTest: NOT RUN (not all registered targets were built).
+- Same-run Protocol I all-pairs and Protocol I+AAV86 comparison: NOT RUN.
+- Formal V4 LAN/WAN warm-up plus five repetitions and six-scheme ranking: NOT
+  RUN; V3 prerequisite remains in force.
+
+The PR remains `PROJECT_DERIVED`; this diagnostic report does not upgrade the
+security scope or mark formal performance acceptance complete.
+```
 
 S32 不运行正式 V4 1+5 LAN/WAN 矩阵。
 
