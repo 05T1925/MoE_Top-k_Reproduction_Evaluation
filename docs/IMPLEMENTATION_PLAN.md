@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-10-10（S31 状态同步；阶段顺序未改变）
+更新日期：2026-10-10（S32 计量同步；阶段顺序未改变）
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -143,6 +143,13 @@ S31 将当前 server package 冻结为 `READY_FOR_FUTURE_V4` 准备资产。正�
 前置约束；在其关闭前允许准备租赁主机配置、材料预检、输入/oracle 和逐次数据合同，
 但不启动正式 LAN/WAN 1+5 矩阵或将 loopback 数据写入性能验收表。S31 对 `conditional_secure_v2`
 的独立接收仅覆盖条件模型下 n≤1000；不代表生产凭据部署、跨主机运维接收或六方案验收。
+
+**S32 研究诊断同步（2026-10-10）**：S32 已落实 schema-v2 的实际记录生成器和一致性审计器，
+为 n=8/128/256/1000 各完成一次 fresh-material、不同 UID、loopback mTLS、冻结 oracle 诊断。
+记录边界和 9 项主指标口径见 S32 决策/报告；这些不是 LAN/WAN 正式重复实验。当前只有
+BMW16-derived 路线已接入该计数器；Protocol I 全对全和 Protocol I+AAV86 的旧 revision/旧口径
+数据不可拼接。S32 不改变 M6A→M6B→M7 正式阶段顺序，V3 未关闭时只准备 V4 实验资产，不启动正式 V4。
+`online_comm_per_party_bits` 固定为标量 total/2；主通信层为在线应用 framed bytes，TLS wire 单列未测。
 
 ### 1.4 最终六种方案
 

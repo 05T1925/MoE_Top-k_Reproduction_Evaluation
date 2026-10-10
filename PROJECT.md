@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-10-10（S31）
+更新日期：2026-10-10（S32）
 
 ## 1. 项目目标与当前边界
 
@@ -132,6 +132,17 @@ S31 报告记录为准；没有合入 main 的结论。
 详见 [S31 条件安全与规模决策](docs/decisions/BMW16_S31_CONDITIONAL_V2_ACCEPTANCE_AND_SERVER_PACKAGE_2026-10-10.md)、
 [S31 独立接收报告](docs/reproduction/BMW16_S31_INDEPENDENT_ACCEPTANCE_2026-10-10.md) 与
 [服务器实验包](docs/reproduction/BMW16_S31_SERVER_BENCHMARK_PACKAGE_2026-10-10.md)。
+
+**2026-10-10 S32 计量准备与诊断**：S32 沿用 S31 已接收的 `conditional_secure_v2`（n≤1000）
+条件安全边界，没有重开安全设计门。它为 Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED
+实验路径实现 schema-v2 的逐次记录生成/审计和实际在线 DCF 扩展、应用帧、比较边计数；并在
+`n=8/128/256/1000` 完成各一次 loopback fresh-material mTLS oracle E2E 诊断。S32 记录是
+EXPERIMENTAL_DIAGNOSTIC，不是预热+5重复或正式 LAN/WAN 性能验收。全对全 Protocol I 与
+Protocol I+AAV86 尚无 S32 同口径配对运行，不能合并旧 E15/E17/E20 数字作排名。S31 schema v1 的
+per-party 通信对象表示已由 v2 的标量 `total/2` 修正；应用帧发送字节是当前可测通信层，TLS wire、
+TCP/IP、root PRG stream、T RSS 等保留 NOT_MEASURED。M6A/V3→V4 正式顺序未改变，V4 与六方案性能
+验收仍未启动。细节见 [S32 决策](docs/decisions/BMW16_S32_UNIFIED_METRICS_AND_DIAGNOSTIC_DECISION_2026-10-10.md)
+和 [S32 计量/诊断报告](docs/reproduction/BMW16_S32_INSTRUMENTATION_AND_DIAGNOSTIC_REPORT_2026-10-10.md)。
 
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 

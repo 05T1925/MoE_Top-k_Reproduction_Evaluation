@@ -2,7 +2,7 @@
 
 状态：**已采纳**。
 
-更新日期：2026-10-10（S31 状态同步；正式验收顺序未变）。
+更新日期：2026-10-10（S32 计量口径同步；正式验收顺序未变）。
 
 本文统一规定两次基础协议通信核验和两次升级算法完整性能验收的方法、参数、计量边界、交付物及通过条件。
 
@@ -29,6 +29,19 @@ loopback E2E。该单次功能/容量结果不是 V4 性能测量；不填 LAN/W
 wire bytes、全路径 PRG、RSS 等九指标中尚未真实覆盖的字段必须保持 `NOT_MEASURED`；当前代码布局
 推导的 12 个应用消息相位与 Select 四层分栏记录，不以四层代替完整入口轮数。正式 V4 仍需
 V3 前置、每配置 1 次预热+5 次、同 revision/输入/材料边界和失败尝试全量留存。
+
+**S32 schema-v2 诊断口径（2026-10-10）**：S32 将九项记录合同落地为
+[BMW16 schema v2](reproduction/BMW16_RUN_RECORD_SCHEMA_2.json) 与逐次生成/审计器
+[`bmw16_run_record.py`](../VFSS/tests/bench/bmw16_run_record.py)。S31 schema-v1 将
+`online_comm_per_party_bits` 表示为对象；v2 按本计划改为标量 `online_comm_total_bits/2`。
+v2 主通信字段使用 `ProtocolIFramedChannel` 应用 framed sent bytes（两方合计），接收量只核对守恒；
+TLS handshake/record、TCP/IP/retransmission 为独立辅助量，未测时填 null + `NOT_MEASURED`。
+offline material 主口径为实际交给在线方的预处理序列化 payload；package、AEAD/manifest wrapper、
+TLS delivery 分别记录，不互相代填。详细计数点、attempt 屏障、PRG/edge 分解和 S32 有界诊断见
+[S32 计量决策](decisions/BMW16_S32_UNIFIED_METRICS_AND_DIAGNOSTIC_DECISION_2026-10-10.md)
+及[诊断报告](reproduction/BMW16_S32_INSTRUMENTATION_AND_DIAGNOSTIC_REPORT_2026-10-10.md)。
+这只表示 BMW16-derived 路线当前具备诊断采集器；全对全 I、I+AAV86 仍需同定义采集/同期重跑，
+禁止拼接历史数字形成排名。V3 前置与正式 V4 1 warm-up + 5 runs LAN/WAN 要求不变。
 
 本文定义验收要求，不表示相关实验已经执行，也不改变历史结果的统计边界。
 
