@@ -1,7 +1,7 @@
 # BMW16 S31：conditional-v2 独立接收与服务器实验包决策
 
-日期：2026-10-10  
-方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**  
+日期：2026-10-10
+方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**
 决策范围：接收 S30 `conditional_secure_v2`（`1≤n≤1000`）并冻结实验运行合同；不重新开启 v1 安全门，不接受正式 LAN/WAN 性能。
 
 ## 1. 决定摘要

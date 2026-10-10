@@ -1,8 +1,8 @@
 # BMW16 S31：conditional-v2 独立接收报告
 
-日期：2026-10-10  
-方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**  
-接收范围：S30 `conditional_secure_v2`（`1≤n≤1000`）源码/入口接收、最终候选有界功能验证及服务器实验准备资产。  
+日期：2026-10-10
+方案身份：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**
+接收范围：S30 `conditional_secure_v2`（`1≤n≤1000`）源码/入口接收、最终候选有界功能验证及服务器实验准备资产。
 明确排除：BB90 原算法复现、BMW16 Algorithm 7 逐字复现、恶意安全、生产 PKI 运维、V4 正式 LAN/WAN 性能矩阵。
 
 ## 1. 接收结论

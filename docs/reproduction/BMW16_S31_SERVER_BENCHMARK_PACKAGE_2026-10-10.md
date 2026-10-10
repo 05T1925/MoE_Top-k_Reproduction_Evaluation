@@ -1,7 +1,7 @@
 # BMW16 S31：服务器性能实验准备包
 
-日期：2026-10-10  
-方案标签：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**  
+日期：2026-10-10
+方案标签：**Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED**
 状态：**READY_FOR_FUTURE_V4**（非正式测量；V3 前置仍有效）
 
 ## 1. 适用范围
