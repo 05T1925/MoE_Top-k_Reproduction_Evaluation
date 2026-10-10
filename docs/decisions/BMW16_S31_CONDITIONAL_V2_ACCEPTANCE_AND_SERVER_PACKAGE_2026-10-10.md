@@ -22,7 +22,7 @@ v1 `1≤n≤256` 的条件安全设计门沿用 S30 的 `CONDITIONALLY_ACCEPTED 
 | S30 被测 v2 runtime | `eac5151e96f3cc67d2bc664c0d300b51ef672e10` | 本轮复核的 v2 wrapper/CMake/CLI/source。 |
 | S30 报告提交 | `d1e8d8dc0a4f594af6e7d6cdb4ce469a4d96797a` | S31 独立 worktree 起点；不是被测 binary 的 runtime revision。 |
 | main/origin/main | `c3926c68fd14f270faa8b55234311071947fa080` | S31 起始核验相同；S30/S31 均未在该起点上合并。 |
-| PR #29 检查 | Open；base `main`；S31 非强推快进后 head=`f1da1113e3a38b112a7b7ecda426527954052fef`；未合入 main | 源分支 diff 已更新；GitHub connector 未连接，标题/正文仍是旧 S26 文案，未冒称 metadata 已更新。见 S31 报告中的可直接采用标题/正文。 |
+| PR #29 检查 | Open；base `main`；S31 非强推快进已推送，远端 head 为 S31 报告提交链的末端；未合入 main | 源分支 diff 已更新；GitHub connector 未连接，标题/正文仍是旧 S26 文案，未冒称 metadata 已更新。精确 remote ref 可用 `git ls-remote origin refs/heads/codex/m6b-i-bmw16-s26` 核验；见 S31 报告中的可直接采用标题/正文。 |
 
 S31 worktree：`codex/m6b-i-bmw16-s31`，起始 `d1e8d8dc…`，起始干净。runtime 文件与 S30 `eac5151…` 的 Git blob 内容一致；S31 只作文档、schema 和实验包更新。桌面主工作区及 VFSS-baseline、Papers、参考树、PR #28 未改动。
 
@@ -118,7 +118,7 @@ S31 运行命令、二进制 SHA、raw record SHA 与失败分型列在 [S31 独
 | `V2_WRAPPER_INDEPENDENT_ACCEPTANCE` | `PASS` | 源码差分、默认 OFF/TLS/admission/negative conformance、v1/core E2E 与 v2 fresh n1000 E2E。 |
 | `N1000_FUNCTIONAL_E2E` | `PASS (1/1, K=80)` | 新 fresh-material mTLS oracle E2E；不代表其它 K 实跑。 |
 | `N1000_SECURITY_PARAMETER_SCOPE` | `CONDITIONAL / n≤1000, 1≤K≤n` | 全 K 的理想/ROM 抽样失败界与 S28 条件优势表达适用；源/G126/PRG/CSPRNG/T/channel 前提不可省略。 |
-| `PR_AND_MAIN_STATUS` | `FAST_FORWARD_PUSHED / METADATA_PENDING` | PR source branch 已从 `871b668…` 快进到 S31 `f1da111…`；base main 未动、PR 未合并。GitHub connector 返回 `USER_NOT_LOGGED_IN`，title/body 未改。 |
+| `PR_AND_MAIN_STATUS` | `FAST_FORWARD_PUSHED / METADATA_PENDING` | PR source branch 已从 `871b668…` 快进并包含本报告；base main 未动、PR 未合并。GitHub connector 返回 `USER_NOT_LOGGED_IN`，title/body 未改。 |
 | `BENCHMARK_PACKAGE_READY` | `READY_FOR_FUTURE_V4`（准备资产） | runbook+schema+资源表已交付；完整线上 wire/全路径 PRG 计数和九指标仍需服务器 instrumentation/运行，V3 未完成。 |
 | `FORMAL_V4_LAN_WAN` | `NOT_RUN` | 无预热+5 LAN/WAN。 |
 

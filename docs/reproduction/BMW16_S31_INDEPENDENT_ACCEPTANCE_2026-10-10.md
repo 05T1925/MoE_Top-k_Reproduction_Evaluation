@@ -23,7 +23,7 @@ S31 未改运行时代码；本轮测试所用 party runtime 源码 revision 是
 | S31 分支 | `codex/m6b-i-bmw16-s31` | 起始工作树干净；所有修改限于本报告、决策、计划、基准准备文档和 schema。 |
 | S31 起始 main / origin/main / merge-base | `c3926c68fd14f270faa8b55234311071947fa080` | 起始时三者一致；实验链未在该 main 中。 |
 | 桌面原工作树 | `feat/m6a-performance-evaluation`，有既存差异 | 保留，未在其中工作或覆盖。 |
-| PR #29（S31 结束核验） | Open，base `main`，head `codex/m6b-i-bmw16-s26`=`f1da1113e3a38b112a7b7ecda426527954052fef` | S31 已非强推快进源分支；PR 未合入 main。GitHub connector 不可用，因此 PR 标题/正文仍为旧 S26 模板；没有实际 CI 通过证据。 |
+| PR #29（S31 结束核验） | Open，base `main`，head `codex/m6b-i-bmw16-s26` 指向 S31 报告提交链末端 | S31 已非强推快进源分支；PR 未合入 main。GitHub connector 不可用，因此 PR 标题/正文仍为旧 S26 模板；没有实际 CI 通过证据。精确 head 用 `git ls-remote origin refs/heads/codex/m6b-i-bmw16-s26` 核验。 |
 | PR #28 / `VFSS-baseline/` / `Papers/` / 本地参考树 | 未改动 | 禁止路径未进入差异。 |
 
 本轮使用 protocol-reproduction skill 和仓库 `AGENTS.md` 约束。证据分类为：论文/既有安全决策、S30 项目派生 wrapper、S31 源码检查、本轮新执行结果和仍未实测项目；功能测试不替代密码学论证。
@@ -203,7 +203,7 @@ S31 最终文档提交中的修改文件仅为：
 | `V2_WRAPPER_INDEPENDENT_ACCEPTANCE` | `PASS` | v1/v2 源码差分、默认 OFF/TLS/admission/fail-closed、conformance 和 v2 n1000 独立 E2E。 |
 | `N1000_FUNCTIONAL_E2E` | `PASS (1/1, K=80)` | 本轮 fresh-material 本机 mTLS；仅这一配置是本轮 n1000 直接 E2E。 |
 | `N1000_SECURITY_PARAMETER_SCOPE` | `CONDITIONAL / n≤1000, 1≤K≤n` | S28 条件证明和本报告全 K 理想/ROM abort 计算；G126/root PRG/OS CSPRNG/T/channel/L 前提均保留。 |
-| `PR_AND_MAIN_STATUS` | `FAST_FORWARD_PUSHED / METADATA_PENDING` | 源分支从 `871b668…` 快进到 `f1da111…`；PR base main 未动、未合并。Metadata connector 返回 `USER_NOT_LOGGED_IN`，页面标题/正文仍旧。 |
+| `PR_AND_MAIN_STATUS` | `FAST_FORWARD_PUSHED / METADATA_PENDING` | 源分支从 `871b668…` 快进并包含 S31 报告；PR base main 未动、未合并。Metadata connector 返回 `USER_NOT_LOGGED_IN`，页面标题/正文仍旧。 |
 | `BENCHMARK_PACKAGE_READY` | `READY_FOR_FUTURE_V4` | runbook/schema/预检资产已交付；服务器完整指标未测。 |
 | `FORMAL_V4_LAN_WAN` | `NOT_RUN` | V3 前置未关闭；本轮未运行 1+5。 |
 | `FULL_REPOSITORY_CTEST` | `NOT_RUN` | 本轮两组定向 9/9；全仓 44 项未运行。 |
@@ -214,7 +214,7 @@ S31 最终文档提交中的修改文件仅为：
 
 ## 10. PR #29 操作结果
 
-S31 在确认 `871b668…` 是当前远端分支祖先后，执行了普通 fast-forward push（无 force）：远端 `codex/m6b-i-bmw16-s26` 从 `871b668…` 移至 `f1da1113e3a38b112a7b7ecda426527954052fef`。PR base 仍是 `main`，PR 保持 Open，没有合并。GitHub 页面确认的 PR URL 为 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29)。
+S31 在确认 `871b668…` 是当前远端分支祖先后，执行普通 fast-forward push（无 force），将 S31 接收/实验包提交推到 PR 源分支；后续状态记录也随 fast-forward 更新。最终精确远端 SHA 可由 `git ls-remote origin refs/heads/codex/m6b-i-bmw16-s26` 直接核验。PR base 仍是 `main`，PR 保持 Open，没有合并。GitHub 页面确认的 PR URL 为 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29)。
 
 Metadata 更新尝试使用 GitHub connector 读取 PR 时返回 `USER_NOT_LOGGED_IN / connector is not connected`，因此没有声称标题/正文已更新，也未通过别的通道绕过身份设置。当前页面仍显示旧标题 `m6b i bmw16 s26-Add opt-in BMW16-derived Protocol I Select candidate` 和 S26 模板正文。用户可在连接 GitHub 后将标题改为：
 
@@ -232,6 +232,6 @@ S31 independently accepted the v2 wrapper and ran fresh-material T/P0/P1 mTLS E2
 The conditional claim is limited to the trusted offline non-colluding T, at most one semi-honest online party corruption, ideal private authenticated channels, the source-specific G126/restricted 126-bit AES-key family assumption, cryptoTools AES-CTR root-stream PRG, OS CSPRNG, and ROM sampling with at least one honest entropy contribution. The approved leakage L and exclusions are documented in the S31 decision and report. This is not unconditional, malicious-secure, or production credential/deployment acceptance. Formal performance metrics remain NOT_MEASURED; the server runbook is READY_FOR_FUTURE_V4 pending V3.
 ```
 
-本地提交与远端分支 head 相同；PR metadata 是唯一需要登录用户执行的剩余操作。PR 未合并 main。
+本地 S31 分支已快进推送到远端 PR 源分支；PR metadata 是唯一需要 GitHub 登录的剩余操作。PR 未合并 main。
 
 若服务器/指标采集齐全且 V3 通过，再进入正式 V4；若 n=10k+，先重做 checked 资源准入，不自动生成全池材料。Protocol III 派生路线和六方案总验收仍按各自真实进度另行判定。
