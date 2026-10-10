@@ -135,9 +135,10 @@ SHA-256 分别仍为 `e895cff05e85a18d314b1fcbc2c41226fbc99342952de380253863afbc
 | Protocol I + AAV86 | E15/E17/E20 历史数据口径/源码 revision 不同 | 否 | 历史数字不得拼接；需 schema-v2 同组重跑 |
 | Protocol I + BMW16-derived Select + DCF | 本报告工具实际采集 | 尚无同期全对全/AAV86 配对运行 | EXPERIMENTAL_DIAGNOSTIC only |
 
-Git 远端状态：S32 文档提交后，通过普通非强制快进成功将 PR 源分支
-`codex/m6b-i-bmw16-s26` 从 `a1a90cb2...` 推至 `d5489ca1be132399e7420bfce4b067bda9feb871`；随后 `git ls-remote`
-确认该分支与 `refs/pull/29/head` 均为此 revision，`main` 仍为
+Git 远端状态：S32 首次文档提交后，通过普通非强制快进将 PR 源分支
+`codex/m6b-i-bmw16-s26` 从 `a1a90cb2...` 推至 `d5489ca1be132399e7420bfce4b067bda9feb871`；修正 PR 状态说明后，
+又以非强制快进推送报告专用提交。最近一次 `git ls-remote` 核对时该分支与 `refs/pull/29/head` 均为
+`12eb42ea753a660b9755c1e269ce17619c2b40b4`，`main` 仍为
 `c3926c68fd14f270faa8b55234311071947fa080`。PR #29 仍 Open、base `main`，公开页显示 26 commits；标题仍是旧 S26
 标题，正文仍为未填写 S32 结果的仓库模板。Checks 页没有显示已配置/已运行的 GitHub Actions 检查。
 GitHub PR 元数据连接器返回 `USER_NOT_LOGGED_IN`，GitHub CLI 未安装，浏览器页面也未登录；因此本轮无法改 PR 标题/正文。
