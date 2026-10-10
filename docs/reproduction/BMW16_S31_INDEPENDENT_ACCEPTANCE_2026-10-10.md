@@ -23,7 +23,7 @@ S31 未改运行时代码；本轮测试所用 party runtime 源码 revision 是
 | S31 分支 | `codex/m6b-i-bmw16-s31` | 起始工作树干净；所有修改限于本报告、决策、计划、基准准备文档和 schema。 |
 | S31 起始 main / origin/main / merge-base | `c3926c68fd14f270faa8b55234311071947fa080` | 起始时三者一致；实验链未在该 main 中。 |
 | 桌面原工作树 | `feat/m6a-performance-evaluation`，有既存差异 | 保留，未在其中工作或覆盖。 |
-| PR #29（本轮起始核验） | Open，base `main`，head `codex/m6b-i-bmw16-s26`=`871b668…` | 未合入 main。GitHub 页面仍显示 S26 旧标题与模板正文；没有实际 CI 通过证据。S31 最终 fast-forward 结果见本报告最后一节。 |
+| PR #29（S31 结束核验） | Open，base `main`，head `codex/m6b-i-bmw16-s26`=`f1da1113e3a38b112a7b7ecda426527954052fef` | S31 已非强推快进源分支；PR 未合入 main。GitHub connector 不可用，因此 PR 标题/正文仍为旧 S26 模板；没有实际 CI 通过证据。 |
 | PR #28 / `VFSS-baseline/` / `Papers/` / 本地参考树 | 未改动 | 禁止路径未进入差异。 |
 
 本轮使用 protocol-reproduction skill 和仓库 `AGENTS.md` 约束。证据分类为：论文/既有安全决策、S30 项目派生 wrapper、S31 源码检查、本轮新执行结果和仍未实测项目；功能测试不替代密码学论证。
@@ -203,7 +203,7 @@ S31 最终文档提交中的修改文件仅为：
 | `V2_WRAPPER_INDEPENDENT_ACCEPTANCE` | `PASS` | v1/v2 源码差分、默认 OFF/TLS/admission/fail-closed、conformance 和 v2 n1000 独立 E2E。 |
 | `N1000_FUNCTIONAL_E2E` | `PASS (1/1, K=80)` | 本轮 fresh-material 本机 mTLS；仅这一配置是本轮 n1000 直接 E2E。 |
 | `N1000_SECURITY_PARAMETER_SCOPE` | `CONDITIONAL / n≤1000, 1≤K≤n` | S28 条件证明和本报告全 K 理想/ROM abort 计算；G126/root PRG/OS CSPRNG/T/channel/L 前提均保留。 |
-| `PR_AND_MAIN_STATUS` | `PENDING_S31_FAST_FORWARD` | 起始远端 PR head `871b668…`、base main、未合入；S31 本地提交后再记录 push/PR 操作结果。 |
+| `PR_AND_MAIN_STATUS` | `FAST_FORWARD_PUSHED / METADATA_PENDING` | 源分支从 `871b668…` 快进到 `f1da111…`；PR base main 未动、未合并。Metadata connector 返回 `USER_NOT_LOGGED_IN`，页面标题/正文仍旧。 |
 | `BENCHMARK_PACKAGE_READY` | `READY_FOR_FUTURE_V4` | runbook/schema/预检资产已交付；服务器完整指标未测。 |
 | `FORMAL_V4_LAN_WAN` | `NOT_RUN` | V3 前置未关闭；本轮未运行 1+5。 |
 | `FULL_REPOSITORY_CTEST` | `NOT_RUN` | 本轮两组定向 9/9；全仓 44 项未运行。 |
@@ -211,5 +211,27 @@ S31 最终文档提交中的修改文件仅为：
 ## 9. 下一阶段执行清单
 
 在租赁服务器任务开始前：先关闭并记录 V3 正式门；读取本报告与 server package，冻结 PR 接收后的最终 commit；准备 ≥8 vCPU/16 GiB RAM 的起始实例、≥30 GB scratch 的串行单次配置（保留六份重复包时建议 ≥80 GB）；按实际 sidecar preflight 保留至少 20% 空间余量；由受信任运维预置非 TEST_ONLY 的 T/P0/P1 证书与独立身份；从最终 commit 重建 default-OFF 与条件入口 Release，保存 cache、binary、input/oracle、manifest 和原始索引 hash；同一输入运行全对全 I、I+AAV86 与本候选，先预热 1 次，再正式 5 次，全部失败尝试入库；分别测 LAN/WAN RTT、带宽、分方线速字节、九指标、RSS 与 PRG/AES/DCF 各自计数；不得把 S31 loopback 记录拼入该矩阵。
+
+## 10. PR #29 操作结果
+
+S31 在确认 `871b668…` 是当前远端分支祖先后，执行了普通 fast-forward push（无 force）：远端 `codex/m6b-i-bmw16-s26` 从 `871b668…` 移至 `f1da1113e3a38b112a7b7ecda426527954052fef`。PR base 仍是 `main`，PR 保持 Open，没有合并。GitHub 页面确认的 PR URL 为 [PR #29](https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation/pull/29)。
+
+Metadata 更新尝试使用 GitHub connector 读取 PR 时返回 `USER_NOT_LOGGED_IN / connector is not connected`，因此没有声称标题/正文已更新，也未通过别的通道绕过身份设置。当前页面仍显示旧标题 `m6b i bmw16 s26-Add opt-in BMW16-derived Protocol I Select candidate` 和 S26 模板正文。用户可在连接 GitHub 后将标题改为：
+
+```text
+Protocol I + BMW16-derived Select + DCF: conditionally accepted v2 candidate (PROJECT_DERIVED)
+```
+
+建议正文：
+
+```markdown
+This PR carries the PROJECT_DERIVED Protocol I + BMW16-derived Select + DCF candidate. It is not a BB90 implementation, does not claim BMW16 Algorithm 7 verbatim, and does not inherit BMW16 theorem constants or bounds. The default build remains OFF. conditional_secure_v1 is limited to 1<=n<=256; conditional_secure_v2 is limited to 1<=n<=1000 and delegates to the same reviewed Select/shuffle/DCF/membership/inverse runtime and material ABI.
+
+S31 independently accepted the v2 wrapper and ran fresh-material T/P0/P1 mTLS E2E at n=1000,K=80. The parties exited successfully; the isolated harness checked the original-order mask against the frozen oracle and verified weight K. Targeted CTest: 18/18 across two groups; common-tape S4/C++ differential: 39/39; v1 independent-process regression: 47/47. Full CTest and formal V4 LAN/WAN 1+5 remain NOT_RUN.
+
+The conditional claim is limited to the trusted offline non-colluding T, at most one semi-honest online party corruption, ideal private authenticated channels, the source-specific G126/restricted 126-bit AES-key family assumption, cryptoTools AES-CTR root-stream PRG, OS CSPRNG, and ROM sampling with at least one honest entropy contribution. The approved leakage L and exclusions are documented in the S31 decision and report. This is not unconditional, malicious-secure, or production credential/deployment acceptance. Formal performance metrics remain NOT_MEASURED; the server runbook is READY_FOR_FUTURE_V4 pending V3.
+```
+
+本地提交与远端分支 head 相同；PR metadata 是唯一需要登录用户执行的剩余操作。PR 未合并 main。
 
 若服务器/指标采集齐全且 V3 通过，再进入正式 V4；若 n=10k+，先重做 checked 资源准入，不自动生成全池材料。Protocol III 派生路线和六方案总验收仍按各自真实进度另行判定。
