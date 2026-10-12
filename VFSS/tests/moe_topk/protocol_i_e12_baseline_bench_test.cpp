@@ -306,7 +306,9 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   FdPool fds;
   ChildSet children;
   const auto c=config_for(t,0);
+  const auto input_generation_started=std::chrono::steady_clock::now();
   const auto scores=scores_for(t,input_seed);
+  const auto input_generation_ended=std::chrono::steady_clock::now();
   const auto transport_start=std::chrono::steady_clock::now();
   std::array<std::array<int,2>,4>offline;
   std::array<std::array<int,2>,2>forward,reverse,score;
@@ -360,13 +362,17 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
   ProtocolIFramedChannel input_p0(input0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,4,1},c.timeout_ms),input_p1(input1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,4,1},c.timeout_ms);
   input_p0.send(encode_words(x0));
   input_p1.send(encode_words(x1));
+  const auto online_started=std::chrono::steady_clock::now();
   ProtocolIFramedChannel result_p0(result0[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,0,6,1},c.timeout_ms),result_p1(result1[0],{t.session,t.fingerprint,c.padded_n,t.k,c.comparison_bits,2,1,6,1},c.timeout_ms);
   const auto out0=result_p0.receive(),out1=result_p1.receive();
   fds.close_all();
   children.wait_ok(p0);
   children.wait_ok(p1);
+  const auto online_terminal=std::chrono::steady_clock::now();
   require(out0.size()==t.logical_n+29*8&&out1.size()==out0.size(),"result shape");
   const auto want=top_k_mask(scores,t.k);
+  std::uint64_t oracle_digest=UINT64_C(1469598103934665603);
+  for(const auto bit:want)oracle_digest=(oracle_digest^bit)*UINT64_C(1099511628211);
   for(std::size_t i=0;i<t.logical_n;++i)require((out0[i]^out1[i])==want[i],"oracle mask");
   const auto m0=decode_words(Bytes(out0.begin()+t.logical_n,out0.end())),m1=decode_words(Bytes(out1.begin()+t.logical_n,out1.end()));
   for(const auto&m:{m0,m1})require(m[0]>48&&m[5]==2U*c.padded_n&&m[6]==4U*c.padded_n&&m[7]==2&&m[16]==static_cast<std::uint64_t>(c.padded_n)*(c.padded_n-1U)/2U&&m[17]==m[16]*2U&&m[18]==6&&m[23]>0&&m[24]>0&&m[27]>0&&m[28]>0,"metrics audit");
@@ -396,7 +402,13 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
     const auto transport_ns=elapsed_ns(transport_start,transport_end);
     std::cout<<"E12_BASELINE_CASE n="<<t.logical_n<<" k="<<t.k
              <<" d="<<c.padded_n<<" input_seed="<<input_seed
-             <<" input_digest="<<digest<<" offline_ns="<<offline_ns
+             <<" input_digest="<<digest<<" input_generation_ns="
+             <<elapsed_ns(input_generation_started,input_generation_ended)
+             <<" offline_ns="<<offline_ns
+             <<" input_share_fixture_ns="<<elapsed_ns(offline_end,online_started)
+             <<" online_wall_ns="<<elapsed_ns(online_started,online_terminal)
+             <<" entry_path_wall_ns="<<elapsed_ns(offline_start,online_terminal)
+             <<" oracle_digest="<<oracle_digest
              <<" dealer_generate_ns="<<dealer_metrics[0]
              <<" dealer_serialize_ns="<<dealer_metrics[1]
              <<" dealer_distribute_ns="<<dealer_metrics[2]
@@ -417,7 +429,8 @@ void run_case(const char*self,const Case&t,std::uint64_t input_seed=0){
              <<" p0_score_dcf_prg="<<m0[27]<<" p1_score_dcf_prg="<<m1[27]
              <<" p0_pipeline_dcf_prg="<<m0[28]
              <<" p1_pipeline_dcf_prg="<<m1[28]
-             <<" edges="<<m0[16]<<" dcf_eval_per_party="<<m0[6]+m0[17]
+             <<" score_ucmp_calls="<<m0[5]<<" edges="<<m0[16]
+             <<" dcf_eval_per_party="<<m0[6]+m0[17]
              <<" rounds="<<m0[7]+m0[18]
              <<" p0_sent_bytes="<<sent(m0)<<" p1_sent_bytes="<<sent(m1)
              <<" p0_received_bytes="<<received(m0)

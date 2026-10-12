@@ -402,11 +402,15 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
   }
   send_all(input[0][0],x0.data(),n*sizeof(std::uint32_t));
   send_all(input[1][0],x1.data(),n*sizeof(std::uint32_t));
+  const auto online_started=std::chrono::steady_clock::now();
   const auto a=decode_result(receive_bytes(result[0][0],1024),n,r);
   const auto b=decode_result(receive_bytes(result[1][0],1024),n,r);
   wait_ok(parties[0],"P0"); wait_ok(parties[1],"P1");
+  const auto online_terminal=std::chrono::steady_clock::now();
   for(const auto fd:parent_keep) ::close(fd);
   const auto oracle=top_k_mask(scores,k);
+  std::uint64_t oracle_digest=UINT64_C(1469598103934665603);
+  for(const auto bit:oracle)oracle_digest=(oracle_digest^bit)*UINT64_C(1099511628211);
   std::uint32_t ones=0;
   for(std::size_t i=0;i<n;++i) {
     const auto bit=static_cast<std::uint8_t>(a.mask[i]^b.mask[i]);
@@ -478,6 +482,13 @@ void run_case(const std::vector<std::uint32_t>& scores,std::uint32_t k,
            <<" total_eval_per_party="<<a.evals<<" p0_bytes="<<a.sent
            <<" p1_bytes="<<b.sent<<" rounds="<<a.rounds
            <<" offline_elapsed_ns="<<offline_ns
+           <<" input_share_fixture_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   online_started-offline_end).count()
+           <<" online_wall_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   online_terminal-online_started).count()
+           <<" entry_path_wall_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   online_terminal-offline_start).count()
+           <<" oracle_digest="<<oracle_digest
            <<" transport_setup_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
                    transport_setup_end-transport_setup_start).count()
            <<" dealer_generate_ns="<<dealer_metrics[0]
@@ -600,6 +611,7 @@ int main(int argc,char** argv) {
       const auto serial=number(argv[6]);
       require((n==128||n==256)&&k>=1&&k<=n&&r>=2&&r<=5,
               "E16 benchmark shape");
+      const auto input_generation_started=std::chrono::steady_clock::now();
       std::mt19937_64 input_rng(input_seed);
       std::uniform_int_distribution<std::int32_t> distribution(-32*4096,32*4096);
       std::vector<std::uint32_t> scores(n);
@@ -608,9 +620,12 @@ int main(int argc,char** argv) {
         score=static_cast<std::uint32_t>(distribution(input_rng));
         digest=(digest^score)*UINT64_C(1099511628211);
       }
+      const auto input_generation_ended=std::chrono::steady_clock::now();
       run_case(scores,k,r,serial,totals);
       std::cout<<"E12_BENCH_META input_seed="<<input_seed
-               <<" input_digest="<<digest<<" serial="<<serial<<"\n";
+               <<" input_digest="<<digest<<" serial="<<serial
+               <<" input_generation_ns="<<std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       input_generation_ended-input_generation_started).count()<<"\n";
       return 0;
     }
     if(const auto* tier=std::getenv("MOE_TOPK_M6A_E9_D")) {
