@@ -139,6 +139,18 @@ DCF、Select、shuffle、材料 ABI 或泄露。正式验收顺序没有改变�
 方案名始终为 Protocol I + BMW16-derived Select + DCF / PROJECT_DERIVED；不把项目候选记为
 BB90 原算法复现、BMW16 Algorithm 7 逐字实现或其定理保证。
 
+**S33 技术复核状态（2026-10-10）**：S32 schema-v2 的源码计数点和四份历史原始诊断哈希已复核；
+计量开启/关闭功能与消息等价、计数开销及 S31 三进程 E2E 属于 S32 历史证据，不冒充本轮新跑。
+新增 schema-v3 统一三路线九指标合同和 TEST_ONLY 配对 runner；测试桥接从 E16 源提交
+`267cb6924f061d376dbce7986fc0093b52ec2512` 读取全对全与 AAV86，不改原分支、PR #28/#29、冻结基线
+或 main。配对范围为 n=128/256、K=2/8，AAV86 `r=2`，每组每路使用同一 signed Q20.12 向量和冻结
+oracle、独立 session/material；n=1000 仅完成三路线资源/参数预检，受 AAV86 `D>256` 与全对全
+入口形状上限拒绝。诊断记录保留工程失败，不能用于正式排名。正式 V4 前仍须关闭 M6A/V3；
+schema/runner 就绪不表示 V4 开始。细节见 [S33 决策](decisions/BMW16_S33_METRIC_RECEIPT_AND_PROTOCOL_I_DIAGNOSTIC_DECISION_2026-10-10.md)
+与 [S33 技术报告](reproduction/BMW16_S33_TECHNICAL_METRIC_REVIEW_AND_DIAGNOSTIC_REPORT_2026-10-10.md)。
+
+**S34 技术复核状态（2026-10-12）**：S33 实施者也参与审查，故结论为技术复核，不是独立接收。最终 12 条 n=128/256、K=2/8 配对诊断通过增强后的 schema-v3 audit、输入/oracle 身份和 fresh session/material serial 核验；22 个历史 campaign 中 7 个通过，15 个早期探索/失败记录原样保留并排除。修复 collector 的错误准入分类和 campaign identity/session audit。n=1000/K=80 的 A/B 预检拒绝，C 为 `RESOURCE_REVIEW_REQUIRED / NOT_RUN`；当前 RAM、峰值 RSS、网络及时限不足以放行单路线诊断。n≥10000 未生成材料。V3 仍 OPEN，正式 V4 仍不可启动。见 [S34 技术复核报告](reproduction/BMW16_S34_SCHEMA_V3_TECHNICAL_REVIEW_AND_ADMISSION_REPORT_2026-10-12.md)。
+
 S31 将当前 server package 冻结为 `READY_FOR_FUTURE_V4` 准备资产。正式 V4 仍受 M6A/V3
 前置约束；在其关闭前允许准备租赁主机配置、材料预检、输入/oracle 和逐次数据合同，
 但不启动正式 LAN/WAN 1+5 矩阵或将 loopback 数据写入性能验收表。S31 对 `conditional_secure_v2`

@@ -746,3 +746,31 @@ V3、V4 报告额外包含：
 - 未解释的关键通信或协议差异不能被数量级结论覆盖。
 - 后续改动使既有结果失效时，只重跑受影响范围并保留版本关系。
 - M7 汇总已经验收的证据，不通过写最终报告追认未完成工作。
+
+## 15. Protocol I 三路线统一记录合同（schema-v3）
+
+2026-10-10 起，Protocol I 全对全、Protocol I+AAV86 与 Protocol I+BMW16-derived Select+DCF
+共用 `VFSS/tests/bench/PROTOCOL_I_UNIFIED_RUN_RECORD_SCHEMA_3.json`。这是新的逐次记录合同；
+S32 `schema-v2` 文件、原始 JSON、哈希和诊断标签保持原样，不批量改标或回填为 FORMAL。
+
+| 主字段 | schema-v3 裁决及采集点 | 对账/附属分栏 |
+| --- | --- | --- |
+| `offline_time_ms` | 从 T/离线入口开始，到材料交付且在线方 ready；输入向量生成、TEST_ONLY 份额拆分独立计时 | 控制器/ready 等待、接收器启动与服务器实际用时附记 |
+| `offline_material_total_bits` | 在线双方实际持有并消费的预处理 payload 字节总和 ×8 | package/shell、sidecar、AEAD/tag、manifest、TLS application/wire 交付各自列出，不能混加 |
+| `online_time_ms` | 输入与材料均 ready 至双方最终原序 mask 完成的完整关键路径 | 测试控制器、oracle 校验、清理时间另列 |
+| `online_comm_total_bits` / per-party | 两在线方实际发送的固定应用帧字节总和 ×8；per-party 是 total/2 | P0/P1 sent/received 分开留存并以对端收发相等核对；TLS wire 与 IP/TCP wire 独立且可为 null |
+| `online_rounds` | 实际消息依赖 DAG 中的应用阶段数 | 帧数、函数调用数、Select 四个层不当作完整协议轮数；BMW16-derived 完整入口当前核为 12 阶段 |
+| `online_prg_calls_total` | 在线实际长度倍增 PRG 调用点汇总双方计数 | DCF Eval、AES block、SHA sampler word 分列，不相互替代 |
+| `comparison_edges_total` | 各路线输入适配 + 协议核心 + 输出适配实际执行的无序安全比较边 | 逻辑请求、dummy/repeat 请求、材料预留槽与双方重复求值另列；不以 Eval 次数替代边数 |
+| `total_time_ms` | 同次尝试 `offline_time_ms + online_time_ms` | 单次行对账后再计算统计量；禁止把不同配置/不同样本的 median 相加 |
+
+记录同时要求 revision/工作树差异/二进制/build-options 哈希、输入和 oracle 哈希、route 与实现标签、
+失败原因、机器与网络拓扑、实测 RTT/吞吐、warmup/formal/diagnostic 身份和逐次证据 manifest 哈希。
+缺少字段写 `null` 并标 `NOT_MEASURED`。正式 LAN/WAN 每路线每配置必须保存 1 次 warmup 和 5 次
+逐次结果及各自原始证据；schema 的 FORMAL campaign 条件要求 `V3_CLOSED`，runner 还要求提供
+machine-readable PASS gate。S33/S34 当前只产出 DIAGNOSTIC/READY 资产，不运行正式 V4。
+
+S33 的逐路线映射、应用层计数恒等式和失败记录规则见
+`docs/decisions/BMW16_S33_METRIC_RECEIPT_AND_PROTOCOL_I_DIAGNOSTIC_DECISION_2026-10-10.md`。
+
+**2026-10-12 S34 技术复核状态**：V3 的 Protocol I+AAV86 和 Protocol III+AAV86 正式性能门仍 OPEN；没有可信项目授权变更 V3→V4 顺序。因此 V4 正式 LAN/WAN 矩阵不得启动。S33 三路线 schema-v3 campaign 已复核，collector 的 campaign audit 现在同时校验 n/K、input/oracle SHA、input seed、hash-bound command identity 和 fresh-session/material serial。当前 n=1000/K=80 的 A/B 形状/容量门为 `PRECHECK_REJECTED`；C `conditional_secure_v2` 只达到参数形状界，因当前资源准入未满足为 `RESOURCE_REVIEW_REQUIRED / NOT_RUN`。n≥10000 仅做 checked 容量分析，不生成材料。详细阶段事实与每项原始证据见 `docs/reproduction/BMW16_S34_SCHEMA_V3_TECHNICAL_REVIEW_AND_ADMISSION_REPORT_2026-10-12.md`。

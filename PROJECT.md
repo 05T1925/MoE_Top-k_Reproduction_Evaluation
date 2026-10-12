@@ -144,6 +144,20 @@ TCP/IP、root PRG stream、T RSS 等保留 NOT_MEASURED。M6A/V3→V4 正式顺�
 验收仍未启动。细节见 [S32 决策](docs/decisions/BMW16_S32_UNIFIED_METRICS_AND_DIAGNOSTIC_DECISION_2026-10-10.md)
 和 [S32 计量/诊断报告](docs/reproduction/BMW16_S32_INSTRUMENTATION_AND_DIAGNOSTIC_REPORT_2026-10-10.md)。
 
+**2026-10-10 S33 计量技术复核与配对诊断准备**：S33 按 S31→S32 源码差异复核 DCF
+KeyGen/Eval、T 材料 payload、P0/P1 应用帧收发、四轮 Select 分项和 12 阶段完整 DAG 计数；复核
+S32 四份诊断记录及证据清单哈希。S32 schema-v2 与原始记录维持历史诊断身份。统一 schema-v3
+冻结九指标和应用帧主口径，并单列 TEST_ONLY 输入/份额夹具时间、材料封装与 TLS wire、控制器时间、
+SHA sampler words、DCF Eval/AES blocks；失败、超时和缺身份 marker 也必须生成逐次记录。
+Protocol I 全对全和 AAV86 仍来自未合并的 E16 revision；本轮只在独立 TEST_ONLY 桥接中配对运行，
+r=2，n=128/256、K=2/8，结果为 DIAGNOSTIC，不拼接 E15/E17/E20 中位数。n=1000 三路线联合预检
+因全对全 benchmark 入口不支持该形状、AAV86 首门 `D=1024>256` 而拒绝；该点 NOT_MEASURED。
+条件安全边界沿用 S31 的 `conditional_secure_v2`，S33 未改 secure 路径、协议消息、泄露、材料 ABI
+或输出语义。S33 由实施者参与复核，结论是技术复核，不是独立接收。V3 未关闭，正式 V4 LAN/WAN 矩阵仍 `READY/NOT_RUN`。详见 [S33 决策](docs/decisions/BMW16_S33_METRIC_RECEIPT_AND_PROTOCOL_I_DIAGNOSTIC_DECISION_2026-10-10.md)
+与 [S33 技术报告](docs/reproduction/BMW16_S33_TECHNICAL_METRIC_REVIEW_AND_DIAGNOSTIC_REPORT_2026-10-10.md)。
+
+**2026-10-12 S34 schema-v3 技术复核与准入裁决**：本轮不是独立接收；复核确认 S33 最终 4 组配对诊断的 12 条 attempt 输入、oracle、fresh session/material、九指标和 raw evidence 均可审计，原始记录未改写。增强后的 auditor 复核 22 个历史 campaign，其中 7 个通过、15 个早期探索/失败批次按原样排除。修复 TEST_ONLY preflight 对 n>1000 BMW 路线的错误 READY 分类，并为 campaign audit/seal 增加 n/K、input/oracle SHA、seed、command identity 和 session/material serial 校验。n=1000/K=80：全对全无当前入口形状，AAV86 因 D=1024>256 在材料生成前拒绝；BMW 路线形状受 conditional_secure_v2 支持，但当前主机 8.12 GB RAM 低于 S31 建议 16 GiB，峰值 RSS、网络及时限未测，故 `RESOURCE_REVIEW_REQUIRED / NOT_RUN`。V3 仍 OPEN，正式 V4 不得启动。n≥10000 不生成材料；A/B/C 分别被入口形状、D 上限、n≤1000 包装界拒绝，容量估算也超过当前可用磁盘。详见 [S34 技术复核报告](docs/reproduction/BMW16_S34_SCHEMA_V3_TECHNICAL_REVIEW_AND_ADMISSION_REPORT_2026-10-12.md)。
+
 M3 三轮工程基线已经完成，作为 M5 的实现基础和对照保留。M4 标记为取消，不复用其编号承载新任务。
 
 M5-B–G 的 shared CmpAgg、modular routing、field layer、两轮 Fselect、独立进程 E2E 与 Fsort/FullEval 已合入 main。M5-H1 按用户指定的数量级门槛通过（n=2–128，Fselect/Fsort）；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits，且没有作者精确复现记录。M5-H2 独立评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑并通过 G3。M5 与 M5-FIX-F1 已完成，F2 / G3 = PASS。详见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，精确成本及其他已记录限制仍然有效。F1 是四轮 bit-mask 项目实例化；通用 ring-to-field 与 field-to-XOR 转换仍未实现。

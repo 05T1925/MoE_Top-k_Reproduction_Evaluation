@@ -353,7 +353,8 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
                   bool conditional_secure_v1=false,
                   bool allow_natural_algorithm_abort=false,
                   bool conditional_secure_v2=false,
-                  const std::string& diagnostic_input_seed_id={}) {
+                  const std::string& diagnostic_input_seed_id={},
+                  bool paired_diagnostic=false) {
   require(::geteuid()==0,"TLS material E2E requires isolated UID provisioning");
   static std::uint64_t serial=0;
   const auto root=fs::path("/tmp")/("bmw16-s20-tls-"+std::to_string(::getpid())+"-"+
@@ -426,6 +427,7 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
       t_failpoint=="receiver_publish"?t_failpoint:
       t_failpoint=="receiver_silent"?t_failpoint:std::string{};
   const auto offline_started = std::chrono::steady_clock::now();
+  auto offline_material_ready = std::chrono::steady_clock::time_point{};
   const auto recv0=spawn_as(receiver_args(0,port0,listen0),p0/"receive.log",kUid0,{listen1},
       (receiver_failpoint=="receiver_fsync"||receiver_failpoint=="receiver_silent")?receiver_failpoint:std::string{});
   const auto recv1=spawn_as(receiver_args(1,port1,listen1),p1/"receive.log",kUid1,{listen0},
@@ -454,6 +456,7 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
   },[&] {
     // This callback is the only location at which the test creates input
     // shares. It cannot run until T and both committed receivers exit zero.
+    offline_material_ready = std::chrono::steady_clock::now();
     std::mt19937_64 split_rng(session^UINT64_C(0x534841524553));
     std::array<std::vector<std::uint8_t>,2> shares;
     for(const auto score:scores){const auto word=static_cast<std::uint32_t>(score);const auto a=static_cast<std::uint32_t>(split_rng());
@@ -609,14 +612,21 @@ void run_tls_case(const std::string& node,const std::vector<std::int32_t>& score
     std::vector<std::uint8_t> canonical_input; canonical_input.reserve(scores.size() * 4U);
     for (const auto score : scores) append_u32(canonical_input, static_cast<std::uint32_t>(score));
     std::vector<std::uint8_t> oracle_bytes(mask.begin(), mask.end());
-    const auto offline_us = std::chrono::duration_cast<std::chrono::microseconds>(offline_ready - offline_started).count();
+    const auto offline_us = std::chrono::duration_cast<std::chrono::microseconds>(
+        (paired_diagnostic ? offline_material_ready : offline_ready) - offline_started).count();
+    const auto input_fixture_us = paired_diagnostic
+        ? std::chrono::duration_cast<std::chrono::microseconds>(offline_ready - offline_material_ready).count()
+        : 0;
     const auto online_us = std::chrono::duration_cast<std::chrono::microseconds>(online_terminal - online_started).count();
-    const auto total_us = std::chrono::duration_cast<std::chrono::microseconds>(online_terminal - offline_started).count();
+    const auto entry_path_us = std::chrono::duration_cast<std::chrono::microseconds>(online_terminal - offline_started).count();
+    const auto total_us = paired_diagnostic ? offline_us + online_us : entry_path_us;
     std::cout << "benchmark_attempt scheme=Protocol_I_BMW16_DERIVED_SELECT_DCF label=PROJECT_DERIVED/EXPERIMENTAL "
               << "n=" << n << " K=" << k << " session=" << session
               << " input_seed_id=" << diagnostic_input_seed_id
               << " fixture=" << root.string()
               << " offline_time_us=" << offline_us << " online_time_us=" << online_us << " total_time_us=" << total_us
+              << " input_fixture_time_us=" << input_fixture_us
+              << " entry_path_wall_time_us=" << entry_path_us
               << " input_sha256=" << sha256_hex(canonical_input)
               << " oracle_mask_sha256=" << sha256_hex(oracle_bytes)
               << " status=SUCCESS_ORACLE_CHECKED p0_exit=" << e0 << " p1_exit=" << e1 << '\n';
@@ -941,11 +951,31 @@ std::vector<std::int32_t> seeded_scores(std::uint32_t n, std::uint64_t seed) {
   }
   return scores;
 }
+
+std::vector<std::int32_t> paired_diagnostic_scores(std::uint32_t n, std::uint64_t seed) {
+  std::mt19937_64 rng(seed);
+  std::uniform_int_distribution<std::int32_t> distribution(-32 * 4096, 32 * 4096);
+  std::vector<std::int32_t> scores(n);
+  for (auto& score : scores) score = distribution(rng);
+  return scores;
+}
+
+std::uint64_t paired_input_digest(const std::vector<std::int32_t>& scores) {
+  std::uint64_t digest = UINT64_C(1469598103934665603);
+  for (const auto score : scores)
+    digest = (digest ^ static_cast<std::uint32_t>(score)) * UINT64_C(1099511628211);
+  return digest;
+}
+std::uint64_t paired_mask_digest(const std::vector<std::uint8_t>& mask) {
+  std::uint64_t digest = UINT64_C(1469598103934665603);
+  for (const auto bit : mask) digest = (digest ^ bit) * UINT64_C(1099511628211);
+  return digest;
+}
 }  // namespace
 
 int main(int argc, char** argv) {
   try {
-    require(argc == 2 || argc == 3 || argc == 7,
+    require(argc == 2 || argc == 3 || argc == 6 || argc == 7,
             "pass party node executable path [--extended|--small-ranks|--n1000|--tls|--tls-n1000]");
     const auto node = fs::canonical(argv[1]).string();
     if (argc == 7 && std::string(argv[2]) == "--conditional-secure-v2-case") {
@@ -973,6 +1003,61 @@ int main(int argc, char** argv) {
       run_tls_case(node, scores, k, session, tls,
           "", false, "", false, "", false, "", false, false, "", false,
           false, false, false, false, true, true, std::to_string(input_seed));
+      return 0;
+    }
+    if (argc == 7 && std::string(argv[2]) == "--conditional-secure-v2-paired-case") {
+      require(::geteuid() == 0, "conditional v2 paired diagnostic requires distinct OS identities");
+      const auto n = static_cast<std::uint32_t>(std::stoul(argv[3]));
+      const auto k = static_cast<std::uint32_t>(std::stoul(argv[4]));
+      const auto input_seed = std::stoull(argv[5]);
+      const auto session = std::stoull(argv[6]);
+      require(n >= 2 && n <= 1000 && k >= 1 && k <= n, "conditional v2 paired diagnostic bounds");
+      const auto root = fs::path("/tmp") / ("bmw16-s33-paired-certs-" + std::to_string(::getpid()));
+      require(::mkdir(root.c_str(), 0700) == 0, "create conditional v2 paired TLS fixture root");
+      auto cleanup = std::unique_ptr<void, std::function<void(void*)>>(
+          reinterpret_cast<void*>(1), [root](void*) { std::error_code ec; fs::remove_all(root, ec); });
+      const auto input_generation_started = std::chrono::steady_clock::now();
+      const auto scores = paired_diagnostic_scores(n, input_seed);
+      const auto input_generation_ended = std::chrono::steady_clock::now();
+      std::vector<std::uint8_t> canonical_input; canonical_input.reserve(scores.size() * 4U);
+      for (const auto score : scores) append_u32(canonical_input, static_cast<std::uint32_t>(score));
+      std::vector<std::uint32_t> oracle_words; oracle_words.reserve(scores.size());
+      for (const auto score : scores) oracle_words.push_back(static_cast<std::uint32_t>(score));
+      const auto expected_mask = moe_topk::top_k_mask(oracle_words, k);
+      std::vector<std::uint8_t> expected_mask_bytes(expected_mask.begin(), expected_mask.end());
+      std::cout << "benchmark_fixture n=" << n << " K=" << k << " session=" << session
+                << " input_seed_id=" << input_seed << " input_generator=uniform_signed_q20_12_v1"
+                << " input_generation_time_us="
+                << std::chrono::duration_cast<std::chrono::microseconds>(
+                       input_generation_ended - input_generation_started).count()
+                << " input_fnv64=" << paired_input_digest(scores)
+                << " input_sha256=" << sha256_hex(canonical_input)
+                << " oracle_mask_sha256=" << sha256_hex(expected_mask_bytes)
+                << " oracle_fnv64=" << paired_mask_digest(expected_mask_bytes) << '\n' << std::flush;
+      const auto tls = make_test_tls_credentials(root);
+      run_tls_case(node, scores, k, session, tls,
+          "", false, "", false, "", false, "", false, false, "", false,
+          false, false, false, false, true, true, std::to_string(input_seed), true);
+      return 0;
+    }
+    if (argc == 6 && std::string(argv[2]) == "--paired-input-identity") {
+      const auto n = static_cast<std::uint32_t>(std::stoul(argv[3]));
+      const auto k = static_cast<std::uint32_t>(std::stoul(argv[4]));
+      const auto input_seed = std::stoull(argv[5]);
+      require(n >= 2 && n <= 1000 && k >= 1 && k <= n, "paired input identity bounds");
+      const auto scores = paired_diagnostic_scores(n, input_seed);
+      std::vector<std::uint8_t> canonical_input; canonical_input.reserve(scores.size() * 4U);
+      for (const auto score : scores) append_u32(canonical_input, static_cast<std::uint32_t>(score));
+      std::vector<std::uint32_t> oracle_words; oracle_words.reserve(scores.size());
+      for (const auto score : scores) oracle_words.push_back(static_cast<std::uint32_t>(score));
+      const auto oracle_mask = moe_topk::top_k_mask(oracle_words, k);
+      std::vector<std::uint8_t> oracle_bytes(oracle_mask.begin(), oracle_mask.end());
+      std::cout << "paired_input_identity n=" << n << " K=" << k << " input_seed=" << input_seed
+                << " input_generator=uniform_signed_q20_12_v1"
+                << " input_fnv64=" << paired_input_digest(scores)
+                << " input_sha256=" << sha256_hex(canonical_input)
+                << " oracle_mask_sha256=" << sha256_hex(oracle_bytes)
+                << " oracle_fnv64=" << paired_mask_digest(oracle_bytes) << '\n';
       return 0;
     }
     if(argc==3&&std::string(argv[2])=="--tls") {
