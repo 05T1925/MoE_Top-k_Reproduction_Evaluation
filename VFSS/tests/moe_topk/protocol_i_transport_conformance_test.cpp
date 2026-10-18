@@ -3,7 +3,9 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <fcntl.h>
 #include <iostream>
+#include <memory>
 #include <poll.h>
 #include <stdexcept>
 #include <sys/socket.h>
@@ -81,6 +83,60 @@ void write_all(int fd, const Bytes& bytes) {
 ProtocolIFrameConfig config(int sender, int receiver) {
   return {7, 9, 5, 2, static_cast<std::uint8_t>(kBits), static_cast<std::uint8_t>(sender),
           static_cast<std::uint8_t>(receiver), 1, 1};
+}
+
+class TestOwnedAuthenticatedStream final : public ProtocolIAuthenticatedByteStream {
+ public:
+  explicit TestOwnedAuthenticatedStream(int fd) : fd_(fd) {}
+  ~TestOwnedAuthenticatedStream() override { if (fd_ >= 0) ::close(fd_); }
+  std::size_t read_some(std::uint8_t*, std::size_t, int) override { return 0; }
+  std::size_t write_some(const std::uint8_t*, std::size_t, int) override { return 0; }
+ private:
+  int fd_;
+};
+
+void expect_explicit_transport_modes() {
+  int missing[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, missing) == 0, "required stream missing socketpair");
+  bool rejected = false;
+  try {
+    ProtocolIFramedChannel channel(missing[0], config(0, 1),
+        ProtocolIFramedChannelOptions{200, 1024,
+            ProtocolITransportMode::RequireAuthenticatedStream});
+  } catch (const ProtocolITransportError&) { rejected = true; }
+  require(rejected, "TLS-required channel rejects missing stream before any raw I/O");
+  require(::fcntl(missing[0], F_GETFD) >= 0, "failed channel constructor leaves caller descriptor owned by caller");
+  ::close(missing[0]); ::close(missing[1]);
+
+  int wrong_mode[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, wrong_mode) == 0, "registered stream socketpair");
+  std::weak_ptr<ProtocolIAuthenticatedByteStream> retained;
+  auto stream = std::make_shared<TestOwnedAuthenticatedStream>(wrong_mode[0]);
+  retained = stream;
+  protocol_i_attach_authenticated_stream(wrong_mode[0], std::move(stream));
+  rejected = false;
+  try { ProtocolIFramedChannel channel(wrong_mode[0], config(0, 1)); }
+  catch (const ProtocolITransportError&) { rejected = true; }
+  require(rejected && protocol_i_has_authenticated_stream(wrong_mode[0]),
+          "explicit caller-FD mode rejects without consuming registered TLS stream");
+  protocol_i_discard_unclaimed_authenticated_stream(wrong_mode[0]);
+  require(retained.expired(), "unclaimed test stream is destroyed exactly once");
+  ::close(wrong_mode[1]);
+
+  int consumed[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, consumed) == 0, "required stream consume socketpair");
+  auto owned = std::make_shared<TestOwnedAuthenticatedStream>(consumed[0]);
+  std::weak_ptr<ProtocolIAuthenticatedByteStream> consumed_weak = owned;
+  protocol_i_attach_authenticated_stream(consumed[0], std::move(owned));
+  {
+    ProtocolIFramedChannel channel(consumed[0], config(0, 1),
+        ProtocolIFramedChannelOptions{200, 1024,
+            ProtocolITransportMode::RequireAuthenticatedStream});
+    require(!protocol_i_has_authenticated_stream(consumed[0]),
+            "required channel atomically consumes registered stream once");
+  }
+  require(consumed_weak.expired(), "consumed authenticated stream is released once by channel");
+  ::close(consumed[1]);
 }
 
 void wait_child(pid_t child) {
@@ -320,11 +376,85 @@ void expect_chunked_io(std::size_t chunk) {
     ::close(sockets[0]);
 }
 
+void expect_bounded_chunk_message(std::size_t message_size) {
+  constexpr std::size_t chunk_data = (1U << 20U) - 16U;
+  int sockets[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0, "bounded chunk socketpair");
+  const auto child = ::fork();
+  require(child >= 0, "bounded chunk fork");
+  if (child == 0) {
+    ::close(sockets[0]);
+    try {
+      ProtocolIFramedChannel peer(sockets[1], config(1, 0));
+      const auto received = protocol_i_receive_framed_chunks(peer, message_size);
+      require(received.size() == message_size, "bounded chunks reconstructed length");
+      for (std::size_t i = 0; i < received.size(); ++i)
+        require(received[i] == static_cast<std::uint8_t>((i * 131U + 7U) & 0xffU),
+                "bounded chunks reconstructed bytes");
+      const std::uint64_t frames = (message_size + chunk_data - 1U) / chunk_data;
+      require(peer.received_bytes() == frames * (kHeaderBytes + 16U) + message_size,
+              "bounded chunks receive byte conservation");
+      peer.send(Bytes{0x5a});
+      _exit(0);
+    } catch (...) { _exit(3); }
+  }
+  ::close(sockets[1]);
+  ProtocolIFramedChannel sender(sockets[0], config(0, 1));
+  Bytes message(message_size);
+  for (std::size_t i = 0; i < message.size(); ++i)
+    message[i] = static_cast<std::uint8_t>((i * 131U + 7U) & 0xffU);
+  protocol_i_send_framed_chunks(sender, message);
+  const std::uint64_t frames = (message_size + chunk_data - 1U) / chunk_data;
+  require(sender.sent_bytes() == frames * (kHeaderBytes + 16U) + message_size,
+          "bounded chunks send byte conservation");
+  require(sender.receive() == Bytes{0x5a}, "bounded chunk acknowledgement");
+  wait_child(child);
+  ::close(sockets[0]);
+}
+
+void expect_chunk_sequence_rejected(bool duplicate_offset, bool truncate_after_first = false) {
+  int sockets[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0, "malformed chunk socketpair");
+  const auto child = ::fork();
+  require(child >= 0, "malformed chunk fork");
+  if (child == 0) {
+    ::close(sockets[0]);
+    ProtocolIFramedChannel sender(sockets[1], config(0, 1));
+    auto make = [](std::uint64_t total, std::uint64_t offset, std::size_t n) {
+      Bytes frame;
+      for (int shift = 56; shift >= 0; shift -= 8) frame.push_back(static_cast<std::uint8_t>(total >> shift));
+      for (int shift = 56; shift >= 0; shift -= 8) frame.push_back(static_cast<std::uint8_t>(offset >> shift));
+      frame.insert(frame.end(), n, 0x31);
+      return frame;
+    };
+    sender.send(make(32, 0, 16));
+    if (!truncate_after_first) sender.send(make(32, duplicate_offset ? 0 : 17, 16));
+    _exit(0);
+  }
+  ::close(sockets[1]);
+  ProtocolIFramedChannel receiver(sockets[0], config(1, 0));
+  bool rejected = false;
+  try { (void)protocol_i_receive_framed_chunks(receiver, 64); }
+  catch (const ProtocolITransportError&) { rejected = true; }
+  require(rejected, truncate_after_first ? "truncated chunk sequence rejected" :
+      duplicate_offset ? "duplicate chunk offset rejected" : "chunk gap rejected");
+  wait_child(child);
+  ::close(sockets[0]);
+}
+
 int main() {
   try {
+    expect_explicit_transport_modes();
     for (const auto chunk : {std::size_t{1}, std::size_t{2}, std::size_t{3}, std::size_t{7}}) {
       expect_chunked_io(chunk);
     }
+    constexpr std::size_t kSingleFrameData = (1U << 20U) - 16U;
+    expect_bounded_chunk_message(kSingleFrameData - 1U);
+    expect_bounded_chunk_message(kSingleFrameData);
+    expect_bounded_chunk_message(kSingleFrameData + 1U);
+    expect_chunk_sequence_rejected(true);
+    expect_chunk_sequence_rejected(false);
+    expect_chunk_sequence_rejected(false, true);
 
     expect_bad_header([](RawHeader& header) { header.magic ^= 1U; });
     expect_bad_header([](RawHeader& header) { ++header.version; });
@@ -333,6 +463,7 @@ int main() {
     expect_bad_header([](RawHeader& header) { header.fingerprint = 100; });
     expect_bad_header([](RawHeader& header) { header.sender = 0; });
     expect_bad_header([](RawHeader& header) { header.sequence = 1; });
+    expect_bad_header([](RawHeader& header) { ++header.phase; });
     expect_bad_header([](RawHeader& header) { header.length = kMaxPayload + 1; });
     expect_truncated_header();
     expect_truncated_payload();
