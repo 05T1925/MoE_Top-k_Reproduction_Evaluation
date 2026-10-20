@@ -1,0 +1,382 @@
+{
+  "schema": "m6b-project-derived-select5-s5-s4-receipt-manifest/v1",
+  "observed_date": "2026-10-13",
+  "s4": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-bb90-source-closure-s1\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-project-derived-5iter-s4",
+    "head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "local_main": "c3926c68fd14f270faa8b55234311071947fa080",
+    "origin_main": "c3926c68fd14f270faa8b55234311071947fa080",
+    "files": [
+      {
+        "path": "PROJECT.md",
+        "s4_status": "M",
+        "s4_bytes": 54038,
+        "s4_sha256": "26cf1f2773e71ba46d350460921626d47ae06ff42b1f195bed65fcf9df176fc0",
+        "provenance": "S4 tracked working-tree modification",
+        "exists_in_s5": true,
+        "s5_sha256": "0241202bb636ad973205b66d99bd918198320caef139e31f597d702b01c420d8",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "VFSS/CMakeLists.txt",
+        "s4_status": "M",
+        "s4_bytes": 27644,
+        "s4_sha256": "340803c56c81765722ed04a836cbbb094e13235917ff09a96c1712cc8131103b",
+        "provenance": "S4 tracked working-tree modification",
+        "exists_in_s5": true,
+        "s5_sha256": "22aa598c4a16ccce30691e6e9a6883801c180af1ee752c8eda017bf31c621026",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_parallel_shuffle.h",
+        "s4_status": "M",
+        "s4_bytes": 6228,
+        "s4_sha256": "0843c6717885f12421b37fed1285d6216c800fb590a97ca0984aa1287254d476",
+        "provenance": "S4 tracked working-tree modification",
+        "exists_in_s5": true,
+        "s5_sha256": "0843c6717885f12421b37fed1285d6216c800fb590a97ca0984aa1287254d476",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+        "s4_status": "M",
+        "s4_bytes": 25744,
+        "s4_sha256": "f5b767130bf6d93fde58151629ef6f209257b7a53daf30cd4843c20cfdc01010",
+        "provenance": "S4 tracked working-tree modification",
+        "exists_in_s5": true,
+        "s5_sha256": "f5b767130bf6d93fde58151629ef6f209257b7a53daf30cd4843c20cfdc01010",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "s4_status": "M",
+        "s4_bytes": 57964,
+        "s4_sha256": "36ffcc9ff459ae3f072eca0bea3c88b6633f0042afc9286f7bee45c4b8901158",
+        "provenance": "S4 tracked working-tree modification",
+        "exists_in_s5": true,
+        "s5_sha256": "c0c1a6e08ab61cf8909b86be2a21390b44be0f5e35fd0b923374ad8726d2ab69",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "docs/PAPERS.sha256",
+        "s4_status": "M",
+        "s4_bytes": 1110,
+        "s4_sha256": "f768a0dc415ddc5ecdbf69e1fb56aa025e7fea447ab2769f4203b2bea87a5151",
+        "provenance": "preexisting S4 user diff; deliberately not copied to S5",
+        "exists_in_s5": true,
+        "s5_sha256": "8dedcc1aef23a03e696e041eeb428d0449ad7f8fc02fedabcbb65c6ad9307c73",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "docs/REFERENCE_MANIFEST.md",
+        "s4_status": "M",
+        "s4_bytes": 29268,
+        "s4_sha256": "e26c1748a7af5df2256aeb817661932d822daf8ff6376f538fa009ef3b5242df",
+        "provenance": "S4 tracked working-tree modification",
+        "exists_in_s5": true,
+        "s5_sha256": "3023056355c55df5992facd457e256dabc7d6ca2196c1a795c7ec557b7246d6e",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "VFSS/include/moe_topk/project_derived_select5.h",
+        "s4_status": "??",
+        "s4_bytes": 2094,
+        "s4_sha256": "19177983f603beddd2cc237d7ca9ee10cea8c49e7b8bed87f71afbaf2a90fe75",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "19177983f603beddd2cc237d7ca9ee10cea8c49e7b8bed87f71afbaf2a90fe75",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+        "s4_status": "??",
+        "s4_bytes": 7841,
+        "s4_sha256": "174b3fdacde85101b6fc19ad74dd11f445df1030c4282067df64d0bcf6510356",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "698f0c0d27d4c4a1fd5b4c7aac1b5ef37d829963bbd4b29942dc4dda0378e862",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+        "s4_status": "??",
+        "s4_bytes": 12441,
+        "s4_sha256": "ecfa56c3d12f8a8183db680d9197bcaf75a18761ba1a4e078a300ca273f2651e",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "ecfa56c3d12f8a8183db680d9197bcaf75a18761ba1a4e078a300ca273f2651e",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+        "s4_status": "??",
+        "s4_bytes": 47110,
+        "s4_sha256": "5d9e981a8613e6ef20ad31cf4ed73ae91dcb3b54f043bc515e79f262d512f6d0",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "a4a5f1c63afd4bc9b621b4a46a203df62fcc924c0a7fa222b6595395f478f325",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "VFSS/tests/moe_topk/project_derived_select5_control_test.cpp",
+        "s4_status": "??",
+        "s4_bytes": 7636,
+        "s4_sha256": "56291adf3904670f26f53766c42d7353c0430a41cf618222c58af2aa0fcfa695",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "56291adf3904670f26f53766c42d7353c0430a41cf618222c58af2aa0fcfa695",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp",
+        "s4_status": "??",
+        "s4_bytes": 18084,
+        "s4_sha256": "2f9ad122a47b6f4c13da195f0a1d818dd5003a388afa484f318e75e83a0b5b33",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "51ad8c34c5b1170585b7cadceb9e3a158d7ece3f7e5106e8177083d8cbaa365d",
+        "byte_identical_in_s5": false
+      },
+      {
+        "path": "docs/decisions/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_DECISION_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 2383,
+        "s4_sha256": "8d9f52ea5f81a26bb5f53ef9bd50105a8c57dbf68c7ca59e7aaf483c29b49692",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "8d9f52ea5f81a26bb5f53ef9bd50105a8c57dbf68c7ca59e7aaf483c29b49692",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_DECISION_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 11389,
+        "s4_sha256": "56119c4b8caf403d6e4f10eafdfaacdf64f31f40e3f00cef4c684baebf40c171",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "56119c4b8caf403d6e4f10eafdfaacdf64f31f40e3f00cef4c684baebf40c171",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_DECISION_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 18418,
+        "s4_sha256": "8e34cc20eba3028f61a8d14c05e81814ab16df2ddc94e39a1d9412397ee6814c",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "8e34cc20eba3028f61a8d14c05e81814ab16df2ddc94e39a1d9412397ee6814c",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_DECISION_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 7065,
+        "s4_sha256": "a59da81ad6e375f1d47bd2758003c6aa1be3ce089dd444a44c253b108f498381",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "a59da81ad6e375f1d47bd2758003c6aa1be3ce089dd444a44c253b108f498381",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_DECISION_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 4201,
+        "s4_sha256": "ab873eef1c05befcdf89a555156ba9c21c0c1988c87f6e4d718f38a5a2e64cb3",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "ab873eef1c05befcdf89a555156ba9c21c0c1988c87f6e4d718f38a5a2e64cb3",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_REPORT_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 29371,
+        "s4_sha256": "b98ce668897631276740e04fe334412f1578b66ab25b0993f7608c4a819fdab0",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "b98ce668897631276740e04fe334412f1578b66ab25b0993f7608c4a819fdab0",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_REPORT_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 19888,
+        "s4_sha256": "09e751bd96f514a3c067dcbd7de503b9005945d359769fa08334f5bc5d47ae43",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "09e751bd96f514a3c067dcbd7de503b9005945d359769fa08334f5bc5d47ae43",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_REPORT_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 16570,
+        "s4_sha256": "ac4fb63cdbeabaa861e89e036b6fe1e1b389b46e5012a69f80458a183cfe3653",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "ac4fb63cdbeabaa861e89e036b6fe1e1b389b46e5012a69f80458a183cfe3653",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_REPORT_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 31844,
+        "s4_sha256": "98f23eeef73f4255e58ca5834fbf560eaecdba394fb5d1616198b6a9e13bbc4c",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "98f23eeef73f4255e58ca5834fbf560eaecdba394fb5d1616198b6a9e13bbc4c",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_REPORT_2026-10-12.md",
+        "s4_status": "??",
+        "s4_bytes": 24483,
+        "s4_sha256": "0a09f8eb5b9e0bb25239e2079358889c4942f3ca7fe37095a6490b7549475a80",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "0a09f8eb5b9e0bb25239e2079358889c4942f3ca7fe37095a6490b7549475a80",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/README.md",
+        "s4_status": "??",
+        "s4_bytes": 2087,
+        "s4_sha256": "9f50b68bda2e5dc3564122171e4c6dfeecfbd3ab4aafa53f48e33c26fede6d53",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "9f50b68bda2e5dc3564122171e4c6dfeecfbd3ab4aafa53f48e33c26fede6d53",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/comparison_cost_bounds.py",
+        "s4_status": "??",
+        "s4_bytes": 9074,
+        "s4_sha256": "3810a095f7552ef233da17d15458ef4f24d976b3f024b94acb975f9942e6b40e",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "3810a095f7552ef233da17d15458ef4f24d976b3f024b94acb975f9942e6b40e",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/independent_accept.py",
+        "s4_status": "??",
+        "s4_bytes": 16077,
+        "s4_sha256": "6dbd5b14a01e6de2796afde4624a953e5456b75c42e11a00ebe6de1f76490883",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "6dbd5b14a01e6de2796afde4624a953e5456b75c42e11a00ebe6de1f76490883",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/material_access_prototype.py",
+        "s4_status": "??",
+        "s4_bytes": 6852,
+        "s4_sha256": "3444405e0b1a782619bb4f9c9338e7d0b095f006eb2e6105f9aba06b6bf56a2d",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "3444405e0b1a782619bb4f9c9338e7d0b095f006eb2e6105f9aba06b6bf56a2d",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/README.md",
+        "s4_status": "??",
+        "s4_bytes": 1689,
+        "s4_sha256": "ee6a26592ef64eb2ec1feeeb2ff6615326f645a3769d8d9dcf93fe96f89e070b",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "ee6a26592ef64eb2ec1feeeb2ff6615326f645a3769d8d9dcf93fe96f89e070b",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/material_budget.py",
+        "s4_status": "??",
+        "s4_bytes": 10589,
+        "s4_sha256": "e14c52f389fc426637e2d54a41f561c7cccb46b59128c17677a012e20b6f6218",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "e14c52f389fc426637e2d54a41f561c7cccb46b59128c17677a012e20b6f6218",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/membership_direction_probe.py",
+        "s4_status": "??",
+        "s4_bytes": 3667,
+        "s4_sha256": "76a27dd56fb7f3e7fdf42914ee7cfc9f4727de427e41e59db2c5571a79d1c912",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "76a27dd56fb7f3e7fdf42914ee7cfc9f4727de427e41e59db2c5571a79d1c912",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/public_view_probe.py",
+        "s4_status": "??",
+        "s4_bytes": 7607,
+        "s4_sha256": "37d06d0367fcc484492e44218c4d0507cbe88e36860188fa53038939ffe48e18",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "37d06d0367fcc484492e44218c4d0507cbe88e36860188fa53038939ffe48e18",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/README.md",
+        "s4_status": "??",
+        "s4_bytes": 2165,
+        "s4_sha256": "44eca9ccfdfaed63c96b675ecb345b0aa86e2d247a7feb91c54c4c7abe7ead41",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "44eca9ccfdfaed63c96b675ecb345b0aa86e2d247a7feb91c54c4c7abe7ead41",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/audit_edges.py",
+        "s4_status": "??",
+        "s4_bytes": 11159,
+        "s4_sha256": "b84591c49ec9f67484258011b0685ce9f6cbcebb56685457a80a571bfbcf2fc0",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "b84591c49ec9f67484258011b0685ce9f6cbcebb56685457a80a571bfbcf2fc0",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/frozen_oracle.cpp",
+        "s4_status": "??",
+        "s4_bytes": 1008,
+        "s4_sha256": "a30fe76ab09552ea532ca0e732a19eb925e3d35db0eb99e1728a087f5e48a457",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "a30fe76ab09552ea532ca0e732a19eb925e3d35db0eb99e1728a087f5e48a457",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/select5iter.py",
+        "s4_status": "??",
+        "s4_bytes": 13495,
+        "s4_sha256": "8b8d3dbd087d601a4962fe61c7b35546aa834cebd0ed4736b4e6d5dca204606b",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "8b8d3dbd087d601a4962fe61c7b35546aa834cebd0ed4736b4e6d5dca204606b",
+        "byte_identical_in_s5": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/test_select5iter.py",
+        "s4_status": "??",
+        "s4_bytes": 13598,
+        "s4_sha256": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
+        "provenance": "S4 untracked artifact snapshot",
+        "exists_in_s5": true,
+        "s5_sha256": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
+        "byte_identical_in_s5": true
+      }
+    ]
+  },
+  "s5": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-derived-5iter-s5",
+    "branch": "codex/m6b-project-derived-5iter-s5",
+    "head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "files_copied_with_identical_hash": 28,
+    "s4_user_diff_not_copied": [
+      "docs/PAPERS.sha256"
+    ]
+  }
+}

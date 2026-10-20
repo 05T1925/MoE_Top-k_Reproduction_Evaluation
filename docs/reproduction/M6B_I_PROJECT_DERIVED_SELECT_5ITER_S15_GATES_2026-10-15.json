@@ -1,0 +1,72 @@
+{
+  "schema": "m6b-project-derived-select5-s15-gates/v1",
+  "date": "2026-10-15",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "bound_snapshot": "S14 68-file selected source snapshot plus S15 build/API gating patch; exact files and hashes in S15 source manifest",
+  "gates": {
+    "S14_INDEPENDENT_RECEIPT": {
+      "status": "CONDITIONAL",
+      "scope": "68/68 hashes and feature-ON functional replay pass; feature-OFF BCG API linkability fails",
+      "evidence": "S15 report §2-3; independent receiver evidence M6B_I_S15_INDEPENDENT_RECEIPT_20261015_02"
+    },
+    "S15_PATCH_INDEPENDENT_RECEIPT": {
+      "status": "NOT_RUN",
+      "scope": "S15 patch author performed its own regression; new patch requires a non-author receiver",
+      "evidence": "S15 report §8"
+    },
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL",
+      "scope": "BCG+21 Theorem 2 semantic party key, exact M2B1/v1 mapping; AES-128 PRP and joint RAND_bytes/getrandom pseudorandomness assumption",
+      "bound": "delta_w <= w*epsilon_G + epsilon_RNG_joint; epsilon_G <= Adv_AES128^PRP(T,q=5)+10/2^128",
+      "evidence": "S14 DCF bridge and S15 report §5"
+    },
+    "UCMP_SINGLE_CALL_VIEW_SIMULATOR": {
+      "status": "CONDITIONAL",
+      "scope": "actual BCG uCMP local key, two Eval shares, one exchanged 64-bit result share, approved masked operands and opened bit",
+      "evidence": "S15 report §5.2-5.3"
+    },
+    "POOL_AND_ADAPTIVE_ACCESS": {
+      "status": "CONDITIONAL",
+      "scope": "DCF/UCMP key-evaluation projection only; includes used/unused fixed pools and adaptive addresses under approved L; excludes shuffle/output state",
+      "N128_pool_bound": "1639424*epsilon_G + epsilon_RNG_joint(T;M6B5/v3,N128)",
+      "N256_pool_bound": "6719104*epsilon_G + epsilon_RNG_joint(T;M6S2/v2,N256)",
+      "evidence": "S15 report §5.3-6"
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION": {
+      "status": "OPEN",
+      "first_missing_hybrid": "Replace actual party-local forward permutation/masked-record arrays and inverse-route/membership/output-share state by a distribution sampled only from corrupted input share, ideal output share and approved L, including PREPARE/COMMIT/ABORT/restart",
+      "evidence": "S15 report §6"
+    },
+    "DEFAULT_OFF_BOUNDARY": {
+      "status": "PASS",
+      "scope": "OFF archive has no BCG API symbols, public BCG header rejects a no-macro client, CMake target help omits Select5, old M2UC tests pass; ON external API probe links and runs",
+      "evidence": "S15 report §3.2-4.2"
+    },
+    "N<=256_FUNCTIONAL_E2E": {
+      "status": "PASS",
+      "scope": "13 TEST_ONLY oracle successes and 6 uniform abort/no-mask; N=257 and N=256 monolithic preflight reject",
+      "evidence": "S15 E2E case JSON and source/build manifest"
+    },
+    "N>256_ADMISSION": {
+      "status": "NO_GO",
+      "scope": "N=257 rejected; no capacity/function evidence beyond N=256",
+      "evidence": "S15 E2E JSON"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NO_GO",
+      "scope": "shuffle/output joint view proof open",
+      "evidence": "S15 report §6-7"
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "status": "V3_OPEN_V4_NOT_ALLOWED_NOT_RUN",
+      "scope": "follow existing V3->V4 prerequisites; formal LAN/WAN matrix not run",
+      "evidence": "PROJECT.md and docs/IMPLEMENTATION_PLAN.md existing M6A gate"
+    }
+  },
+  "limits": [
+    "Do not call PROJECT_DERIVED_SELECT_5ITER BB90 or BMW16.",
+    "No formal LAN/WAN performance data or secure alias.",
+    "Output contract is tested no-complete-mask, not atomic all-or-nothing.",
+    "The new S15 patch itself has not been independently received."
+  ]
+}

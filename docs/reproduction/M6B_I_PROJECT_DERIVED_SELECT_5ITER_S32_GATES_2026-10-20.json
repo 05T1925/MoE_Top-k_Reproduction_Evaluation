@@ -1,0 +1,154 @@
+{
+  "schema": "moe-topk-m6b-s32-gates-v1",
+  "date": "2026-10-20",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S32",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "not_bb90_reproduction": true,
+  "not_bmw16_implementation": true,
+  "source_identity": {
+    "s25_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "s25_manifest_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+    "s25_original_worktree": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s25/MoE_Top-k_Reproduction_Evaluation",
+    "s25_original_worktree_recheck": {
+      "manifest_entries": 74,
+      "hash_matches": 74,
+      "hash_mismatches": 0,
+      "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d",
+      "result": "PASS"
+    },
+    "s32_isolated_worktree": "C:/Users/28641/.codex/worktrees/m6b-i-project-select5-s32/MoE_Top-k_Reproduction_Evaluation",
+    "s32_base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "active_s32_copy_of_s25_files": {
+      "unchanged_from_s25": 69,
+      "changed_by_s32": [
+        "PROJECT.md",
+        "VFSS/CMakeLists.txt",
+        "VFSS/include/moe_topk/protocol_i_transport.h",
+        "VFSS/src/moe_topk/protocol_i_transport.cpp",
+        "docs/IMPLEMENTATION_PLAN.md"
+      ],
+      "result": "EXPECTED_S32_DELTA"
+    }
+  },
+  "prior_receipts": {
+    "s27_functional_receipt": "PASS_WITH_SCOPE_HISTORICAL_ONLY_NOT_RERUN",
+    "s31_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_SOURCE_TEST_EVIDENCE_MANIFEST_2026-10-20.json",
+    "s31_manifest_sha256": "c878f64bbd527e85dbd183a8ebe91b7ecf56cecbbf82455d9b66e5df097fd1c0",
+    "s31_spec_and_test_only_identity": "PASS",
+    "s31_spec_independent_technical_review": "PASS_FOR_SPEC_ONLY",
+    "s32_code_independent_review": "NOT_RUN"
+  },
+  "runtime": {
+    "build_option": "MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL",
+    "default": "OFF",
+    "default_off_fresh_configure_and_target_check": "PASS",
+    "off_library_v3_symbols": "ABSENT",
+    "off_header_without_opt_in_macro": "REJECTED_AS_EXPECTED",
+    "explicit_v3_on_configure_build": "PASS",
+    "v2_dcf_fallback": false,
+    "secure_alias_created": false,
+    "sqlite3_dependency": "NEW_OPT_IN_ONLY_DEPENDENCY_FOR_DURABLE_ESCROW_TRANSACTION",
+    "production_role_cli_targets": "NOT_ADDED; runtime APIs exercised by independent TEST_ONLY exec processes"
+  },
+  "contracts": {
+    "successful_mask_semantics": "F_TOPK-U: P0=R, P1=R XOR M, R uniform bit vector; reconstructed mask is stable descending signed Q20.12 Top-K in original order with exactly K ones",
+    "successful_output_functionality": "PASS_BY_E2E_ORACLE",
+    "atomic_escrow_semantics": "F_TOPK-ATOMIC: no API share before durable two-ciphertext commit; post-commit recipient-only recovery; pre-commit abort is terminal",
+    "atomic_escrow_functionality": "PASS_FOR_LISTED_PROCESS_FAULT_CASES",
+    "escrow_actor": "A is an additional online service, not part of the old two-party-online/T-offline topology",
+    "A_visible_metadata": "session/invocation,N,K,party identities,ciphertext lengths and hashes,transaction state,commit/abort and request timing; recorded under L_A"
+  },
+  "functional_validation": {
+    "runtime_conformance": "PASS",
+    "frozen_oracle_independent_process_e2e": "PASS",
+    "e2e_case_count": 195,
+    "e2e_case_file": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S32_E2E_CASES_2026-10-20.json",
+    "tested_n_values": [1, 2, 3, 4, 5, 8, 128, 256],
+    "all_k_for_ternary_n3": "PASS_27_INPUTS_X_3_K",
+    "all_permutations_and_k_for_n4_signed_boundary_set": "PASS_24_PERMUTATIONS_X_4_K",
+    "tested_runtime_n_claim": "Only listed N values are functionally exercised; configuration guard accepts N in [1,256], but no all-integer exhaustive runtime claim",
+    "gate_budget": {
+      "formula": "P=max(2,next_power_of_two(N)); W=32+log2(P); G=63P+P^2W+binom(P,2)(2W-1)+P^2",
+      "N128": 1289280,
+      "N256": 5281664,
+      "one_triple_per_and_gate": true,
+      "triple_share_bytes_per_party": "ceil(3G/8)",
+      "permutation_share_bytes_per_party": "ceil(P^2/8)",
+      "signed_package_bytes_per_party": "372-byte fixed header + 64-byte Ed25519 signature + ceil(3G/8) + ceil(P^2/8)",
+      "preflight_peak_memory_estimate": "package_bytes + G + max_layer*sizeof(GateInput) + max_layer + 2P^2 + 3PW; max_layer=max(P^2W,binom(P,2)W,P^2,63P)",
+      "all_gate_ids_consumed_in_execution": "PASS"
+    },
+    "n128_package_bytes_per_party": 485964,
+    "n256_package_bytes_per_party": 1989252,
+    "package_cap_bytes": 2097152,
+    "metadata_including_signature_bytes": 436,
+    "metadata_header_bytes": 372,
+    "metadata_cap_bytes": 65536,
+    "max_observed_gate_batch_payload_bytes": 655468,
+    "gate_batch_frame_cap_bytes": 1048576,
+    "peak_party_rss_n128_kib": 25360,
+    "peak_party_rss_n256_kib": 72324,
+    "runtime_preflight_memory_cap_bytes": 268435456,
+    "observed_rss_below_preflight_cap": true,
+    "phase_bound": "W+51",
+    "n128_observed_exchange_phases": 88,
+    "n128_w_plus_51_bound": 90,
+    "n256_observed_exchange_phases": 89,
+    "n256_w_plus_51_bound": 91,
+    "n128_diagnostic_elapsed_ms": 458,
+    "n256_diagnostic_elapsed_ms": 745,
+    "diagnostic_times_are_formal_performance": false
+  },
+  "fault_recovery": {
+    "package_signature_tamper": "PASS_REJECT",
+    "package_truncation": "PASS_REJECT",
+    "wrong_party": "PASS_REJECT",
+    "wrong_session_invocation": "PASS_REJECT",
+    "wrong_party_identity": "PASS_REJECT",
+    "out_of_range_gate_id": "PASS_REJECT",
+    "duplicate_package_lease": "PASS_REJECT",
+    "normal_commit_then_A_restart_and_recipient_fetch": "PASS",
+    "commit_then_lost_party_receipt_failpoint": "PASS_RECOVERY_REQUIRED_THEN_RECIPIENT_FETCH",
+    "precommit_A_SIGKILL_restart_with_one_ciphertext": "PASS_ABORTED_NO_FETCH_BOTH_PARTY_APIS_NO_SHARE",
+    "precommit_A_transaction_timeout_then_restart": "PASS_DURABLE_ABORT_NO_FETCH_BOTH_PARTY_APIS_NO_SHARE",
+    "generic_transport_sequence_rejection_conformance": "PASS",
+    "TLS_peer_identity_mismatch_conformance": "PASS",
+    "arbitrary_v3_frame_reorder_and_party_abort_at_every_stage": "NOT_RUN",
+    "A_application_READY_payload_mismatch": "NOT_RUN",
+    "natural_uninjected_OS_read_or_write_failure": "NOT_OBSERVED",
+    "crash_cases_are_injected_failpoints": true,
+    "power_loss_or_storage_hardware_durability": "NOT_TESTED"
+  },
+  "security": {
+    "P0_full_view_simulator": "OPEN_NO_GO",
+    "P1_full_view_simulator": "OPEN_NO_GO",
+    "A_view_and_crash_recovery_simulator": "OPEN_NO_GO",
+    "Dealer_triple_and_permutation_joint_distribution_proof": "OPEN_NO_GO",
+    "GMW_Beaver_theorem_instantiation": "OPEN_NO_GO",
+    "approved_party_leakage_preserved_by_hybrid": "OPEN_NO_GO",
+    "CSPRNG_DRBG_advantage": "NOT_QUANTIFIED",
+    "TLS13_authentication_advantage_and_deployment_parameters": "NOT_QUANTIFIED",
+    "OpenSSL_signature_and_recipient_encryption_advantages": "NOT_QUANTIFIED",
+    "runtime_function_tests_are_security_proof": false,
+    "reproducible_distinguisher_found": false
+  },
+  "independent_review": {
+    "S31_spec_review": "INDEPENDENT_TECHNICAL_REVIEW_PASS; does not cover S32 code",
+    "S32_implementation_review": "NOT_RUN",
+    "S32_cryptographic_proof_review": "NOT_RUN"
+  },
+  "performance": {
+    "formal_LAN_WAN_matrix": "NOT_RUN",
+    "formal_performance_status": "POSTPONED",
+    "M6A_V3_to_V4_gate": "UNCHANGED_FROM_REPOSITORY_STATE_NOT_RESOLVED_BY_S32",
+    "secure_alias": false
+  },
+  "changes": {
+    "s32_authored_files": "Listed in S32 source/build/evidence manifest",
+    "source_build_evidence_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S32_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-20.json",
+    "vfss_baseline_modified": false,
+    "papers_or_reference_projects_modified": false,
+    "build_outputs_in_repository": false
+  },
+  "decision": "OPT_IN_RUNTIME_FUNCTIONALLY_VERIFIED; security gates remain OPEN; no production or secure admission"
+}

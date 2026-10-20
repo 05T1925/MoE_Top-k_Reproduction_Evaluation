@@ -1,13 +1,20 @@
 #include <moe_topk/protocol_i_transport.h>
 
+#include <atomic>
+#include <chrono>
 #include <cerrno>
+#include <csignal>
 #include <cstdint>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <poll.h>
+#include <pthread.h>
 #include <stdexcept>
 #include <sys/socket.h>
+#include <sys/syscall.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -19,6 +26,10 @@ constexpr std::uint32_t kMaxPayload = 1U << 20;
 constexpr int kBits = 36;
 using Bytes = std::vector<std::uint8_t>;
 using namespace moe_topk;
+
+volatile sig_atomic_t g_sigpipe_handler_calls = 0;
+
+void record_sigpipe(int) { ++g_sigpipe_handler_calls; }
 
 struct RawHeader {
   std::uint32_t n = 5, k = 2, length = 0;
@@ -239,6 +250,117 @@ void expect_timeout() {
   ::close(sockets[1]);
 }
 
+void expect_external_sigpipe_not_consumed_by_successful_write() {
+  int sockets[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0,
+          "SIGPIPE preservation setup");
+  int send_buffer = 4096;
+  require(::setsockopt(sockets[0], SOL_SOCKET, SO_SNDBUF, &send_buffer,
+                       sizeof(send_buffer)) == 0,
+          "SIGPIPE preservation send buffer");
+
+  struct sigaction action{};
+  struct sigaction previous{};
+  action.sa_handler = record_sigpipe;
+  ::sigemptyset(&action.sa_mask);
+  require(::sigaction(SIGPIPE, &action, &previous) == 0,
+          "SIGPIPE preservation handler install");
+  g_sigpipe_handler_calls = 0;
+
+  Bytes payload(kMaxPayload, 0x5a);
+  Bytes received(kHeaderBytes + payload.size());
+  std::atomic<pid_t> writer_tid{0};
+  std::atomic<bool> send_succeeded{false};
+  pthread_t writer_id{};
+  std::exception_ptr writer_error;
+  ProtocolIFramedChannel channel(sockets[0], config(0, 1), {5000, kMaxPayload});
+
+  std::thread reader([&] {
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    std::size_t offset = 0;
+    while (offset < received.size()) {
+      const auto count = ::read(sockets[1], received.data() + offset,
+                                received.size() - offset);
+      if (count < 0 && errno == EINTR) continue;
+      require(count > 0, "SIGPIPE preservation receiver EOF");
+      offset += static_cast<std::size_t>(count);
+    }
+  });
+  std::thread writer([&] {
+    writer_id = ::pthread_self();
+    writer_tid.store(static_cast<pid_t>(::syscall(SYS_gettid)),
+                     std::memory_order_release);
+    try {
+      channel.send(payload);
+      send_succeeded.store(true, std::memory_order_release);
+    } catch (...) {
+      writer_error = std::current_exception();
+    }
+  });
+  bool sigpipe_blocked_in_writer = false;
+  const auto block_deadline = std::chrono::steady_clock::now() +
+      std::chrono::seconds(2);
+  while (writer_tid.load(std::memory_order_acquire) == 0 &&
+         std::chrono::steady_clock::now() < block_deadline)
+    std::this_thread::yield();
+  while (writer_tid.load(std::memory_order_acquire) != 0 &&
+         std::chrono::steady_clock::now() < block_deadline) {
+    const auto status_path = "/proc/self/task/" +
+        std::to_string(writer_tid.load(std::memory_order_acquire)) + "/status";
+    std::ifstream status(status_path);
+    std::string line;
+    while (std::getline(status, line)) {
+      if (line.compare(0, 7, "SigBlk:") == 0) {
+        const auto mask = std::stoull(line.substr(7), nullptr, 16);
+        sigpipe_blocked_in_writer = (mask & (1ULL << (SIGPIPE - 1))) != 0;
+        break;
+      }
+    }
+    if (sigpipe_blocked_in_writer) break;
+    std::this_thread::yield();
+  }
+  const int signal_status = sigpipe_blocked_in_writer
+      ? ::pthread_kill(writer_id, SIGPIPE) : EAGAIN;
+  writer.join();
+  reader.join();
+  ::close(sockets[1]);
+  const int restore_status = ::sigaction(SIGPIPE, &previous, nullptr);
+
+  require(sigpipe_blocked_in_writer && signal_status == 0 && restore_status == 0,
+          "SIGPIPE preservation signal setup/restore");
+  if (writer_error) std::rethrow_exception(writer_error);
+  require(send_succeeded.load(std::memory_order_acquire) &&
+              g_sigpipe_handler_calls == 1,
+          "unrelated SIGPIPE was consumed by successful framed I/O");
+}
+
+void expect_preexisting_sigpipe_remains_pending() {
+  sigset_t set{};
+  sigset_t old_mask{};
+  require(::sigemptyset(&set) == 0 && ::sigaddset(&set, SIGPIPE) == 0 &&
+              ::pthread_sigmask(SIG_BLOCK, &set, &old_mask) == 0,
+          "preexisting SIGPIPE block");
+  require(::raise(SIGPIPE) == 0, "preexisting SIGPIPE raise");
+
+  int sockets[2]{};
+  require(::socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0,
+          "preexisting SIGPIPE socketpair");
+  {
+    ProtocolIFramedChannel channel(sockets[0], config(0, 1), 200);
+    channel.send(Bytes{9});
+    sigset_t pending{};
+    require(::sigpending(&pending) == 0 &&
+                ::sigismember(&pending, SIGPIPE) == 1,
+            "transport consumed a preexisting SIGPIPE");
+  }
+  ::close(sockets[1]);
+  const timespec no_wait{0, 0};
+  require(::sigtimedwait(&set, nullptr, &no_wait) == SIGPIPE,
+          "preexisting SIGPIPE cleanup");
+  require(::pthread_sigmask(SIG_SETMASK, &old_mask, nullptr) == 0,
+          "preexisting SIGPIPE restore");
+}
+
 void expect_rejected_sequence_preserved() {
   int sockets[2]{};
   int sync_pipe[2]{};
@@ -339,6 +461,8 @@ int main() {
     expect_payload_deadline_timeout();
     expect_eof();
     expect_timeout();
+    expect_external_sigpipe_not_consumed_by_successful_write();
+    expect_preexisting_sigpipe_remains_pending();
     expect_rejected_sequence_preserved();
     return 0;
   } catch (const std::exception& error) {

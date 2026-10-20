@@ -323,3 +323,53 @@ vfss-baseline-2026-09-03
 | 资料配置与哈希同步 | 文档和资料负责人协调 | 本清单、配置说明和哈希记录一致 |
 
 来源、版本或代码尚未确认时保持待登记状态。不得为了填满清单而虚构副本、仓库、许可证、revision 或完成结论。
+
+## 12. M6B S20 DCF 安全复核来源与对象
+
+- 被复核运行时：S18 锁定的 S15 默认关闭修复快照，72 项，S15 manifest SHA-256 4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816，canonical source SHA-256 c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498。逐文件哈希清单见 S18 source/build/evidence manifest；S20 对 72 项重新核验，72/72 匹配。
+- DCF 论文来源：Boyle et al., Function Secret Sharing for Mixed-Mode and Fixed-Point Secure Computation, Microsoft Research 作者稿 PDF，Figure 1 第 13 页、Theorem 2 第 14 页、Appendix F.1 第 42–46 页。官方作者 PDF：[Microsoft Research PDF](https://www.microsoft.com/en-us/research/wp-content/uploads/2021/01/FSS.pdf)。S20 未下载或添加论文本地副本。
+- S19 条件推导：见 M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_REPORT_2026-10-16.md。其 epsilon_RNG_joint 仍为未量化的外部假设。
+- S20 非作者密码学复核：审查者 `/root/s18_independent_receipt` 只参与过 S18 功能接收，未参与 S19 撰写；其只读复核支持单次 UCMP 与 key-only 池投影的 CONDITIONAL 结论，并指出 carry→sign continuation 是首个开放混合步骤。完整 adaptive pool 与 shuffle/output/crash 联合视图仍 OPEN；未运行构建/测试，未发现可复现攻击不构成安全通过。
+- S20 决策、报告、机器门禁与 source/evidence manifest：见对应 M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20 文件。S20 不修改 runtime，不改变 S18 功能接收范围，不创建 secure alias。
+- M6A 性能状态不变：V3 OPEN，V4 未获准；S20 未运行正式 LAN/WAN 性能矩阵。
+
+## 13. M6B S21 carry→sign 安全审查来源与对象
+
+- 运行时对象：S18 锁定的 S15 默认关闭修复快照，72 文件；S15 manifest SHA-256 4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816；S18 manifest SHA-256 5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78；canonical source SHA-256 c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498。S21 复核 72/72。
+- 实际位宽：protocol_i_score_input.cpp 使用 kScoreBits=34，score carry/sign 的 ring 为 R34=Z/(2^34)。S21 reviewer 初稿中的 2^53 是错误表达，已更正；Select key 宽度 40/41 位不适用于 score conversion。
+- 首个未闭合步骤：carry DCF 本地输出 share 不公开，低两位进入 lift 并形成 phase-5 sign operand。双方 phase-5 frames、sign key 和 masks 需要条件联合模拟；S20 的 opened-bit 后处理论证不覆盖该 continuation。未发现攻击，不构成安全 PASS。
+- S21 审查者 /root/s12_receipt 未参与 S19/S20 安全推导或 S20 报告撰写，但曾只读审阅 S20 final bridge/report；本轮是延续复核，不是新的独立第二意见。其之前的 S12 工作仅为功能接收。本轮只读、不构建/测试。审查范围为 carry→sign 条件视图和报告公式，不签核完整协议证明。
+- 两个池的 key-only 计数按 S15 slot 构造重算：N=128 41,024 slots / Σw=1,639,424；N=256 163,968 slots / Σw=6,719,104。此候选 bound 不覆盖 adaptive continuation、abort/crash slot ledger 或 shuffle/output。
+- S21 决策、报告、gates 和 source/evidence manifest 位于 docs/decisions 与 docs/reproduction 的同名前缀文件。
+- 论文依据仍限 BCG+21 Microsoft Research 作者稿 Theorem 2 / Appendix F.1 的固定参数单 key 桥接，不替代本地 Protocol I 联合视图证明。
+- M6A V3 仍 OPEN，V4 未获准，正式 LAN/WAN 未运行。
+
+
+## 14. M6B S22 R34 carry→sign continuation 复核对象与来源
+
+- 被审运行时严格是 S18 manifest锁定的S15默认关闭修复快照：72项；S15 manifest SHA-256 `4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816`；S18 receipt manifest SHA-256 `5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78`；canonical source SHA-256 `c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498`。S22重新计算72/72无差异。S22 source/evidence manifest记录关键文件哈希与验证口径。
+- 源码扩展：`protocol_i_score_input.cpp` 的实际运算环是R34；carry输出local share未公开，低两位形成lift并进入phase-5 sign frames。`protocol_i_project_derived_select5.cpp` 的full mask/份额在ideal joint tape下是uniform additive pair；DCF roots由`RAND_bytes`产生。RAND/getrandom联合假设仍未量化。
+- DCF论文来源：Boyle et al., *Function Secret Sharing for Mixed-Mode and Fixed-Point Secure Computation*，Microsoft Research作者稿，[官方PDF](https://www.microsoft.com/en-us/research/wp-content/uploads/2021/01/FSS.pdf)。DCF Theorem 2见PDF p.13–14，Appendix F.1见pp.42–46。该定理支持固定函数参数下的单方key分布，不自行证明本路线完整协议 transcript。
+- S22独立 reviewer `/root/independent_dcf_review` 明确未参与S19–S21，并仅对R34 carry→sign local pre-output transcript sampler给出CONDITIONAL范围复核；证据记于 `M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_INDEPENDENT_REVIEW_2026-10-16.md`。该签核不覆盖ideal output-share条件化模拟。首个未闭合状态为 `q_b → key_records → forward shuffle`，详见S22 report/gates；不得将条件局部引理外推为自适应整链证明。
+- S22不重算N=128 `M6B5/v3+M2CM/v1+M6P2/v1` 与N=256 `M6S2/v2` 完整池；既有key-only projection维持CONDITIONAL，adaptive full-pool和shuffle/output/crash维持OPEN。S22未构建/测试/跑正式性能，不改V3/V4状态。
+
+
+## 15. M6B S23 F_scoreconv output-conditioned 审查对象与证据
+
+- 运行时对象仍是 S18 锁定的 S15 default-OFF repair snapshot；S15 manifest SHA-256 4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816，S18 receipt manifest SHA-256 5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78，72-file canonical source SHA-256 c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498。S23 重新核对 72/72；核心文件 hash 见 S23 source/evidence manifest。
+- S23 审查 VFSS/src/moe_topk/protocol_i_score_input.cpp 的 R34 输入转换和 protocol_i_project_derived_select5.cpp:1890–1906 的 key record 入口。返回的 Q_b 是 priority-key 加法份额，不是均匀 share 或最终 mask share；完整 ideal share law 尚未写入 API。给定 Q_b 后 q_b 与 key_records 确定；在 carry/sign DCF correctness 下 Q_0+Q_1 等于稳定 priority key。
+- 对 uniform-share 假设的 witness：真实输出满足低 h index bits 和由本方 x_b 决定的低32个 q bits；均匀 R_(2^(33+h)) share 满足该事件的概率为 2^-(h+32)，真实概率为1。此为拒绝错误 ideal law，不是对当前路线的攻击。
+- S23 为 M2CM/v1 forward shuffle 子协议给出 P0/P1 固定 Q_b 的局部 sampler；结论只在理想独立均匀 dealer tape 下成立。实际 getrandom/FSS RNG 联合优势未量化，且该子引理不含 scoreconv carry/sign pre-output state。
+- 完整 view 首个断点是从 S22 的 V_pre sampler 转成给定 Q_b 的 V_pre | (x_b,Q_b,L) 条件 sampler。没有条件混合引理/输出 share law；未发现攻击。执行者参与 S19–S22，S23 crypto independence 为 NOT_SATISFIED；S22 独立 review 不扩展为 S23 签核。
+- S23 未重算 N=128 M6B5/v3 + M2CM/v1 + M6P2/v1 或 N=256 M6S2/v2 全池，不审 adaptive/inverse/output/crash，不构建或测试。S18 的 no-complete-mask 案例及可能遗留 P1 8-byte share 仍是历史、有限范围证据。
+- S23 决策、报告、机器门禁和 source/evidence manifest：分别见 M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_DECISION_2026-10-16.md、M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_REPORT_2026-10-16.md、M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_GATES_2026-10-16.json 和同前缀 SOURCE_EVIDENCE_MANIFEST。
+- 正式性能仍遵守 M6A V3→V4 顺序：V3 OPEN、V4 未获准、正式 LAN/WAN NOT_RUN。
+
+
+## 16. M6B S24 F_scoreconv/v2 刷新设计、实现与证据
+
+- S24 绑定 S18 已接收的 S15 基线：S15 源 manifest SHA-256 `4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816`；S18 receipt manifest SHA-256 `5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78`；72 文件 canonical SHA-256 `c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498`。S24 外部 snapshot 复核为 72/72。
+- `F_scoreconv/v1` 的输出是 R_(2^(33+h)) 的加法 priority-key shares；在 DCF correctness 下重构为 `((0x7fffffff-score)<<h)+original_index`。v1 具有低 h 位约束，未定义为均匀 share。
+- S24 添加独立枚举 `FullKeyZeroSumRefreshV2`。刷新在完整键环中保持 share sum。局部右移语义不保持，故 v2 不提供可重构 q；consumer 使用完整 Q′。刷新材料使用 M6B5/v4 monolithic 或 M6S2/v3 streamed 版本，不兼容旧包，并绑定输出 ABI。
+- `getrandom`/`RAND_bytes` 联合随机带优势、BCG+21 DCF 转换项与 TLS 信道优势仍须量化/明确适用条件。该刷新只条件支持 F_scoreconv 本地输出视图；不是整池或完整 Protocol I 安全证明。S24 执行者参与 S19–S23，独立密码学 review 为 `NOT_SATISFIED`。
+- S24 决策、报告、门禁与 source/build/evidence manifest：`docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_DECISION_2026-10-17.md` 与同前缀 `docs/reproduction/` 文件。M6A V3 仍 OPEN、V4 未获准、正式矩阵 NOT_RUN。

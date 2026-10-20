@@ -31,7 +31,27 @@ std::vector<std::uint64_t> exchange(const ProtocolIScoreInputConfig& config, int
                                     std::uint64_t* sent, std::uint64_t* received) {
   const auto peer = static_cast<std::uint8_t>(1U - config.party);
   ProtocolIFramedChannel channel(fd, {config.session, config.fingerprint, config.padded_n,
-      config.k, config.comparison_bits, config.party, peer, phase, 2}, config.timeout_ms);
+      config.k, config.comparison_bits, config.party, peer, phase, 2,
+       config.material_id}, ProtocolIFramedChannelOptions{config.timeout_ms});
+  std::vector<std::uint8_t> remote;
+  const auto encoded = encode_words(local);
+  if (config.party == 0) { channel.send(encoded); remote = channel.receive(); }
+  else { remote = channel.receive(); channel.send(encoded); }
+  *sent += channel.sent_bytes();
+  *received += channel.received_bytes();
+  return decode_words(remote, local.size());
+}
+
+std::vector<std::uint64_t> exchange(
+    const ProtocolIScoreInputConfig& config,
+    const ProtocolIFramedEndpoint& endpoint, std::uint8_t phase,
+    const std::vector<std::uint64_t>& local, std::uint64_t* sent,
+    std::uint64_t* received) {
+  const auto peer = static_cast<std::uint8_t>(1U - config.party);
+  ProtocolIFramedChannel channel(endpoint,
+      {config.session, config.fingerprint, config.padded_n, config.k,
+       config.comparison_bits, config.party, peer, phase, 2,
+       config.material_id}, ProtocolIFramedChannelOptions{config.timeout_ms});
   std::vector<std::uint8_t> remote;
   const auto encoded = encode_words(local);
   if (config.party == 0) { channel.send(encoded); remote = channel.receive(); }
@@ -42,11 +62,12 @@ std::vector<std::uint64_t> exchange(const ProtocolIScoreInputConfig& config, int
 }
 
 void validate(const ProtocolIScoreInputConfig& config, const ProtocolIPartyPackage& package,
-              const std::vector<std::uint32_t>& raw_share, const std::array<int, 2>& fds) {
+              const std::vector<std::uint32_t>& raw_share,
+              const std::array<ProtocolIFramedEndpoint, 2>& fds) {
   if (config.party > 1 || config.logical_n == 0 || config.logical_n > config.padded_n ||
       config.k == 0 || config.k > config.logical_n || config.index_bits == 0 ||
       config.comparison_bits != 33U + config.index_bits || config.comparison_bits > 53 ||
-      raw_share.size() != config.logical_n || fds[0] < 0 || fds[1] < 0 ||
+      raw_share.size() != config.logical_n || fds[0].fd < 0 || fds[1].fd < 0 ||
       package.party != config.party || package.session != config.session ||
       package.fingerprint != config.fingerprint || package.n != config.padded_n ||
       package.k != config.k || package.comparison_bits != config.comparison_bits ||
@@ -57,7 +78,8 @@ void validate(const ProtocolIScoreInputConfig& config, const ProtocolIPartyPacka
 
 std::vector<std::uint64_t> protocol_i_raw_score_input_party(
     const ProtocolIScoreInputConfig& config, ProtocolIPartyPackage& package,
-    const std::vector<std::uint32_t>& raw_share, const std::array<int, 2>& stage_fds,
+    const std::vector<std::uint32_t>& raw_share,
+    const std::array<ProtocolIFramedEndpoint, 2>& stage_fds,
     ProtocolIScoreInputMetrics* metrics) {
   validate(config, package, raw_share, stage_fds);
   ProtocolIScoreInputMetrics local_metrics;
@@ -118,4 +140,34 @@ std::vector<std::uint64_t> protocol_i_raw_score_input_party(
   if (metrics) *metrics = local_metrics;
   return keys;
 }
+
+std::vector<std::uint64_t> protocol_i_raw_score_input_party(
+    const ProtocolIScoreInputConfig& config, ProtocolIPartyPackage& package,
+    const std::vector<std::uint32_t>& raw_share,
+    const std::array<int, 2>& stage_fds,
+    ProtocolIScoreInputMetrics* metrics) {
+  const std::array<ProtocolIFramedEndpoint, 2> endpoints{{
+      ProtocolIFramedEndpoint(stage_fds[0]),
+      ProtocolIFramedEndpoint(stage_fds[1])}};
+  return protocol_i_raw_score_input_party(config, package, raw_share,
+                                          endpoints, metrics);
+}
+#if defined(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)
+void protocol_i_refresh_full_priority_key_shares_v2(
+    std::vector<std::uint64_t>& key_shares,
+    const std::vector<std::uint64_t>& rho_shares,
+    std::uint8_t comparison_bits) {
+  if (comparison_bits < 34 || comparison_bits > 53 || key_shares.empty() ||
+      key_shares.size() != rho_shares.size())
+    throw std::invalid_argument("F_scoreconv/v2 refresh shape");
+  const auto ring_mask = (UINT64_C(1) << comparison_bits) - 1U;
+  for (std::size_t i = 0; i < key_shares.size(); ++i) {
+    if ((key_shares[i] & ~ring_mask) != 0 ||
+        (rho_shares[i] & ~ring_mask) != 0)
+      throw std::invalid_argument("F_scoreconv/v2 refresh ring value");
+    key_shares[i] = (key_shares[i] + rho_shares[i]) & ring_mask;
+  }
+}
+#endif
+
 }  // namespace moe_topk

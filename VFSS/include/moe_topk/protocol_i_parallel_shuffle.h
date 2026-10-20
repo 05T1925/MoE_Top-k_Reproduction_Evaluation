@@ -54,6 +54,29 @@ struct ProtocolIParallelShuffleDealerOutput {
 
 ProtocolIParallelShuffleDealerOutput protocol_i_parallel_shuffle_dealer_generate(
     const ProtocolIParallelShuffleDealerConfig& config);
+// Input-independent T setup variant for paired forward/inverse routing.
+// The supplied permutation is known only to the dealer and is not serialized
+// as a public permutation by the party material format.
+ProtocolIParallelShuffleDealerOutput
+protocol_i_parallel_shuffle_dealer_generate_for_permutation(
+    const ProtocolIParallelShuffleDealerConfig& config,
+    const ProtocolIPermutation& permutation);
+// Emits only the O(N) masks/permutations used by Select5's two-message route.
+// It does not generate M2CP's C(N,2) CmpAgg DCF pool, which that route does
+// not evaluate. This is a distinct, purpose-limited material profile.
+ProtocolIParallelShuffleDealerOutput
+protocol_i_parallel_shuffle_dealer_generate_two_round_metadata_for_permutation(
+    const ProtocolIParallelShuffleDealerConfig& config,
+    const ProtocolIPermutation& permutation);
+
+// Select5 package profile: serializes only the metadata consumed by its two
+// exchange shuffle. The M2CM/v1 encoding is distinct from M2CP/v1 and carries
+// an empty edge pool; it must not be used by the three-round CmpAgg route.
+std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_select5_metadata(
+    const ProtocolIParallelShufflePartyMaterial& material);
+ProtocolIParallelShufflePartyMaterial
+protocol_i_parallel_shuffle_deserialize_select5_metadata(
+    const std::vector<std::uint8_t>& bytes, int expected_party);
 
 std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_material(
     const ProtocolIParallelShufflePartyMaterial& material);

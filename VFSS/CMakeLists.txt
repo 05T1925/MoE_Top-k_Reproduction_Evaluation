@@ -20,7 +20,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-write-strings -Wno-unused-result -m
 find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 find_package(Threads REQUIRED)
 find_package(OpenMP COMPONENTS CXX REQUIRED)
+find_package(OpenSSL 1.1.1 REQUIRED COMPONENTS SSL Crypto)
 option(MOE_TOPK_ENABLE_EMP_OT "Enable pinned EMP IKNP backend for M2 conformance" OFF)
+option(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL
+    "Build the opt-in PROJECT_DERIVED_SELECT_5ITER Protocol I experimental path and tests" OFF)
+option(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL
+    "Build the explicit score-to-mask-v3 GMW/Beaver experimental runtime and tests" OFF)
+if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
+    find_package(SQLite3 REQUIRED)
+endif()
 # find_package(CUDAToolkit REQUIRED)
 
 add_subdirectory(ext/cryptoTools)
@@ -70,7 +78,28 @@ PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ext/FSS>
 )
 
-target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX FSS cryptoTools) # SCI-FloatML CUDA::cudart
+target_link_libraries (${PROJECT_NAME} Eigen3::Eigen Threads::Threads OpenMP::OpenMP_CXX OpenSSL::SSL OpenSSL::Crypto FSS cryptoTools) # SCI-FloatML CUDA::cudart
+
+if(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL=1)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp
+        src/moe_topk/project_derived_select5.cpp
+        src/moe_topk/protocol_i_project_derived_select5.cpp
+        src/moe_topk/protocol_i_material_slot_store.cpp)
+endif()
+
+if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC
+        MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=1)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/moe_topk/score_to_mask_v3_gmw.cpp
+        src/moe_topk/score_to_mask_v3_party.cpp
+        src/moe_topk/score_to_mask_v3_escrow.cpp
+        src/moe_topk/project_derived_select5.cpp)
+    target_link_libraries(${PROJECT_NAME} SQLite::SQLite3)
+endif()
 
 
 # === Benchmarks ===
@@ -260,6 +289,40 @@ add_executable(moe_topk_m2_reverse_shuffle_model_test tests/moe_topk/protocol_i_
 target_link_libraries(moe_topk_m2_reverse_shuffle_model_test ${PROJECT_NAME})
 add_executable(moe_topk_m2_ucmp_conformance_test tests/moe_topk/protocol_i_ucmp_conformance_test.cpp)
 target_link_libraries(moe_topk_m2_ucmp_conformance_test ${PROJECT_NAME})
+if(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)
+    add_executable(moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test
+        tests/moe_topk/dcf_bcg21_fig1_aes128_v1_conformance_test.cpp)
+    target_link_libraries(moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test
+        ${PROJECT_NAME})
+    add_executable(moe_topk_project_derived_select5_conformance_test
+        tests/moe_topk/project_derived_select5_control_test.cpp)
+    target_link_libraries(moe_topk_project_derived_select5_conformance_test ${PROJECT_NAME})
+    add_executable(moe_topk_project_derived_select5_process_e2e_test
+        tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp)
+    target_link_libraries(moe_topk_project_derived_select5_process_e2e_test ${PROJECT_NAME})
+    add_executable(moe_topk_project_derived_select5_material_store_test
+        tests/moe_topk/protocol_i_project_derived_select5_material_store_test.cpp)
+    target_link_libraries(moe_topk_project_derived_select5_material_store_test ${PROJECT_NAME})
+    add_executable(moe_topk_score_key_refresh_v2_test
+        tests/moe_topk/protocol_i_score_key_refresh_v2_test.cpp)
+    target_link_libraries(moe_topk_score_key_refresh_v2_test ${PROJECT_NAME})
+    add_executable(moe_topk_streamed_material_slot_store_test
+        tests/moe_topk/protocol_i_material_slot_store_test.cpp)
+    target_link_libraries(moe_topk_streamed_material_slot_store_test ${PROJECT_NAME})
+    add_executable(moe_topk_tls13_transport_conformance_test
+        tests/moe_topk/protocol_i_tls13_transport_conformance_test.cpp)
+    target_link_libraries(moe_topk_tls13_transport_conformance_test ${PROJECT_NAME})
+endif()
+if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
+    add_executable(moe_topk_score_to_mask_v3_runtime_conformance_test
+        tests/moe_topk/score_to_mask_v3_runtime_conformance_test.cpp)
+    target_link_libraries(moe_topk_score_to_mask_v3_runtime_conformance_test
+        PRIVATE ${PROJECT_NAME})
+    add_executable(moe_topk_score_to_mask_v3_process_e2e_test
+        tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp)
+    target_link_libraries(moe_topk_score_to_mask_v3_process_e2e_test
+        PRIVATE ${PROJECT_NAME})
+endif()
 add_executable(moe_topk_m2_cmpagg_conformance_test tests/moe_topk/protocol_i_cmpagg_conformance_test.cpp)
 target_link_libraries(moe_topk_m2_cmpagg_conformance_test ${PROJECT_NAME})
 add_executable(moe_topk_m2_transport_conformance_test tests/moe_topk/protocol_i_transport_conformance_test.cpp)
@@ -653,6 +716,26 @@ target_compile_definitions(
 )
 
 if(BUILD_TESTING)
+    if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
+        add_test(NAME moe_topk_score_to_mask_v3_runtime_conformance_test
+                 COMMAND moe_topk_score_to_mask_v3_runtime_conformance_test)
+        add_test(NAME moe_topk_score_to_mask_v3_process_e2e_test
+                 COMMAND moe_topk_score_to_mask_v3_process_e2e_test)
+    endif()
+    if(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)
+        add_test(NAME moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test
+                 COMMAND moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test)
+        add_test(NAME moe_topk_project_derived_select5_conformance_test
+                 COMMAND moe_topk_project_derived_select5_conformance_test)
+        add_test(NAME moe_topk_project_derived_select5_material_store_test
+                 COMMAND moe_topk_project_derived_select5_material_store_test)
+        add_test(NAME moe_topk_score_key_refresh_v2_test
+                 COMMAND moe_topk_score_key_refresh_v2_test)
+        add_test(NAME moe_topk_project_derived_select5_process_e2e_test
+                 COMMAND moe_topk_project_derived_select5_process_e2e_test)
+        set_tests_properties(moe_topk_project_derived_select5_process_e2e_test
+            PROPERTIES SKIP_RETURN_CODE 77)
+    endif()
     # Protocol III primitive and runtime tests.
     add_test(
         NAME moe_topk_dpf_conformance_test

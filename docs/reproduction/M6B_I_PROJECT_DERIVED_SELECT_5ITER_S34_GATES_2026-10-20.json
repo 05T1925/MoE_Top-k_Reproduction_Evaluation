@@ -1,0 +1,159 @@
+{
+  "schema": "m6b-i-project-select5-s34-gates/v1",
+  "date": "2026-10-20",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S34",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_five_iteration_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_performance_result": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF"
+  },
+  "source_identity": {
+    "s33_received_snapshot": {
+      "status": "PASS",
+      "file_count": 84,
+      "matched": 84,
+      "canonical_sha256": "7e0f2ab6ae03ae402a739e2f5e97a09aa44a4fb3a373294f860ebb6f441c3df9",
+      "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+      "method": "rebuild S25 74-file snapshot plus S32 15 increments using recorded hashes; verify each S33 final file and canonical hash"
+    },
+    "s34_source_after_minimal_fix": {
+      "status": "PASS",
+      "file_count": 84,
+      "canonical_sha256": "caa5e162944c20331d6fabded31a419404a37b8228afd6066707b0791bf4a9c4",
+      "delta_files_inside_84": [
+        "PROJECT.md",
+        "docs/IMPLEMENTATION_PLAN.md",
+        "VFSS/src/moe_topk/protocol_i_transport.cpp",
+        "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp"
+      ],
+      "supplemental_delta_outside_84": {
+        "path": "VFSS/tests/moe_topk/protocol_i_transport_conformance_test.cpp",
+        "s33_sha256": "eb14b4243bba0ebc0047cf76c0fba7aeef362337dfabfc28b4823b3a939fa94ca",
+        "s34_sha256": "34ffe71c1ed77b8f10940d353083cd2071b1f7bd0d493c1d1d69d21b337e0395"
+      }
+    },
+    "s32_s33_worktrees_or_user_main": "PRESERVED_NO_CLEAN_RESET_OR_OVERWRITE",
+    "vfss_baseline": "UNCHANGED"
+  },
+  "build": {
+    "fresh_release_default_off": {
+      "status": "PASS",
+      "sytorch_build": "PASS",
+      "v3_symbols": "ABSENT",
+      "v3_targets": "ABSENT",
+      "v3_header_without_optin_macro": "EXPECTED_REJECTION",
+      "library_sha256": "04950d311143c10723e82ba19bbf7bb24c9be819ddd5ed7c244a468dff12366a"
+    },
+    "fresh_release_explicit_v3_on": {
+      "status": "PASS",
+      "v2_off": true,
+      "v3_on": true,
+      "fallback_to_v2_dcf": "ABSENT",
+      "library_sha256": "12c2820083b63222210751b5fd8f6d1792c5900461ec18c6c1a5b4cf9d474548",
+      "runtime_conformance_sha256": "6d638c75aa020ecd5840f745ef8e0cec44c27ca0f8ad79c9a1f11b5d268a3fff",
+      "process_e2e_sha256": "70dfff40f1cd6f4e67d55c763679bfe2e03abec94c6d0cea9c99d6da88f749a1",
+      "generic_transport_sha256": "d6bec05d93c70a254024ea2a45ca3475aaa94fed6f5b001fd5bce822589dca21"
+    },
+    "dedicated_v2_tls13": {
+      "status": "PASS",
+      "target": "moe_topk_tls13_transport_conformance_test",
+      "exit_code": 0,
+      "binary_sha256": "1c4ad04b9c29b14e1446dec3bdda032f3baa36953640cb882901ffc565f4f751"
+    },
+    "historical_archive_hash_discrepancy": {
+      "status": "OPEN",
+      "s33_recorded_archive_sha256": "53acd750a1c3d0f0ec10f4f96fe9641f86470510de1acbcb41ef89c3dc9a7500",
+      "s34_fresh_prepatch_archive_sha256": "8881faabcaa2fcbccf69eabd04db7f4844b76f68d51b2a6cf479d04e54bfaac9",
+      "cause": "NOT_DETERMINED",
+      "note": "the S33 runtime and process test executable hashes matched before S34 edits; do not claim the fresh static archive byte identity"
+    }
+  },
+  "communication": {
+    "normal_no_injection_path": {
+      "status": "PASS_WITH_SCOPE",
+      "natural_io_fault": "NOT_REPRODUCED",
+      "dealer_p0_p1_exit_codes": [0, 0, 0],
+      "a_status": "COMMITTED",
+      "a_transactions_ciphertext_rows": [1, 2],
+      "p0_p1_api": ["committed/share-returned", "committed/share-returned"],
+      "p0_p1_exchange_phases": [73, 73],
+      "other_no_injection_phase_observations": [73, 76, 76, 76],
+      "outer_sequence_range": [0, 72],
+      "a_exit_code": 143,
+      "a_exit_reason": "test harness sent SIGTERM during teardown",
+      "observer_close": "TLS unexpected EOF after successful parties and commit",
+      "phase_is_rtt": false
+    },
+    "injected_cases": {
+      "status": "PASS_WITH_SCOPE",
+      "count": 3,
+      "ready_body_mismatch": "P0/P1 exit 10; both ABORTED/no-share; lease burned; A rows 0",
+      "duplicate_ready_stale_phase": "P0/P1 exit 10; both ABORTED/no-share; lease burned; A rows 0",
+      "sigkill_p1_after_beaver_opening": "P0 exit 10; P1 exit 137 before API return; leases burned; A rows 0; extra gate prefix NOT_MEASURED"
+    },
+    "escrow_restart_recovery": {
+      "postcommit_lost_receipt": "PASS_WITH_SCOPE; P0 RECOVERY_REQUIRED/exit 11, P1 COMMITTED/exit 0; after A restart both recipient shares recover; duplicate fetch stable; wrong P0 identity at P1 endpoint rejected",
+      "precommit_a_sigkill": "PASS_WITH_SCOPE; both API RECOVERY_REQUIRED/exit 11; after A restart pending transaction ABORTED and neither party can fetch",
+      "precommit_timeout": "PASS_WITH_SCOPE; both API RECOVERY_REQUIRED/exit 11; transaction ABORTED and not fetchable",
+      "a_restart_process_exact_wait_codes": "NOT_RECORDED by driver; injected shutdown signals are recorded"
+    },
+    "transport_regressions": {
+      "external_sigpipe_during_successful_write": "S33 FAIL reproduced; S34 PASS",
+      "preexisting_pending_sigpipe": "PASS; remains pending",
+      "runtime_and_generic_transport_ctest": "PASS 2/2",
+      "partial_read_write_syscall_counts_in_normal_trace": "NOT_MEASURED",
+      "tls_fatal_error_plus_concurrent_external_sigpipe_origin": "OPEN residual ambiguity"
+    }
+  },
+  "functionality": {
+    "normal_stable_oracle": "PASS for N=3,K=2 no-injection case",
+    "s33_full_e2e_matrix": "HISTORICAL_PASS 195/195 on exact S33 source; not rerun in S34",
+    "full_195_case_matrix_s34": "NOT_RUN",
+    "n128_n256_resources_s34": "NOT_RUN; S33 historical values only",
+    "supported_functional_scope": "PASS_WITH_SCOPE for tested S33 inputs with S34 transport targeted regression; not every integer N≤256",
+    "n_greater_256": "NOT_ADMITTED"
+  },
+  "roles_and_atomic_output": {
+    "escrow_a_conditionally_trusted_noncolluding": {
+      "status": "CONFIRMED_BY_PROJECT_OWNER_IN_THIS_SESSION",
+      "scope": "logical commit visibility and identity-bound recovery; no recipient decrypt key; not a malicious-A or power-loss proof"
+    },
+    "test_launcher_a_package_access": {
+      "status": "OPEN_MODEL_MISMATCH",
+      "detail": "TEST_ONLY escrow_worker receives P0 package path and validates full file; metadata-only A isolation absent"
+    },
+    "physical_two_row_same_sql_transaction": {
+      "status": "NOT_IMPLEMENTED",
+      "actual": "first deposit commits one pending row in transaction 1; second deposit inserts second row and flips state/receipt in transaction 2; fetch visibility linearizes on final committed state"
+    },
+    "simultaneous_client_return": "NOT_GUARANTEED; only same logical commit point/postcommit recoverability is specified"
+  },
+  "security": {
+    "p0_p1_output_conditioned_full_view_simulators": {
+      "status": "OPEN_NO_GO",
+      "first_stop": "fixed T Ed25519 sig[64] on package has no generator in prescribed Sim_b(x_b,z_b/public,L_S29) because no trusted F_T package/signing oracle is provided"
+    },
+    "a_full_view_simulator": {
+      "status": "OPEN_NO_GO",
+      "first_stop": "A process transiently reads full P0 package body, including local triple/permutation material, outside metadata+ciphertext L_A"
+    },
+    "dealer_joint_triples_and_permutation_distribution": "OPEN",
+    "adaptive_active_comparison_leakage_composition": "OPEN",
+    "abort_prefix_and_crash_recovery_simulation": "OPEN",
+    "rng_signature_hash_encryption_tls_advantage": "NOT_QUANTIFIED",
+    "power_loss_durability": "NOT_MEASURED",
+    "attack_found": "NO; this is not a security pass"
+  },
+  "performance": {
+    "formal_lan_wan_matrix": "NOT_RUN",
+    "rtt": "NOT_MEASURED",
+    "s33_n128_n256_values": "HISTORICAL_DIAGNOSTIC_ONLY",
+    "five_algorithm_iterations_vs_comparison_layers_vs_exchange_phases_vs_rtt": "KEPT_SEPARATE",
+    "v3_to_v4_precondition": "UNCHANGED"
+  }
+}

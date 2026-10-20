@@ -1,0 +1,312 @@
+{
+  "schema": "m6b-project-derived-select5-s6-input-freeze/v1",
+  "created_utc": "2026-10-14T06:47:17.0189069Z",
+  "source_worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-derived-5iter-s5",
+  "source_head": "c3926c68fd14f270faa8b55234311071947fa080",
+  "source_branch": "codex/m6b-project-derived-5iter-s5",
+  "s4_manifest_sha256": "feb5001cb89e334eaea85f765f05920645ac4762d0e510198a527fe2be7cb079",
+  "copied_files": [
+    {
+      "path": "docs/decisions/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_DECISION_2026-10-12.md",
+      "sha256": "8d9f52ea5f81a26bb5f53ef9bd50105a8c57dbf68c7ca59e7aaf483c29b49692",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_DECISION_2026-10-12.md",
+      "sha256": "56119c4b8caf403d6e4f10eafdfaacdf64f31f40e3f00cef4c684baebf40c171",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_DECISION_2026-10-12.md",
+      "sha256": "8e34cc20eba3028f61a8d14c05e81814ab16df2ddc94e39a1d9412397ee6814c",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_DECISION_2026-10-12.md",
+      "sha256": "a59da81ad6e375f1d47bd2758003c6aa1be3ce089dd444a44c253b108f498381",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_DECISION_2026-10-12.md",
+      "sha256": "ab873eef1c05befcdf89a555156ba9c21c0c1988c87f6e4d718f38a5a2e64cb3",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_DECISION_2026-10-13.md",
+      "sha256": "7eae3cac642397859e020430f2490685f7854d9d94f5aeefcba7607031d0d3c5",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "sha256": "c0c1a6e08ab61cf8909b86be2a21390b44be0f5e35fd0b923374ad8726d2ab69",
+      "source_status": "M",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "sha256": "6b9bd2e1cc6fcd6212ca8159cd12cc08c29419125c3003ad85d21c78d1876b99",
+      "source_status": "M",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_REPORT_2026-10-12.md",
+      "sha256": "b98ce668897631276740e04fe334412f1578b66ab25b0993f7608c4a819fdab0",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_REPORT_2026-10-12.md",
+      "sha256": "09e751bd96f514a3c067dcbd7de503b9005945d359769fa08334f5bc5d47ae43",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_REPORT_2026-10-12.md",
+      "sha256": "ac4fb63cdbeabaa861e89e036b6fe1e1b389b46e5012a69f80458a183cfe3653",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_REPORT_2026-10-12.md",
+      "sha256": "98f23eeef73f4255e58ca5834fbf560eaecdba394fb5d1616198b6a9e13bbc4c",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_REPORT_2026-10-12.md",
+      "sha256": "0a09f8eb5b9e0bb25239e2079358889c4942f3ca7fe37095a6490b7549475a80",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_E2E_CASES_2026-10-13.json",
+      "sha256": "56142221b7acfe35f784109fea763864489b71237659e299cef42708ede5207d",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_REPORT_2026-10-13.md",
+      "sha256": "215ef7fe3b077df0b0dc36da6ea356fcce3a7abda7b8abc4ad599a4201c7bb61",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_SOURCE_MANIFEST_2026-10-13.json",
+      "sha256": "feb5001cb89e334eaea85f765f05920645ac4762d0e510198a527fe2be7cb079",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/comparison_cost_bounds.py",
+      "sha256": "3810a095f7552ef233da17d15458ef4f24d976b3f024b94acb975f9942e6b40e",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/independent_accept.py",
+      "sha256": "6dbd5b14a01e6de2796afde4624a953e5456b75c42e11a00ebe6de1f76490883",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/material_access_prototype.py",
+      "sha256": "3444405e0b1a782619bb4f9c9338e7d0b095f006eb2e6105f9aba06b6bf56a2d",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/README.md",
+      "sha256": "9f50b68bda2e5dc3564122171e4c6dfeecfbd3ab4aafa53f48e33c26fede6d53",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/material_budget.py",
+      "sha256": "e14c52f389fc426637e2d54a41f561c7cccb46b59128c17677a012e20b6f6218",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/membership_direction_probe.py",
+      "sha256": "76a27dd56fb7f3e7fdf42914ee7cfc9f4727de427e41e59db2c5571a79d1c912",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/public_view_probe.py",
+      "sha256": "37d06d0367fcc484492e44218c4d0507cbe88e36860188fa53038939ffe48e18",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/README.md",
+      "sha256": "ee6a26592ef64eb2ec1feeeb2ff6615326f645a3769d8d9dcf93fe96f89e070b",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/audit_edges.py",
+      "sha256": "b84591c49ec9f67484258011b0685ce9f6cbcebb56685457a80a571bfbcf2fc0",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/frozen_oracle.cpp",
+      "sha256": "a30fe76ab09552ea532ca0e732a19eb925e3d35db0eb99e1728a087f5e48a457",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/README.md",
+      "sha256": "44eca9ccfdfaed63c96b675ecb345b0aa86e2d247a7feb91c54c4c7abe7ead41",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/select5iter.py",
+      "sha256": "8b8d3dbd087d601a4962fe61c7b35546aa834cebd0ed4736b4e6d5dca204606b",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/test_select5iter.py",
+      "sha256": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "PROJECT.md",
+      "sha256": "0241202bb636ad973205b66d99bd918198320caef139e31f597d702b01c420d8",
+      "source_status": "M",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/CMakeLists.txt",
+      "sha256": "22aa598c4a16ccce30691e6e9a6883801c180af1ee752c8eda017bf31c621026",
+      "source_status": "M",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/include/moe_topk/project_derived_select5.h",
+      "sha256": "19177983f603beddd2cc237d7ca9ee10cea8c49e7b8bed87f71afbaf2a90fe75",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_material_slot_store.h",
+      "sha256": "18cce441cf4f719d720ddab39f603e2c76b5b82621994d3248c78c91a8564690",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_parallel_shuffle.h",
+      "sha256": "0843c6717885f12421b37fed1285d6216c800fb590a97ca0984aa1287254d476",
+      "source_status": "M",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "sha256": "698f0c0d27d4c4a1fd5b4c7aac1b5ef37d829963bbd4b29942dc4dda0378e862",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_score_input.h",
+      "sha256": "61eca4c20e21a86c76593c2ee2bc22d887d78d33df28e44c7b879a171c2d09af",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_transport.h",
+      "sha256": "87d479df29e06ea635c6fd8ead7b9295620fe869aa8a7e1d4195ddcfd4d5fd0e",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+      "sha256": "ecfa56c3d12f8a8183db680d9197bcaf75a18761ba1a4e078a300ca273f2651e",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_material_slot_store.cpp",
+      "sha256": "d84c14d93ed58e1baf8a18737a6387074d288dd0d1fcefc96a3f8dd096d66792",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "sha256": "f5b767130bf6d93fde58151629ef6f209257b7a53daf30cd4843c20cfdc01010",
+      "source_status": "M",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "sha256": "a4a5f1c63afd4bc9b621b4a46a203df62fcc924c0a7fa222b6595395f478f325",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+      "sha256": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "sha256": "54c2c7f5a803bc4f7ce44774e83ff79b674ca1fc05a748efeaa788a191a93dfd",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/project_derived_select5_control_test.cpp",
+      "sha256": "56291adf3904670f26f53766c42d7353c0430a41cf618222c58af2aa0fcfa695",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_material_slot_store_test.cpp",
+      "sha256": "4c2ce29ef13ab5d1614283aaabe5b176e6c6133b5f069233b5541a9c633715ff",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_material_store_test.cpp",
+      "sha256": "574cfa48f06b52aa7a2cf141465a72f51236ce0aa243d9a1b523e8b693bf294a",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp",
+      "sha256": "51ad8c34c5b1170585b7cadceb9e3a158d7ece3f7e5106e8177083d8cbaa365d",
+      "source_status": "??",
+      "source": "S5 worktree"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_tls13_transport_conformance_test.cpp",
+      "sha256": "c8adb49eac16967f48d24ec5358bc11d6f60ae2425feb69c6290aa05409dac63",
+      "source_status": "S5-only change",
+      "source": "S5 worktree"
+    }
+  ],
+  "hash_mismatch_exceptions": [
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "manifest_sha256": "3023056355c55df5992facd457e256dabc7d6ca2196c1a795c7ec557b7246d6e",
+      "observed_sha256": "6b9bd2e1cc6fcd6212ca8159cd12cc08c29419125c3003ad85d21c78d1876b99",
+      "reason": "post-manifest S5 documentation append; not source/runtime code"
+    }
+  ],
+  "excluded_s4_user_diff": [
+    "docs/PAPERS.sha256"
+  ],
+  "excluded_untracked_directory": [
+    "experiments/ (copied only individual files enumerated by S4 manifest)"
+  ]
+}

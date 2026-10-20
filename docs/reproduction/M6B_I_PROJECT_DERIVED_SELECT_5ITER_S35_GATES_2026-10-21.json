@@ -1,0 +1,126 @@
+{
+  "schema": "m6b-i-project-derived-select5-s35-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S35",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "identity": {
+    "s34_canonical_sha256": "caa5e162944c20331d6fabded31a419404a37b8228afd6066707b0791bf4a9c4",
+    "s34_file_count": 84,
+    "s35_source_file_count_including_supplement": 85,
+    "s35_changed_s34_entries": 9,
+    "supplemental_transport_source": "VFSS/tests/moe_topk/protocol_i_transport_conformance_test.cpp",
+    "s35_source_canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "s33_runtime_receive": "NOT_ACCEPTED_AFTER_S34_REPRODUCED_SIGPIPE_DEFECT",
+    "s34_targeted_fix_regression": "PASS_AWAITED_NONAUTHOR_FINAL_RECEIVE",
+    "s35_non_author_receive": "PASS_WITH_SCOPE",
+    "original_worktrees_modified": false,
+    "vfss_baseline_modified": false
+  },
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_five_iteration_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "cryptographic_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "owner_confirmed_model": {
+    "escrow_a": "CONDITIONALLY_TRUSTED_NONCOLLUDING_WITH_T_P0_P1",
+    "scope": "logical visibility and identity-bound recovery; no recipient decryption key",
+    "malicious_a_or_collusion": "OUT_OF_SCOPE",
+    "power_loss_durability": "NOT_MEASURED"
+  },
+  "gates": {
+    "s34_snapshot_hashes": "PASS",
+    "default_off_no_v3_target_symbol_and_header_rejection": "PASS",
+    "explicit_v3_on_no_v2_or_dcf_fallback": "PASS",
+    "metadata_only_context_signature_domain_separation": "PASS",
+    "escrow_process_identity_and_package_file_denial": "PASS_WITH_SCOPE_ROOT_UID0_FINAL_BINARY_RERUN",
+    "escrow_context_package_cross_use_rejected": "PASS",
+    "certificate_pin_before_application_ready": "PASS",
+    "s34_sigpipe_and_tls_regressions": "PASS_WITH_SCOPE",
+    "v2_tls_dedicated_path": "PASS",
+    "oracle_e2e_cases": "PASS_WITH_SCOPE",
+    "n128_n256_resource_and_oracle": "PASS_WITH_SCOPE",
+    "normal_natural_io_fault": "NOT_REPRODUCED",
+    "fault_injections": "PASS_WITH_SCOPE; SEPARATE_FROM_NATURAL_IO",
+    "ft_joint_distribution": "CONDITIONAL_OPEN",
+    "p0_p1_full_view_simulation": "OPEN_NO_GO",
+    "a_only_full_view_simulation": "OPEN",
+    "crypto_advantage_quantification": "NOT_QUANTIFIED",
+    "sqlite_power_loss_durability": "NOT_MEASURED",
+    "s33_s34_library_archive_provenance": "OPEN",
+    "n_gt_256": "NOT_ADMITTED",
+    "formal_lan_wan": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED",
+    "secure_alias": "NOT_CREATED",
+    "client_A_pin_wrong_fingerprint_same_ca_san": "PASS",
+    "server_party_pin_checked_before_READY_source_review": "PASS",
+    "server_party_wrong_fingerprint_same_ca_san_integration": "NOT_RUN",
+    "wrong_party_identity_recovery_fetch_rejected": "PASS",
+    "tls_handshake_midflight_peer_close": "NOT_RUN"
+  },
+  "functionality": {
+    "output": "original-order stable Top-K XOR mask shares; signed Q20.12 descending; tie by original index ascending; exactly K ones",
+    "n128": "PASS_WITH_SCOPE",
+    "n256": "PASS_WITH_SCOPE",
+    "full_oracle_process_case_count": 195,
+    "full_oracle_process_cases": "195/195 PASS",
+    "natural_trace": "Dealer/P0/P1 exit 0; P0/P1 API committed/share-returned; A COMMITTED; 73 frames/phases each",
+    "normal_trace_proxy_eof": "POST_SUCCESS_TEST_PROXY_TEARDOWN; NOT_A_PARTY_API_ERROR",
+    "normal_trace_escrow_exit": "143 due harness SIGTERM teardown after completion"
+  },
+  "resources_observed": {
+    "n128": {
+      "k": 64,
+      "gate_count": 1289280,
+      "package_bytes_each_party": 485964,
+      "max_frame_payload_bytes": 159852,
+      "peak_party_rss_kib": 25336,
+      "application_exchange_phases": 88,
+      "p0_sent_bytes": 337536,
+      "p1_sent_bytes": 337404
+    },
+    "n256": {
+      "k": 128,
+      "gate_count": 5281664,
+      "package_bytes_each_party": 1989252,
+      "max_frame_payload_bytes": 655468,
+      "peak_party_rss_kib": 72372,
+      "application_exchange_phases": 89,
+      "p0_sent_bytes": 1336285,
+      "p1_sent_bytes": 1336025
+    },
+    "formal_performance": "NOT_MEASURED",
+    "phase_is_rtt": false
+  },
+  "security_stop": {
+    "step": "first Select5 kTagOpenedCompare active comparison opening after package/READY, input conversion, forward routing, and all-pair comparator setup",
+    "source": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp compare_wave",
+    "unresolved_variable": "joint law of party-conditioned package/triple/wire prefix and local/peer active-comparison opening shares conditioned on x_b, ideal z_b, public parameters, and L_S29",
+    "required_equality": "Law(V_b_prefix, local_bits, peer_bits | x_b,z_b,public,L_S29) = Law(Sim_b(x_b,z_b,public,L_S29))",
+    "classification": "PROOF_GAP_NOT_ATTACK",
+    "distinguishing_attack_found": false,
+    "reduced_distribution_probe": "NOT_RUN"
+  },
+  "residual_transport_boundary": {
+    "concurrent_unrelated_thread_SIGPIPE_with_same_operation_EPIPE": "NOT_PROVEN_DISTINGUISHABLE_FROM_COALESCED_PENDING_SIGNAL",
+    "claim_of_complete_race_freedom": false
+  },
+  "archive_provenance": {
+    "s33_manifest_final_library_sha256": "53acd750a1c3d0f0ec10f4f96fe9641f86470510de1acbcb41ef89c3dc9a7500",
+    "s34_fresh_pre_repair_library_sha256": "8881faabcaa2fcbccf69eabd04db7f4844b76f68d51b2a6cf479d04e54bfaac9",
+    "s34_final_library_sha256": "12c2820083b63222210751b5fd8f6d1792c5900461ec18c6c1a5b4cf9d474548",
+    "s35_final_library_sha256": "2851036d2d526b54e6a7874805e693326323ddd48921eb1d058e03df3379e59d",
+    "finding": "member names/order/sizes match; source-identical objects include absolute __FILE__/debug path differences; transport object differs with source; historical archive byte provenance remains OPEN"
+  },
+  "deliverables": {
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_DECISION_2026-10-21.md",
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_REPORT_2026-10-21.md",
+    "cases": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_CASES_2026-10-21.json",
+    "manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json"
+  }
+}

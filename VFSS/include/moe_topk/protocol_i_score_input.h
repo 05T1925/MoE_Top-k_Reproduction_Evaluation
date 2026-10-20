@@ -5,6 +5,8 @@
 #include <vector>
 
 #include <moe_topk/protocol_i_party_package.h>
+#include <moe_topk/protocol_i_transport.h>
+#include <moe_topk/protocol_i_score_share_abi.h>
 
 namespace moe_topk {
 
@@ -15,6 +17,7 @@ struct ProtocolIScoreInputConfig {
   std::uint32_t logical_n = 0, padded_n = 0, k = 0;
   std::uint8_t index_bits = 0, comparison_bits = 0, party = 0;
   int timeout_ms = 0;
+  std::uint64_t material_id = 0;
 };
 
 struct ProtocolIScoreInputMetrics {
@@ -26,7 +29,24 @@ struct ProtocolIScoreInputMetrics {
 
 std::vector<std::uint64_t> protocol_i_raw_score_input_party(
     const ProtocolIScoreInputConfig&, ProtocolIPartyPackage&,
+    const std::vector<std::uint32_t>& raw_share,
+    const std::array<ProtocolIFramedEndpoint, 2>& stage_fds,
+    ProtocolIScoreInputMetrics* metrics);
+
+std::vector<std::uint64_t> protocol_i_raw_score_input_party(
+    const ProtocolIScoreInputConfig&, ProtocolIPartyPackage&,
     const std::vector<std::uint32_t>& raw_share, const std::array<int, 2>& stage_fds,
     ProtocolIScoreInputMetrics* metrics);
+
+#if defined(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)
+// Applies F_scoreconv/v2 to the complete priority-key shares produced by the
+// unchanged S15 carry/sign adapter. The one-shot rho vector is party/session/
+// slot-bound by the caller's versioned material ABI. No q/high-part share is
+// produced after this transformation. This API is absent from feature-OFF builds.
+void protocol_i_refresh_full_priority_key_shares_v2(
+    std::vector<std::uint64_t>& key_shares,
+    const std::vector<std::uint64_t>& rho_shares,
+    std::uint8_t comparison_bits);
+#endif
 
 }  // namespace moe_topk

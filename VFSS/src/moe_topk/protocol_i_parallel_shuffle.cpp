@@ -156,7 +156,8 @@ void validate_records(int bits, const std::vector<ProtocolIBlock192>& records,
   for (const auto& record : records) validate_record(bits, record);
 }
 
-void validate_material(const ProtocolIParallelShufflePartyMaterial& material) {
+void validate_material(const ProtocolIParallelShufflePartyMaterial& material,
+                       bool require_full_edge_pool = true) {
   require(material.session != 0 && material.fingerprint != 0 && material.material_id != 0 &&
               material.n >= 2 && material.k >= 1 && material.k <= material.n && material.party < 2,
           "parallel shuffle material binding");
@@ -168,8 +169,11 @@ void validate_material(const ProtocolIParallelShufflePartyMaterial& material) {
   validate_records(material.comparison_bits, material.a, material.n);
   validate_records(material.comparison_bits, material.e, material.n);
   validate_records(material.comparison_bits, material.r_share, material.n);
-  require(material.edge_materials.size() == edge_count(material.n),
-          "parallel shuffle edge material count");
+  require(require_full_edge_pool
+              ? material.edge_materials.size() == edge_count(material.n)
+              : material.edge_materials.empty(),
+          require_full_edge_pool ? "parallel shuffle edge material count"
+                                 : "Select5 metadata must omit edge pool");
   for (const auto& edge : material.edge_materials)
     require(edge.party_id() == material.party &&
                 edge.comparison_bits() == material.comparison_bits,
@@ -299,7 +303,46 @@ ProtocolIParallelShuffleDealerOutput protocol_i_parallel_shuffle_dealer_generate
     const ProtocolIParallelShuffleDealerConfig& config) {
   validate_dealer_config(config);
   seed_fss_once();
-  const auto pi = random_permutation(config.n);
+  return protocol_i_parallel_shuffle_dealer_generate_for_permutation(
+      config, random_permutation(config.n));
+}
+
+ProtocolIParallelShuffleDealerOutput
+protocol_i_parallel_shuffle_dealer_generate_for_permutation(
+    const ProtocolIParallelShuffleDealerConfig& config,
+    const ProtocolIPermutation& permutation) {
+  auto output = protocol_i_parallel_shuffle_dealer_generate_two_round_metadata_for_permutation(
+      config, permutation);
+  const auto full_r = add_vectors(config.comparison_bits,
+      output.party0.r_share, output.party1.r_share);
+  std::uint64_t key_wire_bytes = 0;
+  for (std::uint32_t left = 0; left < config.n; ++left) {
+    for (std::uint32_t right = left + 1U; right < config.n; ++right) {
+      ProtocolIUcmpMaterial edge(config.comparison_bits, full_r[left].word0,
+                                  full_r[right].word0);
+      auto key0 = edge.export_party_material(0);
+      auto key1 = edge.export_party_material(1);
+      key_wire_bytes += key0.serialize().size() + key1.serialize().size();
+      output.party0.edge_materials.push_back(std::move(key0));
+      output.party1.edge_materials.push_back(std::move(key1));
+    }
+  }
+  output.metrics.cmpagg_party_material_wire_bytes = key_wire_bytes;
+  validate_material(output.party0);
+  validate_material(output.party1);
+  return output;
+}
+
+ProtocolIParallelShuffleDealerOutput
+protocol_i_parallel_shuffle_dealer_generate_two_round_metadata_for_permutation(
+    const ProtocolIParallelShuffleDealerConfig& config,
+    const ProtocolIPermutation& permutation) {
+  validate_dealer_config(config);
+  protocol_i_validate_permutation(permutation);
+  require(permutation.size() == config.n,
+          "parallel shuffle dealer permutation size");
+  seed_fss_once();
+  const auto pi = permutation;
   const auto sigma0 = random_permutation(config.n);
   const auto sigma1 = random_permutation(config.n);
   const auto tau0 = protocol_i_compose_permutation(
@@ -333,33 +376,23 @@ ProtocolIParallelShuffleDealerOutput protocol_i_parallel_shuffle_dealer_generate
   };
   initialize(output.party0, 0, sigma0, tau0, a0, e0, r0);
   initialize(output.party1, 1, sigma1, tau1, a1, e1, r1);
-  const auto full_r = add_vectors(config.comparison_bits, r0, r1);
-  std::uint64_t key_wire_bytes = 0;
-  for (std::uint32_t left = 0; left < config.n; ++left) {
-    for (std::uint32_t right = left + 1U; right < config.n; ++right) {
-      ProtocolIUcmpMaterial edge(config.comparison_bits, full_r[left].word0,
-                                  full_r[right].word0);
-      auto key0 = edge.export_party_material(0);
-      auto key1 = edge.export_party_material(1);
-      key_wire_bytes += key0.serialize().size() + key1.serialize().size();
-      output.party0.edge_materials.push_back(std::move(key0));
-      output.party1.edge_materials.push_back(std::move(key1));
-    }
-  }
   const auto record_bits = static_cast<std::uint64_t>(config.comparison_bits) + 128U;
   const auto permutation_bits = protocol_i_parallel_rank_bits(config.n);
   output.metrics.record_material_logical_bits = 6U * config.n * record_bits;
   output.metrics.permutation_material_logical_bits = 4U * config.n * permutation_bits;
-  output.metrics.cmpagg_party_material_wire_bytes = key_wire_bytes;
-  validate_material(output.party0);
-  validate_material(output.party1);
+  output.metrics.cmpagg_party_material_wire_bytes = 0;
   return output;
 }
 
-std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_material(
-    const ProtocolIParallelShufflePartyMaterial& material) {
-  validate_material(material);
-  std::vector<std::uint8_t> output{'M','2','C','P',1,material.party,
+namespace {
+
+std::vector<std::uint8_t> serialize_material_profile(
+    const ProtocolIParallelShufflePartyMaterial& material, bool select5_metadata) {
+  validate_material(material, !select5_metadata);
+  std::vector<std::uint8_t> output{
+      'M','2', static_cast<std::uint8_t>(select5_metadata ? 'C' : 'C'),
+      static_cast<std::uint8_t>(select5_metadata ? 'M' : 'P'),
+      1,material.party,
                                    material.comparison_bits,0};
   put_u64(output, material.session); put_u64(output, material.fingerprint);
   put_u64(output, material.material_id); put_u64(output, material.n); put_u64(output, material.k);
@@ -382,13 +415,17 @@ std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_material(
   return output;
 }
 
-ProtocolIParallelShufflePartyMaterial protocol_i_parallel_shuffle_deserialize_material(
-    const std::vector<std::uint8_t>& bytes, int expected_party) {
+ProtocolIParallelShufflePartyMaterial deserialize_material_profile(
+    const std::vector<std::uint8_t>& bytes, int expected_party,
+    bool select5_metadata) {
   require(expected_party >= 0 && expected_party <= 1 && bytes.size() >= 48U &&
               bytes.size() <= kMaxMaterialBytes && bytes[0]=='M' && bytes[1]=='2' &&
-              bytes[2]=='C' && bytes[3]=='P' && bytes[4]==1 && bytes[5]==expected_party &&
+              bytes[2]=='C' &&
+              bytes[3]==(select5_metadata ? 'M' : 'P') &&
+              bytes[4]==1 && bytes[5]==expected_party &&
               bytes[7]==0,
-          "parallel shuffle material header");
+          select5_metadata ? "Select5 metadata material header"
+                           : "parallel shuffle material header");
   ProtocolIParallelShufflePartyMaterial material;
   material.party = bytes[5]; material.comparison_bits = bytes[6];
   std::size_t offset = 8;
@@ -409,7 +446,9 @@ ProtocolIParallelShufflePartyMaterial protocol_i_parallel_shuffle_deserialize_ma
   };
   get_records(material.a); get_records(material.e); get_records(material.r_share);
   const auto edges = get_u64(bytes, offset);
-  require(edges == edge_count(material.n), "parallel shuffle serialized edge count");
+  require(select5_metadata ? edges == 0 : edges == edge_count(material.n),
+          select5_metadata ? "Select5 metadata edge count"
+                           : "parallel shuffle serialized edge count");
   material.edge_materials.reserve(static_cast<std::size_t>(edges));
   for (std::uint64_t index = 0; index < edges; ++index) {
     const auto length = get_u64(bytes, offset);
@@ -420,8 +459,31 @@ ProtocolIParallelShufflePartyMaterial protocol_i_parallel_shuffle_deserialize_ma
     material.edge_materials.push_back(ProtocolIUcmpPartyMaterial::deserialize(encoded));
   }
   require(offset == bytes.size(), "parallel shuffle material trailing bytes");
-  validate_material(material);
+  validate_material(material, !select5_metadata);
   return material;
+}
+
+}  // namespace
+
+std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_select5_metadata(
+    const ProtocolIParallelShufflePartyMaterial& material) {
+  return serialize_material_profile(material, true);
+}
+
+ProtocolIParallelShufflePartyMaterial
+protocol_i_parallel_shuffle_deserialize_select5_metadata(
+    const std::vector<std::uint8_t>& bytes, int expected_party) {
+  return deserialize_material_profile(bytes, expected_party, true);
+}
+
+std::vector<std::uint8_t> protocol_i_parallel_shuffle_serialize_material(
+    const ProtocolIParallelShufflePartyMaterial& material) {
+  return serialize_material_profile(material, false);
+}
+
+ProtocolIParallelShufflePartyMaterial protocol_i_parallel_shuffle_deserialize_material(
+    const std::vector<std::uint8_t>& bytes, int expected_party) {
+  return deserialize_material_profile(bytes, expected_party, false);
 }
 
 ProtocolIParallelShuffleParty::ProtocolIParallelShuffleParty(

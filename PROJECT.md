@@ -856,3 +856,67 @@ Protocol III 精确两轮已是明确目标，不再将“是否只保留三轮�
 CryptoMoE 的模型参数、eligibility、容量、dummy、drop 和 transcript 需求留待 M7 之后单独确定。Ruffle、恶意安全 3PC 及 CipherGPT 不作为当前六种方案的前置任务。
 
 总体计划、详细实施计划、两份分工计划及路线决策应保持一致。修改计划不等于完成实现；所有完成状态、论文一致性和性能结论必须对应可审计证据。
+
+## M6B 项目派生 Select 安全状态（2026-10-16）
+
+Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF 是与 BB90+DCF 六方案行分开的 PROJECT_DERIVED / EXPERIMENTAL 研究路线。S18 对 S15 精确运行时快照的功能接收范围仍为 PASS_WITH_SCOPE；这不接收 S19/S20 安全论证。S20 作者撰写了 S19，但另有未参与 S19 的审查者（此前仅参与 S18 功能接收）完成只读密码学复核：单次 UCMP 和 key-only pool projection 为 CONDITIONAL；carry→sign continuation 是首个未闭合步骤，adaptive pool 与 shuffle/output 联合视图仍 OPEN。未发现可复现攻击或运行时缺陷。epsilon_RNG_joint 未量化，路线不建 secure alias。
+
+本状态记录不改变 M6A V3→V4 前置：V3 仍 OPEN，V4 未获准，正式 LAN/WAN 性能矩阵 NOT_RUN。细节见 [S20 决策](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_DECISION_2026-10-16.md)、[复核报告](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_REPORT_2026-10-16.md) 和配套 gates/manifest。
+
+## M6B 项目派生 Select 安全状态（S21，2026-10-16）
+
+S21 将 carry→sign 作为 S20 固定参数单 key/单次调用结论之后的第一项 continuation 检验。S15 score adapter 实际使用 R34，而非 2^53；未打开的 carry local share 通过其低两位进入 lift，再形成 phase-5 sign operand。针对 P0/P1 的完整条件联合模拟均 OPEN/NO_GO：边缘均匀和 key-only replacement 不能替代 continuation sampler。未发现攻击或可复现运行时代码缺陷，本轮只读且不改 runtime。
+
+两种 schema 的 Σw 仍只对应条件 key-only projection；N=128 与 N=256 的 adaptive full-pool、shuffle/inverse/output/crash 组合未通过。N≤256 功能范围仅继承 S18 的 S15 快照 PASS_WITH_SCOPE。继续保持 EXPERIMENTAL；不创建 secure alias，不扩大 N。S21 更正 reviewer 初稿的 score ring 位宽为实际 R34，历史 S20 原报告保留不覆盖。M6A V3 OPEN、V4 NOT_ALLOWED，正式 LAN/WAN NOT_RUN。见 S21 报告、gates 与 source/evidence manifest。
+
+
+## M6B 项目派生 Select 安全状态（S22，2026-10-16）
+
+S22 新增一位未参与 S19–S21 的独立密码学审查者 `/root/independent_dcf_review`。其对 P0/P1 的 R34 carry→sign **local pre-output transcript** 给出范围限定的 CONDITIONAL PASS：ideal joint RNG tape 与 fixed-parameter BCG+21 key-only bridge 下，候选替换界为 `68·epsilon_G + epsilon_RNG_joint`；AES 时间 `T′` 与 RNG 联合优势未量化。该审查不覆盖固定 ideal output share 的模拟。
+
+沿 S15 源码确认首个未闭合后续转移为 `q_b → key_records → forward shuffle`（`protocol_i_project_derived_select5.cpp:1901–1906`）。仓库没有 `F_scoreconv` 输出 share 约定，也未证明 `Sim_b(x_b,Q_b,L)` 对 priority-key shares 和 shuffle 本地视图的条件分布。P0/P1 output-conditioned gate 因而仍 OPEN/NO_GO；这是证明缺口，不是攻击。S22 在此断点停止，未外推到自适应比较、两种材料整池或 M2CM shuffle/output/crash。运行时未改、构建/测试未运行；S18功能接收范围不变。V3 OPEN、V4 NOT_ALLOWED、正式矩阵 NOT_RUN。
+
+
+## M6B 项目派生 Select 安全状态（S23，2026-10-16）
+
+S23 按 S18 的 S15 manifest 重新核验 72/72 文件，canonical hash 仍为 c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498。执行者参与 S19–S22 推导，故本轮不是独立密码学审查。实际 adapter 返回 priority-key 加法份额 Q_b，不是均匀 share；在 DCF correctness 下 Q_0+Q_1 是稳定 priority key。给定 Q_b 后 q_b 与 key_records 是确定映射；M2CM/v1 forward 子协议可在理想独立均匀 dealer tape 下作逐方条件模拟。
+
+P0/P1 完整 F_scoreconv output-conditioned view 仍 OPEN/NO_GO：S22 的 pre-output sampler 未证明在固定 (x_b,Q_b,L) 条件下生成 carry/sign keys、masks 和 frames。没有发现攻击或 runtime 缺陷；S23 只读，未构建/测试、未重算 N=128 M6B5/v3 + M2CM/v1 + M6P2/v1 或 N=256 M6S2/v2 整池，也未外推至 adaptive Select、inverse/output/crash。S18 PASS_WITH_SCOPE 功能接收保持为历史证据。继续 EXPERIMENTAL，不创建 secure alias；V3 OPEN、V4 NOT_ALLOWED、正式矩阵 NOT_RUN。详见 S23 决策、报告、gates 与 source/evidence manifest。
+
+## M6B 项目派生 Select 安全状态（S24，2026-10-17）
+
+S24 在隔离工作树实现 opt-in `FullKeyZeroSumRefreshV2`：为每条完整 priority key 增加一次性零和份额 `rho_0 + rho_1 = 0`，在 `R_(2^(33+h))` 内保留稳定键重构。N≤128 使用 M6B5/v4 monolithic package，N=256 使用 M6S2/v3 streamed store。v1 默认行为不变，v2 的 `Q'_b >> h` 不可作高位 share 使用；运行时只传递完整 `Q'_b`。默认关闭符号与测试目标检查通过。
+
+理想独立随机带下，v2 使本方完整 `Q'_b` 与其 score-conversion carry/sign 前置视图独立，给出了 F_scoreconv 输出条件模拟的条件推导。该范围依赖 S22 的 carry/sign pre-output sampler、AES/DCF 条件桥接和未量化的 `epsilon_RNG_joint`；S24 执行者参与 S19–S23，故独立密码学复核为 `NOT_SATISFIED`。自适应 DCF 池、shuffle/inverse、membership、完整输出 share 与 crash/abort 的联合模拟仍 OPEN。不得宣称整条协议安全，不创建 `secure` alias，也不称作 BB90/BMW16。
+
+详见 S24 决策、报告、gates 和 source/build/evidence manifest。V3 仍 OPEN、V4 未获准，正式 LAN/WAN 矩阵未运行。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S32（2026-10-20）
+
+按 S31 接收规格新增默认关闭的 `PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL` 运行时。显式构建选项为 `MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON`；无 v2/DCF 降级路径、默认 alias 或 `secure` alias。成功输出维持原序 `F_TOPK-U`：各方仅得到本方均匀 XOR mask share。A 使用 SQLite WAL 和 `synchronous=FULL` 单事务原子提交收件人密文，提交前不提供 API share，提交后可按收件方恢复。
+
+A 是新增在线服务参与方。它没有解密密钥，只能看到会话/调用参数、party 身份、密文与哈希、提交/中止状态及访问时序；这些元数据按独立 `L_A` 审查，不能称作原两方离线 Dealer 架构。S32 的多进程功能与恢复验证不关闭任何密码学门：P0/P1/A 全视图模拟、Dealer Beaver/preprocessing 联合分布、CSPRNG/TLS 优势量化和独立实现审查均未完成。该实验身份不属于 BB90 复现或 BMW16 实现。M6A V3→V4 状态独立记录，正式 LAN/WAN 性能矩阵仍未运行。详见 S32 决策、报告、gates、逐案记录和 source/build/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S33（2026-10-20）
+
+独立接收 S32 的 GMW/Beaver-v3 实验路线后，复建的 84 文件 S32 源码身份与 manifest 完全一致。READY mismatch 的故障注入复现了异常 TLS 关闭时 SIGPIPE 直接杀死双方进程；framed transport 已加入线程级 SIGPIPE 屏蔽、清理本次操作生成的信号并恢复原 signal mask，使写失败回到既有异常清理逻辑。修复后 READY mismatch、重复旧 phase 帧、第一 Beaver opening 后 P1 被杀三项案例均符合 API/lease/A 提交合同；195 个正常功能 case 与相关 CTest 通过。本轮 4 个有意变化为 PROJECT.md 和实施计划更新、framed transport SIGPIPE 修复、TEST_ONLY 无注入帧观测与故障驱动；其余 80 个快照文件匹配 S32，原 S32 worktree 未修改。另有一条不注入观测运行保存双方 stdout/stderr、逐帧 phase/sequence/tag 和 A 提交结果。
+
+该修复只改善通信错误退出，不构成密码学安全证明或物理掉电持久性证明。安全门仍 OPEN，正式 LAN/WAN 仍 NOT_RUN；v3 仍显式 opt-in、默认 OFF，无 `secure` alias。详见 S33 报告、决策、gates、case results 和 manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S34（2026-10-20）
+
+S34 以 S33 的 84 文件最终快照为接收对象，先逐文件核验后在隔离工作树构建。无 failpoint 正常多进程 trace 中 Dealer、P0、P1 均 exit 0；最终 N=3 trace 双方各 73 个应用 exchange phase（重复诊断 trace 观察到 73/76），A 记录一条 COMMITTED 交易和两条收件人密文，双方恢复各自 share。READY 参数不一致、READY 重复/重排和 P1 在 Beaver opening 后退出是人工故障注入；本轮正常路径自然读写错误为 NOT_REPRODUCED。
+
+复现一个 S33 transport 缺陷：仅凭 SIGPIPE pending 状态新旧变化就 drain，会误消费在成功 write 期间由其他线程发来的 SIGPIPE。S34 将 drain 条件改为当前 raw I/O 明确 EPIPE，或 TLS I/O 明确是 fatal TLS error / EPIPE syscall，并补充并发外部 SIGPIPE 与预先 pending 回归。第一次仅按 EPIPE 过滤的修复仍使 READY TLS error path 以 141 退出；该失败保留为单独证据。最终 v3 runtime/generic transport CTest 2/2、三项隔离通信故障与 v2 TLS 专用路径通过。
+
+独立审查发现安全论证不能闭合：P0/P1 的规定 simulator 缺少可信 Dealer 签名包生成接口；A 的 TEST_ONLY launcher 会读入完整 P0 package，故实际 harness 的 A view 超出仅元数据与密文的 `L_A`；源码中的两个 recipient row 分别在两次 SQL transaction 中提交，只有最终 state/receipt commit 负责统一控制 fetch 可见性。这些是模型/接口/实现合同断点，不是攻击结论。完整 party/A simulator、Dealer 联合预处理分布、A 崩溃/恢复模拟、优势量化与 A 的负责人信任批准仍 OPEN；不得创建 `secure` alias，v3 继续默认 OFF。
+
+路线名保持 `Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL`。N≤256 仅保留已测样例功能范围；N>256 NOT_ADMITTED。5 次算法迭代、依赖层、exchange phase 与网络 RTT 分开计量；本轮不启动正式 LAN/WAN 或 RTT 测量，仍遵守 V3→V4 前置门。详见 S34 决策、报告、gates、case records 与 source/build/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S35（2026-10-21）
+
+S35 以 S34 最终修复版 84 文件快照为起点，并将 S34 快照外 generic transport conformance test 纳入被测源码清单。S33 原样版本因 S34 复现 SIGPIPE 缺陷未获运行时独立接收；S34 修复版定向回归通过但此前仍待非作者最终接收。S35 在隔离工作树完成 metadata-only escrow context 和进程隔离，最终 Release binary 通过 195/195 oracle E2E、N=128/256 功能边界、transport/SIGPIPE/TLS/v2 TLS 和 default-OFF 回归，状态为 `PASS_WITH_SCOPE`。自然读写错误 `NOT_REPRODUCED`；人工故障注入单独记录。
+
+A 的条件信任边界由负责人确认：A 与 T/P0/P1 不合谋，负责逻辑可见提交和身份绑定恢复，不持有 recipient 解密密钥。party package format 4 与 metadata-only escrow context format 1 使用不同签名用途域；launcher/service 只接收签名 context 和 T 公钥。Linux/WSL 测试中 A 以独立进程身份运行并不能打开 P0/P1 package。真实 SQLite 状态允许第一份密文作为 pending 单独提交；第二份密文与 `COMMITTED` state/receipt 在同一最终 transaction 中写入。fetch 以最终 state 为可见性门，因此是逻辑原子可见点，不是两份密文在同一初始 SQL transaction 插入，也不意味着两个 API 同时物理返回。
+
+报告定义 `F_T/v1` setup/signing oracle，使 P0/P1/A simulator 可取得与固定 verifier key 相容的签名材料而无需 T 私钥；ideal tape 下的 triple/permutation 联合生成律已写出，真实 RNG 仍有未量化优势项。P0/P1 在 Select5 首个活动比较 opening 后的本方 package/wire/open-share 条件联合模拟仍 OPEN；A-only simulator、密码学优势和存储掉电耐久性也未关闭。功能接收不等于安全通过。路线严格保持 `Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL`，不是 BB90 五迭代复现、BMW16 或 BB90+DCF。算法迭代、比较依赖层、exchange phase、RTT 分开；正式 LAN/WAN/RTT 未运行，N>256 未准入，v3 默认 OFF，不创建 `secure` alias。详见 [S35 决策](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_DECISION_2026-10-21.md)、报告、gates、cases 和 manifest。

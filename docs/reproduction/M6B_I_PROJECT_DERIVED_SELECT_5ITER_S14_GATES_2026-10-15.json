@@ -1,0 +1,99 @@
+{
+  "schema": "m6b-project-derived-select5-s14-gates/v1",
+  "date": "2026-10-15",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "base_revision": "c3926c68fd14f270faa8b55234311071947fa080",
+  "task_commit": null,
+  "merged": false,
+  "gates": {
+    "S12_INDEPENDENT_RECEIPT": {
+      "status": "PASS",
+      "scope": "Exact S12 manifest-selected 58-file snapshot only",
+      "receiver": "Did not participate in S12 or S4-S12 implementation/route decisions",
+      "canonical_source_sha256": "dcfd9bccda57edb0cfbc4c953ae5fbd640535cd67dfba59756c2aae6949e4188",
+      "manifest_sha256": "e333b5a7bda6b067ca3a626946c8bfa34c53fdade64f8bd4cb61bb626d3a78e"
+    },
+    "S14_INDEPENDENT_RECEIPT": {
+      "status": "NOT_RUN",
+      "reason": "S14 implementation and its current functional reruns were performed by the S14 author"
+    },
+    "DCF_BCG21_FIG1_CORRECTNESS": {
+      "status": "PASS",
+      "scope": "Conformance only: AES KAT; exhaustive small domains; Bin 34..53 boundaries; beta variants; serialization, strict-< and wrapped uCMP adapter"
+    },
+    "SELECT5_ORACLE_E2E_N_LE_256": {
+      "status": "PASS",
+      "scope": "13 BCG ABI success rows; TEST_ONLY controller XOR reconstruction checked frozen stable Top-K oracle"
+    },
+    "ABORT_NO_MASK": {
+      "status": "PASS",
+      "scope": "6 BCG fault rows: package tamper, disconnect, K mismatch, wrong TLS identity, early T exit, malformed seed"
+    },
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL",
+      "assumptions": [
+        "BCG+21 Theorem 2 / Appendix F.1 applies to the semantic key distribution mapped in the S14 bridge",
+        "AES-128 is a secure PRP for the stated time and five-query bound",
+        "epsilon_RNG_joint(T;X) is the computational advantage for the actual joint RAND_bytes/getrandom output under X versus mutually independent uniform bits, including party-visible getrandom-derived mask-share auxiliary information"
+      ],
+      "symbolic_bound": "delta_w <= w*epsilon_G + epsilon_RNG_joint(T;slot); epsilon_G <= Adv_AES128_PRP(T,q=5)+10/2^128; Convert_G loss 0"
+    },
+    "CORRELATED_POOL_KEY_ONLY": {
+      "status": "CONDITIONAL",
+      "N128_bound": "1,639,424*epsilon_G + epsilon_RNG_joint(T;M6B5/v3,N128)",
+      "N256_bound": "6,719,104*epsilon_G + epsilon_RNG_joint(T;M6S2/v2,N256)",
+      "DCF_root_bytes": {"N128": 1312768, "N256": 5246976},
+      "scope": "Per-party DCF key projection, canonical serialization/digest, independently generated one-shot slots; not opened transcript composition"
+    },
+    "ADAPTIVE_QUERY_SIMULATION": {
+      "status": "OPEN",
+      "first_missing_hybrid": "Replace actual joint local mask shares, opened masked operands/compare bit, selected key/eval share and future adaptive state using only approved L, ideal output and the corrupted party input share"
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION": {
+      "status": "OPEN",
+      "first_missing_hybrid": "Compose the actual forward/inverse shuffle state and local output share/no-mask state with the DCF/UCMP transcript simulator"
+    },
+    "JOINT_PARTY_VIEW": {
+      "status": "OPEN",
+      "attack_found": false,
+      "statement": "No concrete attack found; full proof not closed"
+    },
+    "MATERIAL_CAPACITY_N128": {
+      "status": "PASS_FOR_TESTED_PROFILE",
+      "schema": "M6B5/v3 + M2CM/v1 + M6P2/v1; M2B1/v1",
+      "observed_bytes_per_party": 44985596,
+      "cap_bytes_per_party": 67108864
+    },
+    "MATERIAL_CAPACITY_N256": {
+      "status": "PASS_FOR_TESTED_PROFILE",
+      "schema": "M6S2/v2 ABI id 1; M2B1/v1",
+      "observed_bytes_per_party": 192644416,
+      "manifest_bytes_per_party": 12656192,
+      "segments_per_party": 11,
+      "note": "Local storage observation, not network/performance measurement"
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "NO_GO",
+      "evidence": "N=257 streamed preflight rejected"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NO"
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "V3": "OPEN",
+      "V4": "NOT_ALLOWED_NOT_RUN",
+      "formal_LAN_WAN": "NOT_ALLOWED_NOT_RUN",
+      "reason": "Retain existing V3-to-V4 prerequisite; no new performance gate introduced"
+    }
+  },
+  "functional_diagnostics_not_performance": {
+    "algorithm_iterations": 5,
+    "plain_comparison_dependency_layers_max": 9,
+    "observed_end_to_end_online_exchanges": "13..32 across listed E2E cases",
+    "N128_comparison_calls_min_median_max": [311, 370, 2938],
+    "N256_comparison_calls_min_median_max": [605, 619, 12055]
+  },
+  "report": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_REPORT_2026-10-15.md",
+  "dcf_bridge": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_DCF_BRIDGE_2026-10-15.md",
+  "case_file": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_E2E_CASES_2026-10-15.json"
+}
