@@ -1,0 +1,148 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s41-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S41",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall": {
+    "escrow_continuation": "OPEN_WITH_EXACT_GAP",
+    "full_security": "OPEN",
+    "build": "NOT_RUN",
+    "test": "NOT_RUN",
+    "formal_lan_wan": "NOT_RUN",
+    "rtt": "NOT_MEASURED",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "fixed_identity": {
+    "s40_commit": "b04618117b11cffe0e899947726ab1c66807ffdd",
+    "s40_parent_review_commit": "b3b04dd835b355193b83d689c698a688267605bc",
+    "s39_runtime_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s40_source_count": 85,
+    "s40_canonical_sha256": "10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6"
+  },
+  "proof_scope": {
+    "corruption": "one static semi-honest party",
+    "A_T": "conditionally trusted; non-colluding with corrupted party",
+    "preprocessing": "ideal F_T/v1",
+    "execution": "successful path without I/O/process faults",
+    "fetch": "optional single authenticated fetch from already COMMITTED state",
+    "L_S29_expanded": false,
+    "roles_changed": false,
+    "F_TOPK_output_changed": false,
+    "arbitrary_crash_abort_prefix": "OUT_OF_SCOPE",
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "physical_power_loss": "NOT_PROVED"
+  },
+  "gates": [
+    {
+      "id": "s40_commit_and_parent_chain",
+      "status": "PASS",
+      "evidence": "S41 starts at b04618117b11cffe0e899947726ab1c66807ffdd; parent is b3b04dd835b355193b83d689c698a688267605bc; runtime baseline is 8028c0fece69fe0c648b1e0f1e12ad7fca723f20."
+    },
+    {
+      "id": "s40_85_file_manifest_reconstruction",
+      "status": "PASS",
+      "evidence": "All 85 recorded raw hashes match the preserved S40 worktree; recomputed canonical SHA-256 is 10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6."
+    },
+    {
+      "id": "s41_checkout_content_identity",
+      "status": "PASS_WITH_EOL_NOTE",
+      "evidence": "The new checkout is at the exact S40 commit with clean Git diff; two Markdown working-tree byte streams have checkout newline differences, while preserved S40 raw files match the manifest."
+    },
+    {
+      "id": "runtime_and_vfss_baseline_unchanged",
+      "status": "PASS",
+      "evidence": "No runtime source or VFSS-baseline changes in this proof-only worktree."
+    },
+    {
+      "id": "honest_peer_endpoint_causal_route",
+      "status": "REVIEWED_LOCAL_ROUTE_ONLY",
+      "evidence": "Independent reviewer confirms the honest existing P_(1-b) endpoint can cause the second authenticated deposit using only its own ideal output/package; Sim_b receives no peer secret/context/J_b and no unconditional success oracle is used. This does not establish joint prefix simulation."
+    },
+    {
+      "id": "party_simulator_permission_boundary",
+      "status": "PASS_IN_CANDIDATE_SPEC",
+      "evidence": "Sim_b receives only its own state and actual A response; peer package/share/credential, A context, T private key and reduction-only J_b stay outside."
+    },
+    {
+      "id": "conditional_escrow_kernel_equation",
+      "status": "PASS_FIXED_S_PRE_ONLY",
+      "evidence": "For a fixed complete pre-submit state, the application-layer escrow continuation follows the source state machine. This is a local kernel result only."
+    },
+    {
+      "id": "prefix_hidden_state_joint_law",
+      "status": "OPEN_WITH_EXACT_GAP",
+      "evidence": "No proof/sampler establishes Law_real(H_b | Q_b) = Law_ideal(H_b | Q_b), where Q_b=(x_b,z_b,L_S29,pkg_b,static_b,Vpre_b,C_b) and H_b contains peer output/package, A context and A pre-submit state. Fixed-S_pre kernel equality does not imply the required party-view joint law. Independent reviewer identified this as the first gap."
+    },
+    {
+      "id": "shared_ideal_invocation_binding",
+      "status": "OPEN_SPEC_REQUIRED",
+      "evidence": "The proof-only sampler must bind F_T/v1 and F_TOPK to one explicit tuple (session, invocation, N, K, route, circuit, gate_schedule); the S41 draft used same-invocation prose but omitted some fields from the F_TOPK call. This is an interface/specification gap, not a runtime defect."
+    },
+    {
+      "id": "escrow_response_field_projection",
+      "status": "PASS_SOURCE_REVIEWED",
+      "evidence": "Source response projection includes status, transaction length, ciphertext length, 32-byte token, transaction, and optional ciphertext; cited at score_to_mask_v3_escrow.cpp:472-482."
+    },
+    {
+      "id": "A_LA_vs_party_LS29",
+      "status": "PASS_IN_CANDIDATE_SPEC",
+      "evidence": "A-only context/package-set/cipher hashes/length/state/order/timing remain in L_A; L_S29 is unchanged."
+    },
+    {
+      "id": "receipt_v2_local_token_lemma",
+      "status": "INHERITED_CONDITIONAL_PASS_S39_S40",
+      "evidence": "No re-derivation; ideal independent A RNG local 32-byte token result only."
+    },
+    {
+      "id": "ideal_FT_to_real_dealer_bridge",
+      "status": "NOT_STARTED_BLOCKED_BY_PREFIX_JOINT_LAW",
+      "evidence": "Not attempted. First close and independently review the hidden-state/pre-submit-prefix conditional law; only then continue to joint Beaver/permutation law, package/signature binding and real RNG/TLS bridge."
+    },
+    {
+      "id": "full_GMW_party_view_security",
+      "status": "OPEN",
+      "evidence": "A conditional escrow continuation is not a complete protocol simulator or security proof."
+    },
+    {
+      "id": "S40_211_case_matrix",
+      "status": "INHERITED_NOT_RERUN",
+      "evidence": "S40 PASS_WITH_SCOPE remains historical functional evidence; no matrix was repeated."
+    },
+    {
+      "id": "natural_business_phase_io_fault",
+      "status": "NOT_REPRODUCED_IN_S40; NOT_RUN_IN_S41",
+      "evidence": "S41 is proof/documentation only and ran no I/O experiment."
+    },
+    {
+      "id": "fault_injection",
+      "status": "NOT_RUN",
+      "evidence": "No SIGKILL, timeout, lost receipt or other fault injection in this proof review."
+    },
+    {
+      "id": "default_off_secure_alias",
+      "status": "INHERITED_DEFAULT_OFF; ALIAS_NOT_CREATED",
+      "evidence": "No build or configuration change in S41."
+    },
+    {
+      "id": "formal_performance_rtt_n_gt_256",
+      "status": "NOT_RUN_NOT_MEASURED_NOT_ADMITTED",
+      "evidence": "No formal LAN/WAN, RTT or N>256 experiment."
+    },
+    {
+      "id": "push_merge_and_secrets",
+      "status": "NOT_PERFORMED; NO_SECRET_OR_BUILD_ARTIFACTS",
+      "evidence": "S41 is local documentation-only evidence; no keys, materials, certificates, build products or raw logs added."
+    }
+  ],
+  "review": {
+    "reviewer": "/root/s40_independent_receiver",
+    "relationship": "not involved in S41 derivation; read-only review of endpoint permissions, same-invocation bindings, source response fields and conditional joint-law step",
+    "status": "COMPLETED_OPEN_WITH_EXACT_GAP",
+    "verdict": "The causal honest endpoint route is valid as a local route specification, but equality of continuation kernels conditional on a complete hidden S_pre does not establish the party-view joint law. The first missing item is Law_real(H_b|Q_b) versus Law_ideal(H_b|Q_b), or a valid sampler/distance bound; common invocation parameters also need explicit binding."
+  },
+  "secure_alias": "NOT_CREATED",
+  "v3_default": "OFF",
+  "receipt_v2_default": "OFF",
+  "push": "NOT_PERFORMED",
+  "merge": "NOT_PERFORMED"
+}
