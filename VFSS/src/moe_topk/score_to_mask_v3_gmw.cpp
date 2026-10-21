@@ -43,6 +43,14 @@ constexpr std::string_view kScheduleDescription =
 
 void fail(const std::string& what) { throw std::runtime_error(what); }
 
+bool receipt_format_supported(std::uint8_t version) {
+  if (version == kScoreToMaskV3ReceiptFormatV1) return true;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+  if (version == kScoreToMaskV3ReceiptFormatV2) return true;
+#endif
+  return false;
+}
+
 void append_u32(std::vector<std::uint8_t>& out, std::uint32_t value) {
   out.push_back(static_cast<std::uint8_t>(value >> 24U));
   out.push_back(static_cast<std::uint8_t>(value >> 16U));
@@ -499,7 +507,7 @@ void score_to_mask_v3_dealer_issue_packages(
       escrow_state.max_ciphertext_bytes == 0 ||
       escrow_state.max_ciphertext_bytes > kScoreToMaskV3MaxPackageBytes ||
       escrow_state.pending_restart_policy != 1 ||
-      escrow_state.receipt_format_version != 1)
+      !receipt_format_supported(escrow_state.receipt_format_version))
     fail("v3 escrow state parameters are unsupported");
   auto signer = read_key(dealer_ed25519_private_key_pem, true);
   const auto signer_fp = key_fingerprint(signer.get());
@@ -668,7 +676,8 @@ ScoreToMaskV3EscrowContext score_to_mask_v3_validate_escrow_context(
   read_array(bytes, at, context.signer_identity_sha256);
   context.state.transaction_wait_timeout_ms = read_u32(bytes, at);
   context.state.max_ciphertext_bytes = read_u32(bytes, at);
-  if (at + 4 != body_size || bytes[at] != 1 || bytes[at + 1] != 1 ||
+  if (at + 4 != body_size || bytes[at] != 1 ||
+      !receipt_format_supported(bytes[at + 1]) ||
       bytes[at + 2] != 0 || bytes[at + 3] != 0)
     fail("v3 escrow context state-machine parameters unsupported");
   context.state.pending_restart_policy = bytes[at++];
@@ -695,6 +704,7 @@ ScoreToMaskV3EscrowContext score_to_mask_v3_validate_escrow_context(
       context.state.transaction_wait_timeout_ms > 60000U ||
       context.state.max_ciphertext_bytes == 0 ||
       context.state.max_ciphertext_bytes > kScoreToMaskV3MaxPackageBytes ||
+      !receipt_format_supported(context.state.receipt_format_version) ||
       all_zero(context.signer_identity_sha256))
     fail("v3 escrow context fields invalid");
   auto verifier = read_key(dealer_ed25519_public_key_pem, false);

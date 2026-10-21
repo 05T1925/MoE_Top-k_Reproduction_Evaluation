@@ -385,9 +385,9 @@ void write_process_output(const std::string& path,
   out.write(output.abort_code.data(), static_cast<std::streamsize>(output.abort_code.size()));
   write_u32(out, static_cast<std::uint32_t>(output.transaction_id.size()));
   out.write(output.transaction_id.data(), static_cast<std::streamsize>(output.transaction_id.size()));
-  write_u32(out, static_cast<std::uint32_t>(output.commit_receipt_sha256.size()));
-  out.write(output.commit_receipt_sha256.data(),
-            static_cast<std::streamsize>(output.commit_receipt_sha256.size()));
+  write_u32(out, static_cast<std::uint32_t>(output.commit_receipt.size()));
+  out.write(output.commit_receipt.data(),
+            static_cast<std::streamsize>(output.commit_receipt.size()));
   write_u32(out, static_cast<std::uint32_t>(output.local_mask_share.size()));
   out.write(reinterpret_cast<const char*>(output.local_mask_share.data()),
             static_cast<std::streamsize>(output.local_mask_share.size()));
@@ -862,10 +862,11 @@ int party_worker(int argc, char** argv) {
 }
 
 int dealer_worker(int argc, char** argv) {
-  if (argc != 8) return 64;
+  if (argc != 9) return 64;
   const auto session = read_session_file(argv[2]);
   ScoreToMaskV3EscrowStateParameters state;
   state.transaction_wait_timeout_ms = static_cast<std::uint32_t>(std::stoul(argv[7]));
+  state.receipt_format_version = static_cast<std::uint8_t>(std::stoul(argv[8]));
   score_to_mask_v3_dealer_issue_packages(session, argv[3], argv[4], argv[5],
                                           argv[6], state);
   return 0;
@@ -891,12 +892,15 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                  const std::vector<std::int32_t>& scores, std::uint32_t k,
                  bool lose_receipt_p0 = false,
                  bool fail_p1_before_submit = false,
-                 bool timeout_precommit = false) {
+                 bool timeout_precommit = false,
+                 std::uint8_t receipt_format_version = 1) {
   if (std::getenv("S35_TRACE_CASES") != nullptr)
     std::cerr << "S35_CASE_START dir=" << directory << " n=" << scores.size()
               << " k=" << k << " lost_receipt=" << lose_receipt_p0
               << " p1_pre_submit_failure=" << fail_p1_before_submit
-              << " precommit_timeout=" << timeout_precommit << '\n';
+              << " precommit_timeout=" << timeout_precommit
+              << " receipt_version=" << static_cast<unsigned>(receipt_format_version)
+              << '\n';
   const auto diagnostic_start = std::chrono::steady_clock::now();
   ScoreToMaskV3Session session;
   if (RAND_bytes(session.session.data(), 16) != 1 ||
@@ -923,7 +927,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   write_session_file(session_path, session);
   ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
       p1_package, context_path, identities.dealer_private,
-      timeout_precommit ? "2000" : "15000"}));
+      timeout_precommit ? "2000" : "15000",
+      std::to_string(static_cast<unsigned>(receipt_format_version))}));
   require(dealer.wait() == 0, "T process failed to issue bound packages");
   const auto package_info = score_to_mask_v3_validate_package(
       p0_package, identities.dealer_public, session, 0);
@@ -1034,6 +1039,15 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   if (!lose_receipt_p0 && !fail_p1_before_submit)
     require(output0.receipt == output1.receipt,
             "parties received different durable escrow commit receipts");
+  if (receipt_format_version == 2 &&
+      !fail_p1_before_submit && !timeout_precommit) {
+    const auto& delivered_token = lose_receipt_p0 ? output1.receipt : output0.receipt;
+    require(delivered_token.size() == 64 &&
+                std::all_of(delivered_token.begin(), delivered_token.end(),
+                    [](char c) { return (c >= '0' && c <= '9') ||
+                                        (c >= 'a' && c <= 'f'); }),
+            "receipt/v2 did not return a fixed 32-byte opaque token");
+  }
   require(output0.phases == output1.phases && output0.phases <=
               score_to_mask_v3_gate_budget(session.n).key_bits + 51U,
           "observed party exchange phases exceed the S31 DAG bound");
@@ -1093,9 +1107,9 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
         recovery0, package_info, 0, output0.transaction);
     const auto recovered_cipher1 = score_to_mask_v3_escrow_fetch(
         recovery1, package_info_p1, 1, output1.transaction);
-    require(recovered_cipher0.commit_receipt_sha256 ==
-                recovered_cipher1.commit_receipt_sha256 &&
-                recovered_cipher1.commit_receipt_sha256 == output1.receipt,
+    require(recovered_cipher0.commit_receipt ==
+                recovered_cipher1.commit_receipt &&
+                recovered_cipher1.commit_receipt == output1.receipt,
             "escrow recovery did not return the common durable commit receipt");
     const auto recovered0 = score_to_mask_v3_decrypt_recipient_share(
         recovered_cipher0.recipient_ciphertext,
@@ -1115,11 +1129,30 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                 recovered_cipher0.recipient_ciphertext &&
                 replayed_cipher1.recipient_ciphertext ==
                 recovered_cipher1.recipient_ciphertext &&
-                replayed_cipher0.commit_receipt_sha256 ==
-                recovered_cipher0.commit_receipt_sha256 &&
-                replayed_cipher1.commit_receipt_sha256 ==
-                recovered_cipher1.commit_receipt_sha256,
+                replayed_cipher0.commit_receipt ==
+                recovered_cipher0.commit_receipt &&
+                replayed_cipher1.commit_receipt ==
+                recovered_cipher1.commit_receipt,
             "repeated post-restart fetch changed ciphertext or receipt");
+    if (receipt_format_version == 2) {
+      const auto duplicate_receipt = score_to_mask_v3_escrow_submit(
+          recovery0, package_info, 0, output0.transaction,
+          recovered_cipher0.recipient_ciphertext);
+      require(duplicate_receipt == recovered_cipher0.commit_receipt,
+              "duplicate submit did not reuse the committed receipt");
+      auto changed_ciphertext = recovered_cipher0.recipient_ciphertext;
+      require(!changed_ciphertext.empty(), "fetched ciphertext unexpectedly empty");
+      changed_ciphertext.back() ^= 1U;
+      bool changed_duplicate_rejected = false;
+      try {
+        (void)score_to_mask_v3_escrow_submit(
+            recovery0, package_info, 0, output0.transaction, changed_ciphertext);
+      } catch (const std::exception&) {
+        changed_duplicate_rejected = true;
+      }
+      require(changed_duplicate_rejected,
+              "duplicate submit with changed ciphertext was accepted");
+    }
     auto wrong_identity = recovery1;
     wrong_identity.tls_credentials = {identities.ca_certificate,
         identities.p0_tls.certificate, identities.p0_tls.private_key};
@@ -1591,6 +1624,38 @@ int main(int argc, char** argv) {
       run_one_e2e(binary, timeout, identities, {INT32_MAX, 1, 1}, 1,
                   false, false, true);
       std::cout << "S32 score-to-mask-v3 escrow fault recovery PASS\n";
+      return 0;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--receipt-v2-only") {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+      const auto success = (std::filesystem::path(directory.path) /
+                            "receipt-v2-success").string();
+      std::filesystem::create_directory(success);
+      run_one_e2e(binary, success, identities, {-7, 11, 11, INT32_MIN}, 2,
+                  false, false, false, kScoreToMaskV3ReceiptFormatV2);
+      const auto lost = (std::filesystem::path(directory.path) /
+                         "receipt-v2-lost-response").string();
+      std::filesystem::create_directory(lost);
+      run_one_e2e(binary, lost, identities, {-9, -9, 10, INT32_MIN}, 2,
+                  true, false, false, kScoreToMaskV3ReceiptFormatV2);
+      const auto abort = (std::filesystem::path(directory.path) /
+                          "receipt-v2-precommit-abort").string();
+      std::filesystem::create_directory(abort);
+      run_one_e2e(binary, abort, identities, {5, 5, 0}, 2,
+                  false, true, false, kScoreToMaskV3ReceiptFormatV2);
+      std::cout << "S39 receipt/v2 targeted independent-process E2E PASS\n";
+      return 0;
+#else
+      throw std::runtime_error(
+          "receipt/v2 E2E requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON");
+#endif
+    }
+    if (argc > 1 && std::string(argv[1]) == "--receipt-v1-smoke") {
+      const auto v1_smoke = (std::filesystem::path(directory.path) /
+                             "receipt-v1-smoke").string();
+      std::filesystem::create_directory(v1_smoke);
+      run_one_e2e(binary, v1_smoke, identities, {-7, 11, 11, INT32_MIN}, 2);
+      std::cout << "S39 receipt/v1 compatibility E2E PASS\n";
       return 0;
     }
     struct Fixture {

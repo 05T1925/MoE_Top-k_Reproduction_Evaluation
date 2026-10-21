@@ -762,7 +762,7 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     output.state = ScoreToMaskV3PartyOutput::State::kCommitted;
     output.local_mask_share = std::move(local_output);
     output.transaction_id = expected_transaction;
-    output.commit_receipt_sha256 = receipt;
+    output.commit_receipt = receipt;
     output.party_channel_bytes_sent = peer_channel.sent_bytes();
     output.party_channel_bytes_received = peer_channel.received_bytes();
     output.party_channel_frames_sent = peer_channel.sent_frames();
@@ -776,7 +776,7 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     output.state = ScoreToMaskV3PartyOutput::State::kAborted;
     output.local_mask_share.clear();
     output.transaction_id.clear();
-    output.commit_receipt_sha256.clear();
+    output.commit_receipt.clear();
     output.abort_code = "ABORT_V3";
     output.party_channel_bytes_sent = peer_channel.sent_bytes();
     output.party_channel_bytes_received = peer_channel.received_bytes();

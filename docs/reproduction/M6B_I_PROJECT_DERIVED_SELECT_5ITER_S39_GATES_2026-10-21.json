@@ -1,0 +1,206 @@
+{
+  "schema": "m6b-i-project-select5iter-s39-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S39",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall_security_status": "OPEN_WITH_EXACT_GAP",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_five_iteration_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "secure_implementation": false,
+    "cryptographic_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "receipt_v2_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "baseline": {
+    "s38_start_commit": "2f350b6d79fc88df381347b597cbead4398a7902",
+    "s37_parent": "5c31ebfeaf6eb072421badf31d7354431b984d35",
+    "s36_ancestor": "ca5eb001e72c971a7dbaf87d789d4a7fbcba1b9a",
+    "s35_runtime_commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "s35_source_file_count": 85,
+    "s35_source_canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "s38_runtime_source_diff_from_s35": "NONE",
+    "s39_worktree": "C:\\Users\\28641\\.codex\\worktrees\\s39-receipt-v2\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s39",
+    "starting_worktree_clean": true,
+    "source_snapshot_hashes_recomputed": 85,
+    "source_snapshot_canonical_hash": "0c385152e4bcceb64de3d6c19666a5bc8f4b9330adc151800f927865db4df3bb",
+    "vfss_baseline_modified": false,
+    "s37_s38_history_worktrees_modified": false
+  },
+  "decision": {
+    "receipt_v1_h4_to_simulator": "OPEN_WITH_EXACT_GAP",
+    "receipt_v1_gap": "R_v1 hashes hidden context_hash and package_set_hash and both ciphertext hashes into a party-visible deterministic value; H4 gives no joint conditional sampler for those hidden values with Vpre_b,z_b,L_S29,pkg_b.",
+    "receipt_v2_ideal_token_step": "CONDITIONAL_PENDING_INDEPENDENT_CRYPTO_REVIEW",
+    "receipt_v2_real_rng_bridge": "OPEN_ADV_DRBG_A_Q_UNQUANTIFIED",
+    "receipt_v2_party_mac": "NOT_REQUIRED_IN_CONDITIONALLY_TRUSTED_A_MODEL; party validates encoding and TLS service identity only",
+    "next_exact_gap": "Ideal F_T/v1 joint material/signature/random-tape generation to the real offline Dealer, OpenSSL DRBG and signing implementation.",
+    "inherited_s38_jb_and_g0_g1": "CONDITIONAL_PASS_REVIEWED_HISTORICAL_NOT_REPEATED",
+    "attack_observed": false,
+    "full_party_view_theorem": "OPEN_WITH_EXACT_GAP"
+  },
+  "scope": {
+    "corruption": "One static semi-honest P_b; A/T conditionally trusted, honest and non-colluding",
+    "preprocessing": "Ideal F_T/v1; real Dealer implementation bridge not established",
+    "execution": "Successful no-I/O/no-process-fault transcript",
+    "fetch": "One successful authenticated party fetch from an already COMMITTED state",
+    "l_s29_expanded": false,
+    "f_topk_atomic_changed": false,
+    "arbitrary_crash_abort_prefix_privacy": "OUT_OF_SCOPE",
+    "a_only_corruption": "OUT_OF_SCOPE",
+    "party_a_or_t_collusion": "OUT_OF_SCOPE",
+    "physical_power_loss_or_media_corruption": "NOT_PROVED",
+    "a_view_l_a": "Separate; retains context/package hashes, ciphertexts/hashes/lengths, transaction states, receipt, order and timing"
+  },
+  "gates": [
+    {
+      "id": "exact_s38_baseline_and_s35_ancestry",
+      "status": "PASS",
+      "evidence": "Starting HEAD is exact S38 commit; ancestry and S35 85-entry canonical manifest verified."
+    },
+    {
+      "id": "receipt_v1_h4_joint_simulation",
+      "status": "OPEN_WITH_EXACT_GAP",
+      "evidence": "No conditional joint law from H4 party prefix to hidden A context/package-set digest and deterministic R_v1; collision resistance is not a hiding assumption."
+    },
+    {
+      "id": "s38_peer_ciphertext_hybrid_jb",
+      "status": "INHERITED_CONDITIONAL_PASS_REVIEWED_NOT_REPEATED",
+      "evidence": "S38 reduction-only J_b and G0-to-G1 envelope replacement are historical and were not re-proved in S39."
+    },
+    {
+      "id": "receipt_v2_ideal_token_conditional_law",
+      "status": "CONDITIONAL_PENDING_INDEPENDENT_CRYPTO_REVIEW",
+      "evidence": "For independent U uniform over 256 bits, Pr[U=u | H4 tuple, hidden ctx_A, package/cipher hashes]=2^-256; service response/status/tx/fetch are post-processing with cached C_b and U."
+    },
+    {
+      "id": "receipt_v2_real_rng",
+      "status": "OPEN",
+      "evidence": "A uses OpenSSL RAND_bytes; Adv_DRBG_A(q) must cover joint token and party-observable DRBG outputs; no numerical advantage claimed."
+    },
+    {
+      "id": "receipt_v2_opt_in_build_isolation",
+      "status": "PASS",
+      "evidence": "New CMake option defaults OFF and requires explicit GMW v3 option; unknown versions reject."
+    },
+    {
+      "id": "party_receipt_authentication_requirement",
+      "status": "SOURCE_CONFIRMED",
+      "evidence": "Party checks fixed 64-character lowercase-hex encoding and TLS identity; it does not cryptographically verify receipt content. No MAC is required under trusted-A baseline."
+    },
+    {
+      "id": "v1_v2_targeted_conformance_and_process_e2e",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "v2 OFF conformance and v1 smoke passed; opt-in v2 conformance and independent-process success/lost-response recovery/precommit abort/restart/fetch/duplicate/identity cases passed."
+    },
+    {
+      "id": "initial_receipt_v2_decode_failure",
+      "status": "REPRODUCED_AND_FIXED",
+      "evidence": "First v2 run rejected context because decoder required receipt format 1; decoder now checks supported version; failed and passing outputs preserved in external log hash."
+    },
+    {
+      "id": "ideal_ft_v1_to_real_dealer_signature_drbg",
+      "status": "OPEN_NOT_REACHED"
+    },
+    {
+      "id": "independent_s39_crypto_review",
+      "status": "PENDING",
+      "reviewed_by": null,
+      "result": null
+    },
+    {
+      "id": "n_le_256_functional_scope",
+      "status": "S35_ACCEPTED_SCOPE; S39_V2_TESTS_N3_N4_ONLY"
+    },
+    {
+      "id": "n_gt_256",
+      "status": "NOT_ADMITTED"
+    },
+    {
+      "id": "s35_195_case_matrix",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "n128_n256_receipt_v2_e2e",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "natural_io_fault",
+      "status": "NOT_RUN_S39; NOT_REPRODUCED_HISTORICALLY"
+    },
+    {
+      "id": "formal_lan_wan",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "physical_rtt",
+      "status": "NOT_MEASURED"
+    },
+    {
+      "id": "secure_alias",
+      "status": "NOT_CREATED"
+    },
+    {
+      "id": "push_merge",
+      "status": "NOT_PERFORMED"
+    },
+    {
+      "id": "receipt_v2_without_gmw_rejected",
+      "status": "PASS",
+      "evidence": "Fresh CMake configure with receipt/v2 ON and GMW v3 OFF failed at the explicit dependency guard; output hash is recorded in the source/build/evidence manifest."
+    }
+  ],
+  "build_test": {
+    "status": "TARGETED_BUILD_AND_TESTS_RUN",
+    "environment": {
+      "os": "WSL Ubuntu 24.04",
+      "cmake": "3.28.3",
+      "ninja": "1.11.1",
+      "compiler": "GCC 13.3.0",
+      "openssl": "3.0.13",
+      "sqlite": "system runtime; external header package"
+    },
+    "build_dirs_outside_repository": true,
+    "formal_performance": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED"
+  },
+  "cryptographic_advantages": {
+    "receipt_v2_ideal_token": "EXACT_CONDITIONAL_UNIFORMITY_IN_IDEAL_A_RNG_MODEL",
+    "a_drbg": "Adv_DRBG_A(q), SYMBOLIC_UNQUANTIFIED",
+    "s38_envelope_ind_cpa": "INHERITED_SYMBOLIC_NOT_REPEATED",
+    "signature": "SYMBOLIC_UNQUANTIFIED",
+    "tls": "SYMBOLIC_UNQUANTIFIED",
+    "hash_binding": "SYMBOLIC; NOT_USED_AS_HIDING_FOR_V2_RECEIPT",
+    "rsa_oaep_aes_gcm_and_nonce": "INHERITED_SYMBOLIC_UNQUANTIFIED",
+    "ideal_ft_to_real_generator": "OPEN_NOT_REACHED"
+  },
+  "changes": {
+    "runtime_files": [
+      "VFSS/CMakeLists.txt",
+      "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+      "VFSS/src/moe_topk/score_to_mask_v3_party.cpp"
+    ],
+    "test_files": [
+      "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+      "VFSS/tests/moe_topk/score_to_mask_v3_runtime_conformance_test.cpp"
+    ],
+    "documentation_files": [
+      "docs/IMPLEMENTATION_PLAN.md",
+      "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_DECISION_2026-10-21.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_REPORT_2026-10-21.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_GATES_2026-10-21.json",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json"
+    ],
+    "vfss_baseline_modified": false,
+    "historical_s37_s38_evidence_modified": false,
+    "build_artifacts_keys_materials_certificates_or_raw_large_logs_added": false
+  },
+  "self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE"
+}

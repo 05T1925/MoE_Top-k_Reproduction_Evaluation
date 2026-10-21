@@ -18,6 +18,8 @@ namespace moe_topk {
 inline constexpr std::uint32_t kScoreToMaskV3ProtocolVersion = 3;
 inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersion = 4;
 inline constexpr std::uint32_t kScoreToMaskV3EscrowContextFormatVersion = 1;
+inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV1 = 1;
+inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV2 = 2;
 inline constexpr std::uint32_t kScoreToMaskV3MaxN = 256;
 inline constexpr std::size_t kScoreToMaskV3MaxPackageBytes = 2U * 1024U * 1024U;
 inline constexpr std::size_t kScoreToMaskV3MaxMetadataBytes = 64U * 1024U;
@@ -60,7 +62,7 @@ struct ScoreToMaskV3EscrowStateParameters {
   std::uint32_t max_ciphertext_bytes =
       static_cast<std::uint32_t>(kScoreToMaskV3MaxPackageBytes);
   std::uint8_t pending_restart_policy = 1;  // abort pending transactions
-  std::uint8_t receipt_format_version = 1;
+  std::uint8_t receipt_format_version = kScoreToMaskV3ReceiptFormatV1;
 };
 
 // Signed, metadata-only context consumed by escrow A. It intentionally has no
@@ -113,7 +115,10 @@ struct ScoreToMaskV3PartyOutput {
   enum class State { kAborted, kRecoveryRequired, kCommitted } state = State::kAborted;
   std::vector<std::uint8_t> local_mask_share;
   std::string transaction_id;
-  std::string commit_receipt_sha256;
+  // Opaque 32-byte receipt encoded as lowercase hex. The signed escrow
+  // context selects receipt/v1 (deterministic digest) or opt-in receipt/v2
+  // (A-generated random token); parties validate encoding, not authenticity.
+  std::string commit_receipt;
   std::string abort_code;
   std::uint64_t party_channel_bytes_sent = 0;
   std::uint64_t party_channel_bytes_received = 0;
@@ -143,7 +148,7 @@ struct ScoreToMaskV3EscrowServerConfig {
 
 struct ScoreToMaskV3EscrowFetchedRecord {
   std::vector<std::uint8_t> recipient_ciphertext;
-  std::string commit_receipt_sha256;
+  std::string commit_receipt;
 };
 
 using ScoreToMaskV3EscrowSubmitter = std::function<std::string(

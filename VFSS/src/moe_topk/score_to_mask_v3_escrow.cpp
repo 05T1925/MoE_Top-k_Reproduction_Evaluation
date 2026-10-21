@@ -246,6 +246,18 @@ std::array<std::uint8_t, 32> make_receipt(
     const ScoreToMaskV3EscrowContext& context, const std::string& transaction,
     const std::array<std::uint8_t, 32>& hash0,
     const std::array<std::uint8_t, 32>& hash1) {
+  if (context.state.receipt_format_version == kScoreToMaskV3ReceiptFormatV2) {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+    std::array<std::uint8_t, 32> token{};
+    if (RAND_bytes(token.data(), static_cast<int>(token.size())) != 1)
+      fail("v3 opaque receipt/v2 CSPRNG failed");
+    return token;
+#else
+    fail("v3 opaque receipt/v2 is not enabled in this build");
+#endif
+  }
+  if (context.state.receipt_format_version != kScoreToMaskV3ReceiptFormatV1)
+    fail("v3 escrow receipt format is unsupported");
   static constexpr std::array<std::uint8_t, 32> domain = {
       's','c','o','r','e','-','t','o','-','m','a','s','k','-','v','3','/',
       'e','s','c','r','o','w','/','c','o','m','m','i','t','/','1'};
@@ -852,7 +864,7 @@ ScoreToMaskV3EscrowFetchedRecord score_to_mask_v3_escrow_fetch(
   ScoreToMaskV3EscrowFetchedRecord result;
   result.recipient_ciphertext = request_service(
       config, package, party, kOpFetch, transaction, {}, receipt);
-  result.commit_receipt_sha256 = hex(receipt.data(), receipt.size());
+  result.commit_receipt = hex(receipt.data(), receipt.size());
   return result;
 }
 

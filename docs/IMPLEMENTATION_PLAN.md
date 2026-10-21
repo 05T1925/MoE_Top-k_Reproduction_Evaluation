@@ -1207,3 +1207,11 @@ S38 固定在 S37 commit 5c31ebfeaf6eb072421badf31d7354431b984d35 及其 S35 run
 S38 在 S35 电路正确性前提下得到输出份额点条件关系：对固定输入对，z_0 XOR z_1 = M_TOPK(x_0,x_1)，故归约器从外层输入对和 z_b 可精确算出 z_(1-b)。按明确列出的 proof-only F_T/v1 联合生成律与签名 oracle 运行两方 S35 pre-cipher 状态机，构造 reduction-only J_b-ENC-CHALLENGE/v1；其挑战消息对为 (z_(1-b),0^N)，不需要 peer 明文的条件 rejection，也不把对端材料/份额/context 交 party simulator。S35 的 Fisher–Yates 本身使用 rejection sampling；strict-PPT 截断误差为 ε_perm≤255·2^(-24λ)。peer envelope 的 IND-CPA 替换只比较真实本方前缀下的两个对端密文，A 哈希、receipt、COMMITTED response 与已提交 fetch 是该替换的有效率后处理，界为 Adv_Env-IND-CPA+2ε_perm，并依赖精确 envelope/key-setup 假设。
 
 完整 receipt/fetch simulator 仍为 OPEN_WITH_EXACT_GAP：S36 H4 没有建立本方 pre-cipher view 与同次 F_T setup 生成、只交 A 的 context/package-set commitment 以及 A 返回 receipt 之间的 joint law。密文替换的 G0→G1 没有把真实前缀替换成受限 Sim_b；SHA-256 碰撞抗性不推出此隐藏性，也不以“hash looks random”填缺口。证明接口修正候选、toy 边缘/联合反例和准确条件式见 S38 报告。没有攻击或 runtime defect 结论；本轮只改证明文档，没有 BUILD/TEST，也未启动正式 LAN/WAN/RTT。A-only 模型与任意 crash-prefix privacy 保持范围外，N>256 不准入，v3 默认 OFF、没有 secure alias，路线仍为 PROJECT_DERIVED / EXPERIMENTAL。非作者已复核 J 与首个停点，并仅对 reduction-only 子引理给出有条件认可；没有完整 hybrid 关闭意见。未推进至实际离线 Dealer/DRBG/signature 桥接。详见 S38 决策、报告、gates 和 source/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S39（2026-10-21）
+
+S39 从 S38 `2f350b6d79fc88df381347b597cbead4398a7902` 的隔离提交开始，沿用 S35 的 85 项规范源集合与 canonical identity。S38 的 reduction-only `J_b`/peer-envelope G0→G1 作为历史有条件子引理，不在本轮重报。receipt/v1 在 H4→party simulator 处仍 `OPEN_WITH_EXACT_GAP`：确定性 receipt 将 A-only 的 `context_hash`、`package_set_hash` 和两份密文摘要相关地映入 party 响应；既有碰撞抗性、边缘分布与密文替换不足以得到所需条件联合 law。
+
+S39 增加默认关闭的 receipt/v2 opt-in。显式签名 context 选择 v2 后，A 在最终写入第二密文、`COMMITTED` 与 receipt 的 SQL transaction 中生成并保存 32-byte token；同一值用于双方 commit 响应、重试与 committed fetch。party 只做固定格式检查，不验证 token 密码学内容；当前条件受信 A 模型无需 token MAC。理想 A 独立均匀源下，token 对 H4 前缀、hidden context/package 摘要、密文及本方理想输出条件均匀，故它移除 v1 receipt 的相关性而不扩张 L_S29。真实 `RAND_bytes` 桥仍为未量化的 `Adv_DRBG_A(q)`，receipt/v2 局部证明等待非作者密码学复核；整体安全门保持 OPEN，不构成完整模拟或安全 PASS。
+
+显式 opt-in 的 v2 conformance、提交/恢复/重复/fetch/身份拒绝独立进程 E2E 和 v1 兼容 smoke 通过。首轮发现 context decoder 仍拒绝 receipt format 2，修正后重跑通过并保留原失败日志摘要。未跑 S35 的 195 案、N=128/256 v2 E2E、正式 LAN/WAN、RTT 或自然故障。v3 默认 OFF，N>256 未准入，不创建 secure alias；不改 `VFSS-baseline/`，不推送/合并。下一证明断点是 ideal F_T/v1 到真实 Dealer、材料随机带、签名与 DRBG 的联合分布桥。参见 S39 决策、报告、机器 gates 与 source/build/evidence manifest。

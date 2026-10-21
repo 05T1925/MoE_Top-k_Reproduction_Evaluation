@@ -26,6 +26,13 @@ option(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL
     "Build the opt-in PROJECT_DERIVED_SELECT_5ITER Protocol I experimental path and tests" OFF)
 option(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL
     "Build the explicit score-to-mask-v3 GMW/Beaver experimental runtime and tests" OFF)
+option(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+    "Enable the opt-in opaque random receipt/v2 format for score-to-mask-v3" OFF)
+if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL AND
+   NOT MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
+    message(FATAL_ERROR
+        "Receipt/v2 requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON")
+endif()
 if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
     find_package(SQLite3 REQUIRED)
 endif()
@@ -93,6 +100,10 @@ endif()
 if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
     target_compile_definitions(${PROJECT_NAME} PUBLIC
         MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=1)
+    if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC
+            MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=1)
+    endif()
     target_sources(${PROJECT_NAME} PRIVATE
         src/moe_topk/score_to_mask_v3_gmw.cpp
         src/moe_topk/score_to_mask_v3_party.cpp
@@ -721,6 +732,10 @@ if(BUILD_TESTING)
                  COMMAND moe_topk_score_to_mask_v3_runtime_conformance_test)
         add_test(NAME moe_topk_score_to_mask_v3_process_e2e_test
                  COMMAND moe_topk_score_to_mask_v3_process_e2e_test)
+        if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL)
+            add_test(NAME moe_topk_score_to_mask_v3_receipt_v2_process_e2e_test
+                     COMMAND moe_topk_score_to_mask_v3_process_e2e_test --receipt-v2-only)
+        endif()
     endif()
     if(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)
         add_test(NAME moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test

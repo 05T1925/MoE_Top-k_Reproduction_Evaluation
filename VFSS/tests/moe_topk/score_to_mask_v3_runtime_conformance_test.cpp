@@ -141,6 +141,43 @@ void check_material_and_leases() {
           "metadata context does not bind the two signed packages");
   require(std::filesystem::file_size(escrow_context_path) < 1024,
           "metadata context unexpectedly contains package-sized material");
+  require(moe_topk::ScoreToMaskV3EscrowStateParameters{}.receipt_format_version == 1,
+          "receipt/v2 unexpectedly became the default format");
+  const auto p0_v2_path = (std::filesystem::path(temp.path) / "p0-v2.pkg").string();
+  const auto p1_v2_path = (std::filesystem::path(temp.path) / "p1-v2.pkg").string();
+  const auto context_v2_path =
+      (std::filesystem::path(temp.path) / "escrow-v2.context").string();
+  auto receipt_v2_state = moe_topk::ScoreToMaskV3EscrowStateParameters{};
+  receipt_v2_state.receipt_format_version =
+      moe_topk::kScoreToMaskV3ReceiptFormatV2;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+  moe_topk::score_to_mask_v3_dealer_issue_packages(
+      session, p0_v2_path, p1_v2_path, context_v2_path, keys.first,
+      receipt_v2_state);
+  const auto context_v2 = moe_topk::score_to_mask_v3_validate_escrow_context(
+      context_v2_path, keys.second);
+  require(context_v2.state.receipt_format_version ==
+              moe_topk::kScoreToMaskV3ReceiptFormatV2 &&
+              context_v2.party_package_sha256[0] !=
+                  context_v2.party_package_sha256[1],
+          "signed context did not preserve explicit receipt/v2 selection");
+#else
+  must_reject([&] {
+    moe_topk::score_to_mask_v3_dealer_issue_packages(
+        session, p0_v2_path, p1_v2_path, context_v2_path, keys.first,
+        receipt_v2_state);
+  }, "receipt/v2 was accepted without its explicit build opt-in");
+#endif
+  auto unsupported_receipt_state = moe_topk::ScoreToMaskV3EscrowStateParameters{};
+  unsupported_receipt_state.receipt_format_version = 3;
+  must_reject([&] {
+    moe_topk::score_to_mask_v3_dealer_issue_packages(
+        session,
+        (std::filesystem::path(temp.path) / "p0-v3.pkg").string(),
+        (std::filesystem::path(temp.path) / "p1-v3.pkg").string(),
+        (std::filesystem::path(temp.path) / "escrow-v3.context").string(),
+        keys.first, unsupported_receipt_state);
+  }, "unknown escrow receipt format version was accepted");
   must_reject([&] {
     (void)moe_topk::score_to_mask_v3_validate_escrow_context(p0_path, keys.second);
   }, "party package was accepted as an escrow context");
