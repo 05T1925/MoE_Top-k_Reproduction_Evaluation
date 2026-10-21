@@ -1,0 +1,143 @@
+{
+  "schema": "m6b-i-project-select5-s37-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S37",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "status": {
+    "overall_security": "OPEN_WITH_EXACT_GAP",
+    "receipt_fetch_success_path_sublemma": "OPEN_WITH_EXACT_GAP",
+    "f_a_postprocessing": "PASS_WITH_SCOPE",
+    "reduction_joint_sampler_j_b": "OPEN_WITH_EXACT_GAP",
+    "reviewed_scope": "ideal F_T/v1; explicit F_A-ATOMIC/v1; public recipient-key registry; one static semi-honest party; honest conditionally trusted noncolluding A; no-fault successful message path or fetch from an already committed state",
+    "runtime_defect_reproduced": false,
+    "crash_abort_prefix_privacy": "OUT_OF_SCOPE_FOR_S37_THEOREM",
+    "a_only_strengthening_simulator": "OPEN",
+    "real_f_t_joint_distribution": "OPEN_NOT_QUANTIFIED; not reached past current stop point"
+  },
+  "identity": {
+    "s36_commit": "ca5eb001e72c971a7dbaf87d789d4a7fbcba1b9a",
+    "s35_parent_commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "s35_manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+    "s35_manifest_sha256": "62be2127ae4eb28eb2c6d5d5b1dc2a5d46d068d6a68a62f2c0835708abdc6c07",
+    "s35_file_count": 85,
+    "s35_canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "s35_preserved_worktree_raw_hashes": "85/85 PASS",
+    "s36_parent_runtime_tree_diff": "NONE",
+    "s36_plan_change": "docs/IMPLEMENTATION_PLAN.md only; S37 current plan differs from S35 snapshot by the committed S36 entry",
+    "s37_text_content_compare": "84/85 manifest paths match S35 after line-ending normalization; remaining semantic difference is S36 plan entry",
+    "initial_s37_worktree_clean": true,
+    "runtime_sources_modified": false,
+    "vfss_baseline_modified": false
+  },
+  "receipt_fetch_simulation": {
+    "status": "OPEN_WITH_EXACT_GAP",
+    "ideal_interface": "F_A-ATOMIC/v1 proof interface; not a runtime API implementation",
+    "party_simulator_inputs": [
+      "corrupted party input share x_b",
+      "logical commit share z_b^commit (distinct from physical API return status)",
+      "public protocol/session parameters and L_S29",
+      "only party b's F_T/v1 signed package",
+      "public recipient-key registry {pk0,pk1} fingerprint-bound to signed session"
+    ],
+    "party_simulator_forbidden_inputs": [
+      "peer party package or material",
+      "A-side signed context",
+      "T signing private key",
+      "peer output share or peer recipient private key"
+    ],
+    "role_routing": "F_T/v1 routes metadata-only context only to A; F_A returns only the service values visible to the requesting party",
+    "receipt_sha256_inputs_in_order": [
+      "score-to-mask-v3/escrow/commit/1 domain bytes",
+      "session-bound transaction string",
+      "session[16]",
+      "invocation[16]",
+      "u32(N)",
+      "u32(K)",
+      "circuit_sha256[32]",
+      "gate_schedule_sha256[32]",
+      "context_sha256[32]",
+      "package_set_sha256[32]",
+      "SHA256(C0)[32]",
+      "SHA256(C1)[32]"
+    ],
+    "dummy_ciphertext_hybrid": "Candidate replacement is not closed: a uniform IND-CPA reduction needs a reduction-only efficient joint sampler J_b for z_(1-b), V_b_pre, ctx_A, pkg_b, z_b and L_S29. Per-fixed-message worst-case advantage followed by averaging does not supply that sampler. If J_b is supplied, only the challenge ciphertext enters F_A and receipt/hash/state/fetch are efficient post-processing, not SHA-as-random.",
+    "missing_reduction_interface": "J_b-ENC-CHALLENGE/v1 samples the ideal F_T/v1 joint tape plus honest peer execution for the IND-CPA reduction only; no peer package/share/context/T key is returned to Sim_b and no new L_S29 leakage is added",
+    "public_recipient_key_interface": "Required proof/public setup field because runtime session stores key fingerprints and each party call takes only its own public-key path; not added to L_S29",
+    "fault_paths": {
+      "normal_receipt": "service state/hash/post-processing specified; IND-CPA connection OPEN pending J_b",
+      "commit_then_lost_receipt": "service response delivery event modeled; entire fault prefix out of scope",
+      "committed_recovery_fetch": "service post-processing specified conditional on pre-existing COMMITTED; full view simulation OPEN pending J_b",
+      "repeated_fetch": "deterministic same recipient ciphertext and receipt",
+      "wrong_identity": "service rejection behavior only; no privacy theorem for arbitrary TLS fault timing"
+    },
+    "symbolic_advantages": [
+      "epsilon_H4",
+      "epsilon_FT",
+      "Adv_DRBG(q)",
+      "Adv_signature",
+      "Adv_RSA-OAEP/AES-GCM-IND-CPA(1)",
+      "Adv_TLS",
+      "Adv_hash(binding)",
+      "epsilon_F_A-model",
+      "epsilon_J_b (currently an undefined sampler gap, not a bounded advantage)",
+      "epsilon_timing"
+    ],
+    "numeric_security_bits_claimed": false
+  },
+  "remaining_exact_gap": {
+    "first_exact_gap": "reduction-only joint distribution of honest peer output share with party-b pre-cipher view and A context",
+    "source": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp:693-744; encryption at :370-440",
+    "variables": [
+      "honest peer output share z_(1-b) correlated with party-b pre-cipher view V_b_pre",
+      "correlation with z_b, L_S29, package hashes and A-side context ctx_A",
+      "efficient reduction-only joint sampler preserving the ideal F_T/v1 and honest peer execution law"
+    ],
+    "missing_equation": "J_b-ENC-CHALLENGE/v1 must efficiently sample Law(z_(1-b), z_b, L_S29, V_b_pre, pkg_b, ctx_A | x0,x1,public; F_T/v1, honest peer); current F_T/Sim_b interface specifies no reduction-only source for this joint sample",
+    "classification": "PROOF_INTERFACE_GAP_NOT_ATTACK_OR_CODE_DEFECT",
+    "missing_joint_sampler": "J_b-ENC-CHALLENGE/v1(x0,x1,public;F_T/v1) -> (z_(1-b), z_b, L_S29, V_b_pre, pkg_b, ctx_A), with ctx_A routed only to A and hidden values restricted to the reduction",
+    "later_open_bridge": "real T setup tape to ideal F_T/v1 joint outputs at score_to_mask_v3_gmw.cpp:515-585; not reached past current stop point",
+    "next_action": "specify and verify J_b efficiency/correlation preservation, then re-run IND-CPA hybrid review; only after crossing this stop point address the separate real F_T/RAND_bytes/signature bridge"
+  },
+  "models": {
+    "base": "T excluded; A conditionally trusted honest and noncolluding with T/P0/P1; at most one static semi-honest P_b corrupted",
+    "a_only_strengthening": "separate open model; L_A includes context metadata, both ciphertexts/hash/length, state, receipt, order/timing, authenticated restart/fetch view",
+    "party_wall_clock": "not in L_S29; excluded from S37 message-level theorem",
+    "physical_power_loss_disk_corruption_malicious_os": "not modeled or verified"
+  },
+  "functional_and_performance": {
+    "s35_historical_oracle_e2e": "195/195 PASS_WITH_SCOPE; not rerun in S37",
+    "s35_historical_n128_n256": "PASS_WITH_SCOPE; not rerun in S37",
+    "n_gt_256": "NOT_ADMITTED",
+    "natural_io_fault": "NOT_REPRODUCED_S35_HISTORICAL; S37_NOT_RUN",
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "formal_lan_wan": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED",
+    "five_algorithm_iterations": 5,
+    "exchange_phase_is_rtt": false,
+    "v3_default": "OFF",
+    "secure_alias": "NOT_CREATED"
+  },
+  "independent_review": {
+    "reviewer": "s37_receipt_hybrid_review",
+    "status": "OPEN_WITH_EXACT_GAP",
+    "reviewed_subcomponents": "F_A state/hash/post-processing and source field order PASS_WITH_SCOPE; IND-CPA receipt/fetch bridge OPEN pending J_b",
+    "reviewed": [
+      "receipt hash inputs/order and response fields/lengths",
+      "F_T context routing only to A and no peer package/T private key in Sim_b",
+      "public recipient-key registry requirement without L_S29 expansion",
+      "F_A receipt/hash/state/fetch post-processing is correct once a challenge ciphertext is supplied",
+      "logical commit vs lost receipt/API return and recovery fetch",
+      "crash-prefix exclusion and A-only separation"
+    ],
+    "exact_gap_found": "No uniform IND-CPA reduction can be stated from per-fixed-message worst-case advantage then averaging alone; it needs a reduction-only efficient joint sampler for z_peer with V_b_pre and ctx_A.",
+    "recommended_status": "OPEN_WITH_EXACT_GAP",
+    "code_changes_or_tests_by_reviewer": false
+  },
+  "deliverables": {
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_REPORT_2026-10-21.md",
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_DECISION_2026-10-21.md",
+    "gates": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_GATES_2026-10-21.json",
+    "source_evidence_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_SOURCE_EVIDENCE_MANIFEST_2026-10-21.json"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "schema": "m6b-i-project-select5-s37-source-evidence/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S37",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_five_iteration_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "overall_cryptographic_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED",
+    "formal_lan_wan": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED"
+  },
+  "baseline_identity": {
+    "s36_commit": "ca5eb001e72c971a7dbaf87d789d4a7fbcba1b9a",
+    "s35_parent_commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-project-select5-s37\\MoE_Top-k_Reproduction_Evaluation",
+    "initial_s37_worktree_clean": true,
+    "s36_to_s35_git_tree_changes": [
+      "docs/IMPLEMENTATION_PLAN.md: S36 milestone append",
+      "S36 decision/report/gates/source-build-evidence manifest additions"
+    ],
+    "runtime_source_delta_in_s36": 0,
+    "s35_manifest": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+      "sha256": "62be2127ae4eb28eb2c6d5d5b1dc2a5d46d068d6a68a62f2c0835708abdc6c07",
+      "file_count": 85,
+      "canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+      "original_s35_worktree_raw_file_hashes": "85/85 verified"
+    },
+    "s37_worktree_comparison": {
+      "content_comparison": "84/85 paths equal after CRLF/LF normalization",
+      "only_semantic_difference": "docs/IMPLEMENTATION_PLAN.md contains S36's committed milestone entry",
+      "other_raw_byte_differences": "Windows checkout newline conversion; normalized file contents match",
+      "runtime_code_identity": "matches S35 parent source tree",
+      "silent_snapshot_substitution": false
+    }
+  },
+  "prior_evidence_inputs": [
+    {
+      "milestone": "S29",
+      "decision_path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_DECISION_2026-10-20.md",
+      "decision_sha256": "e486f80f968f8eeb353823fb26be904c35fa63339c79a31a7a79c13fd43044e7",
+      "report_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_REPORT_2026-10-20.md",
+      "report_sha256": "aa8dde4bde549c59bffa4ce2f2d2343e52d53912f734d7cc2134c6e15cccf717",
+      "read_only_external_spec": true
+    },
+    {
+      "milestone": "S31",
+      "decision_sha256": "7cc455e2c4e7a73206a569ff21e6fe16b7c6502cf57f1230145187d8e6e0fa15",
+      "report_sha256": "567ecea1353631d139eecf40a4c477a1ad5c2f3e5c17aae84570577af9ed84cd",
+      "gates_sha256": "e77c178f35b40d8b448f24bd39170729c0477bcca5971db57361bbc12fe4a65b",
+      "source_test_manifest_sha256": "c878f64bbd527e85dbd183a8ebe91b7ecf56cecbbf82455d9b66e5df097fd1c0",
+      "read_only_external_spec": true
+    },
+    {
+      "milestone": "S32",
+      "decision_sha256": "03ceb8a2560028f50f81e71ccb9934bb0b0bf98c9754c864c76c759b9ff51c7f",
+      "report_sha256": "e09b617058d6a00ce5a39ab9c6f5fd42c087a2dd3a13fdf57b8372e6b1d77e78",
+      "gates_sha256": "e0e429b88cd021bcd8d79c12d68f88958b1d090006fa60faeb2a5ebca7fe3d2d",
+      "cases_sha256": "1bb9fabc36bc21227eb12cbf17abaca3460a05ffc15e71d8f20f8d2f415d978b"
+    },
+    {
+      "milestone": "S33",
+      "decision_sha256": "e33a54a4d3cc9173cea89c53c1a292d05bd31bf322408c9f12f29e9cc91f67e4",
+      "report_sha256": "ada19123be54ae6d3f1eb98e87bc3586394a2e08fa899e3023cb89864a53f0ae",
+      "gates_sha256": "e49c5f4d0266e14f0b108e52540e0a67e0a9015024d1199e8eb2ee48b89a04dc",
+      "source_build_manifest_sha256": "0f965e878032ac661adf541f513a364ff4d73cd2c3b0212902e3cd9957ac0574",
+      "historical_worktree_read_only": true
+    },
+    {
+      "milestone": "S34",
+      "decision_sha256": "253be32dd41313b500b0f63787226a6813186c13a791a1332d5391d9a1dc0959",
+      "report_sha256": "be458623efcb7da214fa58064ba807be5e5e34f2253eb3924c746105af59da31",
+      "gates_sha256": "203be32dd41313b500b0f63787226a6813186c13a791a1332d5391d9a1dc0959",
+      "cases_sha256": "f14d3654bfb5769421db73fa3c11139e513a9426de2553bd4a0c7b06a691e7a8",
+      "source_build_manifest_sha256": "34f1b5ce89542928d4cb4d712d6803ff1a5331907853a7a6c46d7d0cc66dda79"
+    },
+    {
+      "milestone": "S35",
+      "decision_sha256": "3f1b7fd261c9871e647425e5e3b7f109660b8d523b04f259919fb4b90a793d1d",
+      "report_sha256": "234ddbb1ab1b2caf69a8bafa04696fce1674d4c82e8c8c4a8aa31d388239bb46",
+      "gates_sha256": "8d78bf0cc92f22253e68dc9527f8b08704bc862f8b38dcd0ba372aa630508f22",
+      "cases_sha256": "bbea9dc706ad0a88afa57aa2da9fe847600a71a3cb08ae127cbffa394446882d",
+      "source_build_manifest_sha256": "62be2127ae4eb28eb2c6d5d5b1dc2a5d46d068d6a68a62f2c0835708abdc6c07"
+    },
+    {
+      "milestone": "S36",
+      "decision_sha256": "c5a50456667f6231e1c15eeb669f2d08e0d69972d7af0086a7d8e836d862c63d",
+      "report_sha256": "981bbb782a970cef44c756e43caa1973a64a21d4cdb6d5aafa818a25844cae1",
+      "gates_sha256": "43cae71bdf13609f15bd18f1c0008e555c4ecd76251bbb0e88a6d2c8df8223c2",
+      "source_build_manifest_sha256": "fe2fb92a362022413756d8916d014150280f63138d0c8ca999b134dc0074e82e"
+    }
+  ],
+  "build_and_execution": {
+    "runtime_files_changed": false,
+    "build_status": "NOT_RUN",
+    "tests_status": "NOT_RUN",
+    "s35_historical_binary_sha256": "f511f262e574ddb430317894f63a97e725dd0a62e3f475e21bd44f0da94984ba",
+    "s35_binary_reverified_in_s37": false,
+    "s35_historical_oracle_cases": "195/195 PASS_WITH_SCOPE; not rerun",
+    "s35_historical_n128_n256": "PASS_WITH_SCOPE; not rerun",
+    "natural_io_fault": "NOT_REPRODUCED in S35; S37 NOT_RUN",
+    "formal_performance": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED"
+  },
+  "security_evidence": {
+    "receipt_fetch_sublemma": "OPEN_WITH_EXACT_GAP",
+    "f_a_postprocessing": "PASS_WITH_SCOPE",
+    "reduction_joint_sampler_j_b": "OPEN_WITH_EXACT_GAP",
+    "overall_security": "OPEN_WITH_EXACT_GAP",
+    "f_a_atomic_v1": "proof-only ideal honest service interface, not a runtime implementation",
+    "a_only_simulator": "OPEN; separate stronger model",
+    "crash_abort_prefix": "OUT_OF_SCOPE_FOR_S37_THEOREM; functional contracts retained",
+    "first_exact_gap": "reduction-only joint distribution of honest peer output share with party-b pre-cipher view and A context",
+    "first_exact_gap_source": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp:693-744; encryption at :370-440",
+    "missing_joint_sampler": "J_b-ENC-CHALLENGE/v1(x0,x1,public;F_T/v1) -> (z_(1-b), z_b, L_S29, V_b_pre, pkg_b, ctx_A), with ctx_A routed only to A and hidden values restricted to the reduction",
+    "later_open_bridge": "real Dealer joint tape/package/context distribution to ideal F_T/v1 at score_to_mask_v3_gmw.cpp:515-585; not reached past current stop point",
+    "advantages": "ε_FT, Adv_DRBG(q), Adv_signature, Adv_hash(binding), Adv_TLS, Adv_RSA-OAEP/AES-GCM-IND-CPA, ε_F_A-model and ε_timing remain symbolic/unquantified",
+    "no_attack_or_runtime_defect_claim": true
+  },
+  "review": {
+    "reviewer": "s37_receipt_hybrid_review",
+    "status": "OPEN_WITH_EXACT_GAP",
+    "reviewed_subcomponents": "F_A field order, role routing and deterministic post-processing PASS_WITH_SCOPE; receipt/fetch IND-CPA bridge OPEN pending J_b",
+    "exact_gap": "Worst-case IND-CPA advantage for each fixed plaintext followed by averaging does not provide a uniform reduction without an efficient joint sampler for z_peer, V_b_pre and ctx_A.",
+    "reviewed_receipt_hash_inputs_and_order": true,
+    "reviewed_role_routing_and_forbidden_inputs": true,
+    "reviewed_conditional_ciphertext_hybrid_and_postprocessing": "post-processing verified; IND-CPA hybrid incomplete pending J_b",
+    "reviewed_commit_vs_return_and_fault_scope": true,
+    "reviewer_modified_code_or_ran_tests": false
+  },
+  "s37_artifact_sha256": {
+    "report": "6a1db36687706d9cacc5fd81b3eab535f679adf4abac1df71ca6578c3d6055e2",
+    "decision": "6390d28837f04d5c7fee42ab3bba748c7696c8ab631f7cb5f1c1b6b34b82b13c",
+    "gates": "a83302dfeceee42cad6633869dda87cd20d4888e862a99f50958b2a3ba35e017",
+    "implementation_plan": "26078c8234c8495a414e71f3dff649d2362af1cc4c0780671eb183451baf104f"
+  },
+  "repository_changes": {
+    "source_code_files_changed": [],
+    "files_to_add_or_update": [
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_REPORT_2026-10-21.md",
+      "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_DECISION_2026-10-21.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_GATES_2026-10-21.json",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S37_SOURCE_EVIDENCE_MANIFEST_2026-10-21.json",
+      "docs/IMPLEMENTATION_PLAN.md"
+    ],
+    "secrets_material_certificates_build_artifacts_or_raw_large_logs_added": false,
+    "vfss_baseline_modified": false,
+    "historical_worktrees_cleaned_or_reset": false,
+    "pushed_or_merged": false
+  },
+  "self_hash_note": "This manifest intentionally omits its own SHA-256; the S37 report, decision, gates and implementation-plan hashes are listed in s37_artifact_sha256."
+}
