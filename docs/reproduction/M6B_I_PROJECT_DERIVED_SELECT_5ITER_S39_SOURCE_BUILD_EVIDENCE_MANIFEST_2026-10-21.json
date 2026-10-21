@@ -35,7 +35,7 @@
     "file_set_reused_exactly": true,
     "current_file_hashes_recomputed": 85,
     "current_s39_canonicalization": "UTF-8; ordinal ascending relative path; path<TAB>lowercase_sha256<LF>",
-    "current_s39_canonical_sha256": "0c385152e4bcceb64de3d6c19666a5bc8f4b9330adc151800f927865db4df3bb",
+    "current_s39_canonical_sha256": "09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9",
     "raw_hash_matches_s35_materialized": 20,
     "lf_normalized_hash_matches_s35_materialized": 55,
     "source_content_changes_from_s38": [
@@ -250,7 +250,7 @@
       },
       {
         "path": "docs/IMPLEMENTATION_PLAN.md",
-        "sha256": "3f18c2ea123c884f5da68d06df0577afa7879015a44db75473637bd6e3a90321",
+        "sha256": "b1be89a7e7dd9ad36a1f14179ba7bf0f4b555ee4f2957ef1aa61a61b7242c62a",
         "s35_materialized_sha256": "101852fd9ceeedbd56169bfab3058f357274ffdb038885c83f41549af6f44cad",
         "status": "S39_PLAN_APPEND; CONTAINS_S36_S38_HISTORY"
       },
@@ -560,7 +560,8 @@
         "s35_materialized_sha256": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
         "status": "UNCHANGED_FROM_S38_BASELINE"
       }
-    ]
+    ],
+    "s39_runtime_build_snapshot_canonical_sha256": "0c385152e4bcceb64de3d6c19666a5bc8f4b9330adc151800f927865db4df3bb"
   },
   "prior_evidence": {
     "s38_manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S38_SOURCE_EVIDENCE_MANIFEST_2026-10-21.json",
@@ -624,7 +625,8 @@
         "log": "/tmp/m6b_i_s39_receipt_invalid_optin.log",
         "log_sha256": "8cdf9653738ef0a0f3f2becad5dc4c4264c089b9cebb0e03f27337eda5995173"
       }
-    ]
+    ],
+    "post_build_review_amendment": "Documentation-only changes after targeted builds; no runtime/test source changed in this amendment, so targeted builds/tests were not rerun."
   },
   "test_evidence": {
     "default_off_target_inventory": {
@@ -694,31 +696,33 @@
   "security": {
     "overall": "OPEN_WITH_EXACT_GAP",
     "receipt_v1": "OPEN_WITH_EXACT_GAP",
-    "receipt_v2": "CONDITIONAL_PENDING_INDEPENDENT_CRYPTO_REVIEW",
+    "receipt_v2": "OPEN_WITH_EXACT_GAP",
     "real_A_DRBG": "OPEN; Adv_DRBG_A(q) symbolic",
-    "ideal_F_T_to_real_Dealer_signature_DRBG": "OPEN_NOT_REACHED",
-    "independent_review": "PENDING",
+    "ideal_F_T_to_real_Dealer_signature_DRBG": "OPEN_NOT_REACHED_AFTER_ROLE_ROUTE_GAP",
+    "independent_review": "COMPLETED; reviewer /root/s39_crypto_review confirmed the token-local conditional law and identified the undefined honest-peer deposit route for complete commit/fetch simulation",
     "crash_prefix_privacy": "OUT_OF_SCOPE",
     "A_only_corruption": "OUT_OF_SCOPE",
     "N_gt_256": "NOT_ADMITTED",
-    "performance_and_rtt": "NOT_RUN_NOT_MEASURED"
+    "performance_and_rtt": "NOT_RUN_NOT_MEASURED",
+    "receipt_v2_token_law": "CONDITIONAL_PASS_REVIEWED_LOCAL_LEMMA",
+    "receipt_v2_commit_fetch_simulation": "OPEN_WITH_EXACT_GAP"
   },
   "changed_artifact_hashes": [
     {
       "path": "docs/IMPLEMENTATION_PLAN.md",
-      "sha256": "3f18c2ea123c884f5da68d06df0577afa7879015a44db75473637bd6e3a90321"
+      "sha256": "b1be89a7e7dd9ad36a1f14179ba7bf0f4b555ee4f2957ef1aa61a61b7242c62a"
     },
     {
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_DECISION_2026-10-21.md",
-      "sha256": "c832bde48442e08d55c6b51819d95b3139f794f676af6f8b01cc8ce8365667b5"
+      "sha256": "5f61e68102fbd9c78f5794f931dd3c1bfe28d7ba56d8ad907cc5379cb73885b9"
     },
     {
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_REPORT_2026-10-21.md",
-      "sha256": "6d2a026bb7c614b1850dee3950961eb0632dcb6fd3f75c0e9aeefd1e30e27550"
+      "sha256": "25d35d62329660a82c610f33cc90db396cd552531ae979cb98f769da9377572b"
     },
     {
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_GATES_2026-10-21.json",
-      "sha256": "6c78ce908e1095f6170e5315a247b778f1ca39b22cfe88429955399664c299c2"
+      "sha256": "e73f15a71e87887ec2a79983bb3569a6963ae30faecd6153ab8e14a926b6e1bd"
     }
   ],
   "changes": {
@@ -735,10 +739,25 @@
       "docs/IMPLEMENTATION_PLAN.md",
       "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_DECISION_2026-10-21.md",
       "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_REPORT_2026-10-21.md",
-      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_GATES_2026-10-21.json"
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_GATES_2026-10-21.json",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json"
     ],
     "push_or_merge": "NOT_PERFORMED",
     "secrets_materials_certificates_build_artifacts_raw_large_logs_in_repository": false
   },
-  "self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE"
+  "self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE",
+  "independent_review": {
+    "reviewer": "/root/s39_crypto_review",
+    "status": "COMPLETED_READ_ONLY",
+    "prior_derivation_participation": false,
+    "files_reviewed": [
+      "S39 report, decision, gates",
+      "S38 report",
+      "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "VFSS/src/moe_topk/score_to_mask_v3_party.cpp"
+    ],
+    "runtime_files_modified": false,
+    "tests_run": false,
+    "result": "CONDITIONAL_PASS_REVIEWED_LOCAL_TOKEN_LAW; OPEN_WITH_EXACT_GAP for successful commit/fetch simulation because honest-peer authenticated deposit routing is undefined"
+  }
 }

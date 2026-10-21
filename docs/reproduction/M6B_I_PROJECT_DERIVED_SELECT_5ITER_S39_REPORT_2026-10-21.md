@@ -2,7 +2,7 @@
 
 日期：2026-10-21
 路线：`Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL`
-结论：receipt/v1 首个联合模拟点未闭合；receipt/v2 opt-in 候选移除了该回执相关性，但仍等待独立密码学复核，整体安全状态保持 `OPEN_WITH_EXACT_GAP`。
+结论：receipt/v1 的 H4 联合模拟仍 `OPEN_WITH_EXACT_GAP`。receipt/v2 的理想独立 token 条件分布经独立复核为局部 `CONDITIONAL_PASS_REVIEWED`；但完整 H4→Sim_b 的 commit/fetch 模拟仍 `OPEN_WITH_EXACT_GAP`，因为现有“不透明 role route”没有定义如何由诚实对端实际 deposit 触发 `COMMITTED`。整体安全状态保持 `OPEN_WITH_EXACT_GAP`。
 
 ## 1. 裁决摘要
 
@@ -32,15 +32,15 @@ S39 评估并实现默认关闭的 receipt/v2：最终提交时，A 采样 `U←
 Pr[U=u | x_b,z_b,L_S29,pkg_b,static_b,Vpre_b,ctx_A,Hpkg,H(C0),H(C1)] = 2^-256
 ```
 
-所以 H4 sampler 可完成本方前缀后，从 A 的真实角色路由响应取得 token；或者在理想服务模拟中为该交易采样一次 `U`，把它 memoize 到 COMMITTED 响应及已提交 fetch。transaction ID 仅由公开 session/invocation 编码产生。COMMITTED/status/transaction 字段是公开或已有服务字段，fetch ciphertext 是本方已生成并提交的密文。固定 32-byte token 与这些字段组成的后处理不会重新引入 v1 的 context/package-set 哈希相关性。
+该式只证明理想独立随机源下 token 本身不携带 v1 的 context/package-set 摘要相关性。它没有证明 H4 sampler 能使服务进入 `COMMITTED`，也没有证明 party simulator 能取得该状态响应；这需要单独定义服务交互与诚实对端的 deposit 路由，见 §5.4。不能仅因 token 可独立采样就把它附加到一个尚未可生成的成功 transcript。
 
-该局部闭合依赖理想 A token 独立均匀。实际服务使用 OpenSSL `RAND_bytes`；把它替换为理想独立随机源的优势保留为 `Adv_DRBG_A(q)`，其中 q 覆盖 A 进程中 token 与可被 parties 观察到的相关 DRBG 输出。该优势没有量化。它不关闭 S38 的密文替换假设、H4 其余条件步骤、F_T/v1 的真实生成器桥、签名、TLS 或输出正确性证明。未参与 S39 推导者的独立密码学复核待完成，因此状态是 `CONDITIONAL / PENDING_INDEPENDENT_CRYPTO_REVIEW`，不是已审通过。
+该局部 token law 依赖理想 A token 独立均匀。实际服务使用 OpenSSL `RAND_bytes`；把它替换为理想独立随机源的优势保留为 `Adv_DRBG_A(q)`，完整 q 范围见 §5.3。该优势没有量化。它不关闭 S38 的密文替换假设、H4 其余条件步骤、F_T/v1 的真实生成器桥、签名、TLS 或输出正确性证明。独立 reviewer 已审该 token 条件 law；其发现的成功服务响应路由缺口仍使完整 receipt/status/fetch 模拟 `OPEN_WITH_EXACT_GAP`。
 
 ## 2. 固定对象与来源
 
 - S39 起始 worktree：`C:\Users\28641\.codex\worktrees\s39-receipt-v2\MoE_Top-k_Reproduction_Evaluation`，分支 `codex/m6b-i-project-select5-s39`。
 - 起始 HEAD 精确为 S38 `2f350b6d79fc88df381347b597cbead4398a7902`；父级 S37 `5c31ebfeaf6eb072421badf31d7354431b984d35`，再前为 S36 `ca5eb001e72c971a7dbaf87d789d4a7fbcba1b9a`，S35 runtime commit `77f9684e1a50794004fd31f3e5ee7f193e9b12ec`。
-- S35 85 项规范源清单 canonical SHA-256：`af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0`。该基线文件集合和 S38 manifest 中记录一致；本轮对该集合重新计算变更后的 S39 hashes，canonical SHA-256 为 `0c385152e4bcceb64de3d6c19666a5bc8f4b9330adc151800f927865db4df3bb`，完整逐文件哈希见 source/build/evidence manifest。
+- S35 85 项规范源清单 canonical SHA-256：`af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0`。该基线文件集合和 S38 manifest 中记录一致；S39 定向构建对应的运行时代码快照 canonical SHA-256 为 `0c385152e4bcceb64de3d6c19666a5bc8f4b9330adc151800f927865db4df3bb`。独立复核后仅 `docs/IMPLEMENTATION_PLAN.md` 更新，当前 85 项 source manifest canonical SHA-256 为 `09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9`；7 个 VFSS runtime/test 文件未变。完整逐文件哈希见 source/build/evidence manifest。
 - S38/S37 原 worktree 未修改；本轮在从 S38 精确提交创建的隔离 worktree 中操作。`VFSS-baseline/` 未改动，未将密钥、材料、证书、构建物或原始大日志放入仓库。
 - 证据区分：Protocol I 论文定义不蕴含本项目派生 Select5 是论文算法复现；稳定 Top-K mask 是项目规格；本文列出的 v1/v2 字段与顺序是源码事实；定向 E2E 是功能观察；H4、F_T/v1、理想 A token 与密码优势均是证明假设或待验证桥接。
 
@@ -50,7 +50,7 @@ Pr[U=u | x_b,z_b,L_S29,pkg_b,static_b,Vpre_b,ctx_A,Hpkg,H(C0),H(C1)] = 2^-256
 
 ```text
 Sim_b(x_b, z_b 或 ⊥, public, L_S29, pkg_b, static_b;
-      F_T/v1 party route, F_A-ATOMIC/v2 party route)
+      F_T/v1 party route, F_A-ATOMIC/v2 candidate route)
 ```
 
 ### 3.1 联合变量
@@ -118,7 +118,7 @@ Law(Vpre_b,z_b,L_S29,pkg_b,R1,COMMITTED_b,fetch_b)_real
 
 token 不在 submit request 中传入。A 内部仍按交易行、context/package-set hash 与两密文 hash 绑定状态；v2 只替换 party 可见 receipt 值，不移除 A 的内部审计字段。transaction/status/receipt/ciphertext 的字段长度与 v1 相同，receipt 仍为 32 bytes（API hex 仍 64 chars），所以不会额外增加已有应用消息长度。A 可见的到达顺序/时序仍属于 L_A。SQLite WAL/FULL 的配置与进程级 restart 测试不证明物理断电或介质耐久。
 
-### 5.3 v2 simulator 与优势项
+### 5.3 v2 token 局部引理与优势项
 
 对任一 `b`，在 H4 和理想 `F_A-ATOMIC/v2` 成功状态机下：
 
@@ -126,15 +126,50 @@ token 不在 submit request 中传入。A 内部仍按交易行、context/packag
 Sim_b:
   1. 接收 x_b,z_b,public,L_S29,pkg_b,static_b；按 H4_b 生成 Vpre_b。
   2. 用公开本方 recipient key 和新鲜本方加密随机性生成 C_b=Enc(pk_b,z_b)，缓存 C_b。
-  3. 通过 A 的不透明 role route 走正常成功 commit 服务响应；Sim_b 不读 ctx_A。
-     A/理想服务内部只在 COMMITTED 事务生成一次 U；Sim_b 只得到真实 party
-     endpoint 应见的 COMMITTED/status/transaction/U。
-  4. 对一次 committed fetch 复用缓存 C_b 与相同 U；后续同一调用重试复用同一对值。
+  3. 向 A 提交 C_b。真实 A 在等待另一方 deposit 期间保持 PENDING；仅凭本方
+     submit，Sim_b 不能生成 COMMITTED/status/transaction/U 响应。
+  4. 只有经定义的诚实对端 deposit 到达后，A 才能完成提交；当前 H4/party
+     simulator 接口没有定义如何在不暴露 peer state 的前提下驱动或观察该事件。
+  5. 若服务已从 COMMITTED 状态开始，fetch_b 返回缓存的 C_b 与已持久化 U；
+     该 fetch 后处理成立，但不补足此前成功提交响应的可达性。
 ```
 
-对理想独立 token `U`，第 3 步的 conditional law 对第 2 步及所有隐藏 setup 量均是均匀分布，故把 `U` 附加在 H4 sampler 后保持联合分布；status 与 transaction 是确定性公开后处理，fetch 是缓存本方 ciphertext 与 `U`。此处没有用 SHA 输出“看似随机”的说法，也没有对 party simulator 开放 J_b 的 peer/context 权限。服务路由是 opaque capability，只负责会话/交易路由，不返回 A context 或数据库内部摘要。
+独立 reviewer `/root/s39_crypto_review`（未参与 S37/S38/S39 推导）确认：理想 `U` 的局部条件 law 对 H4 前缀、隐藏 setup 量和两份密文均匀；重复 fetch/submit 复用同一 token；party 不验证 receipt 密码学内容，因此当前条件受信 A 模型不要求 MAC。reviewer 同时指出，S39 原文中“不透明 role route”尚无可执行定义。源码 `score_to_mask_v3_escrow.cpp:583-602` 在本方 submit 后等待状态；必须有第二方 deposit 才会转为 `COMMITTED` 并返回成功响应。因此局部 token 引理是 `CONDITIONAL_PASS_REVIEWED`，完整 receipt/status/fetch transcript 不是 PASS。
 
-真实 A 使用 OpenSSL `RAND_bytes` 而非数学理想源。v2 回执步骤的可归约优势保留为 `Adv_DRBG_A(q)`，要求该 DRBG 在至多 q 次、包含 token 及 party 可见 TLS/DRBG 输出的联合观察下伪随机；不填安全位数。完整协议总界还需加上既有 `Adv_H4_b`（若有正式构造）、S38 `Adv_Env-IND-CPA` 与最多 `2ε_perm` 的严格置换截断项、`Adv_DRBG_party`、`Adv_signature`、`Adv_TLS`、envelope OAEP/GCM 与 nonce 项、哈希绑定项以及输出正确性前提。各项符号量尚未量化，且 S38 J_b 不由本轮重新证明。receipt/v2 局部引理不是完整安全结论。
+### 5.4 成功提交的理想路由接口与精确未闭合点
+
+源码事实是：每个计算方用其已认证连接提交自己的 ciphertext；首个 deposit 可持久化为 PENDING，第二个 deposit 才触发最终事务。S39 当前 party simulator 只生成本方 `C_b`，没有 peer package/share、peer TLS 凭据、A context、T 私钥，也没有 S38 `J_b` 的 proof-only 权限。因此它只能真实地提交 `C_b` 并观察 PENDING；它不能自行触发成功响应。
+
+下一版证明接口最小候选为交互式 `F_A-ATOMIC/v2`，而不是一个无条件返回成功的 oracle：
+
+```text
+submit_b(tx, C_b, auth_b):
+  验证本方已有身份/交易绑定；仅存本方密文；返回 PENDING。
+
+peer_deposit(tx, C_peer, auth_peer):
+  只接受真实诚实对端 endpoint 的已认证 deposit；服务内部存放密文，
+  不向 Sim_b 返回 C_peer、peer identity secret、share 或 package。
+
+await_committed_b(tx):
+  仅在两份已认证 deposit 均到达后返回 (COMMITTED, tx, U)。
+  在该服务转移的同一事务中产生并保存 U；party 只收到其真实 endpoint
+  可见的固定字段。模拟器无权伪造 peer_deposit 或绕过等待条件。
+
+fetch_b(tx, auth_b):
+  仅从已 COMMITTED 状态返回本方 C_b 和同一个 U；重试复用存储值。
+```
+
+这段接口规定了服务门槛和信息权限，但尚未提供可执行的理想执行桥：需要定义 honest peer endpoint 如何从自身理想输出/自身材料生成并向该服务发出 deposit、H4 如何与该交互组合，以及模拟器何时只观察本方 endpoint 的响应。不能将 `peer_deposit` 变成由 `Sim_b` 无条件调用的 oracle；那会把成功事件直接作为未证明前提。也不能把 peer ciphertext/package/share 交给 party simulator。
+
+首个完整转录断点现在精确为条件分布：
+
+```text
+Law(D_peer, response_b | x_b,z_b,L_S29,pkg_b,static_b,Vpre_b,C_b)
+```
+
+其中 `D_peer` 表示诚实对端经认证的第二份 deposit 及其触发时序，`response_b` 包括 COMMITTED receipt。现有 H4 只给出本方前缀条件 sampler；J_b 只给 reduction 使用，不能提供此 party-simulator 输入。缺少的是该交互式 peer→A transition 在固定本方输入/输出/泄露条件下的生成接口和条件分布等式。它属于证明接口/模型缺项，不是 token 条件分布失败、攻击或运行时代码缺陷。最小下一步是将 H4 扩成不泄露 peer state 的交互式 transcript sampler，并由独立 reviewer 检查它只通过认证 peer endpoint 推动 `F_A-ATOMIC/v2`；在这之前 receipt/status/commit/fetch simulator 保持 OPEN。
+
+真实 A 使用 OpenSSL `RAND_bytes` 而非数学理想源。v2 token 局部步骤的优势保留为 `Adv_DRBG_A(q)`；`q` 应覆盖本定理涉及的 A 随机子系统完整自适应观察序列，包括新 COMMITTED token、可被 party 观察的 TLS handshake 随机量/临时公钥，以及并发服务进程、重启和 reseed 产生且会影响响应的输出。重复 fetch/submit 会再次观察原 token，但不新增 token 采样。该优势未量化。若扩展为多交易且规格要求 token 全局唯一/不可关联，还需唯一性检查或生日项 `O(q²/2^256)`；本轮单交易结论不声称全局唯一。完整协议总界还需加上既有 `Adv_H4_b`（若有正式构造）、S38 `Adv_Env-IND-CPA` 与最多 `2ε_perm` 的严格置换截断项、`Adv_DRBG_party`、`Adv_signature`、`Adv_TLS`、envelope OAEP/GCM 与 nonce 项、哈希绑定项以及输出正确性前提。各项符号量尚未量化，且 S38 J_b 不由本轮重新证明。receipt/v2 token 局部引理不是完整安全结论。
 
 ## 6. 输出与故障范围
 
@@ -171,6 +206,6 @@ Sim_b:
 
 ## 8. 审查状态与下一个断点
 
-本报告作者未参与 S37/S38 的推导；S38 reviewer 只复核 S38 的 J_b 子引理，不计作 S39 的独立复核。S39 的 receipt/v2 条件 law、F_T/A 信息权限、`Adv_DRBG_A(q)` 依赖和真实响应字段尚待未参与本轮推导者逐项复核；当前独立审查状态 `PENDING`。
+独立审查者 `/root/s39_crypto_review` 未参与 S37/S38/S39 的推导。本次只读检查 S39/S38 报告、S39 gates/决策与 S35 escrow/party 源码；未改文件、未运行测试。审查结论：v1 gap 精确；理想 v2 token 条件 law、party 无 MAC 需求和持久 token 重用为 `CONDITIONAL_PASS_REVIEWED`；完整成功 commit/fetch simulator 仍 `OPEN_WITH_EXACT_GAP`，原因是 role-route/诚实对端 deposit 未定义；真实 A RNG 桥未通过。该审查没有复核 S38 的 `J_b`，也没有推进 F_T/v1 到真实 Dealer 的实现桥。
 
-在 v2 局部相关性问题之外，下一处更大的证明断点为：从理想 F_T/v1 的联合材料分布、签名接口和随机 tape，桥接到真实 Dealer 的 Beaver triples、permutation shares、一次性 package、OpenSSL DRBG 与签名实现。所需的是完整调用序列下的条件联合分布/优势归约，包含 package/context 签名及对两方可见输出的路由；本轮未向该点外推。
+当前首个待办证明断点是 §5.4 的交互式 `F_A-ATOMIC/v2` 成功路由与诚实对端 deposit 联合 sampler。闭合并经独立复核后，下一层才是从理想 F_T/v1 的联合材料分布、签名接口和随机 tape 桥接到真实 Dealer 的 Beaver triples、permutation shares、一次性 package、OpenSSL DRBG 与签名实现；需要覆盖完整调用序列及 package/context 签名和两方可见输出路由。本轮未向该层外推。
