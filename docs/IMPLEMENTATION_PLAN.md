@@ -1188,3 +1188,8 @@ S35 接收对象为 S34 的 84 文件最终修复快照，加上清单外 generi
 F_TOPK-ATOMIC 的源码事实为：第一份 recipient ciphertext 可在 pending 状态单独写入并提交；第二份 ciphertext 和 `COMMITTED` state/receipt 在同一最终 SQL transaction 更新；最终 state 是两份 ciphertext 的共同逻辑 fetch 可见点。receipt 与两个客户端 API return 的实际时刻可不同。A 被建模为负责人确认的条件受信、与 T/P0/P1 不合谋且无解密密钥的服务。`F_T/v1` 提供可信签名 package/context oracle 的形式化接口，模拟器不获 T 私钥。
 
 P0/P1 完整条件 transcript 的首个未闭合等式位于 Select5 首个活动 `kTagOpenedCompare` 结果对应的 package/triple/wire/open-share 前缀；A-only simulator、setup 随机优势、加密/TLS 优势和掉电持久性均继续 OPEN/未量化。不得扩张 `L_S29`、创建 `secure` alias 或将功能 E2E 写成安全 PASS。自然多进程读写故障 `NOT_REPRODUCED`；故障注入单独登记。五次算法迭代、`W` 依赖层、88/89 phase 与 RTT 不是同一指标；正式 LAN/WAN/RTT 未运行，N>256 不准入，v3 默认关闭并继续遵守 V3→V4 前置门。详见 [S35 决策](decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_DECISION_2026-10-21.md)、报告、gates、cases 和 source/build/evidence manifest。
+
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S36（2026-10-21）
+
+S36 以 S35 精确提交 `77f9684e1a50794004fd31f3e5ee7f193e9b12ec` 和 85 项 canonical source hash `af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0` 为对象，仅做证明/规格审查，没有运行时改动、构建或测试。非作者复核确认：在理想独立 `F_T/v1` tape、单方静态半诚实、成功路径下，H4 首个活动 `kTagOpenedCompare` 的本方完整 package-conditioned Beaver openings、活动 outcome 和 seed 驱动的自适应边可条件模拟；这只是条件证明草案，不是安全 PASS。继续至 escrow receipt 时，字面 `Sim_b(...;F_T/v1)` 缺少把 A-side context 与诚实 A emulator 耦合进 Sim_b 的显式接口，故 receipt simulator OPEN；其后任意 abort/crash prefix 也因缺环境切点合同而 OPEN。未扩大 `L_S29`，A-only 模型独立开放，优势项未量化。自然 I/O fault `NOT_REPRODUCED`（S36 未重跑），N>256 `NOT_ADMITTED`，LAN/WAN/RTT 未运行/测量；没有 secure alias，v3 仍 OFF。详见 S36 decision/report/gates/manifest；路线保持 `PROJECT_DERIVED / EXPERIMENTAL`，不作论文等价结论。

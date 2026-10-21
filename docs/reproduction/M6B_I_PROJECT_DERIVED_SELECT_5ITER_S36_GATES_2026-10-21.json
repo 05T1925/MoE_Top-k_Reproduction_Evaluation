@@ -1,0 +1,89 @@
+{
+  "schema": "m6b-i-project-select5-s36-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S36",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+    "source_manifest_sha256": "62be2127ae4eb28eb2c6d5d5b1dc2a5d46d068d6a68a62f2c0835708abdc6c07",
+    "file_count": 85,
+    "canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "baseline_worktree_modified": false,
+    "new_runtime_build": false,
+    "new_runtime_tests": false
+  },
+  "status": {
+    "s35_exact_source_identity": "PASS",
+    "h4_activity_open_conditioned_simulation": "CONDITIONAL_PASS_REVIEWED",
+    "h4_scope": "ideal F_T/v1 independent tape; single static semi-honest party corruption; success/no-fault path",
+    "p0_p1_full_success_view_through_receipt": "OPEN",
+    "receipt_gap": "Sim_b is not explicitly coupled to an honest A emulator receiving the A-side context; peer ciphertext hash is needed for the exact receipt",
+    "abort_crash_prefix_simulation": "OPEN",
+    "f_t_real_rng_and_signing_bridge": "CONDITIONAL_NOT_QUANTIFIED",
+    "a_only_simulator": "OPEN",
+    "natural_io_failure": "NOT_REPRODUCED",
+    "s36_natural_io_rerun": "NOT_RUN",
+    "n_le_256_functional": "PASS_WITH_SCOPE_S35_HISTORICAL",
+    "n_gt_256": "NOT_ADMITTED",
+    "formal_lan_wan": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED",
+    "secure_alias": "NOT_CREATED",
+    "v3_default": "OFF",
+    "vfss_baseline_modified": false,
+    "runtime_code_changed": false
+  },
+  "reviewed_by": {
+    "reviewer": "s36_conditional_crypto_review",
+    "status": "PASS_WITH_SCOPE",
+    "reviewed": [
+      "conditional local Beaver triple distribution given fixed global masks",
+      "D/E opening uniformity conditioned on the complete party package and prior view",
+      "peer active-comparison bit determined by approved XOR outcome",
+      "adaptive edge continuation from approved seeds/outcomes",
+      "fixed output-share conditioning through output refresh",
+      "next receipt gap and role-limited A-emulator requirement"
+    ],
+    "changes_or_tests_by_reviewer": false
+  },
+  "security_boundary": {
+    "paper_equivalence_claim": false,
+    "overall_security_pass": false,
+    "permitted_leakage_expanded": false,
+    "l_s29": [
+      "public parameters and protocol bindings",
+      "approved shuffled endpoints/positions",
+      "pivot and opened active comparison outcome bits",
+      "sample seeds only after forward shuffle and only for active iterations",
+      "previously approved masked values (legacy wording; no new v3 fields added here)",
+      "comparison count, communication length, uniform ABORT"
+    ],
+    "l_a_separate": true,
+    "a_model": "conditionally trusted honest service, no decryption keys, non-colluding with T/P0/P1; A-only corruption is a separate open model",
+    "proposed_minimal_interfaces_not_implemented": [
+      "F_A-ATOMIC/v1 role-routed honest A emulator for receipt simulation",
+      "F_TOPK-ATOMIC/v2 environment-specified cut semantics if arbitrary abort/crash prefixes are in proof scope"
+    ],
+    "symbolic_advantage_terms": [
+      "epsilon_FT",
+      "Adv_DRBG(q)",
+      "Adv_signature",
+      "Adv_hash",
+      "Adv_TLS",
+      "Adv_RSA-OAEP/AES-GCM",
+      "epsilon_GMW-conditioned-L",
+      "epsilon_A-model",
+      "epsilon_abort/timing"
+    ],
+    "numeric_security_bits_claimed": false
+  },
+  "performance_and_admission": {
+    "iterations": 5,
+    "comparison_dependency_width": "W=39/40 at S35 resource points; not a measured network metric",
+    "application_exchange_phases": "S35 historical 88/89 at N=128/256; not RTT",
+    "formal_lan_wan_run": false,
+    "rtt_measured": false,
+    "n_gt_256_admitted": false,
+    "v3_enabled_by_default": false
+  }
+}
