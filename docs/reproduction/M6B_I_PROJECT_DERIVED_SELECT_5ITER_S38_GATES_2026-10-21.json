@@ -1,0 +1,164 @@
+{
+  "schema": "m6b-i-project-select5iter-s38-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S38",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall_security_status": "OPEN_WITH_EXACT_GAP",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_five_iteration_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "secure_implementation": false,
+    "cryptographic_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "baseline": {
+    "s37_commit": "5c31ebfeaf6eb072421badf31d7354431b984d35",
+    "s36_parent": "ca5eb001e72c971a7dbaf87d789d4a7fbcba1b9a",
+    "s35_runtime_commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "s35_source_file_count": 85,
+    "s35_source_canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "s35_manifest_worktree_hashes_verified": 85,
+    "s35_manifest_worktree_mismatches": 0,
+    "s35_original_worktree_status": "CLEAN",
+    "s37_runtime_diff_from_s35": "NONE",
+    "historical_s35_release_binary_sha256": "f511f262e574ddb430317894f63a97e725dd0a62e3f475e21bd44f0da94984ba",
+    "binary_rebuilt_or_reverified": false,
+    "line_ending_note": "23 direct Git blob SHA-256 values differ from S35 materialized-file hashes; all were verified as CRLF/LF-only checkout differences."
+  },
+  "decision": {
+    "overall_security_status": "OPEN_WITH_EXACT_GAP",
+    "J_b_peer_plaintext_sampler": "CONDITIONAL_PASS_REVIEWED",
+    "J_b_reduction_only_full_joint_sampler": "CONDITIONAL_PASS_REVIEWED",
+    "peer_envelope_IND_CPA_substitution": "CONDITIONAL_PASS_REVIEWED",
+    "receipt_fetch_full_party_simulation": "OPEN_WITH_EXACT_GAP",
+    "first_remaining_gap": "After real-prefix peer-envelope replacement G0->G1, the next transition G1->Sim_b^H4 plus role-routed F_A is open: H4 does not establish the joint distribution of V_b_pre, z_b, L_S29, pkg_b, static_b, own envelope and party-visible receipt/COMMITTED/fetch with the same hidden F_T/v1 ctx_A/package_set commitment.",
+    "gap_class": "PROOF_INTERFACE_AND_CORRELATION_GAP",
+    "attack_observed": false,
+    "runtime_defect_reproduced": false,
+    "code_changes": "NONE",
+    "reason_for_stopping": "The peer-envelope challenge reduction compares two real S35 prefixes and closes only that encryption substitution under its setup assumptions. It does not replace the real prefix with the restricted H4 party simulator; no joint law with the hidden F_T context and returned A receipt has been proved."
+  },
+  "scope": {
+    "corruption": "One static semi-honest P_b; A and T conditionally trusted, honest and non-colluding",
+    "preprocessing": "Ideal F_T/v1; J_b additionally assumes a reduction-only explicit joint sampler and compatible T signing oracle, not exposed to a party simulator",
+    "execution": "Successful no-I/O/no-process-fault transcript",
+    "fetch": "One successful party fetch from already COMMITTED state",
+    "arbitrary_crash_abort_prefix_privacy": "OUT_OF_SCOPE",
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "party_A_or_T_collusion": "OUT_OF_SCOPE",
+    "physical_power_loss_or_media_corruption": "NOT_PROVED"
+  },
+  "gates": [
+    {
+      "id": "source_identity",
+      "status": "PASS",
+      "evidence": "S35 original worktree: 85/85 raw file hashes and canonical manifest match; S37 adds no VFSS source delta."
+    },
+    {
+      "id": "output_share_relation",
+      "status": "PASS",
+      "evidence": "S35 score_to_mask_v3_party.cpp:693-723 unconditionally gives z0 XOR z1 = m0 XOR m1; identifying this with M_TOPK needs the separate circuit-correctness premise."
+    },
+    {
+      "id": "conditional_peer_plaintext",
+      "status": "CONDITIONAL_PASS_REVIEWED",
+      "evidence": "Assuming the S35 circuit computes the frozen stable Top-K mask, party.cpp:693-723 gives z_(1-b)=M_TOPK(x0,x1) XOR z_b pointwise; finite E2E is not a proof of that correctness premise."
+    },
+    {
+      "id": "J_b_full_joint_sampler",
+      "status": "CONDITIONAL_PASS_REVIEWED",
+      "evidence": "Explicit reduction-only ideal F_T tape law, T signing oracle and two-party application-state execution. Strict-PPT Fisher-Yates uses at most lambda attempts per slot; epsilon_perm <= 255*2^(-24*lambda), adding at most 2*epsilon_perm when bridging both exact games. This is not party-simulator access and not a public S35 API."
+    },
+    {
+      "id": "peer_envelope_replacement",
+      "status": "CONDITIONAL_PASS_REVIEWED",
+      "evidence": "IND-CPA of the exact RSA-OAEP/AES-256-GCM envelope with matching recipient-key setup; real-prefix G0->G1 receipt/hash/state/fetch steps are PPT post-processing. Strict-PPT Fisher-Yates cap bridges exact permutation games with at most 2*epsilon_perm, epsilon_perm<=255*2^(-24*lambda). This does not replace the real prefix by Sim_b."
+    },
+    {
+      "id": "receipt_fetch_party_simulator",
+      "status": "OPEN_WITH_EXACT_GAP",
+      "evidence": "No proved conditional joint law linking H4 V_b_pre to role-routed ctx_A/package-set digest; receipt contains context/setup digest inputs."
+    },
+    {
+      "id": "A_only_simulator",
+      "status": "OUT_OF_SCOPE_FOR_S38"
+    },
+    {
+      "id": "real_F_T_DRBG_signature_bridge",
+      "status": "NOT_REACHED_OPEN"
+    },
+    {
+      "id": "independent_S38_review",
+      "status": "CONDITIONAL_PASS_REVIEWED_FOR_J_ONLY",
+      "reviewer": "s38_independent_review",
+      "result": "J_b is valid as a reduction-only peer-envelope sampler under the listed proof-only F_T/signing access, recipient-key setup, circuit correctness and exact-envelope IND-CPA assumptions. The review confirms the G1-to-Sim_b gap remains open.",
+      "full_receipt_fetch_closure": "OPEN_WITH_EXACT_GAP",
+      "build_tests": "NOT_RUN",
+      "S37_review_not_reused": true
+    },
+    {
+      "id": "runtime_build_test",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "natural_io_fault",
+      "status": "NOT_REPRODUCED_HISTORICAL",
+      "evidence": "No S38 I/O run; S37 successful-path scope preserved."
+    },
+    {
+      "id": "N_le_256_functional_evidence",
+      "status": "S35_HISTORICAL_ONLY_NOT_RERUN"
+    },
+    {
+      "id": "N_gt_256",
+      "status": "NOT_ADMITTED"
+    },
+    {
+      "id": "formal_LAN_WAN",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "physical_RTT",
+      "status": "NOT_MEASURED"
+    },
+    {
+      "id": "secure_alias",
+      "status": "NOT_CREATED"
+    }
+  ],
+  "cryptographic_advantages": {
+    "envelope_ind_cpa": "SYMBOLIC_UNQUANTIFIED",
+    "rsa_oaep_kem_key_indistinguishability": "SYMBOLIC_UNQUANTIFIED_MODEL_TO_BE_STATED",
+    "aes_256_gcm_ind_cpa": "SYMBOLIC_UNQUANTIFIED",
+    "nonce_key_collision": "SYMBOLIC_UNQUANTIFIED",
+    "signature": "SYMBOLIC_UNQUANTIFIED",
+    "drbg": "SYMBOLIC_UNQUANTIFIED",
+    "tls": "SYMBOLIC_UNQUANTIFIED",
+    "hash_binding": "SYMBOLIC_UNQUANTIFIED",
+    "hash_hiding_or_context_joint_sampler": "OPEN_NOT_ASSUMED",
+    "ideal_F_T_to_real_generator": "OPEN_NOT_REACHED"
+  },
+  "performance": {
+    "formal_lan_wan": "NOT_RUN",
+    "physical_rtt": "NOT_MEASURED",
+    "N_gt_256": "NOT_ADMITTED"
+  },
+  "independent_review": {
+    "status": "CONDITIONAL_PASS_REVIEWED_FOR_J_ONLY",
+    "full_receipt_fetch_closure": "OPEN_WITH_EXACT_GAP",
+    "historical_s37_reviewer_not_counted": true
+  },
+  "changes": {
+    "runtime_files": [],
+    "test_files": [],
+    "VFSS_baseline_modified": false,
+    "historical_S37_evidence_modified": false,
+    "build_artifacts_or_secrets_added": false
+  },
+  "self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE"
+}
