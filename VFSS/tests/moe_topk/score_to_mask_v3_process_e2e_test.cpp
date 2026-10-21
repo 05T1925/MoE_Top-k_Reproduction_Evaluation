@@ -893,7 +893,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                  bool lose_receipt_p0 = false,
                  bool fail_p1_before_submit = false,
                  bool timeout_precommit = false,
-                 std::uint8_t receipt_format_version = 1) {
+                 std::uint8_t receipt_format_version = 1,
+                 const std::string& case_id = "unspecified") {
   if (std::getenv("S35_TRACE_CASES") != nullptr)
     std::cerr << "S35_CASE_START dir=" << directory << " n=" << scores.size()
               << " k=" << k << " lost_receipt=" << lose_receipt_p0
@@ -925,11 +926,15 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   const auto p1_package = (std::filesystem::path(directory) / "p1.v3pkg").string();
   const auto context_path = (std::filesystem::path(directory) / "escrow.context").string();
   write_session_file(session_path, session);
+  const auto dealer_stdout = (std::filesystem::path(directory) / "dealer.stdout").string();
+  const auto dealer_stderr = (std::filesystem::path(directory) / "dealer.stderr").string();
   ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
       p1_package, context_path, identities.dealer_private,
       timeout_precommit ? "2000" : "15000",
-      std::to_string(static_cast<unsigned>(receipt_format_version))}));
-  require(dealer.wait() == 0, "T process failed to issue bound packages");
+      std::to_string(static_cast<unsigned>(receipt_format_version))},
+      dealer_stdout, dealer_stderr));
+  const int dealer_status = dealer.wait();
+  require(dealer_status == 0, "T process failed to issue bound packages");
   const auto package_info = score_to_mask_v3_validate_package(
       p0_package, identities.dealer_public, session, 0);
   const auto package_info_p1 = score_to_mask_v3_validate_package(
@@ -949,6 +954,10 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   const auto lease1 = (std::filesystem::path(directory) / "lease-p1").string();
   const auto p0_output = (std::filesystem::path(directory) / "p0.output").string();
   const auto p1_output = (std::filesystem::path(directory) / "p1.output").string();
+  const auto p0_stdout = (std::filesystem::path(directory) / "p0.stdout").string();
+  const auto p0_stderr = (std::filesystem::path(directory) / "p0.stderr").string();
+  const auto p1_stdout = (std::filesystem::path(directory) / "p1.stdout").string();
+  const auto p1_stderr = (std::filesystem::path(directory) / "p1.stderr").string();
   const auto sandbox = prepare_escrow_sandbox(directory, p0_package, p1_package,
                                                context_path, identities);
   const auto db_path = sandbox.database;
@@ -973,7 +982,7 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       identities.ca_certificate, identities.p0_tls.certificate,
       identities.p0_tls.private_key, std::to_string(port0), p0_output,
       lose_receipt_p0 ? "drop-receipt-after-commit" : "reserved",
-      "reserved", "reserved", "reserved"}));
+      "reserved", "reserved", "reserved"}, p0_stdout, p0_stderr));
   ::close(channels[0]);
   channels[0] = -1;
   ChildProcess p1_process(exec_child(binary, {"--party", "1", std::to_string(channels[1]),
@@ -983,19 +992,21 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       std::to_string(port1), p1_output,
       (fail_p1_before_submit || timeout_precommit)
           ? "p1-fail-before-submit" : "reserved",
-      "reserved", "reserved", "reserved"}));
+      "reserved", "reserved", "reserved"}, p1_stdout, p1_stderr));
   ::close(channels[1]);
   channels[1] = -1;
   long p0_rss_kib = 0;
   long p1_rss_kib = 0;
   int p0_status = 0;
   int p1_status = 0;
+  int service_status = -1;
   if (fail_p1_before_submit || timeout_precommit) {
     p1_status = p1_process.wait(&p1_rss_kib);
     wait_for_one_precommit_ciphertext(db_path);
     if (fail_p1_before_submit) {
       service.signal(SIGKILL);
-      require(service.wait() >= 128, "pre-commit escrow crash failpoint failed");
+      service_status = service.wait();
+      require(service_status >= 128, "pre-commit escrow crash failpoint failed");
     }
     p0_status = p0_process.wait(&p0_rss_kib);
   } else {
@@ -1073,7 +1084,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
 
   if (!fail_p1_before_submit) {
     service.signal(SIGTERM);
-    require(service.wait() >= 128, "escrow service did not stop on SIGTERM");
+    service_status = service.wait();
+    require(service_status >= 128, "escrow service did not stop on SIGTERM");
   }
   ChildProcess restart_service(exec_child(binary, {"--service", sandbox.context,
       sandbox.dealer_public, std::to_string(port0), std::to_string(port1), db_path,
@@ -1178,13 +1190,23 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     }
   }
   restart_service.signal(SIGTERM);
-  require(restart_service.wait() >= 128, "restarted escrow service did not stop");
+  const int restart_service_status = restart_service.wait();
+  require(restart_service_status >= 128, "restarted escrow service did not stop");
   const auto diagnostic_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - diagnostic_start).count();
   const auto budget = score_to_mask_v3_gate_budget(session.n);
   const auto material_bytes = (3ULL * budget.gate_count + 7U) / 8U +
       (static_cast<std::uint64_t>(budget.padded_n) * budget.padded_n + 7U) / 8U;
-  std::cout << "S32_V3_PROCESS_E2E {\"session\":\""
+  std::cout << "S40_V3_PROCESS_E2E {\"case_id\":\"" << case_id
+            << "\",\"receipt_format_version\":"
+            << static_cast<unsigned>(receipt_format_version)
+            << ",\"dealer_exit\":" << dealer_status
+            << ",\"p0_exit\":" << p0_status
+            << ",\"p1_exit\":" << p1_status
+            << ",\"service_exit\":" << service_status
+            << ",\"restart_service_exit\":" << restart_service_status
+            << ",\"log_dir\":\"" << directory
+            << "\",\"session\":\""
             << bytes_hex(session.session.data(), session.session.size())
             << "\",\"invocation\":\""
             << bytes_hex(session.invocation.data(), session.invocation.size())
@@ -1198,7 +1220,10 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     if (i != 0) std::cout << ',';
     std::cout << scores[i];
   }
-  std::cout << "],\"oracle\":\"PASS\",\"party_api\":\""
+  std::cout << "],\"oracle\":\""
+            << ((fail_p1_before_submit || timeout_precommit)
+                    ? "NOT_APPLICABLE_NO_SHARE" : "PASS")
+            << "\",\"party_api\":\""
             << ((fail_p1_before_submit || timeout_precommit)
                 ? "BOTH_RECOVERY_REQUIRED_NO_SHARE"
                 : (lose_receipt_p0 ? "P0_RECOVERY_REQUIRED_P1_COMMITTED"
@@ -1249,7 +1274,10 @@ void run_communication_fault_case(const std::string& binary,
                                   const std::string& root,
                                   const TestIdentities& identities,
                                   CommunicationFault fault,
-                                  const std::string& evidence_logs_root) {
+                                  const std::string& evidence_logs_root,
+                                  const std::vector<std::int32_t>& scores = {7, 7, -3},
+                                  std::uint32_t k = 2,
+                                  std::uint8_t receipt_format_version = 1) {
   const std::string name = communication_fault_name(fault);
   const auto directory = (std::filesystem::path(root) / name).string();
   std::filesystem::create_directory(directory);
@@ -1262,8 +1290,8 @@ void run_communication_fault_case(const std::string& binary,
     throw std::runtime_error("fault test session CSPRNG failed");
   session.session[0] |= 1U;
   session.invocation[0] |= 1U;
-  session.n = 3;
-  session.k = 2;
+  session.n = static_cast<std::uint32_t>(scores.size());
+  session.k = k;
   session.party_identity_sha256[0] =
       score_to_mask_v3_certificate_sha256(identities.p0_tls.certificate);
   session.party_identity_sha256[1] =
@@ -1280,10 +1308,12 @@ void run_communication_fault_case(const std::string& binary,
   const auto p1_package = (std::filesystem::path(directory) / "p1.v3pkg").string();
   const auto context_path = (std::filesystem::path(directory) / "escrow.context").string();
   write_session_file(session_path, session);
+  const auto dealer_stdout = (std::filesystem::path(logs) / "dealer.stdout").string();
+  const auto dealer_stderr = (std::filesystem::path(logs) / "dealer.stderr").string();
   ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
-      p1_package, context_path, identities.dealer_private, "15000"},
-      (std::filesystem::path(logs) / "dealer.stdout").string(),
-      (std::filesystem::path(logs) / "dealer.stderr").string()));
+      p1_package, context_path, identities.dealer_private, "15000",
+      std::to_string(static_cast<unsigned>(receipt_format_version))},
+      dealer_stdout, dealer_stderr));
   const int dealer_status = dealer.wait();
   require(dealer_status == 0, "fault test T process failed");
   const auto info0 = score_to_mask_v3_validate_package(
@@ -1291,8 +1321,7 @@ void run_communication_fault_case(const std::string& binary,
   const auto info1 = score_to_mask_v3_validate_package(
       p1_package, identities.dealer_public, session, 1);
 
-  std::vector<std::uint32_t> share0(3), share1(3);
-  const std::array<std::int32_t, 3> scores{7, 7, -3};
+  std::vector<std::uint32_t> share0(scores.size()), share1(scores.size());
   if (RAND_bytes(reinterpret_cast<std::uint8_t*>(share0.data()),
                  static_cast<int>(share0.size() * sizeof(std::uint32_t))) != 1)
     throw std::runtime_error("fault test input share CSPRNG failed");
@@ -1526,7 +1555,21 @@ void run_communication_fault_case(const std::string& binary,
 
   std::ofstream result((std::filesystem::path(logs) / "case-result.json").string(),
                        std::ios::trunc);
-  result << "{\"case\":\"" << name << "\",\"injected\":"
+  result << "{\"case\":\"" << name << "\",\"receipt_format_version\":"
+         << static_cast<unsigned>(receipt_format_version)
+         << ",\"N\":" << scores.size() << ",\"K\":" << k
+         << ",\"scores\":[";
+  for (std::size_t i = 0; i < scores.size(); ++i) {
+    if (i != 0) result << ',';
+    result << scores[i];
+  }
+  result << "],\"session\":\""
+         << bytes_hex(session.session.data(), session.session.size())
+         << "\",\"package_sha256_p0\":\""
+         << bytes_hex(info0.package_sha256.data(), info0.package_sha256.size())
+         << "\",\"package_sha256_p1\":\""
+         << bytes_hex(info1.package_sha256.data(), info1.package_sha256.size())
+         << "\",\"injected\":"
          << (normal_path ? "false" : "true")
          << ",\"dealer_exit\":" << dealer_status
          << ",\"p0_exit\":" << p0_status << ",\"p0_api\":\"" << p0_api << "\""
@@ -1650,6 +1693,43 @@ int main(int argc, char** argv) {
           "receipt/v2 E2E requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON");
 #endif
     }
+    bool receipt_v2_matrix = false;
+    if (argc > 1 && std::string(argv[1]) == "--receipt-v2-matrix") {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+      receipt_v2_matrix = true;
+#else
+      throw std::runtime_error(
+          "receipt/v2 matrix requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON");
+#endif
+    }
+    if (argc > 1 && std::string(argv[1]) == "--receipt-v2-normal-target-trace") {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+      if (argc != 3) throw std::runtime_error(
+          "--receipt-v2-normal-target-trace requires an evidence log directory");
+      const std::uint32_t n = 128;
+      std::vector<std::int32_t> scores(n);
+      for (std::uint32_t i = 0; i < n; ++i) {
+        switch (i % 8U) {
+          case 0: scores[i] = INT32_MAX; break;
+          case 1: scores[i] = INT32_MIN; break;
+          case 2: scores[i] = -1; break;
+          case 3: scores[i] = 17; break;
+          case 4: scores[i] = INT32_MAX; break;
+          case 5: scores[i] = -17; break;
+          case 6: scores[i] = 0; break;
+          default: scores[i] = 17; break;
+        }
+      }
+      std::filesystem::create_directories(argv[2]);
+      run_communication_fault_case(binary, directory.path, identities,
+          CommunicationFault::kNoFault, argv[2], scores, n / 2U,
+          kScoreToMaskV3ReceiptFormatV2);
+      return 0;
+#else
+      throw std::runtime_error(
+          "receipt/v2 normal trace requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON");
+#endif
+    }
     if (argc > 1 && std::string(argv[1]) == "--receipt-v1-smoke") {
       const auto v1_smoke = (std::filesystem::path(directory.path) /
                              "receipt-v1-smoke").string();
@@ -1658,6 +1738,18 @@ int main(int argc, char** argv) {
       std::cout << "S39 receipt/v1 compatibility E2E PASS\n";
       return 0;
     }
+    const std::uint8_t receipt_format_version = receipt_v2_matrix
+        ? kScoreToMaskV3ReceiptFormatV2 : kScoreToMaskV3ReceiptFormatV1;
+    auto run_matrix_case = [&](const std::string& case_directory,
+                               const std::vector<std::int32_t>& scores,
+                               std::uint32_t k, const std::string& case_id,
+                               bool lose_receipt = false,
+                               bool precommit_abort = false,
+                               bool precommit_timeout = false) {
+      run_one_e2e(binary, case_directory, identities, scores, k,
+          lose_receipt, precommit_abort, precommit_timeout,
+          receipt_format_version, case_id);
+    };
     struct Fixture {
       std::vector<std::int32_t> scores;
       std::vector<std::uint32_t> k_values;
@@ -1683,7 +1775,8 @@ int main(int argc, char** argv) {
         const auto case_dir = (std::filesystem::path(directory.path) /
             ("case-" + std::to_string(case_index++))).string();
         std::filesystem::create_directory(case_dir);
-        run_one_e2e(binary, case_dir, identities, fixture.scores, k);
+        run_matrix_case(case_dir, fixture.scores, k,
+            "fixture-" + std::to_string(case_index - 1U));
       }
     }
     for (std::uint32_t code = 0; code < 27; ++code) {
@@ -1697,7 +1790,8 @@ int main(int argc, char** argv) {
         const auto case_dir = (std::filesystem::path(directory.path) /
             ("case-ternary-n3-" + std::to_string(case_index++))).string();
         std::filesystem::create_directory(case_dir);
-        run_one_e2e(binary, case_dir, identities, scores, k);
+        run_matrix_case(case_dir, scores, k,
+            "ternary-n3-" + std::to_string(code) + "-k-" + std::to_string(k));
       }
     }
     std::array<std::int32_t, 4> permuted_scores{
@@ -1707,25 +1801,79 @@ int main(int argc, char** argv) {
         const auto case_dir = (std::filesystem::path(directory.path) /
             ("case-permutation-n4-" + std::to_string(case_index++))).string();
         std::filesystem::create_directory(case_dir);
-        run_one_e2e(binary, case_dir, identities,
-                    std::vector<std::int32_t>(permuted_scores.begin(),
-                                              permuted_scores.end()), k);
+        run_matrix_case(case_dir,
+            std::vector<std::int32_t>(permuted_scores.begin(),
+                                      permuted_scores.end()), k,
+            "permutation-n4-k-" + std::to_string(k) + "-case-" +
+                std::to_string(case_index - 1U));
       }
     } while (std::next_permutation(permuted_scores.begin(), permuted_scores.end()));
     const auto recovery_dir = (std::filesystem::path(directory.path) /
                                "case-lost-receipt-after-commit").string();
     std::filesystem::create_directory(recovery_dir);
-    run_one_e2e(binary, recovery_dir, identities, {-9, -9, 10, INT32_MIN}, 2, true);
+    run_matrix_case(recovery_dir, {-9, -9, 10, INT32_MIN}, 2,
+                    "lost-receipt-n4", true);
     const auto abort_dir = (std::filesystem::path(directory.path) /
                             "case-precommit-escrow-crash").string();
     std::filesystem::create_directory(abort_dir);
-    run_one_e2e(binary, abort_dir, identities, {5, 5, 0}, 2, false, true);
+    run_matrix_case(abort_dir, {5, 5, 0}, 2, "precommit-abort-n3", false, true);
     const auto timeout_dir = (std::filesystem::path(directory.path) /
                               "case-precommit-timeout").string();
     std::filesystem::create_directory(timeout_dir);
-    run_one_e2e(binary, timeout_dir, identities, {INT32_MAX, 1, 1}, 1,
-                false, false, true);
-    std::cout << "S32 score-to-mask-v3 independent-process E2E PASS\n";
+    run_matrix_case(timeout_dir, {INT32_MAX, 1, 1}, 1,
+                    "precommit-timeout-n3", false, false, true);
+    if (receipt_v2_matrix) {
+      for (const std::uint32_t n : {128U, 256U}) {
+        for (const std::uint32_t k : {1U, 2U, 8U, n / 2U, n - 1U, n}) {
+          std::vector<std::int32_t> scores(n);
+          const std::size_t pattern = k == 1U ? 0U : k == 2U ? 1U :
+              k == 8U ? 2U : k == n / 2U ? 3U : k == n - 1U ? 4U : 5U;
+          for (std::uint32_t i = 0; i < n; ++i) {
+            switch (pattern) {
+              case 0: scores[i] = (i % 8U == 0U) ? INT32_MAX
+                                                 : -static_cast<std::int32_t>(i % 97U); break;
+              case 1: scores[i] = 23; break;
+              case 2: {
+                const std::array<std::int32_t, 8> values{
+                    INT32_MIN, -1, 0, 1, INT32_MAX, -1, 17, 17};
+                scores[i] = values[i % values.size()];
+                break;
+              }
+              case 3: scores[i] = (i % 2U == 0U) ? INT32_MAX : INT32_MIN; break;
+              case 4: scores[i] = (i % 16U == 0U) ? INT32_MIN
+                                                   : -static_cast<std::int32_t>(i % 11U); break;
+              default: scores[i] = (i % 3U == 0U) ? INT32_MIN
+                                                   : (i % 3U == 1U ? INT32_MAX : -7); break;
+            }
+          }
+          const auto case_dir = (std::filesystem::path(directory.path) /
+              ("receipt-v2-target-n" + std::to_string(n) + "-k-" +
+               std::to_string(k))).string();
+          std::filesystem::create_directory(case_dir);
+          run_matrix_case(case_dir, scores, k,
+              "receipt-v2-target-n" + std::to_string(n) + "-k-" +
+                  std::to_string(k));
+        }
+        std::vector<std::int32_t> recovery_scores(n);
+        for (std::uint32_t i = 0; i < n; ++i)
+          recovery_scores[i] = (i % 4U == 0U) ? INT32_MAX
+                                               : -static_cast<std::int32_t>(i % 31U);
+        const auto lost_dir = (std::filesystem::path(directory.path) /
+            ("receipt-v2-target-n" + std::to_string(n) + "-lost-receipt")).string();
+        std::filesystem::create_directory(lost_dir);
+        run_matrix_case(lost_dir, recovery_scores, n / 2U,
+            "receipt-v2-target-n" + std::to_string(n) + "-lost-receipt", true);
+        const auto abort_dir = (std::filesystem::path(directory.path) /
+            ("receipt-v2-target-n" + std::to_string(n) + "-precommit-abort")).string();
+        std::filesystem::create_directory(abort_dir);
+        run_matrix_case(abort_dir, recovery_scores, n / 2U,
+            "receipt-v2-target-n" + std::to_string(n) + "-precommit-abort",
+            false, true);
+      }
+    }
+    std::cout << (receipt_v2_matrix
+        ? "S40 receipt/v2 195-case plus target-boundary independent-process E2E PASS\n"
+        : "S32 score-to-mask-v3 independent-process E2E PASS\n");
     return 0;
   } catch (const std::exception& error) {
     std::cerr << "S32_V3_PROCESS_E2E_FAIL " << error.what() << '\n';

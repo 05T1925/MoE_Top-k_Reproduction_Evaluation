@@ -1,0 +1,412 @@
+{
+  "schema": "m6b-i-project-select5iter-s40-followup-gates/v1",
+  "date": "2026-10-21",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S40-FOLLOWUP",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall_functional_status": "PASS_WITH_SCOPE",
+  "overall_security_status": "OPEN_WITH_EXACT_GAP",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_five_iteration_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "secure_implementation": false,
+    "secure_alias": "NOT_CREATED",
+    "v3_default": "OFF",
+    "receipt_v2_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED",
+    "formal_lan_wan": "NOT_RUN",
+    "rtt": "NOT_MEASURED"
+  },
+  "baseline": {
+    "review_head": "b3b04dd835b355193b83d689c698a688267605bc",
+    "runtime_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s39_manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+    "s39_manifest_file_sha256": "af4643a816a2bc0e22772ce849d0daab082aa68161cc001777992d060c5b3615",
+    "s39_manifest_file_count": 85,
+    "s39_manifest_canonical_sha256": "09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9",
+    "starting_worktree_clean": true,
+    "runtime_files_changed": false,
+    "vfss_baseline_modified": false,
+    "main_worktree_touched": false,
+    "push_or_merge": "NOT_PERFORMED"
+  },
+  "proof_scope": {
+    "corruption": "one static semi-honest P_b",
+    "A_T": "conditionally trusted, honest, non-colluding with corrupted party",
+    "preprocessing": "ideal F_T/v1",
+    "execution": "successful path without I/O/process faults",
+    "fetch": "one authenticated fetch from already COMMITTED state",
+    "L_S29_expanded": false,
+    "F_TOPK_ATOMIC_changed": false,
+    "arbitrary_crash_abort_prefix_privacy": "OUT_OF_SCOPE",
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "physical_power_loss_or_media_corruption": "NOT_PROVED"
+  },
+  "gates": [
+    {
+      "id": "fixed_source_and_manifest",
+      "status": "PASS",
+      "evidence": "S39 85-entry manifest list recomputes to recorded canonical SHA; exact runtime parent 8028 and b3 review head."
+    },
+    {
+      "id": "runtime_source_unchanged",
+      "status": "PASS",
+      "evidence": "Escrow, GMW and party runtime blobs match 8028; no runtime file changed."
+    },
+    {
+      "id": "default_off_release",
+      "status": "PASS",
+      "evidence": "Fresh no-option Release; both v3/v2 CMake options OFF; M2 target builds; no v3 target or symbol."
+    },
+    {
+      "id": "v2_requires_gmw",
+      "status": "PASS",
+      "evidence": "CMake explicitly rejects receipt/v2 ON with GMW v3 OFF."
+    },
+    {
+      "id": "explicit_v3_v2_release",
+      "status": "PASS",
+      "evidence": "Fresh Release with both explicit ON; local extracted SQLite dev headers/library; linked final binaries."
+    },
+    {
+      "id": "unknown_version_invalid_boundaries",
+      "status": "PASS",
+      "evidence": "Conformance rejects receipt version 3, N=257, wrong party/session/identity, package/context misuse, and second lease consumption."
+    },
+    {
+      "id": "v1_compatibility",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Final v2-enabled binary, v1 receipt smoke at N=4,K=2; oracle and restart/fetch pass."
+    },
+    {
+      "id": "v2_runtime_conformance",
+      "status": "PASS",
+      "evidence": "Signature, triples, permutation shares, one-shot lease, package faults; N128/N256 gate formulas."
+    },
+    {
+      "id": "receipt_v2_195_matrix",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "All 195 old matrix topologies re-run using receipt/v2 and final binary."
+    },
+    {
+      "id": "receipt_v2_target_n128_n256",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Each N covers K={1,2,8,N/2,N-1,N} plus lost-receipt and precommit abort."
+    },
+    {
+      "id": "case_oracle_results",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "211 unique v2 cases; 207 oracle PASS and 4 no-share cases NOT_APPLICABLE_NO_SHARE; no unexpected failures."
+    },
+    {
+      "id": "duplicate_submit_fetch_identity",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Same ciphertext duplicate reuses receipt; changed duplicate rejected; repeated recipient fetch idempotent; wrong TLS identity rejected."
+    },
+    {
+      "id": "lost_receipt_after_commit",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "3 injected cases; P0 requires recovery, peer commits; restart and authenticated fetch recover recipient shares."
+    },
+    {
+      "id": "precommit_crash_timeout",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "3 injected A kill cases and 1 injected timeout; no shares; restart aborts and fetch is rejected."
+    },
+    {
+      "id": "normal_multiprocess_no_injection",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "N128/K64; both parties exit 0 and return share; one A transaction/two ciphertext rows; XOR oracle passes."
+    },
+    {
+      "id": "post_final_proxy_eof",
+      "status": "OBSERVED_AFTER_FINAL_FRAME",
+      "evidence": "Final phase 88 tag-6 frames both read/written OK; EOF only when proxy requests another frame."
+    },
+    {
+      "id": "natural_business_phase_io_fault",
+      "status": "NOT_REPRODUCED",
+      "evidence": "No party phase/API read-write fault through final phase; readiness TCP connect-close explains escrow handshake EOF."
+    },
+    {
+      "id": "honest_peer_deposit_simulator",
+      "status": "OPEN_WITH_EXACT_GAP",
+      "evidence": "After own deposit A remains PENDING; only second authenticated peer deposit commits. No authorized executable peer endpoint in party simulator interface."
+    },
+    {
+      "id": "v2_ideal_token_local_lemma",
+      "status": "CONDITIONAL_PASS_REVIEWED_IN_S39",
+      "evidence": "Inherited local ideal A independent-RNG token law only; it does not generate peer deposit or COMMITTED response."
+    },
+    {
+      "id": "F_T_v1_to_real_dealer_bridge",
+      "status": "NOT_REACHED",
+      "evidence": "Stopped earlier at honest peer deposit route."
+    },
+    {
+      "id": "full_security",
+      "status": "OPEN_WITH_EXACT_GAP",
+      "evidence": "No complete one-party simulator; this is a proof/interface gap, not an attack."
+    },
+    {
+      "id": "A_only_abort_prefix_physical_durability",
+      "status": "OUT_OF_SCOPE_OR_NOT_PROVED"
+    },
+    {
+      "id": "formal_lan_wan",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "rtt",
+      "status": "NOT_MEASURED"
+    },
+    {
+      "id": "n_gt_256",
+      "status": "NOT_ADMITTED"
+    },
+    {
+      "id": "secure_alias",
+      "status": "NOT_CREATED"
+    }
+  ],
+  "normal_path": {
+    "case": "normal-path-trace",
+    "receipt_format_version": 2,
+    "N": 128,
+    "K": 64,
+    "scores": [
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17,
+      2147483647,
+      -2147483648,
+      -1,
+      17,
+      2147483647,
+      -17,
+      0,
+      17
+    ],
+    "dealer_exit": 0,
+    "p0_exit": 0,
+    "p1_exit": 0,
+    "escrow_exit": 143,
+    "p0_api": "committed/share-returned",
+    "p1_api": "committed/share-returned",
+    "a_transactions": 1,
+    "a_share_rows": 2,
+    "a_status": "COMMITTED",
+    "p0_frames_sent": 88,
+    "p0_frames_received": 88,
+    "p1_frames_sent": 88,
+    "p1_frames_received": 88,
+    "phase_count_each": 88,
+    "timeout_ms": 15000,
+    "proxy_exception": "TLS record I/O failed: error:0A000126:SSL routines::unexpected eof while reading",
+    "interpretation": "phase 88 final frames both forwarded successfully; proxy then attempted another receive after the business transcript."
+  },
+  "target_resource_observations": {
+    "128": {
+      "valid_cases": 6,
+      "k_values": [
+        1,
+        2,
+        8,
+        64,
+        127,
+        128
+      ],
+      "gate_count": [
+        1289280
+      ],
+      "package_bytes_each_party": [
+        485964,
+        485964
+      ],
+      "max_payload_bytes": [
+        159852,
+        159852
+      ],
+      "peak_party_rss_kib": [
+        25076,
+        25332
+      ],
+      "exchange_phases": [
+        81,
+        88
+      ],
+      "diagnostic_elapsed_ms": [
+        823,
+        886
+      ],
+      "oracle_pass": 6
+    },
+    "256": {
+      "valid_cases": 6,
+      "k_values": [
+        1,
+        2,
+        8,
+        128,
+        255,
+        256
+      ],
+      "gate_count": [
+        5281664
+      ],
+      "package_bytes_each_party": [
+        1989252,
+        1989252
+      ],
+      "max_payload_bytes": [
+        655468,
+        655468
+      ],
+      "peak_party_rss_kib": [
+        72368,
+        72368
+      ],
+      "exchange_phases": [
+        79,
+        89
+      ],
+      "diagnostic_elapsed_ms": [
+        1118,
+        1291
+      ],
+      "oracle_pass": 6
+    }
+  },
+  "performance": {
+    "formal_lan_wan": "NOT_RUN",
+    "rtt": "NOT_MEASURED",
+    "local_diagnostic": "TEST_ONLY_NOT_PERFORMANCE",
+    "exchange_phase": "not algorithm iterations, comparison dependency depth, or RTT"
+  },
+  "independent_review": {
+    "receiver": "/root (S40, not involved in S39 runtime/proof work)",
+    "read_only_reviewer": "/root/s40_independent_receiver",
+    "review_type": "source/state-machine and final-log review; read-only reviewer did not build or test",
+    "result": "confirmed source identity, 211 case count, EOF after final frame and peer-deposit exact gap"
+  },
+  "self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE"
+}
