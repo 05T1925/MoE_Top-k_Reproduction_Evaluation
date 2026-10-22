@@ -1230,3 +1230,11 @@ S41 对象固定为 S40 提交 `b04618117b11cffe0e899947726ab1c66807ffdd`；S40 
 独立接收者 `/root/s40_independent_receiver` 复核 S41 诚实 endpoint 的因果提交路由：真实 P_(1-b) 可仅用自身输出、package 与凭据向 A 做第二次 authenticated deposit，A 才从 PENDING 转 COMMITTED；Sim_b 没有 peer secret、A context 或 J_b 权限。该局部路由规格通过审查，但本方前缀与 commit/receipt/fetch 的联合模拟为 `OPEN_WITH_EXACT_GAP`。缺失式为隐藏状态 H_b（peer output/package、A context/预提交状态）在 Q_b=(x_b,z_b,L_S29,pkg_b,static_b,Vpre_b,C_b) 条件下的真实/理想联合 law；固定完整 S_pre 下的 continuation kernel 等式不能替代该条件分布。未声称攻击或不可能性。
 
 首要下一步是明确同一个 F_T/F_TOPK 会话的 session、invocation、N、K、route、circuit 与 gate-schedule 绑定，并给出不扩大 L_S29、不给 simulator 增加隐藏输入权限的条件联合 sampler/距离界，再经独立复核。仅此完成后才进入 ideal F_T/v1→真实 Dealer 的材料联合分布、签名、RNG/DRBG、TLS、重启/reseed/并发和 one-shot 消费证明义务。BUILD/TEST=NOT_RUN；receipt/v2 token 局部引理沿用但不扩张为完整证明；无运行时改动、无性能矩阵、无 secure alias。自然 I/O 故障沿用 S40 NOT_REPRODUCED；N>256 NOT_ADMITTED；正式 LAN/WAN 与 RTT 未测。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S42（2026-10-22）
+
+S42 以 S41 固定提交 `486026ba425a2d17ca15173d056db6eb309747d1` 为对象；manifest 的 85 个源条目已核验，本机 raw hash 差异仅为两份 Markdown 的 checkout 换行字节。未改 runtime、VFSS-baseline、算法、输出、角色或 `L_S29`。
+
+构造了一方静态半诚实 party 的成功路径本方可见 transcript sampler：沿用 S36 H4 prefix 和 S39/S40 v2 token 局部条件结论，由真实诚实对端按同次 `F_T/v1`/`F_TOPK` 的自身输出份额及 package 做 authenticated deposit，A 再按真实状态机返回本方 receipt 和已提交 fetch。S42 通过直接 projection factorization 回答 S41 gap；不以完整 `Law(H_b|Q_b)` 相等作为条件，也不把隐藏 context/peer metadata 交给 simulator。未参与 S41 推导的独立接收者 `/root/s40_independent_receiver` 已复核条件因子分解、同次调用绑定及 endpoint/A 信息权限，结果为 `CONDITIONAL_PASS_REVIEWED`，范围限于本方可见成功应用/API transcript，不等于完整安全通过。
+
+仅文档变更，BUILD/TEST=NOT_RUN；S40 211 案功能证据继承不重跑。真实 ideal-to-Dealer/RNG/signature/TLS 桥、完整 GMW 安全和任意故障前缀仍 OPEN；自然业务 I/O 故障仍 NOT_REPRODUCED，N>256 NOT_ADMITTED，正式 LAN/WAN/RTT 未运行/测量，未创建 secure alias，未推送或合并。下一步只推进 ideal `F_T/v1` 到真实 Dealer 的联合材料分布、签名、RNG/DRBG、TLS/认证传输和 one-shot 消费证明义务，不扩大本轮定理。详见 S42 报告、决策、machine-readable gates 与 source/evidence manifest。

@@ -1,0 +1,116 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s42-gates/v1",
+  "date": "2026-10-22",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S42",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall": "CONDITIONAL_PASS_REVIEWED",
+  "overall_scope": "party-visible successful application/API transcript projection only; not complete security",
+  "fixed_identity": {
+    "s41_commit": "486026ba425a2d17ca15173d056db6eb309747d1",
+    "s40_commit": "b04618117b11cffe0e899947726ab1c66807ffdd",
+    "runtime_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s41_tree": "f37604525a67562a9a3fe3f36237d92502ade758",
+    "s41_source_entry_count": 85,
+    "s40_source_canonical_sha256": "10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6",
+    "raw_file_matches": 83,
+    "newline_only_checkout_deltas": ["PROJECT.md", "docs/IMPLEMENTATION_PLAN.md"]
+  },
+  "proof_scope": {
+    "corruption": "one static semi-honest party",
+    "A_T": "conditionally trusted and non-colluding with corrupted party",
+    "preprocessing": "ideal F_T/v1 and specified independent ideal tapes",
+    "functionality": "F_TOPK stable original-order Q20.12 mask plus F_TOPK-ATOMIC commit/recovery contract",
+    "execution": "successful application/API transcript, no I/O or process failures",
+    "fetch": "one authenticated fetch from an already COMMITTED state",
+    "L_S29_expanded": false,
+    "roles_or_output_changed": false,
+    "arbitrary_crash_abort_prefix": "OUT_OF_SCOPE",
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "physical_power_loss": "NOT_PROVED"
+  },
+  "same_call_tuple": ["session", "invocation", "N", "K", "route", "circuit", "gate_schedule"],
+  "gates": [
+    {
+      "id": "fixed_s41_commit_tree_and_s40_source_identity",
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Exact S41 HEAD/tree, clean starting checkout; S40 original 85-entry canonical recomputes to 10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6; 83 of 85 S41 checkout raw hashes match, with only the two documented Markdown checkout-EOL deltas."
+    },
+    {
+      "id": "inherited_s41_manifest_aggregate_consistency",
+      "status": "OPEN_METADATA_DIVERGENCE",
+      "evidence": "S41 manifest per-entry sha256_s41_checkout values recompute to e0bb4d2507a2cf2536c5d28d53c5c2c6aa19f927359482c1e236c5b19b5f8a69 under its stated canonicalization, while its summary field records bfa8ba9c051ca69c43a22130fa9d1cefc8885cbed10284ed0506762667ab726c. This is retained as an inherited metadata inconsistency; exact S41 commit/tree and S40 canonical source snapshot remain identified."
+    },
+    {
+      "id": "same_call_f_t_f_topk_binding",
+      "status": "CONDITIONAL_PASS_REVIEWED_FIXED_ROUTE",
+      "evidence": "Proof coordinator checks all tuple fields. F_TOPK takes route explicitly; F_T/package/context use v3 protocol plus fixed circuit/schedule hashes. The independent reviewer checked the same-call route within this fixed scope. Runtime has no standalone route string and transaction id encodes session/invocation only; A context and DB row bind remaining metadata."
+    },
+    {
+      "id": "s36_h4_prefix_sampler",
+      "status": "INHERITED_CONDITIONAL_PASS_REVIEWED",
+      "evidence": "S36's independent review applies under ideal F_T/v1, one static semi-honest party, and successful path; not a real Dealer bridge."
+    },
+    {
+      "id": "party_visible_submit_commit_fetch_sampler",
+      "status": "CONDITIONAL_PASS_REVIEWED",
+      "evidence": "Explicit polynomial-time sampler uses the honest peer's own same-call F_T/F_TOPK outputs to make a real-format authenticated deposit; A runs the source state machine; Sim_b observes only its own response and fetch. Independent reviewer confirmed the projection factorization and permissions. No peer-success oracle. Scope excludes raw TLS wire/timing, failures, real Dealer bridge, A-only corruption, and full GMW security."
+    },
+    {
+      "id": "hidden_H_conditional_law",
+      "status": "NOT_REQUIRED_FOR_PROJECTED_VIEW; NOT_CLAIMED",
+      "evidence": "The proof compares the party-visible projection by a conditional factorization, independently reviewed within scope. It does not claim Law_real(H_b|Q_b)=Law_ideal(H_b|Q_b); the hidden-state conditional law remains unproved and is not required for this narrower projection claim."
+    },
+    {
+      "id": "honest_peer_causal_deposit",
+      "status": "CONDITIONAL_PASS_REVIEWED_FOR_CAUSAL_ROUTE",
+      "evidence": "The actual endpoint is driven by its own input, same-call ideal output share, own signed package, credential and public settings; it submits before A commits. Independent reviewer confirmed this route does not grant peer secrets or a success oracle to Sim_b."
+    },
+    {
+      "id": "receipt_v2_token_local_law",
+      "status": "INHERITED_CONDITIONAL_PASS_REVIEWED",
+      "evidence": "Only 32-byte token conditional uniformity for ideal independent A RNG from S39/S40. RAND_bytes bridge remains OPEN."
+    },
+    {
+      "id": "receipt_v1_or_peer_ciphertext_hybrid",
+      "status": "NOT_USED",
+      "evidence": "S42 retains receipt/v2 and does not replace the peer ciphertext; no new IND-CPA hybrid is claimed."
+    },
+    {
+      "id": "ideal_FT_to_real_dealer_signature_rng_tls_bridge",
+      "status": "OPEN_NEXT_PROOF_OBLIGATION",
+      "evidence": "Must address joint triple/permutation law, one-shot/package binding, signatures, DRBG restart/reseed/concurrency, TLS/authentication and symbolic advantages."
+    },
+    {
+      "id": "s40_target_size_functional_evidence",
+      "status": "INHERITED_PASS_WITH_SCOPE_NOT_RERUN",
+      "evidence": "S40 211-case receipt/v2 N<=256 evidence: 207 share cases match oracle; four precommit abort cases no share."
+    },
+    {
+      "id": "natural_business_io_fault",
+      "status": "NOT_REPRODUCED_IN_S40; NOT_RUN_IN_S42",
+      "evidence": "No natural business-phase I/O failure recorded; S42 ran no communication experiment."
+    },
+    {
+      "id": "build_tests_performance",
+      "status": "BUILD_TEST_NOT_RUN; FORMAL_LAN_WAN_NOT_RUN; RTT_NOT_MEASURED",
+      "evidence": "Documentation/proof review only; no S40 matrix repetition and no benchmark."
+    },
+    {
+      "id": "n_gt_256_and_secure_alias",
+      "status": "N_GT_256_NOT_ADMITTED; SECURE_ALIAS_NOT_CREATED",
+      "evidence": "No scope increase."
+    },
+    {
+      "id": "independent_review",
+      "status": "COMPLETED_CONDITIONAL_PASS_REVIEWED",
+      "reviewer": "/root/s40_independent_receiver",
+      "independence": "not involved in S41 derivation; read-only review of the S42 sampler, factorization, same-call F_T/F_TOPK routing, and simulator/service permissions",
+      "verdict": "CONDITIONAL_PASS_REVIEWED for the scoped party-visible successful application/API projection only; full hidden-state law and full security not reviewed as passed"
+    }
+  ],
+  "push": "NOT_PERFORMED",
+  "merge": "NOT_PERFORMED",
+  "vfss_baseline_modified": false,
+  "runtime_modified": false,
+  "keys_materials_certificates_build_outputs_raw_large_logs_added": false
+}

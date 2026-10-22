@@ -933,3 +933,11 @@ S41 从 S40 精确提交 `b04618117b11cffe0e899947726ab1c66807ffdd` 的隔离 wo
 本轮定义了 proof-only 诚实对端 endpoint 路由：P_(1-b) 使用自己的 F_TOPK 输出、F_T package 和凭据真实向 A 提交第二份密文；A 由该请求按 PENDING→COMMITTED 状态机提交，Sim_b 不接收对端秘密、不持有 A context/J_b，也不使用无条件成功 oracle。独立接收者 `/root/s40_independent_receiver` 确认这是有效的局部因果路由规格，但裁定完整联合模拟 `OPEN_WITH_EXACT_GAP`：固定完整 S_pre 后 escrow continuation kernel 相同，不能推出给定 Q_b=(x_b,z_b,L_S29,pkg_b,static_b,Vpre_b,C_b) 时，peer 输出/package、A context/状态 H_b 的真实与理想条件分布相同。未提供 Law_real(H_b|Q_b)=Law_ideal(H_b|Q_b) 的证明或不泄露 H_b 的 sampler。该点是证明缺口，不是攻击或不可能性结论。诚实 endpoint route 的局部审查不等于安全通过。
 
 下一步先明确 F_T/F_TOPK 的同一 session、invocation、N、K、route、circuit、gate-schedule 绑定，并补出/独立复核该条件联合 law；此前不推进 ideal F_T/v1 到真实 Dealer 桥。完整安全保持 OPEN；A/T 信任边界、L_S29、输出和角色不变，receipt/v2 局部 token 引理沿用。仅文档变更，BUILD/TEST=NOT_RUN；自然 I/O 故障沿用 S40 NOT_REPRODUCED；N>256 NOT_ADMITTED，正式 LAN/WAN 与 RTT 未测，v3/receipt-v2 默认关闭，未创建 secure alias，未推送或合并。详见 S41 报告、决策、gates 和 source/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S42（2026-10-22）
+
+S42 固定在 S41 提交 `486026ba425a2d17ca15173d056db6eb309747d1`；85 项来源清单按 S41 manifest 重核，S40 canonical 仍为 `10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6`。本轮不重复 S40 的 211 案目标规模功能矩阵。
+
+本轮构造本方可见成功转录的直接 sampler：S36 H4 本方前缀模拟之后，本方密文由已知理想输出和 public recipient key 按源 envelope 分布生成；同次 `F_T/v1`、`F_TOPK` 调用的诚实对端使用自己的 package/output/凭据真实 authenticated deposit；A 运行真实格式状态机并只向本方通道返回 submit receipt 与本方 committed fetch。模拟器不接收 peer package/share、A context、T 私钥或 reduction-only `J_b`，没有伪造 peer-success 事件，也未证明或假设完整隐藏状态 `H_b` 条件 law 相等。未参与 S41 推导的独立接收者 `/root/s40_independent_receiver` 已复核投影因子分解和角色权限，结论为范围限定的 `CONDITIONAL_PASS_REVIEWED`；该状态只覆盖本方可见成功应用/API transcript，不覆盖完整安全。
+
+S39/S40 的 receipt/v2 token 理想独立 A RNG 局部均匀引理只按原范围继承；真实 RNG/Dealer/signature/TLS 桥仍 OPEN。自然读写故障沿用 S40 `NOT_REPRODUCED`；任意 crash/abort prefix、A-only 腐化和掉电耐久仍未证明。N≤256 功能证据沿用 `PASS_WITH_SCOPE`，N>256 `NOT_ADMITTED`；本轮 BUILD/TEST、正式 LAN/WAN 与 RTT 均 `NOT_RUN/NOT_MEASURED`，不创建 `secure` alias，v3 默认关闭，不推送或合并。下一步仅整理并证明 ideal `F_T/v1` 到真实 Dealer 的材料联合分布、签名、RNG/DRBG、TLS/认证传输与 one-shot 消费桥；未完成前完整 GMW 安全仍 OPEN。详细范围见 S42 报告、决策、gates 和 source/evidence manifest。
