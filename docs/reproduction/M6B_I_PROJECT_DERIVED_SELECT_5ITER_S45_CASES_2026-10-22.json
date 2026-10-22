@@ -1,0 +1,163 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s45-cases/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S45",
+  "date": "2026-10-22",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "runtime_base": "aaa7f96095c350e8236246163d48c54a7fb8d9ba",
+  "runtime_changes": "S45 F_T/v2 bounded-rejection candidate",
+  "binary_sha256": {
+    "release_test_archive": "a11262f05be5740c7225c216bf95fa37dcc7ae0752f04885eee4cefcb1dd0f69",
+    "bounded_conformance": "3f466e7e7fd3d75f4081d37c531d26392bb94d3cd1626438f6e6907214451ff3",
+    "ft_v2_process_e2e": "f647aae8367a239f38071065418dd3b43a46de1db99de944eec1659d271d1cff",
+    "release_production_archive": "cfcd488a378710ed9e2c53a884390ee855f4126e67fdbf1928f56a9ddc64b27a",
+    "default_off_archive": "c4771f4372b92b54a06cd4f9ef2f32a06ea3cf6878ebb9dcdb4eb9ce22cd8c16"
+  },
+  "cases": [
+    {
+      "id": "cmake-release-default-off",
+      "command": "cmake -S VFSS -B /tmp/m6b-s45-release-off -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=OFF; cmake --build /tmp/m6b-s45-release-off --target sytorch",
+      "result": "PASS",
+      "assertions": [
+        "GMW, receipt/v2 and F_T/v2 options are OFF in CMakeCache",
+        "target help contains no score_to_mask_v3 or FTv2 target",
+        "nm -C libsytorch.a contains no score_to_mask_v3 or FTv2 symbol"
+      ],
+      "archive_sha256": "c4771f4372b92b54a06cd4f9ef2f32a06ea3cf6878ebb9dcdb4eb9ce22cd8c16"
+    },
+    {
+      "id": "ft-v2-requires-gmw",
+      "command": "cmake -S VFSS -B /tmp/m6b-s45-invalid-ft2-without-gmw -G Ninja -DCMAKE_BUILD_TYPE=Release -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=OFF",
+      "result": "PASS_EXPECTED_CONFIGURE_REJECTION",
+      "exit": "nonzero",
+      "diagnostic": "F_T/v2 requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON",
+      "log_path_outside_repo": "/tmp/m6b-s45-invalid-config.log",
+      "log_sha256": "fa168701f05e4c223e97656c0c519f09e86b28b199785b46a442bf31ee522bc6"
+    },
+    {
+      "id": "release-ft-v2-testing-build",
+      "command": "cmake -S VFSS -B /tmp/m6b-s45-release-ft2 -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=ON; cmake --build /tmp/m6b-s45-release-ft2 --target moe_topk_score_to_mask_v3_ft_v2_bounded_conformance_test moe_topk_score_to_mask_v3_ft_v2_process_e2e_test moe_topk_score_to_mask_v3_runtime_conformance_test -j 4",
+      "result": "PASS",
+      "build_type": "Release",
+      "generator": "Ninja",
+      "compiler": "GCC 13.3.0",
+      "openssl": "3.0.13",
+      "sqlite_dev_header": "Temporary official SQLite 3.45.1 amalgamation header and runtime-library symlink outside repository; no repository dependency change",
+      "archive_sha256": "a11262f05be5740c7225c216bf95fa37dcc7ae0752f04885eee4cefcb1dd0f69"
+    },
+    {
+      "id": "bounded-sampler-conformance",
+      "command": "ctest --test-dir /tmp/m6b-s45-release-ft2 --output-on-failure -R moe_topk_score_to_mask_v3_ft_v2_bounded_conformance_test",
+      "result": "PASS",
+      "cases": [
+        "m=1 returns zero without consuming a word",
+        "m=2 accepts a boundary word",
+        "m=3 and m=255 exercise non-power-of-two threshold edges",
+        "m=256 tests upper boundary for power-of-two range",
+        "forced rejection then acceptance remains within the attempt cap",
+        "six consecutive rejections abort with ISSUANCE_ABORT",
+        "lambda=128 gives r=6 for every m=2..256",
+        "N128/N256 Qmax bytes, RAND call counts and 1 MiB request ceiling match source-derived bounds",
+        "signed F_T/sampler profile mismatch rejected",
+        "receipt_format_version 1 and 2 stay independent from F_T version 2",
+        "same invocation rejected after success and after bounded abort under same registry root",
+        "bounded abort leaves no package/context/party-lease artifact and persists one internal burn record"
+      ],
+      "binary_sha256": "3f466e7e7fd3d75f4081d37c531d26392bb94d3cd1626438f6e6907214451ff3"
+    },
+    {
+      "id": "v3-runtime-conformance",
+      "command": "ctest --test-dir /tmp/m6b-s45-release-ft2 --output-on-failure -R moe_topk_score_to_mask_v3_runtime_conformance_test",
+      "result": "PASS"
+    },
+    {
+      "id": "ft-v2-multiprocess-target-smoke",
+      "command": "S35_KEEP_TEST_TMP=1 /tmp/m6b-s45-release-ft2/moe_topk_score_to_mask_v3_ft_v2_process_e2e_test --ft-v2-smoke",
+      "result": "PASS",
+      "cases": [
+        {
+          "n": 128,
+          "k": 64,
+          "ft_version": 2,
+          "receipt_format_version": 1,
+          "dealer_p0_p1_exit": [0, 0, 0],
+          "oracle": "PASS",
+          "exactly_k_ones_and_original_order": "PASS",
+          "escrow_restart_fetch_recovery": "PASS",
+          "package_sha256_p0": "545bba1255898f9b52d6b066ae63c7977fd2f5fd720c75b7cc3d13a5c0ffe9bf",
+          "package_sha256_p1": "0aba97bb91cdd942a965a874e28537519a0aca1493e2cb243c2383bdca1643cb"
+        },
+        {
+          "n": 256,
+          "k": 128,
+          "ft_version": 2,
+          "receipt_format_version": 2,
+          "dealer_p0_p1_exit": [0, 0, 0],
+          "oracle": "PASS",
+          "exactly_k_ones_and_original_order": "PASS",
+          "escrow_restart_fetch_recovery": "PASS",
+          "package_sha256_p0": "51b7c7c23a02bcab1a7b4d818bea3978d95a0026d951481a82c35b68e0d090ac",
+          "package_sha256_p1": "49c030d08882378de04c6871f69dd6202bca9a3801a36868fb884dd2621f6dae"
+        }
+      ],
+      "bounded_abort_case": {
+        "n": 256,
+        "k": 128,
+        "result": "ISSUANCE_ABORT",
+        "dealer_exit": 1,
+        "package_context_party_lease_artifacts": false,
+        "marker": "one TEST_ONLY private registry burn record"
+      },
+      "service_shutdown_exit": 143,
+      "service_shutdown_interpretation": "Harness SIGTERM after successful committed fetch/recovery; not a protocol failure",
+      "binary_sha256": "f647aae8367a239f38071065418dd3b43a46de1db99de944eec1659d271d1cff",
+      "raw_stdout_outside_repo": "/tmp/m6b-s45-ft-v2-smoke-retained.stdout",
+      "raw_stdout_sha256": "39ddc0c03ee7ec9b38c4b56bf749ac37cad238a5d5c7269891a13069b69b2419",
+      "retained_child_logs_outside_repo": "/tmp/s32-v3-process-e2e-a7XyCP"
+    },
+    {
+      "id": "ft-v1-receipt-v1-compatibility-smoke",
+      "command": "/tmp/m6b-s45-release-ft2/moe_topk_score_to_mask_v3_process_e2e_test --receipt-v1-smoke",
+      "result": "PASS",
+      "n": 4,
+      "k": 2,
+      "scores": [-7, 11, 11, -2147483648],
+      "ft_version": 1,
+      "receipt_format_version": 1,
+      "dealer_p0_p1_exit": [0, 0, 0],
+      "oracle": "PASS",
+      "escrow_restart_recovery": "PASS",
+      "raw_stdout_outside_repo": "/tmp/m6b-s45-v1-smoke.log",
+      "raw_stdout_sha256": "cf84b8349e756cd21b4108cfd9cee29b9fd04672678d3ab5de45796e1ec3f674"
+    },
+    {
+      "id": "release-production-opt-in-symbol-boundary",
+      "command": "cmake --build /tmp/m6b-s45-release-ft2-prod --target sytorch -j 4; nm -C libsytorch.a",
+      "result": "PASS",
+      "configuration": "Release, BUILD_TESTING=OFF, GMW=ON, receipt/v2=ON, FTv2=ON",
+      "assertions": [
+        "explicit score_to_mask_v3_dealer_issue_packages_ft_v2_bounded public symbol present",
+        "deterministic test_only random-source hook symbol absent"
+      ],
+      "archive_sha256": "cfcd488a378710ed9e2c53a884390ee855f4126e67fdbf1928f56a9ddc64b27a"
+    }
+  ],
+  "not_run": [
+    "S35 195-case matrix",
+    "S40 211-case matrix",
+    "complete multi-process N<=256 matrix",
+    "formal LAN/WAN matrix and RTT",
+    "formal performance repetitions",
+    "natural business I/O fault reproduction"
+  ],
+  "inherited": {
+    "S40_receipt_v2_functional_acceptance": "PASS_WITH_SCOPE; 211 cases: 207 oracle cases and 4 pre-commit abort/no-share cases; not rerun in S45",
+    "natural_io_fault": "NOT_REPRODUCED in prior S40 normal-path evidence",
+    "N_gt_256": "NOT_ADMITTED"
+  },
+  "review": {
+    "reviewer": "/root/s45_non_author_review",
+    "reviewer_is_non_author": true,
+    "reviewer_build_test": "NOT_RUN",
+    "final_review_status": "PASS_WITH_SCOPE_REVIEWED"
+  }
+}

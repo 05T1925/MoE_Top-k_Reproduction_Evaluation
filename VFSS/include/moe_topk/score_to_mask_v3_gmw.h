@@ -20,6 +20,14 @@ inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersion = 4;
 inline constexpr std::uint32_t kScoreToMaskV3EscrowContextFormatVersion = 1;
 inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV1 = 1;
 inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV2 = 2;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersionFtV2 = 5;
+inline constexpr std::uint8_t kScoreToMaskV3FtVersionV1 = 1;
+inline constexpr std::uint8_t kScoreToMaskV3FtVersionV2 = 2;
+inline constexpr std::uint8_t kScoreToMaskV3SamplerVersionUnboundedV1 = 0;
+inline constexpr std::uint8_t kScoreToMaskV3SamplerVersionBoundedV1 = 1;
+inline constexpr std::uint8_t kScoreToMaskV3FtV2SecurityParameterBits = 128;
+#endif
 inline constexpr std::uint32_t kScoreToMaskV3MaxN = 256;
 inline constexpr std::size_t kScoreToMaskV3MaxPackageBytes = 2U * 1024U * 1024U;
 inline constexpr std::size_t kScoreToMaskV3MaxMetadataBytes = 64U * 1024U;
@@ -50,6 +58,13 @@ struct ScoreToMaskV3GateBudget {
 struct ScoreToMaskV3PackageInfo {
   ScoreToMaskV3Session parameters;
   std::uint8_t party = 0;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+  std::uint32_t package_format_version = kScoreToMaskV3PackageFormatVersion;
+  std::uint8_t ft_version = kScoreToMaskV3FtVersionV1;
+  std::uint8_t sampler_version = kScoreToMaskV3SamplerVersionUnboundedV1;
+  std::uint8_t sampler_security_parameter_bits = 0;
+  std::uint8_t sampler_retry_limit = 0;
+#endif
   std::array<std::uint8_t, 32> circuit_sha256{};
   std::array<std::uint8_t, 32> gate_schedule_sha256{};
   std::array<std::uint8_t, 32> package_sha256{};
@@ -173,6 +188,22 @@ void score_to_mask_v3_dealer_issue_packages(
     const std::string& signed_escrow_context_path,
     const std::string& dealer_ed25519_private_key_pem,
     const ScoreToMaskV3EscrowStateParameters& escrow_state = {});
+
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+// Explicit F_T/v2 issuance. This never falls back to the F_T/v1 sampler.
+// The v2 bounded-rejection profile is signed in the package format v5 header.
+// The private registry directory must be stable across T restarts and all
+// issuers for this deployment. Its 0700 owner-only files burn each
+// session/invocation once, including bounded-sampler aborts.
+void score_to_mask_v3_dealer_issue_packages_ft_v2_bounded(
+    const ScoreToMaskV3Session& session,
+    const std::string& package_p0_path,
+    const std::string& package_p1_path,
+    const std::string& signed_escrow_context_path,
+    const std::string& dealer_ed25519_private_key_pem,
+    const std::string& private_issuance_registry_directory,
+    const ScoreToMaskV3EscrowStateParameters& escrow_state = {});
+#endif
 
 ScoreToMaskV3PackageInfo score_to_mask_v3_validate_package(
     const std::string& package_path,

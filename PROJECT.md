@@ -957,3 +957,9 @@ S44 从 S43 精确提交 a1b02a8133955786e0bb6b047f55b746af66acbf 开始，实�
 在理想 IID tape、单次成功发材、receipt_format_version 与签名 context 匹配条件下，S43 的联合材料律经未参与 S43 推导的审查者复核后保留 PASS_WITH_SCOPE。S44 只将 E 作为部署配置/生命周期策略；隐藏 S 是初始 seed/熵输入和后续 reseed 熵输入，不含演化状态，并对其求平均，要求 `Law(S | P,sk_T,E)=Law(S | E)` 或明确的熵源替代定理。成功条件化还须显式处理 RAND 错误造成的选择效应。真实 RAND_bytes 全序列桥接需要部署 provider、seed/entropy、并发/fork/restart/reseed 和聚合 query 模型；计算优势 `Adv_DRBG_T(Q,C;E)` 未证明或量化，门仍 OPEN。S39 next_uniform 的拒绝循环无上限；期望时间有限，但不满足本路线 S38 strict-PPT 先例。S44 给出 F_T/v2 bounded-rejection 规格候选；`δ_reject` 只约束去除版本/签名/编码元数据后的语义材料投影，不约束完整 package transcript，且为独立统计项，不与 DRBG 计算优势混写；不改 F_T/v1 或 runtime。
 
 本轮未构建/测试、未重跑 S35 195 案或 S40 211 案，未运行正式 LAN/WAN/RTT。自然业务 I/O 故障沿用 NOT_REPRODUCED；N>256 NOT_ADMITTED；无 secure alias；v3 默认 OFF；VFSS-baseline 不变。完整 GMW party-view、private-channel 与真实部署 DRBG bridge 仍 OPEN，不是完整安全 PASS。详见 S44 decision、报告、gates 与 source/build/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S45（2026-10-22）
+
+S45 从 S44 精确提交 `aaa7f96095c350e8236246163d48c54a7fb8d9ba` 的隔离 worktree 开始，为 F_T 加入独立、默认 OFF 的 `F_T/v2 + bounded-rejection-v1` 候选；它与 escrow `receipt_format_version` 分属不同字段。v2 package format 5 将 F_T/sampler 版本、λ=128、6 次最大抽样尝试纳入签名 header 和用途域，F_T/v1 format 4 与原无界 sampler 保持单独入口，没有自动回退。对 `m≤256`，拒绝概率 `rho_i<2^-24`，整次发材中止界 `delta_reject≤255·2^-144=(255/256)·2^-136<2^-128`；该统计界仅针对去除签名/版本/编码元数据的语义材料投影，不约束完整跨版本 package transcript。
+
+连续 6 次拒绝时，发材在写 party package/context/signature 或创建 party lease 前返回 `ISSUANCE_ABORT`；T 的私有 registry burn marker 有意保留，阻止相同固定 registry 下重发。该一发材记录依赖部署固定 registry 路径，未证明跨版本/路径全局防重、敏感向量清零或后续多文件 I/O 错误原子性。Release default-OFF 检查、F_T/v2 bounded conformance、runtime conformance、F_T/v1 receipt smoke 和 N=128/256 v2 独立进程 oracle E2E 均通过；它们只支持 `PASS_WITH_SCOPE` 功能/严格抽样请求界。实际 RAND_bytes/provider/熵源/生命周期的联合安全桥 `OPEN`，完整 GMW party-view `OPEN`；N>256 未准入，正式 LAN/WAN/RTT 与性能未测，不创建 `secure` alias，v3 继续默认 OFF。详见 S45 报告、决策、gates、逐案结果和 source/build/evidence manifest。

@@ -392,3 +392,12 @@ vfss-baseline-2026-09-03
 - strict-PPT 当前未满足。候选 F_T/v2 bounded-rejection profile 令每个位置至多 r 次；只有投影到去除版本/签名/编码元数据后的语义材料空间，才有 `TV(π_mat(F_T/v2),π_mat(F_T/v1))≤δ_reject=1−∏(1−ρ_i^r)≤255·2^(−24r)`；完整跨版本签名 transcript 不承诺该距离。bounded DRBG 替换到匹配版本是计算优势。方案需要统一 pre-package ISSUANCE_ABORT、显式 version/signature binding 和独立接口审查。没有修改 runtime 或 F_T/v1。
 - OpenSSL 官方资料用于说明 RAND API/provider/seed-source 行为边界，不代替具体部署证明：[RAND_bytes](https://docs.openssl.org/3.0/man3/RAND_bytes/)、[RAND_get0_primary](https://docs.openssl.org/3.0/man3/RAND_get0_primary/)、[EVP_RAND](https://docs.openssl.org/3.0/man7/EVP_RAND/)、[EVP_RAND-SEED-SRC](https://docs.openssl.org/3.0/man7/EVP_RAND-SEED-SRC/)。
 - S44 gates/报告/source-build-evidence manifest 记录 reviewer 身份、继承与未运行项。没有完整协议安全或性能结论；N>256 未准入，默认 v3 OFF，无 secure alias。
+
+## 19. M6B S45 F_T/v2 有界拒绝采样版本化候选
+
+- S45 固定 S44 提交 `aaa7f96095c350e8236246163d48c54a7fb8d9ba`（S43 父提交 `a1b02a8133955786e0bb6b047f55b746af66acbf`）及其 S39 Dealer/runtime 来源 `8028c0fece69fe0c648b1e0f1e12ad7fca723f20`。S35 85 项 canonical source identity 与 S39 85 项 canonical identity 作为历史来源记录；S44 嵌入的 S42治理文档 `OPEN_METADATA_DIVERGENCE` 及 S41 erratum 保留，不改写历史。
+- 新实现位于 `VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h`、`score_to_mask_v3_gmw.cpp` 与对应 package API/header；显式开关和 target 注册在 `VFSS/CMakeLists.txt`。TEST_ONLY 随机源只在 `BUILD_TESTING` 编译，conformance、进程 smoke 及 oracle 检查位于 S45 manifest/cases 指定文件。
+- F_T/v2 package format 5 的签名 profile 字段独立于 receipt-format version；F_T/v1 format 4 和原 `next_uniform` 路径保持不变。有限尝试条件下每 Fisher–Yates residue 仍严格均匀，N≤256整次发材拒绝概率 `delta_reject≤255·2^-144`。该界仅是去版本/签名/编码元数据后的 `pi_mat` 统计界，不能套到完整签名 package/context 或跨版本 transcript。
+- Release default-OFF、显式 v3/receipt-v2/FTv2 Release 与 BUILD_TESTING=OFF production 构建、配置依赖负例、FTv2 bounded/runtime conformance、receipt/v1 smoke、N128/256 FTv2独立进程 oracle E2E 及中止无交付 artifact 结果均见 S45 source/build/evidence manifest 与 case JSON。它们不是安全或性能证明。reviewer `/root/s45_non_author_review` 为只读、未运行构建/测试；执行者参与 S43/S44，非独立作者。
+- `JOINT_RNG_STREAM_BRIDGE=OPEN`；provider/熵源/生命周期未从部署证据固定，`Adv_DRBG_T(Qmax,Cmax;E)` 未量化；`PARTY_VIEW_COMPOSITION=OPEN`。本轮不重复 S35/S40 全矩阵，不运行正式 LAN/WAN/RTT/性能，不准入 N>256，不创建 `secure` alias，v3 与 FTv2 均默认关闭。
+- S45 决策、详细报告、gates、cases 和 source/build/evidence manifest 位于 `docs/decisions/` 与 `docs/reproduction/` 同名前缀文件；本地提交信息在交付记录中，不推送/合并。

@@ -1,5 +1,6 @@
 #include <moe_topk/score_to_mask_v3_gmw.h>
 #include <moe_topk/protocol_i_transport.h>
+#include "score_to_mask_v3_bounded_sampler.h"
 
 #include <algorithm>
 #include <array>
@@ -40,6 +41,19 @@ constexpr std::string_view kScheduleDescription =
     "gate-id-order:v3;add-word-major:generate-bits-0..31,carry-bits-1..31;"
     "forward:row,original,key-bit;compare:pair-lexicographic,generate-bit,"
     "borrow-bit-1..W-1;inverse:original,shuffled;all-batches-depth-ordered";
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+constexpr std::string_view kFtV2PartyPackageSignatureDomain =
+    "ProtocolI/PROJECT_DERIVED_SELECT_5ITER/GMW-Beaver-v3/party-package/"
+    "F_T-v2/bounded-rejection-v1";
+#endif
+
+struct PackageProfile {
+  std::uint32_t package_format_version = kScoreToMaskV3PackageFormatVersion;
+  std::uint8_t ft_version = 1;
+  std::uint8_t sampler_version = 0;
+  std::uint8_t sampler_security_parameter_bits = 0;
+  std::uint8_t sampler_retry_limit = 0;
+};
 
 void fail(const std::string& what) { throw std::runtime_error(what); }
 
@@ -311,6 +325,89 @@ void durable_create(const std::string& path, const std::vector<std::uint8_t>& by
   }
 }
 
+void register_ft_v2_invocation_once(
+    const ScoreToMaskV3Session& session,
+    const std::string& private_registry_directory) {
+  static constexpr std::string_view key_domain =
+      "ProtocolI/PROJECT_DERIVED_SELECT_5ITER/GMW-Beaver-v3/"
+      "F_T-v2/issuance-registry-key/v1";
+  static constexpr std::string_view record_domain =
+      "ProtocolI/PROJECT_DERIVED_SELECT_5ITER/GMW-Beaver-v3/"
+      "F_T-v2/issuance-burn-record/v1";
+
+  std::vector<std::uint8_t> key_input(key_domain.begin(), key_domain.end());
+  key_input.push_back(0);
+  append_array(key_input, session.session);
+  append_array(key_input, session.invocation);
+  const auto key_hash = sha256(key_input);
+  static constexpr char kHex[] = "0123456789abcdef";
+  std::string filename = "ft-v2-";
+  filename.reserve(filename.size() + 2U * key_hash.size());
+  for (const auto byte : key_hash) {
+    filename.push_back(kHex[byte >> 4U]);
+    filename.push_back(kHex[byte & 0x0fU]);
+  }
+
+  const int dirfd = ::open(private_registry_directory.c_str(),
+      O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+  if (dirfd < 0)
+    fail("F_T/v2 issuance registry directory is unavailable: " +
+         std::string(std::strerror(errno)));
+  struct stat registry_stat {};
+  if (::fstat(dirfd, &registry_stat) != 0) {
+    const int saved_errno = errno;
+    ::close(dirfd);
+    fail("F_T/v2 issuance registry stat failed: " +
+         std::string(std::strerror(saved_errno)));
+  }
+  if (!S_ISDIR(registry_stat.st_mode) || registry_stat.st_uid != ::geteuid() ||
+      (registry_stat.st_mode & 0077) != 0) {
+    ::close(dirfd);
+    fail("F_T/v2 issuance registry must be a private 0700 directory owned by T");
+  }
+
+  const int marker_fd = ::openat(dirfd, filename.c_str(),
+      O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW, 0600);
+  if (marker_fd < 0) {
+    const int saved_errno = errno;
+    ::close(dirfd);
+    if (saved_errno == EEXIST)
+      fail("F_T/v2 ISSUANCE_ABORT: session/invocation already issued or burned");
+    fail("F_T/v2 issuance registry record cannot be created: " +
+         std::string(std::strerror(saved_errno)));
+  }
+
+  std::vector<std::uint8_t> record(record_domain.begin(), record_domain.end());
+  record.push_back(0);
+  append_u32(record, 1);
+  append_array(record, session.session);
+  append_array(record, session.invocation);
+  append_u32(record, session.n);
+  append_u32(record, session.k);
+  append_array(record, circuit_hash());
+  append_array(record, schedule_hash());
+
+  std::size_t offset = 0;
+  int saved_errno = 0;
+  while (offset < record.size()) {
+    const auto written = ::write(marker_fd, record.data() + offset,
+                                  record.size() - offset);
+    if (written < 0 && errno == EINTR) continue;
+    if (written <= 0) {
+      saved_errno = written == 0 ? EIO : errno;
+      break;
+    }
+    offset += static_cast<std::size_t>(written);
+  }
+  if (saved_errno == 0 && ::fsync(marker_fd) != 0) saved_errno = errno;
+  if (::close(marker_fd) != 0 && saved_errno == 0) saved_errno = errno;
+  if (saved_errno == 0 && ::fsync(dirfd) != 0) saved_errno = errno;
+  ::close(dirfd);
+  if (saved_errno != 0)
+    fail("F_T/v2 issuance burn record could not be durably registered: " +
+         std::string(std::strerror(saved_errno)));
+}
+
 std::vector<std::uint8_t> make_header(const ScoreToMaskV3Session& session,
                                      std::uint8_t party,
                                      const ScoreToMaskV3GateBudget& budget,
@@ -319,11 +416,12 @@ std::vector<std::uint8_t> make_header(const ScoreToMaskV3Session& session,
                                      const std::array<std::uint8_t, 32>& material_hash,
                                      const std::array<std::uint8_t, 32>& signer_hash,
                                      std::uint32_t triple_bytes,
-                                     std::uint32_t permutation_bytes) {
+                                     std::uint32_t permutation_bytes,
+                                     const PackageProfile& profile) {
   std::vector<std::uint8_t> out;
   out.reserve(kHeaderBytes);
   out.insert(out.end(), kMagic.begin(), kMagic.end());
-  append_u32(out, kScoreToMaskV3PackageFormatVersion);
+  append_u32(out, profile.package_format_version);
   append_u32(out, 32);
   append_u32(out, 12);
   append_array(out, session.session);
@@ -334,7 +432,16 @@ std::vector<std::uint8_t> make_header(const ScoreToMaskV3Session& session,
   for (const auto& key_hash : session.recipient_rsa_public_sha256) append_array(out, key_hash);
   append_array(out, session.escrow_identity_sha256);
   out.push_back(party);
-  out.insert(out.end(), 7, 0);
+  if (profile.package_format_version == kScoreToMaskV3PackageFormatVersion) {
+    // F_T/v1 package format 4 is byte-for-byte unchanged.
+    out.insert(out.end(), 7, 0);
+  } else {
+    out.push_back(profile.ft_version);
+    out.push_back(profile.sampler_version);
+    out.push_back(profile.sampler_security_parameter_bits);
+    out.push_back(profile.sampler_retry_limit);
+    out.insert(out.end(), 3, 0);
+  }
   append_u64(out, budget.gate_count);
   append_u32(out, triple_bytes);
   append_u32(out, permutation_bytes);
@@ -348,7 +455,12 @@ std::vector<std::uint8_t> make_header(const ScoreToMaskV3Session& session,
 
 struct ParsedHeader {
   ScoreToMaskV3Session session;
+  std::uint32_t package_format_version = 0;
   std::uint8_t party = 0;
+  std::uint8_t ft_version = 0;
+  std::uint8_t sampler_version = 0;
+  std::uint8_t sampler_security_parameter_bits = 0;
+  std::uint8_t sampler_retry_limit = 0;
   std::uint64_t gate_count = 0;
   std::uint32_t triple_bytes = 0;
   std::uint32_t permutation_bytes = 0;
@@ -363,11 +475,16 @@ ParsedHeader parse_header(const std::vector<std::uint8_t>& bytes) {
       !std::equal(kMagic.begin(), kMagic.end(), bytes.begin()))
     fail("v3 package magic/length");
   std::size_t at = kMagic.size();
-  if (read_u32(bytes, at) != kScoreToMaskV3PackageFormatVersion)
+  ParsedHeader header;
+  header.package_format_version = read_u32(bytes, at);
+  if (header.package_format_version != kScoreToMaskV3PackageFormatVersion
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+      && header.package_format_version != kScoreToMaskV3PackageFormatVersionFtV2
+#endif
+  )
     fail("v3 package format version");
   if (read_u32(bytes, at) != 32 || read_u32(bytes, at) != 12)
     fail("v3 package score format is not signed Q20.12");
-  ParsedHeader header;
   read_array(bytes, at, header.session.session);
   read_array(bytes, at, header.session.invocation);
   header.session.n = read_u32(bytes, at);
@@ -377,7 +494,23 @@ ParsedHeader parse_header(const std::vector<std::uint8_t>& bytes) {
   read_array(bytes, at, header.session.escrow_identity_sha256);
   if (at + 8 > bytes.size()) fail("v3 package reserved fields truncated");
   header.party = bytes[at++];
-  for (int i = 0; i < 7; ++i) if (bytes[at++] != 0) fail("v3 header reserved bits");
+  if (header.package_format_version == kScoreToMaskV3PackageFormatVersion) {
+    for (int i = 0; i < 7; ++i)
+      if (bytes[at++] != 0) fail("v3 header reserved bits");
+    header.ft_version = 1;
+    header.sampler_version = 0;
+  } else {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+    header.ft_version = bytes[at++];
+    header.sampler_version = bytes[at++];
+    header.sampler_security_parameter_bits = bytes[at++];
+    header.sampler_retry_limit = bytes[at++];
+    for (int i = 0; i < 3; ++i)
+      if (bytes[at++] != 0) fail("F_T/v2 package reserved bits");
+#else
+    fail("F_T/v2 package format is not enabled in this build");
+#endif
+  }
   header.gate_count = read_u64(bytes, at);
   header.triple_bytes = read_u32(bytes, at);
   header.permutation_bytes = read_u32(bytes, at);
@@ -489,12 +622,17 @@ std::array<std::uint8_t, 32> score_to_mask_v3_public_key_sha256(
   return key_fingerprint(key.get());
 }
 
-void score_to_mask_v3_dealer_issue_packages(
+namespace {
+
+template <typename FillRandom, typename BeforeMaterial>
+void dealer_issue_packages_impl(
     const ScoreToMaskV3Session& session, const std::string& package_p0_path,
     const std::string& package_p1_path,
     const std::string& signed_escrow_context_path,
     const std::string& dealer_ed25519_private_key_pem,
-    const ScoreToMaskV3EscrowStateParameters& escrow_state) {
+    const ScoreToMaskV3EscrowStateParameters& escrow_state,
+    const PackageProfile& profile, FillRandom&& fill_random,
+    BeforeMaterial&& before_material) {
   const auto budget = score_to_mask_v3_gate_budget(session.n);
   if (session.k == 0 || session.k > session.n) fail("v3 K outside [1,N]");
   validate_identity_bindings(session);
@@ -516,12 +654,13 @@ void score_to_mask_v3_dealer_issue_packages(
   const auto triple_bytes = static_cast<std::uint32_t>((3ULL * budget.gate_count + 7U) / 8U);
   const auto permutation_bytes = static_cast<std::uint32_t>(
       (static_cast<std::uint64_t>(budget.padded_n) * budget.padded_n + 7U) / 8U);
+  before_material();
   std::array<std::vector<std::uint8_t>, 2> triples{
       std::vector<std::uint8_t>(triple_bytes), std::vector<std::uint8_t>(triple_bytes)};
   std::array<std::vector<std::uint8_t>, 2> permutations{
       std::vector<std::uint8_t>(permutation_bytes), std::vector<std::uint8_t>(permutation_bytes)};
   std::vector<std::uint8_t> randomness(static_cast<std::size_t>(budget.gate_count));
-  random_bytes(randomness.data(), randomness.size());
+  fill_random(randomness.data(), randomness.size());
   for (std::uint64_t gate = 0; gate < budget.gate_count; ++gate) {
     const auto r = randomness[static_cast<std::size_t>(gate)];
     const bool a = (r & 1U) != 0;
@@ -538,10 +677,28 @@ void score_to_mask_v3_dealer_issue_packages(
   }
   std::vector<std::uint32_t> permutation(budget.padded_n);
   std::vector<std::uint8_t> permutation_random(permutation_bytes);
-  random_bytes(permutation_random.data(), permutation_random.size());
+  fill_random(permutation_random.data(), permutation_random.size());
   for (std::uint32_t i = 0; i < budget.padded_n; ++i) permutation[i] = i;
-  for (std::uint32_t i = budget.padded_n; i > 1; --i)
-    std::swap(permutation[i - 1U], permutation[next_uniform(i)]);
+  for (std::uint32_t i = budget.padded_n; i > 1; --i) {
+    std::uint32_t selected = 0;
+    if (profile.ft_version == 1) {
+      selected = next_uniform(i);
+    } else {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+      const auto next_word = [&]() {
+        std::uint32_t word = 0;
+        fill_random(reinterpret_cast<std::uint8_t*>(&word), sizeof(word));
+        return word;
+      };
+      if (!score_to_mask_v3_detail::next_uniform_bounded(
+              i, profile.sampler_retry_limit, next_word, selected))
+        fail("F_T/v2 ISSUANCE_ABORT: bounded rejection limit reached");
+#else
+      fail("F_T/v2 issuance is not enabled in this build");
+#endif
+    }
+    std::swap(permutation[i - 1U], permutation[selected]);
+  }
   for (std::uint32_t original = 0; original < budget.padded_n; ++original) {
     for (std::uint32_t row = 0; row < budget.padded_n; ++row) {
       const auto gate = static_cast<std::uint64_t>(row) * budget.padded_n + original;
@@ -561,11 +718,19 @@ void score_to_mask_v3_dealer_issue_packages(
     materials[party].insert(materials[party].end(), permutations[party].begin(), permutations[party].end());
     material_hashes[party] = sha256(materials[party]);
     packages[party] = make_header(session, party, budget, circuit, schedule,
-        material_hashes[party], signer_fp, triple_bytes, permutation_bytes);
+        material_hashes[party], signer_fp, triple_bytes, permutation_bytes,
+        profile);
     packages[party].insert(packages[party].end(), materials[party].begin(), materials[party].end());
+    std::string_view signature_domain = kScoreToMaskV3PartyPackageSignatureDomain;
+    if (profile.ft_version == 2) {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+      signature_domain = kFtV2PartyPackageSignatureDomain;
+#else
+      fail("F_T/v2 signing is not enabled in this build");
+#endif
+    }
     const auto signing_message = domain_separated_message(
-        kScoreToMaskV3PartyPackageSignatureDomain,
-        kScoreToMaskV3PackageFormatVersion, packages[party]);
+        signature_domain, profile.package_format_version, packages[party]);
     const auto domain_signature = sign_bytes(signer.get(), signing_message);
     append_array(packages[party], domain_signature);
     if (packages[party].size() > kScoreToMaskV3MaxPackageBytes ||
@@ -593,6 +758,122 @@ void score_to_mask_v3_dealer_issue_packages(
   durable_create(signed_escrow_context_path, context_file);
 }
 
+}  // namespace
+
+void score_to_mask_v3_dealer_issue_packages(
+    const ScoreToMaskV3Session& session, const std::string& package_p0_path,
+    const std::string& package_p1_path,
+    const std::string& signed_escrow_context_path,
+    const std::string& dealer_ed25519_private_key_pem,
+    const ScoreToMaskV3EscrowStateParameters& escrow_state) {
+  const PackageProfile f_t_v1_profile{};
+  dealer_issue_packages_impl(session, package_p0_path, package_p1_path,
+      signed_escrow_context_path, dealer_ed25519_private_key_pem, escrow_state,
+      f_t_v1_profile, [](std::uint8_t* out, std::size_t size) {
+        random_bytes(out, size);
+      }, [] {});
+}
+
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+void score_to_mask_v3_dealer_issue_packages_ft_v2_bounded(
+    const ScoreToMaskV3Session& session, const std::string& package_p0_path,
+    const std::string& package_p1_path,
+    const std::string& signed_escrow_context_path,
+    const std::string& dealer_ed25519_private_key_pem,
+    const std::string& private_issuance_registry_directory,
+    const ScoreToMaskV3EscrowStateParameters& escrow_state) {
+  const auto budget = score_to_mask_v3_gate_budget(session.n);
+  const PackageProfile f_t_v2_profile{
+      kScoreToMaskV3PackageFormatVersionFtV2,
+      kScoreToMaskV3FtVersionV2,
+      kScoreToMaskV3SamplerVersionBoundedV1,
+      kScoreToMaskV3FtV2SecurityParameterBits,
+      static_cast<std::uint8_t>(score_to_mask_v3_detail::bounded_retry_limit(
+          kScoreToMaskV3FtV2SecurityParameterBits, budget.padded_n))};
+  dealer_issue_packages_impl(session, package_p0_path, package_p1_path,
+      signed_escrow_context_path, dealer_ed25519_private_key_pem, escrow_state,
+      f_t_v2_profile, [](std::uint8_t* out, std::size_t size) {
+        random_bytes(out, size);
+      }, [&] {
+        register_ft_v2_invocation_once(session,
+                                       private_issuance_registry_directory);
+      });
+}
+
+#ifdef MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING
+namespace test_only {
+void score_to_mask_v3_dealer_issue_packages_ft_v2_with_test_random(
+    const ScoreToMaskV3Session& session, const std::string& package_p0_path,
+    const std::string& package_p1_path,
+    const std::string& signed_escrow_context_path,
+    const std::string& dealer_ed25519_private_key_pem,
+    const std::string& private_issuance_registry_directory,
+    const ScoreToMaskV3EscrowStateParameters& escrow_state,
+    bool reject_once_then_accept, std::size_t* bytes_consumed,
+    std::size_t* random_call_count, std::size_t* max_request_bytes) {
+  if (bytes_consumed == nullptr || random_call_count == nullptr ||
+      max_request_bytes == nullptr)
+    fail("TEST_ONLY random counters are required");
+  std::size_t bytes = 0;
+  std::size_t calls = 0;
+  std::size_t max_request = 0;
+  std::size_t word_index = 0;
+  const auto budget = score_to_mask_v3_gate_budget(session.n);
+  const auto triple_bytes = static_cast<std::size_t>(budget.gate_count);
+  const auto permutation_bytes = static_cast<std::size_t>(
+      (static_cast<std::uint64_t>(budget.padded_n) * budget.padded_n + 7U) / 8U);
+  const auto sampler_offset = triple_bytes + permutation_bytes;
+  auto test_random = [&](std::uint8_t* out, std::size_t size) {
+    while (size != 0) {
+      const auto chunk = std::min<std::size_t>(size, 1U << 20);
+      max_request = std::max(max_request, chunk);
+      std::fill_n(out, chunk, 0);
+      if (bytes >= sampler_offset) {
+        if (chunk != sizeof(std::uint32_t))
+          fail("TEST_ONLY sampler request was not one 32-bit word");
+        std::uint32_t value = 0;
+        if (word_index == 0) value = std::numeric_limits<std::uint32_t>::max();
+        else if (word_index == 1 && reject_once_then_accept) value = 0;
+        else if (word_index == 2 && reject_once_then_accept) value = 1;
+        else if (word_index > 0 && !reject_once_then_accept) value = 0;
+        else value = std::numeric_limits<std::uint32_t>::max();
+        std::memcpy(out, &value, sizeof(value));
+        ++word_index;
+      }
+      bytes += chunk;
+      ++calls;
+      out += chunk;
+      size -= chunk;
+    }
+  };
+  const auto f_t_v2_profile = PackageProfile{
+      kScoreToMaskV3PackageFormatVersionFtV2,
+      kScoreToMaskV3FtVersionV2,
+      kScoreToMaskV3SamplerVersionBoundedV1,
+      kScoreToMaskV3FtV2SecurityParameterBits,
+      static_cast<std::uint8_t>(score_to_mask_v3_detail::bounded_retry_limit(
+          kScoreToMaskV3FtV2SecurityParameterBits, budget.padded_n))};
+  try {
+    dealer_issue_packages_impl(session, package_p0_path, package_p1_path,
+        signed_escrow_context_path, dealer_ed25519_private_key_pem, escrow_state,
+        f_t_v2_profile, test_random, [&] {
+          register_ft_v2_invocation_once(session,
+                                         private_issuance_registry_directory);
+        });
+  } catch (...) {
+    *bytes_consumed = bytes;
+    *random_call_count = calls;
+    *max_request_bytes = max_request;
+    throw;
+  }
+  *bytes_consumed = bytes;
+  *random_call_count = calls;
+  *max_request_bytes = max_request;
+}
+}  // namespace test_only
+#endif
+#endif
+
 ScoreToMaskV3PackageInfo score_to_mask_v3_validate_package(
     const std::string& package_path,
     const std::string& dealer_ed25519_public_key_pem,
@@ -609,6 +890,26 @@ ScoreToMaskV3PackageInfo score_to_mask_v3_validate_package(
       header.permutation_bytes != (static_cast<std::uint64_t>(budget.padded_n) *
                                    budget.padded_n + 7U) / 8U)
     fail("v3 package gate/material count mismatch");
+  if (header.package_format_version == kScoreToMaskV3PackageFormatVersion) {
+    if (header.ft_version != 1 || header.sampler_version != 0 ||
+        header.sampler_security_parameter_bits != 0 ||
+        header.sampler_retry_limit != 0)
+      fail("F_T/v1 package profile mismatch");
+  } else {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+    const auto expected_retry_limit = static_cast<std::uint8_t>(
+        score_to_mask_v3_detail::bounded_retry_limit(
+            kScoreToMaskV3FtV2SecurityParameterBits, budget.padded_n));
+    if (header.ft_version != kScoreToMaskV3FtVersionV2 ||
+        header.sampler_version != kScoreToMaskV3SamplerVersionBoundedV1 ||
+        header.sampler_security_parameter_bits !=
+            kScoreToMaskV3FtV2SecurityParameterBits ||
+        header.sampler_retry_limit != expected_retry_limit)
+      fail("F_T/v2 bounded-rejection profile mismatch");
+#else
+    fail("F_T/v2 package format is not enabled in this build");
+#endif
+  }
   if (header.circuit != circuit_hash() || header.schedule != schedule_hash())
     fail("v3 package circuit/gate schedule mismatch");
   const auto content_bytes = static_cast<std::size_t>(header.triple_bytes) +
@@ -624,15 +925,30 @@ ScoreToMaskV3PackageInfo score_to_mask_v3_validate_package(
   const auto signed_size = bytes.size() - kSignatureBytes;
   const std::vector<std::uint8_t> signed_body(
       bytes.begin(), bytes.begin() + static_cast<std::ptrdiff_t>(signed_size));
+  std::string_view signature_domain = kScoreToMaskV3PartyPackageSignatureDomain;
+  if (header.package_format_version != kScoreToMaskV3PackageFormatVersion) {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+    signature_domain = kFtV2PartyPackageSignatureDomain;
+#else
+    fail("F_T/v2 package format is not enabled in this build");
+#endif
+  }
   const auto signing_message = domain_separated_message(
-      kScoreToMaskV3PartyPackageSignatureDomain,
-      kScoreToMaskV3PackageFormatVersion, signed_body);
+      signature_domain, header.package_format_version, signed_body);
   if (!verify_bytes(verifier.get(), signing_message,
                     bytes.data() + signed_size, kSignatureBytes))
     fail("v3 package signature mismatch");
   ScoreToMaskV3PackageInfo info;
   info.parameters = expected;
   info.party = expected_party;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+  info.package_format_version = header.package_format_version;
+  info.ft_version = header.ft_version;
+  info.sampler_version = header.sampler_version;
+  info.sampler_security_parameter_bits =
+      header.sampler_security_parameter_bits;
+  info.sampler_retry_limit = header.sampler_retry_limit;
+#endif
   info.circuit_sha256 = header.circuit;
   info.gate_schedule_sha256 = header.schedule;
   info.package_sha256 = sha256(bytes);

@@ -1257,3 +1257,13 @@ S44 审查 RAND_bytes 全有序输出流 W_T 到理想 IID tape U 的联合替�
 next_uniform 的拒绝概率 ρ_i=(2^32 mod i)/2^32，期望尝试 1/(1−ρ_i)，但源码 for(;;) 没有上限。N≤256 的总期望输出字节有界，worst-case query 无界。当前可查证明先例（特别是 S38 的 strict-PPT Fisher–Yates cap）不批准把 expected-PPT 默认当作标准安全模型。F_T/v1 不改；候选 F_T/v2 每个位置最多 λ 次，统一 ISSUANCE_ABORT；仅对去掉 sampler/version、签名和编码元数据的语义材料投影 π_mat，有 `TV(π_mat(F_T/v2),π_mat(F_T/v1))≤δ_reject=1−∏(1−ρ_i^λ)≤255·2^(−24λ)`。完整跨版本 package transcript 没有该 TV 界；bounded DRBG 替换到匹配版本 F_T/v2 则是计算优势，两项不得混写。版本兼容/签名参数尚未裁决或实现。
 
 S44 为文档和源码审查；BUILD/TEST=NOT_RUN，不重跑 S35 195 案或 S40 211 案，不运行正式性能矩阵。自然 I/O fault 继承 NOT_REPRODUCED，N>256 NOT_ADMITTED，formal LAN/WAN/RTT NOT_RUN/NOT_MEASURED，secure alias NOT_READY，v3 默认关闭。详见 [S44 决策](decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_DECISION_2026-10-22.md)、报告、gates 和 source/build/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S45（2026-10-22）
+
+- 从 S44 commit `aaa7f96095c350e8236246163d48c54a7fb8d9ba` 隔离开始；Dealer/runtime 依据仍是 S39 commit `8028c0fece69fe0c648b1e0f1e12ad7fca723f20`。本轮没有改 S44/S43 历史文件或 S41 provenance erratum。
+- 新增默认关闭的 `MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL` 和独立发材入口；必须同时显式启用 GMW-v3。F_T/v1 format 4/旧 sampler 不变。F_T/v2 format 5 明确签入 `ft_version=2`、`sampler_version=1`、`lambda=128`、`retry_limit=6`；escrow receipt-format 仍是独立的已签 context state 字段。
+- 对 `m≤256`，每位置 `rho_i=(2^32 mod i)/2^32<2^-24`，最多 `m−1` 位置；`r=ceil((lambda+log2(m−1))/24)`，m=1 特判 0 次，lambda=128 下 m=2..256 均 r=6。联合拒绝界 `delta_reject≤255·2^-144=(255/256)·2^-136<2^-128`。成功时采样 residue 条件均匀；失败统一 `ISSUANCE_ABORT`。此界只针对删除版本/签名/编码元数据的语义材料 `pi_mat`，不界定跨版本完整 package transcript。
+- S45 v2 issuer 在材料生成前于 T 私有固定 registry 写入 fsync burn marker；拒绝到达上限时不产生 party package/context/signature/READY/party lease。marker 有意留存防同 registry 重发，但并非全局跨版本/路径一次性证明，也未证明内存材料擦除或任意后续 filesystem 写失败的多文件原子性。
+- 新鲜 Release default-OFF、显式 opt-in、expected-negative configure、bounded sampler/runtime conformance、旧 F_T/v1 compatibility smoke 与 N128/N256 多进程 oracle E2E 均有本轮二进制证据。自然业务 I/O fault 沿用 S40 `NOT_REPRODUCED`；S35 195 案和 S40 211 案不重跑。
+- `F_T_BOUNDED_VERSION_FUNCTIONALITY` / `PACKAGE_VERSION_BINDING` 为 `PASS_WITH_SCOPE`；`STRICT_PPT_BOUND` 仅对有限响应随机 oracle 下的 sampler loop/query count/单次请求字节数为 `PASS_WITH_SCOPE`。`JOINT_RNG_STREAM_BRIDGE`、`PARTY_VIEW_COMPOSITION` 仍 `OPEN`；实际 provider/熵源/seed/reseed/fork/restart/并发配置与 `Adv_DRBG_T(Qmax,Cmax;E)` 未证明或量化。
+- v3 默认关闭，N>256 `NOT_ADMITTED`，无 `secure` alias。正式 LAN/WAN、RTT 和性能矩阵未运行/测量。本轮本机 phase、RSS、elapsed 只属于功能诊断，不属于性能证据。详见 S45 决策、报告、gates、cases 和 source/build/evidence manifest。

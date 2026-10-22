@@ -4,6 +4,10 @@
 
 #include <moe_topk/score_to_mask_v3_gmw.h>
 #include <moe_topk/topk_oracle.h>
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
+    defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
+#include "score_to_mask_v3_ft_v2_test_support.h"
+#endif
 
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -862,13 +866,38 @@ int party_worker(int argc, char** argv) {
 }
 
 int dealer_worker(int argc, char** argv) {
-  if (argc != 9) return 64;
+  if (argc != 10 && argc != 11 && argc != 12) return 64;
   const auto session = read_session_file(argv[2]);
   ScoreToMaskV3EscrowStateParameters state;
   state.transaction_wait_timeout_ms = static_cast<std::uint32_t>(std::stoul(argv[7]));
   state.receipt_format_version = static_cast<std::uint8_t>(std::stoul(argv[8]));
-  score_to_mask_v3_dealer_issue_packages(session, argv[3], argv[4], argv[5],
-                                          argv[6], state);
+  const auto ft_version = static_cast<std::uint32_t>(std::stoul(argv[9]));
+  if (ft_version == 1 && (argc == 10 || argc == 11)) {
+    score_to_mask_v3_dealer_issue_packages(session, argv[3], argv[4], argv[5],
+                                            argv[6], state);
+  } else if (ft_version == 2 && argc == 11) {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+    score_to_mask_v3_dealer_issue_packages_ft_v2_bounded(
+        session, argv[3], argv[4], argv[5], argv[6], argv[10], state);
+#else
+    throw std::runtime_error("F_T/v2 is not enabled in this build");
+#endif
+  } else if (ft_version == 2 && argc == 12 &&
+             std::string(argv[11]) == "test-only-force-bounded-abort") {
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
+    defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
+    std::size_t bytes = 0;
+    std::size_t calls = 0;
+    std::size_t max_request = 0;
+    test_only::score_to_mask_v3_dealer_issue_packages_ft_v2_with_test_random(
+        session, argv[3], argv[4], argv[5], argv[6], argv[10], state, false,
+        &bytes, &calls, &max_request);
+#else
+    throw std::runtime_error("TEST_ONLY F_T/v2 random source is unavailable");
+#endif
+  } else {
+    throw std::runtime_error("unsupported F_T version or test mode");
+  }
   return 0;
 }
 
@@ -894,13 +923,15 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                  bool fail_p1_before_submit = false,
                  bool timeout_precommit = false,
                  std::uint8_t receipt_format_version = 1,
-                 const std::string& case_id = "unspecified") {
+                 const std::string& case_id = "unspecified",
+                 std::uint32_t ft_version = 1) {
   if (std::getenv("S35_TRACE_CASES") != nullptr)
     std::cerr << "S35_CASE_START dir=" << directory << " n=" << scores.size()
               << " k=" << k << " lost_receipt=" << lose_receipt_p0
               << " p1_pre_submit_failure=" << fail_p1_before_submit
               << " precommit_timeout=" << timeout_precommit
               << " receipt_version=" << static_cast<unsigned>(receipt_format_version)
+              << " ft_version=" << ft_version
               << '\n';
   const auto diagnostic_start = std::chrono::steady_clock::now();
   ScoreToMaskV3Session session;
@@ -925,13 +956,23 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   const auto p0_package = (std::filesystem::path(directory) / "p0.v3pkg").string();
   const auto p1_package = (std::filesystem::path(directory) / "p1.v3pkg").string();
   const auto context_path = (std::filesystem::path(directory) / "escrow.context").string();
+  const auto issuance_registry =
+      (std::filesystem::path(directory) / "dealer-issuance-registry").string();
+  if (ft_version == 2) {
+    std::filesystem::create_directory(issuance_registry);
+    if (::chmod(issuance_registry.c_str(), 0700) != 0)
+      throw std::runtime_error("F_T/v2 issuance registry permissions failed");
+  }
   write_session_file(session_path, session);
   const auto dealer_stdout = (std::filesystem::path(directory) / "dealer.stdout").string();
   const auto dealer_stderr = (std::filesystem::path(directory) / "dealer.stderr").string();
-  ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
+  std::vector<std::string> dealer_arguments = {"--dealer", session_path, p0_package,
       p1_package, context_path, identities.dealer_private,
       timeout_precommit ? "2000" : "15000",
-      std::to_string(static_cast<unsigned>(receipt_format_version))},
+      std::to_string(static_cast<unsigned>(receipt_format_version)),
+      std::to_string(ft_version)};
+  if (ft_version == 2) dealer_arguments.push_back(issuance_registry);
+  ChildProcess dealer(exec_child(binary, dealer_arguments,
       dealer_stdout, dealer_stderr));
   const int dealer_status = dealer.wait();
   require(dealer_status == 0, "T process failed to issue bound packages");
@@ -939,6 +980,13 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       p0_package, identities.dealer_public, session, 0);
   const auto package_info_p1 = score_to_mask_v3_validate_package(
       p1_package, identities.dealer_public, session, 1);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+  require(package_info.ft_version == ft_version &&
+              package_info_p1.ft_version == ft_version,
+          "Dealer emitted a package for the wrong F_T version");
+#else
+  require(ft_version == 1, "F_T/v2 E2E requires its explicit build opt-in");
+#endif
 
   std::vector<std::uint32_t> share0(scores.size()), share1(scores.size());
   if (RAND_bytes(reinterpret_cast<std::uint8_t*>(share0.data()),
@@ -1077,9 +1125,17 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       [](std::int32_t value) { return static_cast<std::uint32_t>(value); });
   const auto oracle = top_k_mask(raw_scores, k);
   if (!lose_receipt_p0 && !fail_p1_before_submit && !timeout_precommit) {
+    std::size_t selected_count = 0;
     for (std::size_t i = 0; i < scores.size(); ++i)
-      require(static_cast<std::uint8_t>(output0.share[i] ^ output1.share[i]) == oracle[i],
-              "two-party v3 share XOR differs from stable oracle");
+      {
+        const auto recovered = static_cast<std::uint8_t>(
+            output0.share[i] ^ output1.share[i]);
+        require(recovered == oracle[i],
+                "two-party v3 share XOR differs from stable original-order oracle");
+        selected_count += recovered;
+      }
+    require(selected_count == k,
+            "two-party recovered mask does not contain exactly K ones");
   }
 
   if (!fail_p1_before_submit) {
@@ -1197,8 +1253,11 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   const auto budget = score_to_mask_v3_gate_budget(session.n);
   const auto material_bytes = (3ULL * budget.gate_count + 7U) / 8U +
       (static_cast<std::uint64_t>(budget.padded_n) * budget.padded_n + 7U) / 8U;
-  std::cout << "S40_V3_PROCESS_E2E {\"case_id\":\"" << case_id
-            << "\",\"receipt_format_version\":"
+  std::cout << (ft_version == 2 ? "S45_FT_V2_PROCESS_E2E {" :
+                                  "S40_V3_PROCESS_E2E {")
+            << "\"case_id\":\"" << case_id
+            << "\",\"ft_version\":" << ft_version
+            << ",\"receipt_format_version\":"
             << static_cast<unsigned>(receipt_format_version)
             << ",\"dealer_exit\":" << dealer_status
             << ",\"p0_exit\":" << p0_status
@@ -1252,6 +1311,70 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
             << ",\"injected_precommit_timeout\":"
             << (timeout_precommit ? "true" : "false") << "}\n";
 }
+
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
+    defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
+void run_ft_v2_issuance_abort_process_case(
+    const std::string& binary, const std::string& root,
+    const TestIdentities& identities) {
+  const auto dir = std::filesystem::path(root) / "ft-v2-issuance-abort";
+  std::filesystem::create_directory(dir);
+  ScoreToMaskV3Session session;
+  if (RAND_bytes(session.session.data(), 16) != 1 ||
+      RAND_bytes(session.invocation.data(), 16) != 1)
+    throw std::runtime_error("F_T/v2 abort test session CSPRNG failed");
+  session.session[0] |= 1U;
+  session.invocation[0] |= 1U;
+  session.n = 256;
+  session.k = 128;
+  session.party_identity_sha256[0] =
+      score_to_mask_v3_certificate_sha256(identities.p0_tls.certificate);
+  session.party_identity_sha256[1] =
+      score_to_mask_v3_certificate_sha256(identities.p1_tls.certificate);
+  session.recipient_rsa_public_sha256[0] =
+      score_to_mask_v3_public_key_sha256(identities.p0_recipient.public_key);
+  session.recipient_rsa_public_sha256[1] =
+      score_to_mask_v3_public_key_sha256(identities.p1_recipient.public_key);
+  session.escrow_identity_sha256 =
+      score_to_mask_v3_certificate_sha256(identities.escrow_tls.certificate);
+
+  const auto session_path = (dir / "session.bin").string();
+  const auto p0_package = (dir / "p0.pkg").string();
+  const auto p1_package = (dir / "p1.pkg").string();
+  const auto context_path = (dir / "escrow.context").string();
+  const auto lease_path = (dir / "lease-p0").string();
+  const auto issuance_registry = (dir / "dealer-issuance-registry").string();
+  std::filesystem::create_directory(issuance_registry);
+  if (::chmod(issuance_registry.c_str(), 0700) != 0)
+    throw std::runtime_error("F_T/v2 abort registry permissions failed");
+  write_session_file(session_path, session);
+  const auto dealer_stdout = (dir / "dealer.stdout").string();
+  const auto dealer_stderr = (dir / "dealer.stderr").string();
+  ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
+      p1_package, context_path, identities.dealer_private, "15000", "1", "2",
+      issuance_registry,
+      "test-only-force-bounded-abort"}, dealer_stdout, dealer_stderr));
+  const int status = dealer.wait();
+  require(status != 0, "forced F_T/v2 rejection exhaustion did not abort T process");
+  std::ifstream error_file(dealer_stderr, std::ios::binary);
+  const std::string error((std::istreambuf_iterator<char>(error_file)),
+                          std::istreambuf_iterator<char>());
+  require(error.find("ISSUANCE_ABORT") != std::string::npos,
+          "Dealer process did not report the unified issuance abort");
+  require(!std::filesystem::exists(p0_package) &&
+              !std::filesystem::exists(p1_package) &&
+              !std::filesystem::exists(context_path) &&
+              !std::filesystem::exists(lease_path),
+          "process-level ISSUANCE_ABORT left a package/context/lease artifact");
+  require(std::filesystem::directory_iterator(issuance_registry) !=
+              std::filesystem::directory_iterator{},
+          "process-level ISSUANCE_ABORT did not persist its invocation burn record");
+  std::cout << "S45_FT_V2_ISSUANCE_ABORT {\"dealer_exit\":" << status
+            << ",\"N\":256,\"K\":128,\"receipt_format_version\":1"
+            << ",\"ft_version\":2,\"package_artifacts\":false"
+            << ",\"context_artifact\":false,\"lease_artifact\":false}\n";
+}
+#endif
 
 enum class CommunicationFault {
   kNoFault,
@@ -1312,7 +1435,7 @@ void run_communication_fault_case(const std::string& binary,
   const auto dealer_stderr = (std::filesystem::path(logs) / "dealer.stderr").string();
   ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
       p1_package, context_path, identities.dealer_private, "15000",
-      std::to_string(static_cast<unsigned>(receipt_format_version))},
+      std::to_string(static_cast<unsigned>(receipt_format_version)), "1"},
       dealer_stdout, dealer_stderr));
   const int dealer_status = dealer.wait();
   require(dealer_status == 0, "fault test T process failed");
@@ -1629,6 +1752,44 @@ int main(int argc, char** argv) {
     const auto binary = std::filesystem::canonical(argv[0]).string();
     TempDirectory directory;
     const auto identities = create_test_identities(directory.path);
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
+    defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
+    if (argc > 1 && std::string(argv[1]) == "--ft-v2-smoke") {
+      const auto make_scores = [](std::uint32_t n) {
+        std::vector<std::int32_t> scores(n);
+        for (std::uint32_t i = 0; i < n; ++i) {
+          switch (i % 8U) {
+            case 0: scores[i] = INT32_MAX; break;
+            case 1: scores[i] = INT32_MIN; break;
+            case 2: scores[i] = -1; break;
+            case 3: scores[i] = 17; break;
+            case 4: scores[i] = INT32_MAX; break;
+            case 5: scores[i] = -17; break;
+            case 6: scores[i] = 0; break;
+            default: scores[i] = 17; break;
+          }
+        }
+        return scores;
+      };
+      const auto n128_dir = (std::filesystem::path(directory.path) / "ft-v2-n128").string();
+      std::filesystem::create_directory(n128_dir);
+      run_one_e2e(binary, n128_dir, identities, make_scores(128), 64,
+          false, false, false, kScoreToMaskV3ReceiptFormatV1,
+          "ft-v2-n128-receipt-v1", 2);
+      const auto n256_dir = (std::filesystem::path(directory.path) / "ft-v2-n256").string();
+      std::filesystem::create_directory(n256_dir);
+      std::uint8_t n256_receipt = kScoreToMaskV3ReceiptFormatV1;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+      n256_receipt = kScoreToMaskV3ReceiptFormatV2;
+#endif
+      run_one_e2e(binary, n256_dir, identities, make_scores(256), 128,
+          false, false, false, n256_receipt,
+          "ft-v2-n256-independent-receipt", 2);
+      run_ft_v2_issuance_abort_process_case(binary, directory.path, identities);
+      std::cout << "S45_FT_V2_TARGETED_MULTI_PROCESS_E2E PASS\n";
+      return 0;
+    }
+#endif
     if (argc > 1 && std::string(argv[1]) == "--communication-faults-only") {
       if (argc != 3) throw std::runtime_error(
           "--communication-faults-only requires an evidence log directory");

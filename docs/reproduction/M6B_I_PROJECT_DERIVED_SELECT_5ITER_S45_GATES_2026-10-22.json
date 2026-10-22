@@ -1,0 +1,173 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s45-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S45",
+  "date": "2026-10-22",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "full_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "ft_v2_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "identity": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-s42-joint-simulator\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s45",
+    "start_commit": "aaa7f96095c350e8236246163d48c54a7fb8d9ba",
+    "start_parent": "a1b02a8133955786e0bb6b047f55b746af66acbf",
+    "start_tree": "7bb41c0d57ed1158aa90764781ad523d83beab58",
+    "start_worktree_clean": true,
+    "runtime_origin_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s35_canonical_source_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "s39_canonical_source_sha256": "09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9",
+    "primary_worktree_modified": false,
+    "vfss_baseline_modified": false,
+    "historical_worktrees_cleaned_or_overwritten": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "versioned_profile": {
+    "ft_v1": {
+      "package_format_version": 4,
+      "sampler_version": 0,
+      "sampling": "existing unbounded next_uniform; explicit legacy API",
+      "behavior_compatibility": "preserved; shared issuance helper refactored"
+    },
+    "ft_v2": {
+      "package_format_version": 5,
+      "ft_version": 2,
+      "sampler_version": 1,
+      "lambda_bits": 128,
+      "max_attempts_per_fisher_yates_position": 6,
+      "explicit_api": "score_to_mask_v3_dealer_issue_packages_ft_v2_bounded",
+      "cmake_option": "MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL",
+      "default": "OFF",
+      "requires_gmw_opt_in": true,
+      "signature_domain_version_bound": true,
+      "receipt_format_version_is_independent_field": true
+    },
+    "receipt_format": {
+      "supported_versions": [1, 2],
+      "independent_of_ft_version": true,
+      "covered_by_signed_escrow_context": true
+    }
+  },
+  "bounded_rejection": {
+    "m_domain": "1<=m<=256; actual Dealer padded_n is at least 2",
+    "rho_i": "(2^32 mod i)/2^32 < 2^-24 for 1<=i<=256",
+    "retry_formula": "r(λ,m)=ceil((λ+log2(m−1))/24), m>1; r=0 for m=1",
+    "lambda": 128,
+    "r_for_m_2_through_256": 6,
+    "delta_exact_union_bound": "1-product_{i=2..m}(1-rho_i^r) <= sum rho_i^r < (m-1)*2^(-24r)",
+    "delta_worst_case_m256": "255*2^-144=(255/256)*2^-136 < 2^-136 < 2^-128",
+    "accepted_residue_law": "uniform conditional on acceptance, under independent uniform 32-bit words",
+    "failure_law": "uniform ISSUANCE_ABORT; not an incorrect output",
+    "delta_scope": "TV only for semantic-material projection pi_mat after removing version/signature/encoding metadata; no full package/context cross-version TV bound",
+    "n128": {
+      "g_bytes": 1289280,
+      "permutation_bytes": 2048,
+      "positions": 127,
+      "qmax_bytes": 1294376,
+      "rand_bytes_calls_max": 765,
+      "single_rand_request_bytes_max": 1048576
+    },
+    "n256": {
+      "g_bytes": 5281664,
+      "permutation_bytes": 8192,
+      "positions": 255,
+      "qmax_bytes": 5295976,
+      "rand_bytes_calls_max": 1537,
+      "single_rand_request_bytes_max": 1048576
+    }
+  },
+  "gates": {
+    "F_T_BOUNDED_VERSION_FUNCTIONALITY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "S45 deterministic sampler conformance and N128/N256 v2 multi-process oracle smoke",
+      "scope": "N<=256 tested path; not full matrix"
+    },
+    "STRICT_PPT_BOUND": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "bounded sampler loop and source-derived finite RAND_bytes byte/call/request bounds",
+      "assumption": "each random-byte API call returns; no wall-clock bound is claimed for OpenSSL, filesystem, or OS calls"
+    },
+    "MATERIAL_FAILURE_CONTRACT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "injected six-rejection exhaustion leaves no package/context/party-lease artifact; invocation burn marker persists",
+      "limitations": [
+        "marker is in the T-owned fixed private registry and not a party lease",
+        "global cross-version or registry-path rollback prevention is not established",
+        "temporary material vectors are not explicitly zeroized",
+        "later multi-file durable_create I/O failure atomicity is outside this sampler-abort result"
+      ]
+    },
+    "PACKAGE_VERSION_BINDING": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "signed format-5 header/domain; tampered profile rejected; receipt version 1/2 kept independent; v1 compatibility smoke passes"
+    },
+    "JOINT_RNG_STREAM_BRIDGE": {
+      "status": "OPEN",
+      "required_term": "Adv_DRBG_T(Qmax,Cmax;E)",
+      "deployment_provider_entropy_seed_lifecycle": "UNKNOWN_OPEN",
+      "reason": "bounded queries do not prove actual OpenSSL provider/entropy/reseed/fork/restart/concurrency stream is IID or computationally indistinguishable"
+    },
+    "PARTY_VIEW_COMPOSITION": {
+      "status": "OPEN",
+      "reason": "bounded issuance does not close the full GMW/Beaver transcript simulator"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "secure_alias_created": false,
+      "v3_default": "OFF",
+      "ft_v2_default": "OFF"
+    },
+    "PERFORMANCE_READY": {
+      "status": "NOT_READY",
+      "formal_lan_wan": "NOT_RUN",
+      "rtt": "NOT_MEASURED",
+      "formal_performance_matrix": "NOT_STARTED",
+      "diagnostic_phase_rss_elapsed": "NOT_PERFORMANCE_EVIDENCE"
+    }
+  },
+  "reliability_and_scope": {
+    "natural_business_io_fault": "NOT_REPRODUCED_INHERITED_FROM_S40; not rerun",
+    "arbitrary_crash_abort_prefix_privacy": "NOT_PROVED",
+    "physical_power_loss_durability": "NOT_TESTED",
+    "n_gt_256": "NOT_ADMITTED",
+    "s35_195_matrix": "NOT_RERUN",
+    "s40_211_matrix": "NOT_RERUN"
+  },
+  "execution": {
+    "default_off_release": "PASS",
+    "explicit_ft_v2_release": "PASS",
+    "production_build_testing_off": "PASS",
+    "ft_v2_bounded_conformance": "PASS",
+    "v3_runtime_conformance": "PASS",
+    "ft_v1_receipt_v1_compatibility_smoke": "PASS",
+    "ft_v2_n128_n256_multiprocess_smoke": "PASS",
+    "full_195_or_211_case_matrix": "NOT_RUN",
+    "formal_lan_wan_rtt": "NOT_RUN_NOT_MEASURED",
+    "formal_performance": "NOT_MEASURED"
+  },
+  "review": {
+    "executor_participated_s43_s44": true,
+    "executor_is_independent": false,
+    "non_author_reviewer": "/root/s45_non_author_review",
+    "reviewer_scope": "retry probability, version/abort specification, source mapping, test interpretation and separation of delta_reject from DRBG advantage",
+    "reviewer_build_test": "NOT_RUN",
+    "reviewer_changed_files": false,
+    "final_review_status": "PASS_WITH_SCOPE_REVIEWED",
+    "review_findings": "Retry math and Qmax/Cmax/source mapping confirmed; initial manifest omission, E2E JSON typo and one source hash were corrected and verified; reviewer did not build or test"
+  },
+  "deliverables": {
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_DECISION_2026-10-22.md",
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_REPORT_2026-10-22.md",
+    "cases": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_CASES_2026-10-22.json",
+    "manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json"
+  }
+}
