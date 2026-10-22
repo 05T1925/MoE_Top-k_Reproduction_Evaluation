@@ -1,0 +1,143 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s44-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S44",
+  "date": "2026-10-22",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "full_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "S43_SOURCE_RECEIPT": {
+    "status": "PASS_WITH_SCOPE",
+    "s43_commit": "a1b02a8133955786e0bb6b047f55b746af66acbf",
+    "s43_parent": "72a23fc067b5bfbf10edf110eeff45ec1f0ed6bd",
+    "s43_manifest_sha256": "9f8064b90a9c52a45d3c7d3488deca075497544de342c6f45a30fb1f0ceee320",
+    "s39_runtime_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s39_core_source_blobs_verified": "7/7",
+    "qualification": "S43 manifest deliverables verify; two inherited S42 governance-document hash rows do not reconstruct from S42 Git tree and remain separately OPEN_METADATA_DIVERGENCE. Fixed S39 Dealer source identity is independently verified."
+  },
+  "S42_NESTED_MANIFEST_RECONSTRUCTION": {
+    "status": "OPEN_METADATA_DIVERGENCE",
+    "rows": 85,
+    "embedded_rows_canonical_sha256": "2ea2896cce7dd284f3d317a7462dde528c188cc15cb32af16c744dad4e5e6837",
+    "reconstructed_from_s42_commit": "83/85",
+    "unresolved_paths": [
+      {
+        "path": "PROJECT.md",
+        "manifest_row_sha256": "924c989e4475b3129d777859d270b6b228e20f294b834568e0522947a8f5b0d8",
+        "s42_git_blob_sha256": "b1a146858cdf7d60bb0985ff32bc61d969f02d80028fd2a8559019ce6d088a65"
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "manifest_row_sha256": "281724be8352d89767ebb5896eed70f4e5fda401ff231c771c64d6f8466cd343",
+        "s42_git_blob_sha256": "e5700651ea981bbc3cf7705c9a3437220f0427e2b687a47d801b002f42b27d7b"
+      }
+    ],
+    "effect_on_s39_runtime_identity": "NONE; fixed S39 runtime blobs separately verified"
+  },
+  "S43_FINAL_TEXT_REVIEW": {
+    "status": "PASS_WITH_SCOPE",
+    "reviewer": "/root/s43_final_text_review",
+    "participated_in_s43": false,
+    "scope": "S43 final ideal-IID joint-law wording, reviewer-edit incorporation, expected-PPT and rejection-boundary statements",
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN"
+  },
+  "DRBG_ASSUMPTION_AND_DEPLOYMENT_MODEL": {
+    "status": "OPEN",
+    "recorded_build_openssl": "3.0.13 (inherited S35/S40 build evidence only)",
+    "actual_deployed_provider_seed_source_entropy_lifecycle": "UNKNOWN",
+    "required_model": [
+      "provider/libcrypto build and OSSL_LIB_CTX/config",
+      "deployment E excludes realized seed/state; hidden S consists only of initial/reseed entropy inputs (not evolving DRBG state) and must satisfy Law(S | P,sk_T,E)=Law(S | E), or a stated entropy-source theorem",
+      "seed and OS entropy source, including initialization/reseed independence from public tuple and fixed T signing key",
+      "multi-call/multi-thread/multi-process/fork/restart/reseed behavior",
+      "joint API bytes/status game, or an explicit conditional-success game accounting for selection effects",
+      "aggregate output/call query bound"
+    ]
+  },
+  "JOINT_RNG_STREAM_BRIDGE": {
+    "status": "OPEN",
+    "required_relation": "Average over hidden S; Law(T_real | P,sk_T,E,Suc_real) is computationally indistinguishable from Law(T_U | P,sk_T,E,Suc_IID); T includes bytes/call boundaries/status, E excludes realized seed/state, and success conditioning must account for selection effects",
+    "symbolic_term": "Adv_DRBG_T(Q,C;E)",
+    "quantified_advantage": "NOT_AVAILABLE",
+    "computational_vs_statistical": "bounded real-to-matching-F_T/v2 full-transcript DRBG replacement is computational; only after projection pi_mat erases sampler/version/signature/encoding metadata does TV(pi_mat(F_T/v2),pi_mat(F_T/v1)) <= delta_reject apply; no full-transcript cross-version TV claim",
+    "marginal_uniformity_sufficient": false
+  },
+  "REJECTION_RUNTIME_BOUND": {
+    "status": "OPEN_STRICT_PPT_NOT_ESTABLISHED",
+    "current_source": "expected-polynomial-time only; next_uniform uses unbounded for(;;)",
+    "worst_case_query_bound": "NONE",
+    "project_norm": "Strict-PPT precedent in S38; no explicit expected-PPT approval found",
+    "build_test": "NOT_RUN"
+  },
+  "FT_VERSION_COMPATIBILITY": {
+    "status": "OPEN_DESIGN_ONLY",
+    "current_ft_v1_modified": false,
+    "candidate": "F_T/v2 bounded-rejection-v1, max r(λ)=λ attempts per shuffle position",
+    "failure_result": "ISSUANCE_ABORT before package/context/lease creation",
+    "delta_reject": "1 - product_{i=2..m}(1 - ( (2^32 mod i) / 2^32 )^r) <= 255 * 2^(-24r), m<=256; this TV bound is only for semantic-material projection pi_mat, not full signed packages",
+    "qmax_bytes": "g + ceil(m^2/8) + 4*r*(m-1)",
+    "n256_qmax_bytes": "5289856 + 1020*r",
+    "implemented": false
+  },
+  "ONE_SHOT_SCOPE": {
+    "status": "CONDITIONAL",
+    "scope": "Same package and intact non-rolled-back lease DB success path only; global reissue/rollback/restart not proven"
+  },
+  "PRIVATE_CHANNEL_BRIDGE": {
+    "status": "OPEN",
+    "s44_reviewed": false
+  },
+  "PARTY_VIEW_COMPOSITION": {
+    "status": "OPEN",
+    "s43_rng_bridge_closed": false
+  },
+  "CRASH_RELIABILITY_SCOPE": {
+    "status": "NOT_PROVED",
+    "natural_business_io_fault": "NOT_REPRODUCED_INHERITED_FROM_S40",
+    "fault_injection": "NOT_RUN_S44",
+    "arbitrary_crash_prefix_privacy": "OUT_OF_SCOPE"
+  },
+  "SECURE_ALIAS_READY": {
+    "status": "NOT_READY",
+    "secure_alias_created": false,
+    "v3_default": "OFF"
+  },
+  "PERFORMANCE_READY": {
+    "status": "NOT_READY",
+    "formal_lan_wan": "NOT_RUN",
+    "rtt": "NOT_MEASURED",
+    "performance_matrix": "NOT_STARTED",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "execution": {
+    "runtime_modified": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "toy_enumeration": "NOT_RUN",
+    "s35_195_matrix": "NOT_RERUN",
+    "s40_211_matrix": "NOT_RERUN",
+    "formal_performance": "NOT_RUN",
+    "formal_rtt": "NOT_MEASURED",
+    "natural_io_fault": "NOT_REPRODUCED_INHERITED",
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "review": {
+    "author_participated_s35_s43": true,
+    "non_author_reviewer": "/root/s43_final_text_review",
+    "reviewer_changed_files": false,
+    "reviewer_built_or_tested": false,
+    "s44_review_pending": false,
+    "s44_review_status": "PASS_WITH_SCOPE_AFTER_CORRECTIONS",
+    "review_corrections_requested": []
+  }
+}

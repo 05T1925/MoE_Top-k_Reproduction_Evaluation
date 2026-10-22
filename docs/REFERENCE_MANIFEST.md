@@ -383,3 +383,12 @@ vfss-baseline-2026-09-03
 - S41 manifest 的历史汇总字段 `bfa8ba9c…67ab726c` 与逐项值重算 `e0bb4d25…b5f8a69` 不一致；新增 [S41 来源勘误](reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S41_PROVENANCE_ERRATUM_2026-10-22.md)，不改 S41 原件。S43 作者参与 S35–S42；非作者 `/root/s39_crypto_review` 已复核理想 tape 下单次成功发材联合 law（`PASS_WITH_SCOPE`），真实 DRBG bridge 仍开放；范围见 manifest。
 - S43 的 ideal-tape 复核范围为：材料联合 law 精确匹配；package/context/signature 在 `receipt_format_version` 参数匹配时逐值耦合。S39 v2 与 S35 v1 的签名状态字段值差异已在报告中单列。非作者复核未运行 build/test，且未重查其意见并入后的措辞编辑。真实 RNG bridge 与全协议 party-view 维持 `CONDITIONAL/OPEN`。
 - S43 未构建/测试/执行 toy enumeration；不重跑 S35 195 案或 S40 211 案，不启动 LAN/WAN/RTT。理想 IID tape 下的上述范围性联合采样为 `PASS_WITH_SCOPE`，不改 VFSS-baseline、不推送/合并、不创建 `secure` alias。
+
+## 18. M6B S44 Dealer RNG joint-stream bridge 与 rejection bound
+
+- 对象固定为 S43 commit a1b02a8133955786e0bb6b047f55b746af66acbf；实际 S39 Dealer/runtime commit 8028c0fece69fe0c648b1e0f1e12ad7fca723f20。S43 source/evidence manifest SHA-256 9f8064b90a9c52a45d3c7d3488deca075497544de342c6f45a30fb1f0ceee320；七个核心 S39 runtime source Git blob SHA-256 逐项核对通过（7/7）。
+- S39 Dealer RNG 源码定位：score_to_mask_v3_gmw.cpp:234–241 将 RAND_bytes 请求按最多 1 MiB 切块并在错误时抛出；:254–262 的 next_uniform 对 32-bit 字使用无界 rejection；:519–544 依次消费 gate_count 字节、ceil(m²/8) 字节和各 Fisher–Yates attempt 的 4 字节。N=256 时前两段共 5,289,856 字节，之后每次位置 attempt 另请求 4 字节；attempt 数无确定上限。
+- ideal IID tape 单次成功发材联合 law 维持 PASS_WITH_SCOPE，经未参与 S43 推导的 /root/s43_final_text_review 复核。S44 将 E 限定为部署配置/生命周期策略；S 只含初始/reseed 熵输入、不含演化状态，所需条件包含 `Law(S | P,sk_T,E)=Law(S | E)` 或显式熵源替代定理。成功条件化必须处理 RAND 错误选择效应。真实部署依赖 provider/seed-source/entropy、生命周期和联合计算优势 Adv_DRBG_T(Q,C;E)，仍 OPEN。
+- strict-PPT 当前未满足。候选 F_T/v2 bounded-rejection profile 令每个位置至多 r 次；只有投影到去除版本/签名/编码元数据后的语义材料空间，才有 `TV(π_mat(F_T/v2),π_mat(F_T/v1))≤δ_reject=1−∏(1−ρ_i^r)≤255·2^(−24r)`；完整跨版本签名 transcript 不承诺该距离。bounded DRBG 替换到匹配版本是计算优势。方案需要统一 pre-package ISSUANCE_ABORT、显式 version/signature binding 和独立接口审查。没有修改 runtime 或 F_T/v1。
+- OpenSSL 官方资料用于说明 RAND API/provider/seed-source 行为边界，不代替具体部署证明：[RAND_bytes](https://docs.openssl.org/3.0/man3/RAND_bytes/)、[RAND_get0_primary](https://docs.openssl.org/3.0/man3/RAND_get0_primary/)、[EVP_RAND](https://docs.openssl.org/3.0/man7/EVP_RAND/)、[EVP_RAND-SEED-SRC](https://docs.openssl.org/3.0/man7/EVP_RAND-SEED-SRC/)。
+- S44 gates/报告/source-build-evidence manifest 记录 reviewer 身份、继承与未运行项。没有完整协议安全或性能结论；N>256 未准入，默认 v3 OFF，无 secure alias。

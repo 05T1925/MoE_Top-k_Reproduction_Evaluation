@@ -949,3 +949,11 @@ S43 固定 S42 本地提交 `72a23fc067b5bfbf10edf110eeff45ec1f0ed6bd` 和已核
 S39 Dealer 在理想 IID 字节带下的 triple shares、Fisher–Yates permutation 与 one-hot permutation XOR shares 联合律精确匹配单次成功 `F_T/v1`。package/context 的确定性摘要和签名只在 public `receipt_format_version` 参数匹配时逐值耦合；S39 receipt-v2 opt-in 将 context 的已签字段从 1 改为 2，和 S35 v1 context 有可解释的确定性字节差异。非作者 `/root/s39_crypto_review` 复核理想 IID tape 下的范围性联合律为 `PASS_WITH_SCOPE`。真实 `RAND_bytes` 联合输出替换仍需未量化的 `Adv_DRBG_T(q)` 与 provider/entropy/reseed/fork/并发条件；拒绝采样有期望界但无最大重试次数。lease 成功路径仅在同一未回滚 DB/package 下有范围性保证；跨重启、重复签发和发材部分文件恢复未定义/未验证。详见 S43 报告、决策、gates 和 source/build/evidence manifest。
 
 本轮执行者参与 S35–S42，属于作者；非作者 `/root/s39_crypto_review` 已只读复核理想 IID tape 下单次成功发材的条件联合 law（`PASS_WITH_SCOPE`），真实 DRBG bridge 仍 `OPEN/CONDITIONAL`，复核者未检查之后的澄清编辑。没有可复现运行时缺陷，因此只修改文档，BUILD/TEST=`NOT_RUN`；S35 195 案和 S40 211 案均不重跑。自然业务 I/O 故障沿用 `NOT_REPRODUCED`；崩溃前缀隐私未证明；N>256 `NOT_ADMITTED`；正式 LAN/WAN/RTT 未运行/未测量；不创建 `secure` alias，v3 默认关闭，不改 `VFSS-baseline/`，不推送/合并。完整 party-view 安全与性能仍是独立 OPEN 门。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S44（2026-10-22）
+
+S44 从 S43 精确提交 a1b02a8133955786e0bb6b047f55b746af66acbf 开始，实际 Dealer/runtime 固定为 S39 提交 8028c0fece69fe0c648b1e0f1e12ad7fca723f20。S43 manifest 及七项交付哈希在本轮开始时核验通过；直接从 S39 Git tree 复算的七个核心源 blob 7/7 与 manifest 一致。S43 manifest 内嵌 S42 85 项 source rows 中，PROJECT.md 与 docs/IMPLEMENTATION_PLAN.md 两行仍有独立 OPEN_METADATA_DIVERGENCE；该治理文档元数据问题不构成 S39 Dealer 源码冲突，具体值载于 S44 manifest。S41 provenance erratum 原样保留。
+
+在理想 IID tape、单次成功发材、receipt_format_version 与签名 context 匹配条件下，S43 的联合材料律经未参与 S43 推导的审查者复核后保留 PASS_WITH_SCOPE。S44 只将 E 作为部署配置/生命周期策略；隐藏 S 是初始 seed/熵输入和后续 reseed 熵输入，不含演化状态，并对其求平均，要求 `Law(S | P,sk_T,E)=Law(S | E)` 或明确的熵源替代定理。成功条件化还须显式处理 RAND 错误造成的选择效应。真实 RAND_bytes 全序列桥接需要部署 provider、seed/entropy、并发/fork/restart/reseed 和聚合 query 模型；计算优势 `Adv_DRBG_T(Q,C;E)` 未证明或量化，门仍 OPEN。S39 next_uniform 的拒绝循环无上限；期望时间有限，但不满足本路线 S38 strict-PPT 先例。S44 给出 F_T/v2 bounded-rejection 规格候选；`δ_reject` 只约束去除版本/签名/编码元数据后的语义材料投影，不约束完整 package transcript，且为独立统计项，不与 DRBG 计算优势混写；不改 F_T/v1 或 runtime。
+
+本轮未构建/测试、未重跑 S35 195 案或 S40 211 案，未运行正式 LAN/WAN/RTT。自然业务 I/O 故障沿用 NOT_REPRODUCED；N>256 NOT_ADMITTED；无 secure alias；v3 默认 OFF；VFSS-baseline 不变。完整 GMW party-view、private-channel 与真实部署 DRBG bridge 仍 OPEN，不是完整安全 PASS。详见 S44 decision、报告、gates 与 source/build/evidence manifest。

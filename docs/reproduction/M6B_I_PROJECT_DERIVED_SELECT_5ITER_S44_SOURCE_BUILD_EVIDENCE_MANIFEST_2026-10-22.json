@@ -1,0 +1,437 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s44-source-build-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S44",
+  "date": "2026-10-22",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "full_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "identity": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-s42-joint-simulator\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s43",
+    "start_commit": "a1b02a8133955786e0bb6b047f55b746af66acbf",
+    "start_parent": "72a23fc067b5bfbf10edf110eeff45ec1f0ed6bd",
+    "start_tree": "2b58e2a02ec9668cfbd9e6ba7419f76142f7f828",
+    "start_worktree_clean": true,
+    "runtime_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s35_runtime_commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "s40_evidence_commit": "b04618117b11cffe0e899947726ab1c66807ffdd",
+    "user_primary_worktree_modified": false,
+    "vfss_baseline_modified": false,
+    "historical_worktrees_cleaned_or_overwritten": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "provenance": {
+    "s43_manifest": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json",
+      "sha256_current_raw_bytes": "9f8064b90a9c52a45d3c7d3488deca075497544de342c6f45a30fb1f0ceee320",
+      "expected_sha256": "9f8064b90a9c52a45d3c7d3488deca075497544de342c6f45a30fb1f0ceee320",
+      "match": true
+    },
+    "s43_deliverables_at_start_commit": [
+      {
+        "name": "decision",
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_DECISION_2026-10-22.md",
+        "sha256_at_s43_commit": "95679fbd1e817c175aada6065aac7e8d81763031bc6ad028d45dce2f158ef7c6",
+        "sha256_expected_from_s43_manifest": "95679fbd1e817c175aada6065aac7e8d81763031bc6ad028d45dce2f158ef7c6",
+        "match": true
+      },
+      {
+        "name": "report",
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_REPORT_2026-10-22.md",
+        "sha256_at_s43_commit": "93788ed68aa4ffd6ab4a2aafb812f9080b80875682b9aae6c611d6ce8f61c5cb",
+        "sha256_expected_from_s43_manifest": "93788ed68aa4ffd6ab4a2aafb812f9080b80875682b9aae6c611d6ce8f61c5cb",
+        "match": true
+      },
+      {
+        "name": "gates",
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_GATES_2026-10-22.json",
+        "sha256_at_s43_commit": "780e25e0e21f83f0b367aa6899cb212817bd3a600601d40cd4daed9427cb1d7f",
+        "sha256_expected_from_s43_manifest": "780e25e0e21f83f0b367aa6899cb212817bd3a600601d40cd4daed9427cb1d7f",
+        "match": true
+      },
+      {
+        "name": "s41_provenance_erratum",
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S41_PROVENANCE_ERRATUM_2026-10-22.md",
+        "sha256_at_s43_commit": "0552ffb6973c18a3b490ee4162845957c4294a087370b87329935c3690d7efc4",
+        "sha256_expected_from_s43_manifest": "0552ffb6973c18a3b490ee4162845957c4294a087370b87329935c3690d7efc4",
+        "match": true
+      },
+      {
+        "name": "PROJECT.md",
+        "path": "PROJECT.md",
+        "sha256_at_s43_commit": "e527ea401ee295269465cdad85d61149787538f924437cc485de187788615a55",
+        "sha256_expected_from_s43_manifest": "1e22abb5b45d6fa8197b291d41ee598ebde6d9a13bab86c156342a6aff398528",
+        "match": false
+      },
+      {
+        "name": "IMPLEMENTATION_PLAN.md",
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "sha256_at_s43_commit": "d6692c4f359d37553efb8dcfc1c341871a1a03268782fcff5b25231254940970",
+        "sha256_expected_from_s43_manifest": "66e2868b3b248af24e082852fdfd79a1f1160af52e5be3e31e8b05af0c0abd11",
+        "match": false
+      },
+      {
+        "name": "REFERENCE_MANIFEST.md",
+        "path": "docs/REFERENCE_MANIFEST.md",
+        "sha256_at_s43_commit": "371971d2890cdcab256aef505c86c9413c1b51cff277fbb9b5cec17763d9bdad",
+        "sha256_expected_from_s43_manifest": "e233297d19a491f9aed83da53e2ab6067a102a302b0e3c4921cdabad21fd370d",
+        "match": false
+      }
+    ],
+    "s35_manifest": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S35_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+      "raw_worktree_sha256": "62be2127ae4eb28eb2c6d5d5b1dc2a5d46d068d6a68a62f2c0835708abdc6c07",
+      "file_count": 85,
+      "canonical_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0"
+    },
+    "s39_manifest": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S39_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+      "raw_worktree_sha256": "af4643a816a2bc0e22772ce849d0daab082aa68161cc001777992d060c5b3615",
+      "file_count": 85,
+      "canonical_sha256": "09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9",
+      "runtime_source_changed_from_s35": [
+        "VFSS/CMakeLists.txt",
+        "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+        "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+        "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+        "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "VFSS/tests/moe_topk/score_to_mask_v3_runtime_conformance_test.cpp",
+        "docs/IMPLEMENTATION_PLAN.md"
+      ]
+    },
+    "s40_manifest": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S40_FOLLOWUP_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+      "git_blob_sha256_at_s40_and_s41": "66b15c5f1354cb1a52812b721e4c456b9a67678bca06ca0209babd2fcdaf029b",
+      "source_count": 85,
+      "canonical_sha256_recomputed": "10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6",
+      "canonical_sha256_recorded": "10c508b3d0d16a06f826bbdfd0ada97b9fd4b99c2abdcd2336cd5a5605b804f6",
+      "s40_runtime_code_changed": false,
+      "s40_tracked_source_delta": [
+        "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp"
+      ]
+    },
+    "s42_nested_manifest": {
+      "rows": 85,
+      "recorded_rows_canonical_sha256": "2ea2896cce7dd284f3d317a7462dde528c188cc15cb32af16c744dad4e5e6837",
+      "rebuilt_from_s42_git_tree": "83/85",
+      "status": "OPEN_METADATA_DIVERGENCE",
+      "unresolved_rows": [
+        {
+          "path": "PROJECT.md",
+          "manifest_sha256": "924c989e4475b3129d777859d270b6b228e20f294b834568e0522947a8f5b0d8",
+          "s42_git_blob_sha256": "b1a146858cdf7d60bb0985ff32bc61d969f02d80028fd2a8559019ce6d088a65"
+        },
+        {
+          "path": "docs/IMPLEMENTATION_PLAN.md",
+          "manifest_sha256": "281724be8352d89767ebb5896eed70f4e5fda401ff231c771c64d6f8466cd343",
+          "s42_git_blob_sha256": "e5700651ea981bbc3cf7705c9a3437220f0427e2b687a47d801b002f42b27d7b"
+        }
+      ],
+      "root_cause": "not established; preserved as metadata caveat, not S39 runtime identity conflict"
+    },
+    "s41_erratum": {
+      "preserved": true,
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S41_PROVENANCE_ERRATUM_2026-10-22.md",
+      "historical_s41_files_modified": false,
+      "s41_summary_vs_recomputed": "OPEN_METADATA_DIVERGENCE"
+    },
+    "s43_deliverables": {
+      "entries": [
+        {
+          "name": "decision",
+          "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_DECISION_2026-10-22.md",
+          "sha256_as_recorded_by_s43": "95679fbd1e817c175aada6065aac7e8d81763031bc6ad028d45dce2f158ef7c6",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "95679fbd1e817c175aada6065aac7e8d81763031bc6ad028d45dce2f158ef7c6",
+          "current_matches_s43_record": true,
+          "current_difference": "none"
+        },
+        {
+          "name": "report",
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_REPORT_2026-10-22.md",
+          "sha256_as_recorded_by_s43": "93788ed68aa4ffd6ab4a2aafb812f9080b80875682b9aae6c611d6ce8f61c5cb",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "93788ed68aa4ffd6ab4a2aafb812f9080b80875682b9aae6c611d6ce8f61c5cb",
+          "current_matches_s43_record": true,
+          "current_difference": "none"
+        },
+        {
+          "name": "gates",
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_GATES_2026-10-22.json",
+          "sha256_as_recorded_by_s43": "780e25e0e21f83f0b367aa6899cb212817bd3a600601d40cd4daed9427cb1d7f",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "780e25e0e21f83f0b367aa6899cb212817bd3a600601d40cd4daed9427cb1d7f",
+          "current_matches_s43_record": true,
+          "current_difference": "none"
+        },
+        {
+          "name": "s41_provenance_erratum",
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S41_PROVENANCE_ERRATUM_2026-10-22.md",
+          "sha256_as_recorded_by_s43": "0552ffb6973c18a3b490ee4162845957c4294a087370b87329935c3690d7efc4",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "0552ffb6973c18a3b490ee4162845957c4294a087370b87329935c3690d7efc4",
+          "current_matches_s43_record": true,
+          "current_difference": "none"
+        },
+        {
+          "name": "PROJECT.md",
+          "path": "PROJECT.md",
+          "sha256_as_recorded_by_s43": "1e22abb5b45d6fa8197b291d41ee598ebde6d9a13bab86c156342a6aff398528",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "62ceb4e111c3d744d8adace433457d63e5aaa5e02f7f9c2ee24c45274d6c5a79",
+          "current_matches_s43_record": false,
+          "current_difference": "intentional S44 governance update"
+        },
+        {
+          "name": "IMPLEMENTATION_PLAN.md",
+          "path": "docs/IMPLEMENTATION_PLAN.md",
+          "sha256_as_recorded_by_s43": "66e2868b3b248af24e082852fdfd79a1f1160af52e5be3e31e8b05af0c0abd11",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "f352bfbdd1e28ab722285597879e65dc6cb1428426c53f946bf12c4d6f1c15f5",
+          "current_matches_s43_record": false,
+          "current_difference": "intentional S44 governance update"
+        },
+        {
+          "name": "REFERENCE_MANIFEST.md",
+          "path": "docs/REFERENCE_MANIFEST.md",
+          "sha256_as_recorded_by_s43": "e233297d19a491f9aed83da53e2ab6067a102a302b0e3c4921cdabad21fd370d",
+          "verified_at_s44_entry_before_edits": "MATCHED_RECORDED",
+          "current_sha256": "001fbad6abc2bb9dcd3c12c19d400e5d60baa5e6ea7b63f4485a08e4bc1cd65e",
+          "current_matches_s43_record": false,
+          "current_difference": "intentional S44 governance update"
+        }
+      ],
+      "entry_time_note": "The seven recorded S43 deliverable raw hashes were checked against the worktree at S44 entry. Four dated S43 artifacts remain byte-identical and match; PROJECT.md, docs/IMPLEMENTATION_PLAN.md and docs/REFERENCE_MANIFEST.md have intentional S44 additions and are separately hashed below."
+    }
+  },
+  "source_audit": {
+    "object": "S39 Dealer/runtime Git tree only; no working-tree substitution",
+    "core_files": [
+      {
+        "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+        "sha256_s39_commit_blob": "48e4872201c25061a030d44d4427798c61bd29702c8cd8f332e06da837d1676f",
+        "sha256_manifest": "48e4872201c25061a030d44d4427798c61bd29702c8cd8f332e06da837d1676f",
+        "match": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "sha256_s39_commit_blob": "527440a7bb9fa0b08d37def3f1a471f357eb22238728c5b141fb20b7b4b9fc60",
+        "sha256_manifest": "527440a7bb9fa0b08d37def3f1a471f357eb22238728c5b141fb20b7b4b9fc60",
+        "match": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+        "sha256_s39_commit_blob": "be00c6cb1c84de7e04bfb6383aff35d6d79decf16597e943f0fc2e04775571cc",
+        "sha256_manifest": "be00c6cb1c84de7e04bfb6383aff35d6d79decf16597e943f0fc2e04775571cc",
+        "match": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+        "sha256_s39_commit_blob": "2312832796b314213b25c901f22e84f745ed7b9a18e78996ac165bb572e17b60",
+        "sha256_manifest": "2312832796b314213b25c901f22e84f745ed7b9a18e78996ac165bb572e17b60",
+        "match": true
+      },
+      {
+        "path": "VFSS/CMakeLists.txt",
+        "sha256_s39_commit_blob": "d34fe3036aa5bfc38bb5a2397294eb85d9cf93f19a6927a4d90a7cbb3dda294d",
+        "sha256_manifest": "d34fe3036aa5bfc38bb5a2397294eb85d9cf93f19a6927a4d90a7cbb3dda294d",
+        "match": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_runtime_conformance_test.cpp",
+        "sha256_s39_commit_blob": "9fb9abb537e7b3a35bd1f02e47bb34e777201a23cd386fd8fdf308413cf0dbf8",
+        "sha256_manifest": "9fb9abb537e7b3a35bd1f02e47bb34e777201a23cd386fd8fdf308413cf0dbf8",
+        "match": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "sha256_s39_commit_blob": "2d32d0f29c6021d4b629beffb27c0b620fbd6502f70d430e3b7a6d63c5df1cf0",
+        "sha256_manifest": "2d32d0f29c6021d4b629beffb27c0b620fbd6502f70d430e3b7a6d63c5df1cf0",
+        "match": true
+      }
+    ],
+    "call_flow": [
+      {
+        "step": "random_bytes helper",
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "lines": "234-241",
+        "behavior": "RAND_bytes chunks <= 1 MiB; non-1 return throws"
+      },
+      {
+        "step": "next_uniform",
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "lines": "254-262",
+        "behavior": "fresh 4-byte draw per attempt; reject v < 2^32 mod i; unbounded loop"
+      },
+      {
+        "step": "triple tape",
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "lines": "519-538",
+        "behavior": "gate_count random bytes; low 5 bits consumed, upper 3 discarded"
+      },
+      {
+        "step": "permutation share tape",
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "lines": "539-541",
+        "behavior": "ceil(m^2/8) bytes"
+      },
+      {
+        "step": "Fisher-Yates",
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "lines": "542-544",
+        "behavior": "one next_uniform draw sequence at each i=m..2"
+      },
+      {
+        "step": "durable write start",
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "lines": "591-593",
+        "behavior": "P0, P1, context writes begin after random material/package construction"
+      }
+    ],
+    "other_rng_excluded": [
+      "party seed",
+      "recipient-envelope AES key/nonce",
+      "output refresh",
+      "A receipt token"
+    ],
+    "core_file_count": 7,
+    "core_hashes_verified": 7
+  },
+  "joint_rng_model": {
+    "public_tuple": "P=(protocol,session,invocation,N,K,route,circuit,gate_schedule,party identities,recipient-key hashes,escrow state incl receipt_format_version,vk_T)",
+    "fixed_secret_key": "sk_T (T-only; not passed to online parties)",
+    "deployment_E": "OpenSSL/libcrypto build/provider/RAND configuration/libctx/seed-source type and lifecycle/error policy; excludes realized entropy, seed, and DRBG state",
+    "hidden_random_state": "S contains only realized initial seed/entropy inputs and later reseed entropy inputs; it excludes evolving DRBG state/output and is averaged over; require Law(S | P,sk_T,E)=Law(S | E) or explicit entropy theorem",
+    "required_adaptive_relation": "Law(T_real | P,sk_T,E,Suc_real) ≈c Law(T_U | P,sk_T,E,Suc_IID), averaging over S; T includes returned bytes, call boundaries and API status; success selection effect is part of the required assumption",
+    "advantage": "Adv_DRBG_T(Q,C;E), symbolic/unquantified; must cover aggregate multi-call/thread/process/fork/restart/reseed behavior and deterministic postprocessing",
+    "equation_kind": "computational indistinguishability; not statistical distance"
+  },
+  "rejection_model": {
+    "current_source": "unbounded for(;;); expected-polynomial but not source-level worst-case strict PPT",
+    "N128": {
+      "m": 128,
+      "g_bytes": 1289280,
+      "perm_share_bytes": 2048,
+      "positions": 127,
+      "q_base": 1291328,
+      "expected_Q_approx": 1291836.000003,
+      "rand_call_count_expected_approx": 130.000001,
+      "q_worst_case": "unbounded"
+    },
+    "N256": {
+      "m": 256,
+      "g_bytes": 5281664,
+      "perm_share_bytes": 8192,
+      "positions": 255,
+      "q_base": 5289856,
+      "expected_Q_approx": 5290876.000014,
+      "rand_call_count_expected_approx": 262.0000035,
+      "q_worst_case": "unbounded"
+    },
+    "current_model_decision": "OPEN_STRICT_PPT_NOT_ESTABLISHED; expected-PPT not explicitly accepted by project precedent",
+    "candidate_not_implemented": {
+      "version": "F_T/v2 bounded-rejection-v1",
+      "attempts_per_position": "r(lambda)=lambda",
+      "abort": "ISSUANCE_ABORT before package/context/lease creation",
+      "Qmax_bytes": "g + ceil(m^2/8) + 4*r*(m-1)",
+      "Cmax_calls": "ceil(g/2^20) + 1 + r*(m-1)",
+      "delta_reject": "1 - product_{i=2..m}(1-rho_i^r) <= 255*2^(-24r), m<=256",
+      "distance_semantics": "Only semantic-material projection pi_mat: successful law equals F_T/v1 semantic materials; with explicit abort TV(pi_mat(F_T/v2),pi_mat(F_T/v1))=delta_reject. No delta bound on full signed package/context transcript. Real-to-matching-F_T/v2 full transcript DRBG replacement is computational Adv_DRBG_T(Qmax,Cmax;E)."
+    }
+  },
+  "evidence_and_execution": {
+    "runtime_modified": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "S35_195_matrix": "NOT_RERUN",
+    "S40_211_matrix": "NOT_RERUN",
+    "toy_probability_enumeration": "NOT_RUN",
+    "fresh_binary": "NOT_BUILT",
+    "formal_LAN_WAN": "NOT_RUN",
+    "RTT": "NOT_MEASURED",
+    "formal_performance": "NOT_MEASURED",
+    "natural_business_IO_fault": "NOT_REPRODUCED_INHERITED_FROM_S40",
+    "fault_injection": "NOT_RUN_S44",
+    "inherited_functional_scope": "S40 receipt/v2 N<=256 PASS_WITH_SCOPE; 211 cases (207 mask cases match oracle; 4 pre-commit aborts no share), not rerun here",
+    "no_logs_binaries_keys_materials_added": true,
+    "openssl_docs_reviewed": [
+      "https://docs.openssl.org/3.0/man3/RAND_bytes/",
+      "https://docs.openssl.org/3.0/man3/RAND_get0_primary/",
+      "https://docs.openssl.org/3.0/man7/EVP_RAND/",
+      "https://docs.openssl.org/3.0/man7/EVP_RAND-SEED-SRC/"
+    ],
+    "deployment_provider_seed_source": "UNKNOWN_OPEN"
+  },
+  "review": {
+    "executor_participated_s35_s43": true,
+    "executor_is_independent": false,
+    "non_author_reviewer": "/root/s43_final_text_review",
+    "reviewer_participated_s43": false,
+    "s43_final_text_review": "PASS_WITH_SCOPE (ideal IID joint law only; exact prior draft diff unavailable)",
+    "s44_review_status": "PASS_WITH_SCOPE_AFTER_CORRECTIONS",
+    "reviewer_built_or_tested": false,
+    "reviewer_changed_files": false
+  },
+  "deliverables": [
+    {
+      "name": "decision",
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_DECISION_2026-10-22.md",
+      "sha256_worktree_bytes": "718c21e931ef9849a80e18592d73feb4ede5808950e6ba4e5ee4ab22fdb4c446"
+    },
+    {
+      "name": "report",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_REPORT_2026-10-22.md",
+      "sha256_worktree_bytes": "6f90ec9048ac141623523f04bfc2d54e1ba59f07eec15ba3b80091128a730ad4"
+    },
+    {
+      "name": "gates",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_GATES_2026-10-22.json",
+      "sha256_worktree_bytes": "5264e7699cf4e26ce3efa30c976924ddb53a749cd60b048def00b6e85132f163"
+    },
+    {
+      "name": "PROJECT.md",
+      "path": "PROJECT.md",
+      "sha256_worktree_bytes": "62ceb4e111c3d744d8adace433457d63e5aaa5e02f7f9c2ee24c45274d6c5a79"
+    },
+    {
+      "name": "IMPLEMENTATION_PLAN.md",
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "sha256_worktree_bytes": "f352bfbdd1e28ab722285597879e65dc6cb1428426c53f946bf12c4d6f1c15f5"
+    },
+    {
+      "name": "REFERENCE_MANIFEST.md",
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "sha256_worktree_bytes": "001fbad6abc2bb9dcd3c12c19d400e5d60baa5e6ea7b63f4485a08e4bc1cd65e"
+    },
+    {
+      "name": "source_build_evidence_manifest",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json",
+      "sha256_worktree_bytes": "NOT_SELF_REFERENCED"
+    }
+  ],
+  "manifest_self_hash": "NOT_SELF_REFERENCED",
+  "diff_scope": {
+    "expected_paths": [
+      "PROJECT.md",
+      "docs/IMPLEMENTATION_PLAN.md",
+      "docs/REFERENCE_MANIFEST.md",
+      "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_DECISION_2026-10-22.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_GATES_2026-10-22.json",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_REPORT_2026-10-22.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json"
+    ],
+    "runtime_or_test_changes": false,
+    "VFSS_baseline_changes": false
+  }
+}

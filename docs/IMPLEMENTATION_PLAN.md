@@ -1247,3 +1247,13 @@ S42 以 S41 固定提交 `486026ba425a2d17ca15173d056db6eb309747d1` 为对象；
 - 执行者参与 S35–S42；非作者 `/root/s39_crypto_review` 已只读复核理想 IID tape 下的单次成功发材联合 law，裁定 `PASS_WITH_SCOPE`；真实 DRBG bridge 仍 `OPEN/CONDITIONAL`，且本次澄清编辑未被复核者复查。BUILD/TEST 均 `NOT_RUN`，不重跑 S35 195 案或 S40 211 案，不测性能。private-channel/TLS、完整 party-view composition、安全别名及正式性能仍 OPEN/NOT_READY；自然业务 I/O 仍 `NOT_REPRODUCED`，N>256 `NOT_ADMITTED`，正式 LAN/WAN/RTT `NOT_RUN/NOT_MEASURED`，v3 OFF，不改 `VFSS-baseline/`，不推送/合并。
 
 详见 [S43 决策](decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_DECISION_2026-10-22.md)、报告、gates、来源勘误和 source/build/evidence manifest。后续先固定实际 OpenSSL DRBG 部署与查询界，并推进材料桥；若严格 PPT 要求保留，则应版本化设置 bounded rejection 与显式失败概率。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S44（2026-10-22）
+
+S44 固定 S43 commit a1b02a8133955786e0bb6b047f55b746af66acbf、S43 manifest raw hash 9f8064b90a9c52a45d3c7d3488deca075497544de342c6f45a30fb1f0ceee320，以及 S39 Dealer/runtime commit 8028c0fece69fe0c648b1e0f1e12ad7fca723f20。S39 六个核心 source blob 身份与 S43 manifest 一致。S43 manifest 所嵌 S42 source list 的 85 行 canonical 与其记录一致，但 2 项治理文档行不能从 S42 Git tree 重构；该差异作为 OPEN_METADATA_DIVERGENCE 单列，不改 S41/S42 原记录，也不混同 S39 runtime 来源。
+
+S44 审查 RAND_bytes 全有序输出流 W_T 到理想 IID tape U 的联合替换，而不是逐次边缘分布。E 只代表部署配置/生命周期策略，不含实际 seed/state；S 仅指初始 seed/熵输入及后续 reseed 熵输入，不含演化状态；对 S 求平均，并要求 `Law(S | P,sk_T,E)=Law(S | E)` 或明确的熵源替代定理。成功条件化还必须由 DRBG 游戏显式处理 RAND 错误的选择效应。所需联合计算界保留为 `Adv_DRBG_T(Q,C;E)`；实际 provider、seed/entropy source、thread/process/fork/restart/reseed 及并发聚合调用预算没有部署证据，RNG bridge OPEN。材料后处理只有在同一理想 tape 下逐值耦合时精确继承；这不能证明 OpenSSL 的实际输出流。
+
+next_uniform 的拒绝概率 ρ_i=(2^32 mod i)/2^32，期望尝试 1/(1−ρ_i)，但源码 for(;;) 没有上限。N≤256 的总期望输出字节有界，worst-case query 无界。当前可查证明先例（特别是 S38 的 strict-PPT Fisher–Yates cap）不批准把 expected-PPT 默认当作标准安全模型。F_T/v1 不改；候选 F_T/v2 每个位置最多 λ 次，统一 ISSUANCE_ABORT；仅对去掉 sampler/version、签名和编码元数据的语义材料投影 π_mat，有 `TV(π_mat(F_T/v2),π_mat(F_T/v1))≤δ_reject=1−∏(1−ρ_i^λ)≤255·2^(−24λ)`。完整跨版本 package transcript 没有该 TV 界；bounded DRBG 替换到匹配版本 F_T/v2 则是计算优势，两项不得混写。版本兼容/签名参数尚未裁决或实现。
+
+S44 为文档和源码审查；BUILD/TEST=NOT_RUN，不重跑 S35 195 案或 S40 211 案，不运行正式性能矩阵。自然 I/O fault 继承 NOT_REPRODUCED，N>256 NOT_ADMITTED，formal LAN/WAN/RTT NOT_RUN/NOT_MEASURED，secure alias NOT_READY，v3 默认关闭。详见 [S44 决策](decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S44_DECISION_2026-10-22.md)、报告、gates 和 source/build/evidence manifest。
