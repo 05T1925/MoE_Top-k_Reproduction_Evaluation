@@ -1267,3 +1267,13 @@ S44 为文档和源码审查；BUILD/TEST=NOT_RUN，不重跑 S35 195 案或 S40
 - 新鲜 Release default-OFF、显式 opt-in、expected-negative configure、bounded sampler/runtime conformance、旧 F_T/v1 compatibility smoke 与 N128/N256 多进程 oracle E2E 均有本轮二进制证据。自然业务 I/O fault 沿用 S40 `NOT_REPRODUCED`；S35 195 案和 S40 211 案不重跑。
 - `F_T_BOUNDED_VERSION_FUNCTIONALITY` / `PACKAGE_VERSION_BINDING` 为 `PASS_WITH_SCOPE`；`STRICT_PPT_BOUND` 仅对有限响应随机 oracle 下的 sampler loop/query count/单次请求字节数为 `PASS_WITH_SCOPE`。`JOINT_RNG_STREAM_BRIDGE`、`PARTY_VIEW_COMPOSITION` 仍 `OPEN`；实际 provider/熵源/seed/reseed/fork/restart/并发配置与 `Adv_DRBG_T(Qmax,Cmax;E)` 未证明或量化。
 - v3 默认关闭，N>256 `NOT_ADMITTED`，无 `secure` alias。正式 LAN/WAN、RTT 和性能矩阵未运行/测量。本轮本机 phase、RSS、elapsed 只属于功能诊断，不属于性能证据。详见 S45 决策、报告、gates、cases 和 source/build/evidence manifest。
+
+## 20. M6B S46 F_T/v2 独立接收与 DRBG 联合流门
+
+- S46 固定 S45 commit `6fd6bed0718be28d677892ca40125d0f52323f0e`，由未参与 S45 实现的 reviewer fresh-build 并重跑本轮相关目标。default-OFF 隔离、显式 opt-in Release、sampler/runtime conformance、10 个 N=128/256 边界 K 多进程 oracle 案例、连续拒绝 `ISSUANCE_ABORT` 和 F_T/v1/receipt-v1 smoke 为 `PASS_WITH_SCOPE`。不重跑 S35 195 案或 S40 211 案，不把 S40 历史结果当成 F_T/v2 全矩阵。
+- 该定向 K E2E 入口仅在 FTv2 TEST_ONLY target 下编译。唯一源代码差异为 `VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp`，Dealer/runtime 和材料 ABI 未改。错误选择普通 S40-style E2E target 的中止尝试单列记录，不计入 S46 成功案例。
+- 固定 S45 源码上单发材随机请求界：N=128 `Qmax=1,294,376` bytes、`Cmax=765` calls；N=256 `Qmax=5,295,976` bytes、`Cmax=1,537` calls；single request≤1 MiB。只限制 API 请求量，不限制调用执行时间。拒绝差异 `delta_reject≤255·2^-144` 只约束去掉版本/签名/编码元数据后的 semantic projection `pi_mat`。
+- 本地 WSL build/CLI 观察 OpenSSL 3.0.13 与 default provider，但实际部署 libcrypto/provider/`OSSL_LIB_CTX`/熵源/reseed/lifecycle/并发及聚合 query 模型未知，故 `DRBG_DEPLOYMENT_PROFILE=OPEN`、`JOINT_RNG_STREAM_BRIDGE=OPEN`。保留 `Adv_DRBG_T(Qmax,Cmax;E)` 符号优势，不以功能测试或 OpenSSL 文档关闭此门。
+- 自然业务 I/O fault 仍继承 `NOT_REPRODUCED`；人工采样耗尽不等于自然 I/O 错误。N>256 `NOT_ADMITTED`；无正式 LAN/WAN、RTT 或性能测量；secure alias 未创建；v3 与 F_T/v2 默认关闭。目标部署资料清单、reviewer 身份、构建/二进制哈希和失败尝试见 S46 report/gates/cases/manifest。
+
+- 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。

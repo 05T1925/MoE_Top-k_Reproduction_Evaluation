@@ -963,3 +963,13 @@ S44 从 S43 精确提交 a1b02a8133955786e0bb6b047f55b746af66acbf 开始，实�
 S45 从 S44 精确提交 `aaa7f96095c350e8236246163d48c54a7fb8d9ba` 的隔离 worktree 开始，为 F_T 加入独立、默认 OFF 的 `F_T/v2 + bounded-rejection-v1` 候选；它与 escrow `receipt_format_version` 分属不同字段。v2 package format 5 将 F_T/sampler 版本、λ=128、6 次最大抽样尝试纳入签名 header 和用途域，F_T/v1 format 4 与原无界 sampler 保持单独入口，没有自动回退。对 `m≤256`，拒绝概率 `rho_i<2^-24`，整次发材中止界 `delta_reject≤255·2^-144=(255/256)·2^-136<2^-128`；该统计界仅针对去除签名/版本/编码元数据的语义材料投影，不约束完整跨版本 package transcript。
 
 连续 6 次拒绝时，发材在写 party package/context/signature 或创建 party lease 前返回 `ISSUANCE_ABORT`；T 的私有 registry burn marker 有意保留，阻止相同固定 registry 下重发。该一发材记录依赖部署固定 registry 路径，未证明跨版本/路径全局防重、敏感向量清零或后续多文件 I/O 错误原子性。Release default-OFF 检查、F_T/v2 bounded conformance、runtime conformance、F_T/v1 receipt smoke 和 N=128/256 v2 独立进程 oracle E2E 均通过；它们只支持 `PASS_WITH_SCOPE` 功能/严格抽样请求界。实际 RAND_bytes/provider/熵源/生命周期的联合安全桥 `OPEN`，完整 GMW party-view `OPEN`；N>256 未准入，正式 LAN/WAN/RTT 与性能未测，不创建 `secure` alias，v3 继续默认 OFF。详见 S45 报告、决策、gates、逐案结果和 source/build/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S46（2026-10-22）
+
+S46 从 S45 commit `6fd6bed0718be28d677892ca40125d0f52323f0e` 的隔离 worktree 接收 F_T/v2 有界采样路径。非作者 `/root/s45_non_author_review` fresh-build 并运行定向验证：默认 OFF 隔离、显式 Release、sampler/runtime conformance、N=128/256 的 K={1,8,N/2,N−1,N} 共 10 个多进程 oracle 案例、受控发材中止和 F_T/v1 + receipt/v1 兼容 smoke 通过，范围为 `PASS_WITH_SCOPE`。它们不是 S40 的 211 案历史矩阵，也不是完整 F_T/v2 组合矩阵。
+
+从固定源码重算，单次 F_T/v2 发材在 N=128 的 `Qmax=1,294,376` 字节、`Cmax=765` 次 `RAND_bytes`；N=256 的 `Qmax=5,295,976` 字节、`Cmax=1,537` 次；单次请求≤1 MiB。该界只限制有界 sampler 的随机请求数量/长度，不限制 OpenSSL/OS 调用耗时，也不证明输出流是理想 IID 或计算不可区分。构建主机 OpenSSL 3.0.13/default provider 观察不等于目标部署配置；provider、熵源、`OSSL_LIB_CTX`、reseed、并发、fork、重启及聚合 query 模型未固定，故 `DRBG_DEPLOYMENT_PROFILE=OPEN`、`JOINT_RNG_STREAM_BRIDGE=OPEN`，优势保留为符号项 `Adv_DRBG_T(Qmax,Cmax;E)`。`delta_reject≤255·2^-144` 仍只适用于 S45 指定的语义材料投影，不适用于完整签名 transcript。
+
+S46 仅增加 TEST_ONLY E2E 目标 K 入口及接收记录，没有改 Dealer/runtime。自然业务 I/O 故障沿用 `NOT_REPRODUCED`；人工采样耗尽是单独故障注入。S35 195 案与 S40 211 案未重跑，N>256 继续 `NOT_ADMITTED`；正式 LAN/WAN、RTT 与性能未运行/测量，v3 与 F_T/v2 默认关闭，不创建 `secure` alias。详见 S46 decision、报告、gates、cases 和 source/build/evidence manifest。
+
+- 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。

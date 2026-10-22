@@ -1,0 +1,66 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s46-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S46",
+  "date": "2026-10-22",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "status": {
+    "S45_SOURCE_RECEIPT": "PASS",
+    "F_TV2_INDEPENDENT_FUNCTIONAL_RECEIPT": "PASS_WITH_SCOPE",
+    "DEFAULT_OFF_ISOLATION": "PASS_WITH_SCOPE",
+    "BOUNDED_REJECTION_FAILURE_CONTRACT": "PASS_WITH_SCOPE",
+    "FINITE_Q_C_BOUND": "PASS_WITH_SCOPE",
+    "DRBG_DEPLOYMENT_PROFILE": "OPEN",
+    "JOINT_RNG_STREAM_BRIDGE": "OPEN",
+    "PRIVATE_CHANNEL_BRIDGE": "OPEN",
+    "PARTY_VIEW_COMPOSITION": "OPEN",
+    "SECURE_ALIAS_READY": "NOT_READY",
+    "TARGET_SCALE_READY": "PASS_WITH_SCOPE",
+    "PERFORMANCE_READY": "NOT_READY",
+    "LOW_PROBABILITY_ISSUANCE_ABORT_PRODUCT_ACCEPTANCE": "OPEN_CONFIRMATION"
+  },
+  "evidence": {
+    "S45_SOURCE_RECEIPT": "S45 exact commit/tree and seven source-delta hashes verified; S46 runtime unchanged.",
+    "F_TV2_INDEPENDENT_FUNCTIONAL_RECEIPT": "Non-author reviewer fresh Release build; bounded sampler and runtime conformance 2/2; N=128/256 K={1,8,N/2,N-1,N} 10/10 oracle E2E; controlled issuance abort; v1 receipt smoke.",
+    "DEFAULT_OFF_ISOLATION": "Default OFF build contains no v3/FTv2 targets or symbols; compile probes reject FTv2 API when opt-in is absent; production BUILD_TESTING=OFF omits TEST_ONLY hook.",
+    "BOUNDED_REJECTION_FAILURE_CONTRACT": "Forced six-rejection case returns ISSUANCE_ABORT; private burn marker retained; package/context/party lease/READY absent.",
+    "FINITE_Q_C_BOUND": "Single F_T/v2 issuance: N128 Qmax=1294376 bytes/Cmax=765 RAND_bytes calls; N256 Qmax=5295976 bytes/Cmax=1537; request <= 1 MiB. Source-derived assuming calls return.",
+    "DRBG_DEPLOYMENT_PROFILE": "OPEN: observed OpenSSL 3.0.13/default provider only on build/CLI host; actual deployment binary, provider, entropy and lifecycle are unknown.",
+    "JOINT_RNG_STREAM_BRIDGE": "OPEN: no target whole ordered adaptive RAND stream bound Adv_DRBG_T(Qmax,Cmax;E), including success/error status and conditioning.",
+    "PRIVATE_CHANNEL_BRIDGE": "OPEN; not in S46 scope.",
+    "PARTY_VIEW_COMPOSITION": "OPEN; not inferred from functional tests or RNG query bound.",
+    "SECURE_ALIAS_READY": "NOT_READY; no secure alias created.",
+    "TARGET_SCALE_READY": "PASS_WITH_SCOPE for ten representative N=128/256 cases only; N>256 NOT_ADMITTED.",
+    "PERFORMANCE_READY": "NOT_READY; formal LAN/WAN, RTT and performance matrix NOT_RUN/NOT_MEASURED.",
+    "LOW_PROBABILITY_ISSUANCE_ABORT_PRODUCT_ACCEPTANCE": "Runtime behavior and no-artifact abort were tested; project docs do not contain a distinct owner-level acceptance sentence for low-probability pre-issuance abort on otherwise valid input."
+  },
+  "bounds": {
+    "delta_reject": "<=255*2^-144, under IID 32-bit words; applies only to semantic-material projection pi_mat with version/signature/encoding metadata removed.",
+    "Adv_DRBG": "Adv_DRBG_T(Qmax,Cmax;E), symbolic and unquantified; separate from delta_reject and signature/private-channel advantages."
+  },
+  "reviewer": {
+    "identity": "/root/s45_non_author_review",
+    "S45_implementation_author": false,
+    "S45_sampler_spec_author": false,
+    "fresh_build_and_targeted_tests": true,
+    "status": "PASS_WITH_SCOPE",
+    "deployment_DRBG_or_full_crypto_review": false
+  },
+  "not_run": [
+    "S35 195-case matrix",
+    "S40 211-case matrix",
+    "full N<=256 F_Tv2 matrix",
+    "N>256 admission",
+    "natural business I/O fault reproduction",
+    "formal LAN/WAN",
+    "formal RTT/performance",
+    "target deployment DRBG profile acquisition"
+  ],
+  "inherited": {
+    "S40_receipt_v2_211": "Historical old F_T/receipt configuration only; not FTv2 evidence",
+    "natural_business_io_fault": "NOT_REPRODUCED in historical normal path; not rerun",
+    "N_gt_256": "NOT_ADMITTED"
+  },
+  "no_secure_alias": true,
+  "v3_default": "OFF",
+  "ft_v2_default": "OFF"
+}

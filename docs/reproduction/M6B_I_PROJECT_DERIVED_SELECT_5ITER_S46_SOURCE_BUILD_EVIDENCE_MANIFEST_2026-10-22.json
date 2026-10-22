@@ -1,0 +1,367 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s46-source-build-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S46",
+  "date": "2026-10-22",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "full_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "ft_v2_default": "OFF",
+    "N_gt_256": "NOT_ADMITTED"
+  },
+  "identity": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-project-select5-s46\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s46",
+    "starting_commit": "6fd6bed0718be28d677892ca40125d0f52323f0e",
+    "starting_tree": "a77ba90ccce3ac18c7a735f6617e47ab8f0aaa2f",
+    "parent_commit": "aaa7f96095c350e8236246163d48c54a7fb8d9ba",
+    "start_worktree_clean": true,
+    "runtime_source_commit": "6fd6bed0718be28d677892ca40125d0f52323f0e",
+    "S45_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json",
+    "S45_manifest_sha256": "292705d52ab3f25958d4c4f79748ade070012ab6b1bf1e80e6bf9a3ef4534c81",
+    "S45_source_count": 85,
+    "S35_canonical_source_sha256": "af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0",
+    "S39_canonical_source_sha256": "09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9",
+    "primary_worktree_modified": false,
+    "vfss_baseline_modified": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "provenance": {
+    "S45_deliverable_hashes_verified": true,
+    "checkout_line_endings": "core.autocrlf=true; three added S45 LF text files have different checkout raw SHA-256, but git hash-object --path matches S45 commit blobs.",
+    "S45_source_delta": [
+      {
+        "path": "VFSS/CMakeLists.txt",
+        "sha256": "99accb56797150b552417fcad5095908e717f3959bceecc3054bcf38cda328aa"
+      },
+      {
+        "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+        "sha256": "91a9d36a51559824c198a653d470c4487c700ecb2583cf1f0488983855027d40"
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "sha256": "5ef8494467e7abcaca612256008d4f7f24515411883700af1dc7327895ffdd32"
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+        "sha256": "a2c0871a11731d46765dd262b6f82f6e089a7b249d28e970d1b79e97d961bbf6"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v2_bounded_conformance_test.cpp",
+        "sha256": "1b4f016bc8d1e3476d69653facf761ae76a7cb7fdfc49520f2dfc0c3b53de9f1"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v2_test_support.h",
+        "sha256": "02898ea822d11684ea317c7748692de61a29dd025d7ae6cc60230be7ba17bb59"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "sha256": "6188c01a7ac8d3e0db073651e547f24af21a2c8bce5c670f9b0af86b2d11be59"
+      }
+    ],
+    "s46_source_delta": [
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "status": "TEST_ONLY target K case entry; no runtime/Dealer changes",
+        "baseline_s45_git_blob": "d1ae4fb6f1951c5677cf91118746c2187221c286",
+        "checkout_raw_sha256": "4658931edf3013995eacde5a508e326a7f44fc8dbce4bb4edfe75897c4e4ff64",
+        "normalized_git_blob": "48b46f4c6b33cb849133846cf33593cc74112e13"
+      }
+    ]
+  },
+  "reviewer": {
+    "identity": "/root/s45_non_author_review",
+    "participated_in_S45_implementation_or_sampler_proof": false,
+    "prior_role": "Read-only review only; no S45 build/test.",
+    "performed_fresh_release_build_and_targeted_tests": true,
+    "result": "PASS_WITH_SCOPE",
+    "reviewed_target_deployment_DRBG_or_full_protocol_crypto": false,
+    "changed_repository_files": false
+  },
+  "environment": {
+    "host": "Windows desktop / WSL Ubuntu 24.04.4",
+    "kernel": "6.6.87.2-microsoft-standard-WSL2",
+    "cmake": "3.28.3",
+    "ninja": "1.11.1",
+    "compiler": "GCC 13.3.0",
+    "openssl_build_host": "OpenSSL 3.0.13; CLI reported active default provider",
+    "openssl_config_sha256": "529815b0dd4bd6608bafeeb3d410b0683374e61aef792b3e3f38b3767d26f747",
+    "libcrypto_sha256": "6a66c3ba6b3749aacc9497973fff00f6ba61c703ba7015d0d7ab3fd9510974b6",
+    "target_deployment_profile": "UNKNOWN; local build/CLI facts do not establish target runtime configuration",
+    "sqlite": "3.45.1 temporary header/library workaround outside repository"
+  },
+  "builds": [
+    {
+      "name": "fresh Release default OFF",
+      "directory": "/tmp/m6b-s46-review/default-off",
+      "exit": 0,
+      "checks": "No v3/FTv2 targets or symbols; default-OFF archive",
+      "archive_sha256": "20afe504e050f37294352b5377fe4aa4a52904eeed3782d3e0149ffa79501351"
+    },
+    {
+      "name": "explicit FTv2 Release with BUILD_TESTING",
+      "directory": "/tmp/m6b-s46-review/ft-v2-tests",
+      "exit": 0,
+      "checks": "FTv2 opt-in build; sampler/runtime conformance and E2E targets",
+      "sampler_binary_sha256": "3f466e7e7fd3d75f4081d37c531d26392bb94d3cd1626438f6e6907214451ff3",
+      "runtime_binary_sha256": "df85270c1779685f09a125f90264e57f6cceb065fca32ab2b9470e3387571afb",
+      "e2e_binary_sha256": "c0512470a0fed791810ef4207c24f3181340fa8154e91e09094d6462069d8ef3"
+    },
+    {
+      "name": "production Release BUILD_TESTING=OFF",
+      "directory": "/tmp/m6b-s46-review/ft-v2-production",
+      "exit": 0,
+      "archive_sha256": "094429a86d037b227f1670aaf7b6bd4c1cfb8422d8509c83a82611296c98edbd",
+      "public_ftv2_api": "present",
+      "test_only_hook": "absent"
+    }
+  ],
+  "test_execution": {
+    "ctest_command": "ctest --test-dir /tmp/m6b-s46-review/ft-v2-tests -R 'moe_topk_score_to_mask_v3_(ft_v2_bounded|runtime)_conformance_test' --output-on-failure --verbose",
+    "ctest_exit": 0,
+    "selected": 2,
+    "passed": 2,
+    "failed": 0,
+    "target_k_e2e_command": "TMPDIR=/tmp/m6b-s46-review/tmp S35_KEEP_TEST_TMP=1 /tmp/m6b-s46-review/ft-v2-tests/moe_topk_score_to_mask_v3_ft_v2_process_e2e_test --ft-v2-target-k-cases",
+    "target_k_exit": 0,
+    "target_k_cases": 10,
+    "target_k_log_sha256": "01750f7fe26840a1a391bcedd443e64160c79728921e26757cb2fa80a3ea66a1",
+    "v1_smoke": "N=4 K=2; F_T/v1 + receipt/v1; oracle and restart recovery pass",
+    "v1_smoke_log_sha256": "66526e73d382b1e63de42fb378464228253c872cdadaf95590a286a0f9eaaced",
+    "wrong_target_attempt": {
+      "binary_sha256": "4889dde795876e9813c9ff5d52ef5de4e1c492ff70dc574cccd66735cd23b1a3",
+      "exit": 1,
+      "observed_legacy_rows": 73,
+      "s46_summary_rows": 0,
+      "log_sha256": "c981d562c04bed477f571d94ebf87ad120b106b45577c6d636fddc14646d1453",
+      "disposition": "Interrupted; invalid target; not counted; not relaunched."
+    },
+    "controlled_abort": {
+      "n": 256,
+      "k": 128,
+      "exit": 1,
+      "error": "ISSUANCE_ABORT",
+      "package_context_party_lease": "absent",
+      "private_burn_marker": "present"
+    },
+    "final_process_check": "No leftover protocol processes",
+    "command_results_log": "/tmp/m6b-s46-review/logs/command-results.txt",
+    "command_results_sha256": "5a4f51b9763bc89eab4519e72a9b2c75b6ac157430cd7cc8247e5804dc5b07b4"
+  },
+  "finite_request_bound": {
+    "formula": "Qmax=g+ceil(m^2/8)+4*r*(m-1); Cmax=ceil(g/2^20)+1+r*(m-1); r=6; request<=2^20 bytes",
+    "N128": {
+      "gate_bytes": 1289280,
+      "permutation_bytes": 2048,
+      "rejection_words": 762,
+      "Qmax_bytes": 1294376,
+      "Cmax_RAND_bytes_calls": 765
+    },
+    "N256": {
+      "gate_bytes": 5281664,
+      "permutation_bytes": 8192,
+      "rejection_words": 1530,
+      "Qmax_bytes": 5295976,
+      "Cmax_RAND_bytes_calls": 1537
+    },
+    "assumption": "Source-level maximum for one F_T/v2 issuance if each RAND_bytes request returns; excludes aggregate and unrelated T-process callers and is not a wall-clock bound.",
+    "delta_reject": "<=255*2^-144 under IID words; semantic pi_mat only after version/signature/encoding metadata removal."
+  },
+  "drbg_review": {
+    "required_stream": "Full ordered adaptive stream (request length/boundary, return status, bytes), with output and failure conditioning accounted for.",
+    "required_assumption": "Adv_DRBG_T(Qmax,Cmax;E) for deployed E, with hidden initial/reseed entropy S averaged and an explicit entropy-source model.",
+    "first_gap": "No target Dealer executable/container, linked libcrypto/provider/OSSL_LIB_CTX, entropy source, DRBG/reseed policy, lifecycle, concurrency/fork/restart, or aggregate query profile.",
+    "status": "OPEN",
+    "environment_information_checklist": [
+      "target Dealer binary/container digest and exact loaded libcrypto version/path/hash",
+      "OpenSSL build/provider/module hashes and config/OSSL_LIB_CTX/FIPS/engine/custom RAND settings",
+      "OS seed-source and entropy/failure semantics; do not disclose actual seed",
+      "DRBG instantiation/reseed type, parameters, thresholds and errors",
+      "T threads/concurrency/fork/snapshot/restart/rollback and all shared-context callers",
+      "conditional law of initial/reseed entropy S versus public parameters/signing key/configuration",
+      "whole-stream adaptive indistinguishability bound including return statuses and success conditioning"
+    ]
+  },
+  "gates_file": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_GATES_2026-10-22.json",
+  "case_file": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_CASES_2026-10-22.json",
+  "deliverables": [
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_DECISION_2026-10-22.md",
+      "sha256": "3ffaf7917548d981c9fc5372598bee62fdaca5883fd337217f17c33d1a2223ae",
+      "git_blob": "69c8cefb6bf6e715fae254fa698602a82150a583"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_REPORT_2026-10-22.md",
+      "sha256": "2a784d645c01f1a44daab0037ee92e1bb6bf71496834f3912bde848203bd6859",
+      "git_blob": "0e205aeeba153c67a26f98e3411fee2a32489835"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_GATES_2026-10-22.json",
+      "sha256": "02a2f2689ece66adbe69d13099ee845b183e672dcb0b97d34deae6ceea19a77e",
+      "git_blob": "b1d28e23526ec445e4a8efb98536a1def6dee045"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_CASES_2026-10-22.json",
+      "sha256": "2fde149e29228d23bfda9c7ceb9b73cb28d60e59292b7e9a4d754df12106e2a0",
+      "git_blob": "5d6a24f9cce6cc3272f26dfa994641773d04ab23"
+    },
+    {
+      "path": "PROJECT.md",
+      "sha256": "dfdaec8490b967e23b7fc0793b9f8e358d165b4412d19bc9aa4b670b66e95580",
+      "git_blob": "e64ae55e278b8bf3fc481f44d6fb3f570458cc9b"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "sha256": "ee73a285d96f3e5d37a53a67a2124b96641ddf7060cec83ba10579f8b409045b",
+      "git_blob": "b5fb398f9b33c9705379f1af6d4cca15b757a14d"
+    },
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "sha256": "ec4dbf2b1a8e172eac84f52db16f1d5a6da65f45b40c0de62d8e99a80038262f",
+      "git_blob": "362e3ca90a5f6767fa86eacc0c2dac4d47a60027"
+    }
+  ],
+  "non_goals": {
+    "S35_195": "NOT_RUN",
+    "S40_211": "NOT_RUN",
+    "full_N_le_256_FTv2_matrix": "NOT_RUN",
+    "N_gt_256": "NOT_ADMITTED",
+    "natural_business_io_fault": "NOT_REPRODUCED; not rerun",
+    "formal_LAN_WAN": "NOT_RUN",
+    "RTT": "NOT_MEASURED",
+    "formal_performance": "NOT_MEASURED",
+    "secure_alias": "NOT_CREATED",
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "low_probability_preissuance_abort_product_acceptance": "OPEN_CONFIRMATION"
+  },
+  "no_sensitive_or_generated_artifacts_in_repository": {
+    "keys": true,
+    "materials": true,
+    "certificates": true,
+    "build_products": true,
+    "raw_large_logs": true,
+    "all_test_builds_and_logs": "/tmp only"
+  },
+  "manifest_self_hash": "NOT_SELF_REFERENCED",
+  "commands": [
+    {
+      "name": "default-off-configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s46/MoE_Top-k_Reproduction_Evaluation/VFSS",
+        "-B",
+        "/tmp/m6b-s46-review/default-off",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
+        "-DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=OFF",
+        "-DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=OFF",
+        "-DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=OFF"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "default-off-build",
+      "argv": [
+        "cmake",
+        "--build",
+        "/tmp/m6b-s46-review/default-off",
+        "--target",
+        "sytorch",
+        "--parallel",
+        "4"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "ft-v2-tests-configure",
+      "argv": [
+        "cmake",
+        "-S",
+        "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s46/MoE_Top-k_Reproduction_Evaluation/VFSS",
+        "-B",
+        "/tmp/m6b-s46-review/ft-v2-tests",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
+        "-DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON",
+        "-DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON",
+        "-DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=ON",
+        "-DSQLite3_INCLUDE_DIR=/tmp/m6b-s45-sqlite",
+        "-DSQLite3_LIBRARY=/tmp/m6b-s45-sqlite/libsqlite3"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "ft-v2-tests-build",
+      "argv": [
+        "cmake",
+        "--build",
+        "/tmp/m6b-s46-review/ft-v2-tests",
+        "--target",
+        "moe_topk_score_to_mask_v3_ft_v2_bounded_conformance_test",
+        "moe_topk_score_to_mask_v3_runtime_conformance_test",
+        "moe_topk_score_to_mask_v3_process_e2e_test",
+        "--parallel",
+        "4"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "sampler-runtime-ctest",
+      "argv": [
+        "ctest",
+        "--test-dir",
+        "/tmp/m6b-s46-review/ft-v2-tests",
+        "-R",
+        "moe_topk_score_to_mask_v3_(ft_v2_bounded|runtime)_conformance_test",
+        "--output-on-failure",
+        "--verbose"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "target-k-e2e",
+      "command": "TMPDIR=/tmp/m6b-s46-review/tmp S35_KEEP_TEST_TMP=1 /tmp/m6b-s46-review/ft-v2-tests/moe_topk_score_to_mask_v3_ft_v2_process_e2e_test --ft-v2-target-k-cases",
+      "exit": 0
+    },
+    {
+      "name": "receipt-v1-smoke",
+      "command": "TMPDIR=/tmp/m6b-s46-review/tmp S35_KEEP_TEST_TMP=1 /tmp/m6b-s46-review/ft-v2-tests/moe_topk_score_to_mask_v3_ft_v2_process_e2e_test --receipt-v1-smoke",
+      "exit": 0
+    },
+    {
+      "name": "production-configure-build",
+      "summary": "Release BUILD_TESTING=OFF, GMW/receipt-v2/FTv2 ON; configure and sytorch build exit 0; full argv options match ft-v2-tests configuration except BUILD_TESTING=OFF and build directory /tmp/m6b-s46-review/ft-v2-prod.",
+      "exit": 0,
+      "command": "cmake -S /mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s46/MoE_Top-k_Reproduction_Evaluation/VFSS -B /tmp/m6b-s46-review/ft-v2-prod -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=ON -DSQLite3_INCLUDE_DIR=/tmp/m6b-s45-sqlite -DSQLite3_LIBRARY=/tmp/m6b-s45-sqlite/libsqlite3; cmake --build /tmp/m6b-s46-review/ft-v2-prod --target sytorch --parallel 4"
+    },
+    {
+      "name": "api-off-compile-probes",
+      "summary": "Compile without GMW macro and compile with GMW but without FTv2 macro; both expected rejection, status 1.",
+      "exit": 1,
+      "expected_rejection": true
+    },
+    {
+      "name": "wrong-target-attempt",
+      "command": "TMPDIR=/tmp/m6b-s46-review/tmp S35_KEEP_TEST_TMP=1 /tmp/m6b-s46-review/ft-v2-tests/moe_topk_score_to_mask_v3_process_e2e_test --ft-v2-target-k-cases",
+      "exit": 1,
+      "disposition": "Interrupted at 73 legacy S40 rows; not S46 evidence."
+    }
+  ],
+  "independent_run_index": {
+    "path": "/tmp/m6b-s46-review/logs/command-results.txt",
+    "sha256": "5a4f51b9763bc89eab4519e72a9b2c75b6ac157430cd7cc8247e5804dc5b07b4"
+  }
+}

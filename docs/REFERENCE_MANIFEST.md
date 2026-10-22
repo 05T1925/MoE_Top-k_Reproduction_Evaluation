@@ -401,3 +401,12 @@ vfss-baseline-2026-09-03
 - Release default-OFF、显式 v3/receipt-v2/FTv2 Release 与 BUILD_TESTING=OFF production 构建、配置依赖负例、FTv2 bounded/runtime conformance、receipt/v1 smoke、N128/256 FTv2独立进程 oracle E2E 及中止无交付 artifact 结果均见 S45 source/build/evidence manifest 与 case JSON。它们不是安全或性能证明。reviewer `/root/s45_non_author_review` 为只读、未运行构建/测试；执行者参与 S43/S44，非独立作者。
 - `JOINT_RNG_STREAM_BRIDGE=OPEN`；provider/熵源/生命周期未从部署证据固定，`Adv_DRBG_T(Qmax,Cmax;E)` 未量化；`PARTY_VIEW_COMPOSITION=OPEN`。本轮不重复 S35/S40 全矩阵，不运行正式 LAN/WAN/RTT/性能，不准入 N>256，不创建 `secure` alias，v3 与 FTv2 均默认关闭。
 - S45 决策、详细报告、gates、cases 和 source/build/evidence manifest 位于 `docs/decisions/` 与 `docs/reproduction/` 同名前缀文件；本地提交信息在交付记录中，不推送/合并。
+
+## 20. M6B S46 F_T/v2 独立接收与 DRBG 联合流门
+
+- 精确基线：S45 commit `6fd6bed0718be28d677892ca40125d0f52323f0e`；S46 独立 worktree 的起始 tree、父提交和状态见 S46 source/build/evidence manifest。S45 七项源码增量与被测 Git tree 已逐项核对；S46 仅增加 TEST_ONLY E2E target K 入口。
+- 非作者 `/root/s45_non_author_review` fresh Release 验证默认关闭隔离、显式 FTv2 opt-in、sampler/runtime conformance、10 个 N=128/256 K 边界进程 E2E、发材中止和 v1 兼容 smoke；结论 `PASS_WITH_SCOPE`。S40 211-case 是旧配置历史证据，未迁移为 FTv2 结果；S35 195-case 与 S40 211-case 本轮未重跑。
+- 单次 Dealer 随机请求：N=128 Qmax 1,294,376 bytes/Cmax 765；N=256 Qmax 5,295,976 bytes/Cmax 1,537；每请求不超过 1 MiB。有限请求界及 `delta_reject≤255·2^-144` 的适用投影详见报告。目标 OpenSSL provider、熵源与 lifecycle 未有部署证据，`DRBG_DEPLOYMENT_PROFILE` 和 `JOINT_RNG_STREAM_BRIDGE` 均 `OPEN`。
+- S46 决策、报告、gates、逐案 JSON、source/build/evidence manifest 文件位于 `docs/decisions/` 与 `docs/reproduction/` 的 `M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_*_2026-10-22` 同名前缀项；清单记录所有新增文件与相关源码哈希、构建哈希、错误 target 尝试及未运行项。仅本地提交，不推送/合并。
+
+- 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。

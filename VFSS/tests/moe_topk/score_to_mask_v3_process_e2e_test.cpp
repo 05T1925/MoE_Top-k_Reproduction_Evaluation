@@ -1754,6 +1754,54 @@ int main(int argc, char** argv) {
     const auto identities = create_test_identities(directory.path);
 #if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
     defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
+    if (argc > 1 && std::string(argv[1]) == "--ft-v2-target-k-cases") {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
+      const auto make_scores = [](std::uint32_t n) {
+        std::vector<std::int32_t> scores(n);
+        for (std::uint32_t i = 0; i < n; ++i) {
+          switch (i % 8U) {
+            case 0: scores[i] = INT32_MAX; break;
+            case 1: scores[i] = INT32_MIN; break;
+            case 2: scores[i] = -1; break;
+            case 3: scores[i] = 17; break;
+            case 4: scores[i] = INT32_MAX; break;
+            case 5: scores[i] = -17; break;
+            case 6: scores[i] = 0; break;
+            default: scores[i] = 17; break;
+          }
+        }
+        return scores;
+      };
+      std::size_t case_count = 0;
+      for (const auto n : {128U, 256U}) {
+        const auto scores = make_scores(n);
+        const std::vector<std::uint32_t> k_values =
+            {1U, 8U, n / 2U, n - 1U, n};
+        for (std::size_t index = 0; index < k_values.size(); ++index) {
+          const auto k = k_values[index];
+          const bool use_receipt_v2 = ((index + (n == 256U ? 1U : 0U)) % 2U) != 0;
+          const auto receipt_version = use_receipt_v2
+              ? kScoreToMaskV3ReceiptFormatV2
+              : kScoreToMaskV3ReceiptFormatV1;
+          const auto receipt_label = use_receipt_v2 ? "receipt-v2" : "receipt-v1";
+          const auto case_id = "s46-ft-v2-n" + std::to_string(n) + "-k" +
+              std::to_string(k) + "-" + receipt_label;
+          const auto case_directory = (std::filesystem::path(directory.path) /
+              case_id).string();
+          std::filesystem::create_directory(case_directory);
+          run_one_e2e(binary, case_directory, identities, scores, k,
+              false, false, false, receipt_version, case_id, 2);
+          ++case_count;
+        }
+      }
+      run_ft_v2_issuance_abort_process_case(binary, directory.path, identities);
+      std::cout << "S46_FT_V2_TARGET_K_CASES PASS cases=" << case_count << '\n';
+      return 0;
+#else
+      throw std::runtime_error(
+          "F_T/v2 target K cases require receipt/v2 opt-in for both receipt profiles");
+#endif
+    }
     if (argc > 1 && std::string(argv[1]) == "--ft-v2-smoke") {
       const auto make_scores = [](std::uint32_t n) {
         std::vector<std::int32_t> scores(n);
