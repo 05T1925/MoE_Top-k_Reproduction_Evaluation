@@ -20,7 +20,7 @@ inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersion = 4;
 inline constexpr std::uint32_t kScoreToMaskV3EscrowContextFormatVersion = 1;
 inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV1 = 1;
 inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV2 = 2;
-#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) || defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL)
 inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersionFtV2 = 5;
 inline constexpr std::uint8_t kScoreToMaskV3FtVersionV1 = 1;
 inline constexpr std::uint8_t kScoreToMaskV3FtVersionV2 = 2;
@@ -28,8 +28,22 @@ inline constexpr std::uint8_t kScoreToMaskV3SamplerVersionUnboundedV1 = 0;
 inline constexpr std::uint8_t kScoreToMaskV3SamplerVersionBoundedV1 = 1;
 inline constexpr std::uint8_t kScoreToMaskV3FtV2SecurityParameterBits = 128;
 #endif
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersionFtV3 = 6;
+inline constexpr std::uint32_t kScoreToMaskV3EscrowContextFormatVersionFtV3 = 2;
+inline constexpr std::uint8_t kScoreToMaskV3FtVersionV3 = 3;
+inline constexpr std::uint8_t kScoreToMaskV3SamplerVersionBoundedV2 = 2;
+inline constexpr std::uint8_t kScoreToMaskV3FtV3SecurityParameterBits = 128;
+inline constexpr std::uint8_t kScoreToMaskV3FtV3MaxRetryLimit = 7;
+inline constexpr std::uint32_t kScoreToMaskV3FtV3MaxN = 1000;
+inline constexpr std::uint32_t kScoreToMaskV3FtV3MaxPaddedN = 1024;
+inline constexpr std::uint64_t kScoreToMaskV3FtV3MaxGateCount = 100000000ULL;
+inline constexpr std::size_t kScoreToMaskV3FtV3MaxPackageBytes = 64U * 1024U * 1024U;
+inline constexpr std::uint32_t kScoreToMaskV3FtV3MaxBatchGates = 4193824U;
+#endif
 inline constexpr std::uint32_t kScoreToMaskV3MaxN = 256;
 inline constexpr std::size_t kScoreToMaskV3MaxPackageBytes = 2U * 1024U * 1024U;
+inline constexpr std::uint32_t kScoreToMaskV3MaxCiphertextBytes = 2U * 1024U * 1024U;
 inline constexpr std::size_t kScoreToMaskV3MaxMetadataBytes = 64U * 1024U;
 inline constexpr std::size_t kScoreToMaskV3MaxGateBatchFrameBytes = 1U * 1024U * 1024U;
 inline constexpr std::string_view kScoreToMaskV3PartyPackageSignatureDomain =
@@ -58,7 +72,7 @@ struct ScoreToMaskV3GateBudget {
 struct ScoreToMaskV3PackageInfo {
   ScoreToMaskV3Session parameters;
   std::uint8_t party = 0;
-#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) || defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL)
   std::uint32_t package_format_version = kScoreToMaskV3PackageFormatVersion;
   std::uint8_t ft_version = kScoreToMaskV3FtVersionV1;
   std::uint8_t sampler_version = kScoreToMaskV3SamplerVersionUnboundedV1;
@@ -85,6 +99,13 @@ struct ScoreToMaskV3EscrowStateParameters {
 // shares. Package digests bind this service context to the two signed T outputs.
 struct ScoreToMaskV3EscrowContext {
   std::uint32_t format_version = kScoreToMaskV3EscrowContextFormatVersion;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+  std::uint8_t ft_version = 0;
+  std::uint8_t sampler_version = 0;
+  std::uint8_t sampler_security_parameter_bits = 0;
+  std::uint8_t sampler_retry_limit = 0;
+  std::uint32_t package_format_version = kScoreToMaskV3PackageFormatVersion;
+#endif
   std::array<std::uint8_t, 16> session{};
   std::array<std::uint8_t, 16> invocation{};
   std::uint32_t n = 0;
@@ -171,6 +192,9 @@ using ScoreToMaskV3EscrowSubmitter = std::function<std::string(
     const std::vector<std::uint8_t>& recipient_ciphertext)>;
 
 ScoreToMaskV3GateBudget score_to_mask_v3_gate_budget(std::uint32_t n);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+ScoreToMaskV3GateBudget score_to_mask_v3_gate_budget_ft_v3(std::uint32_t n);
+#endif
 ProtocolIFrameConfig score_to_mask_v3_frame_config(
     const ScoreToMaskV3PackageInfo& package, std::uint8_t party);
 ProtocolIFrameConfig score_to_mask_v3_escrow_frame_config(
@@ -196,6 +220,18 @@ void score_to_mask_v3_dealer_issue_packages(
 // issuers for this deployment. Its 0700 owner-only files burn each
 // session/invocation once, including bounded-sampler aborts.
 void score_to_mask_v3_dealer_issue_packages_ft_v2_bounded(
+    const ScoreToMaskV3Session& session,
+    const std::string& package_p0_path,
+    const std::string& package_p1_path,
+    const std::string& signed_escrow_context_path,
+    const std::string& dealer_ed25519_private_key_pem,
+    const std::string& private_issuance_registry_directory,
+    const ScoreToMaskV3EscrowStateParameters& escrow_state = {});
+#endif
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+// Explicit F_T/v3 issuance for N<=1000 and padded m<=1024. This does not
+// change the legacy F_T/v1 or F_T/v2 entry points or their resource limits.
+void score_to_mask_v3_dealer_issue_packages_ft_v3_bounded(
     const ScoreToMaskV3Session& session,
     const std::string& package_p0_path,
     const std::string& package_p1_path,

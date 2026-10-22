@@ -8,6 +8,10 @@
     defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
 #include "score_to_mask_v3_ft_v2_test_support.h"
 #endif
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL) && \
+    defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V3_TESTING)
+#include "score_to_mask_v3_ft_v3_test_support.h"
+#endif
 
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -49,6 +53,25 @@
 namespace {
 
 using namespace moe_topk;
+
+std::uint32_t test_package_format(const ScoreToMaskV3PackageInfo& info) {
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) || defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL)
+  return info.package_format_version;
+#else
+  (void)info;
+  return kScoreToMaskV3PackageFormatVersion;
+#endif
+}
+
+ScoreToMaskV3GateBudget test_gate_budget(std::uint32_t n,
+                                         std::uint32_t ft_version) {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+  if (ft_version == 3) return score_to_mask_v3_gate_budget_ft_v3(n);
+#else
+  (void)ft_version;
+#endif
+  return score_to_mask_v3_gate_budget(n);
+}
 
 void require(bool condition, const char* message) {
   if (!condition) throw std::runtime_error(message);
@@ -357,7 +380,11 @@ std::vector<std::uint32_t> read_input_share(const std::string& path) {
   std::ifstream in(path, std::ios::binary);
   if (!in) throw std::runtime_error("party input share unavailable");
   const auto count = read_u32(in);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+  if (count == 0 || count > kScoreToMaskV3FtV3MaxN)
+#else
   if (count == 0 || count > kScoreToMaskV3MaxN)
+#endif
     throw std::runtime_error("party input share count invalid");
   std::vector<std::uint32_t> result(count);
   for (auto& value : result) value = read_u32(in);
@@ -427,7 +454,11 @@ ProcessOutput read_process_output(const std::string& path) {
   output.receipt.resize(count);
   in.read(output.receipt.data(), count);
   count = read_u32(in);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+  if (count > kScoreToMaskV3FtV3MaxN ||
+#else
   if (count > kScoreToMaskV3MaxN ||
+#endif
       (output.state == static_cast<std::uint8_t>(
            ScoreToMaskV3PartyOutput::State::kCommitted) && count == 0) ||
       (output.state != static_cast<std::uint8_t>(
@@ -854,8 +885,15 @@ int party_worker(int argc, char** argv) {
         throw std::runtime_error("TEST_ONLY lost receipt after durable commit");
       return receipt;
     };
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    const auto party_memory_cap = info.ft_version == kScoreToMaskV3FtVersionV3
+        ? 2ULL * 1024ULL * 1024ULL * 1024ULL
+        : 256ULL * 1024ULL * 1024ULL;
+#else
+    const auto party_memory_cap = 256ULL * 1024ULL * 1024ULL;
+#endif
     output = score_to_mask_v3_execute_party(package_path, dealer_public,
-        session, {input}, party, lease_dir, 256ULL * 1024ULL * 1024ULL,
+        session, {input}, party, lease_dir, party_memory_cap,
         channel, recipient_public, submitter);
   }
   protocol_i_tls13_context_free(tls_context);
@@ -894,6 +932,31 @@ int dealer_worker(int argc, char** argv) {
         &bytes, &calls, &max_request);
 #else
     throw std::runtime_error("TEST_ONLY F_T/v2 random source is unavailable");
+#endif
+  } else if (ft_version == 3 && argc == 11) {
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    score_to_mask_v3_dealer_issue_packages_ft_v3_bounded(
+        session, argv[3], argv[4], argv[5], argv[6], argv[10], state);
+#else
+    throw std::runtime_error("F_T/v3 is not enabled in this build");
+#endif
+  } else if (ft_version == 3 && argc == 12 &&
+             std::string(argv[11]) == "test-only-force-ft-v3-abort") {
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL) && \
+    defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V3_TESTING)
+    std::size_t bytes = 0, calls = 0, maximum = 0;
+    try {
+      test_only::score_to_mask_v3_dealer_issue_packages_ft_v3_with_test_random(
+          session, argv[3], argv[4], argv[5], argv[6], argv[10], state,
+          &bytes, &calls, &maximum);
+    } catch (...) {
+      std::cout << "S47_FT_V3_TEST_RANDOM {\"bytes\":" << bytes
+                << ",\"calls\":" << calls
+                << ",\"max_request_bytes\":" << maximum << "}\n";
+      throw;
+    }
+#else
+    throw std::runtime_error("TEST_ONLY F_T/v3 random source is unavailable");
 #endif
   } else {
     throw std::runtime_error("unsupported F_T version or test mode");
@@ -958,7 +1021,7 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   const auto context_path = (std::filesystem::path(directory) / "escrow.context").string();
   const auto issuance_registry =
       (std::filesystem::path(directory) / "dealer-issuance-registry").string();
-  if (ft_version == 2) {
+  if (ft_version == 2 || ft_version == 3) {
     std::filesystem::create_directory(issuance_registry);
     if (::chmod(issuance_registry.c_str(), 0700) != 0)
       throw std::runtime_error("F_T/v2 issuance registry permissions failed");
@@ -971,7 +1034,7 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       timeout_precommit ? "2000" : "15000",
       std::to_string(static_cast<unsigned>(receipt_format_version)),
       std::to_string(ft_version)};
-  if (ft_version == 2) dealer_arguments.push_back(issuance_registry);
+  if (ft_version == 2 || ft_version == 3) dealer_arguments.push_back(issuance_registry);
   ChildProcess dealer(exec_child(binary, dealer_arguments,
       dealer_stdout, dealer_stderr));
   const int dealer_status = dealer.wait();
@@ -980,12 +1043,12 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       p0_package, identities.dealer_public, session, 0);
   const auto package_info_p1 = score_to_mask_v3_validate_package(
       p1_package, identities.dealer_public, session, 1);
-#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+#if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) || defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL)
   require(package_info.ft_version == ft_version &&
               package_info_p1.ft_version == ft_version,
           "Dealer emitted a package for the wrong F_T version");
 #else
-  require(ft_version == 1, "F_T/v2 E2E requires its explicit build opt-in");
+  require(ft_version == 1, "F_T/v2/v3 E2E requires its explicit build opt-in");
 #endif
 
   std::vector<std::uint32_t> share0(scores.size()), share1(scores.size());
@@ -1108,7 +1171,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
             "receipt/v2 did not return a fixed 32-byte opaque token");
   }
   require(output0.phases == output1.phases && output0.phases <=
-              score_to_mask_v3_gate_budget(session.n).key_bits + 51U,
+              (ft_version == 3 ? 106U :
+                  test_gate_budget(session.n, ft_version).key_bits + 51U),
           "observed party exchange phases exceed the S31 DAG bound");
   require(output0.max_payload_sent <= kScoreToMaskV3MaxGateBatchFrameBytes &&
               output1.max_payload_sent <= kScoreToMaskV3MaxGateBatchFrameBytes &&
@@ -1250,11 +1314,12 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   require(restart_service_status >= 128, "restarted escrow service did not stop");
   const auto diagnostic_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - diagnostic_start).count();
-  const auto budget = score_to_mask_v3_gate_budget(session.n);
+  const auto budget = test_gate_budget(session.n, ft_version);
   const auto material_bytes = (3ULL * budget.gate_count + 7U) / 8U +
       (static_cast<std::uint64_t>(budget.padded_n) * budget.padded_n + 7U) / 8U;
-  std::cout << (ft_version == 2 ? "S45_FT_V2_PROCESS_E2E {" :
-                                  "S40_V3_PROCESS_E2E {")
+  std::cout << (ft_version == 3 ? "S47_FT_V3_PROCESS_E2E {" :
+                (ft_version == 2 ? "S45_FT_V2_PROCESS_E2E {" :
+                                   "S40_V3_PROCESS_E2E {"))
             << "\"case_id\":\"" << case_id
             << "\",\"ft_version\":" << ft_version
             << ",\"receipt_format_version\":"
@@ -1291,18 +1356,28 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
             << ((fail_p1_before_submit || timeout_precommit)
                     ? "ABORTED_NO_FETCH" : "PASS") << "\","
             << "\"gate_count\":" << budget.gate_count
+            << ",\"material_payload_bytes_per_party\":" << material_bytes
+            << ",\"package_format_version\":" << test_package_format(package_info)
+            << ",\"context_format_version\":" <<
+               score_to_mask_v3_validate_escrow_context(
+                   sandbox.context, sandbox.dealer_public).format_version
             << ",\"package_metadata_bytes_including_signature\":"
             << (package_info.package_bytes - material_bytes)
             << ",\"package_bytes_p0\":" << std::filesystem::file_size(p0_package)
             << ",\"package_bytes_p1\":" << std::filesystem::file_size(p1_package)
             << ",\"party_exchange_phases\":" << output0.phases
+            << ",\"party_exchange_phases_bound\":" <<
+               (ft_version == 3 ? 106U : 255U)
             << ",\"party_frames_each_direction\":" << output0.sent_frames
             << ",\"party_bytes_sent_p0\":" << output0.sent_bytes
             << ",\"party_bytes_sent_p1\":" << output1.sent_bytes
             << ",\"max_payload_bytes\":" << std::max({output0.max_payload_sent,
                   output0.max_payload_received, output1.max_payload_sent,
                   output1.max_payload_received})
+            << ",\"p0_peak_rss_kib\":" << p0_rss_kib
+            << ",\"p1_peak_rss_kib\":" << p1_rss_kib
             << ",\"peak_party_rss_kib\":" << std::max(p0_rss_kib, p1_rss_kib)
+            << ",\"aggregate_party_peak_rss_kib\":" << (p0_rss_kib + p1_rss_kib)
             << ",\"diagnostic_elapsed_ms\":" << diagnostic_ms
             << ",\"injected_lost_receipt_after_commit\":"
             << (lose_receipt_p0 ? "true" : "false")
@@ -1752,6 +1827,55 @@ int main(int argc, char** argv) {
     const auto binary = std::filesystem::canonical(argv[0]).string();
     TempDirectory directory;
     const auto identities = create_test_identities(directory.path);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    if (argc > 1 && std::string(argv[1]) == "--ft-v3-n1000") {
+      const auto make_scores = [](std::uint32_t n) {
+        std::vector<std::int32_t> scores(n);
+        for (std::uint32_t i = 0; i < n; ++i) {
+          switch (i % 10U) {
+            case 0: scores[i] = INT32_MAX; break;
+            case 1: scores[i] = INT32_MIN; break;
+            case 2: scores[i] = -1; break;
+            case 3: scores[i] = 0; break;
+            case 4: scores[i] = 17; break;
+            case 5: scores[i] = INT32_MAX; break;
+            case 6: scores[i] = -17; break;
+            case 7: scores[i] = 4096; break;
+            case 8: scores[i] = -4096; break;
+            default: scores[i] = 17; break;
+          }
+        }
+        return scores;
+      };
+      std::size_t count = 0;
+      const auto run = [&](std::uint32_t n, std::uint32_t k,
+                           std::uint32_t version, std::uint8_t receipt,
+                           const std::string& id) {
+        const auto case_dir = (std::filesystem::path(directory.path) / id).string();
+        std::filesystem::create_directory(case_dir);
+        run_one_e2e(binary, case_dir, identities, make_scores(n), k, false,
+                    false, false, receipt, id, version);
+        ++count;
+      };
+      for (const auto k : {1U, 8U, 500U, 999U, 1000U})
+        run(1000U, k, 3U, kScoreToMaskV3ReceiptFormatV2,
+            "s47-ft-v3-n1000-k" + std::to_string(k));
+      run(1U, 1U, 3U, kScoreToMaskV3ReceiptFormatV2,
+          "s47-ft-v3-n1-k1");
+      run(128U, 64U, 3U, kScoreToMaskV3ReceiptFormatV2,
+          "s47-ft-v3-n128-k64");
+      run(256U, 128U, 3U, kScoreToMaskV3ReceiptFormatV2,
+          "s47-ft-v3-n256-k128");
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
+      run(128U, 64U, 1U, kScoreToMaskV3ReceiptFormatV1,
+          "s47-legacy-ft-v1-n128-k64");
+      run(256U, 128U, 2U, kScoreToMaskV3ReceiptFormatV2,
+          "s47-legacy-ft-v2-n256-k128");
+#endif
+      std::cout << "S47_FT_V3_TARGETED_CASES PASS cases=" << count << '\n';
+      return 0;
+    }
+#endif
 #if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
     defined(MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING)
     if (argc > 1 && std::string(argv[1]) == "--ft-v2-target-k-cases") {

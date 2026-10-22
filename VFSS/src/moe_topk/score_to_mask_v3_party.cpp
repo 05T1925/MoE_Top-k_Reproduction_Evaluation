@@ -209,6 +209,67 @@ class GmwParty {
 
   std::vector<std::uint8_t> and_layer(const std::vector<GateInput>& gates) {
     if (gates.empty()) return {};
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    if (material_.info.ft_version == kScoreToMaskV3FtVersionV3) {
+      const auto layer = next_layer_ordinal_++;
+      std::vector<std::uint8_t> outputs(gates.size());
+      for (std::size_t offset = 0, batch = 0; offset < gates.size();
+           offset += kScoreToMaskV3FtV3MaxBatchGates, ++batch) {
+        const auto count = std::min<std::size_t>(
+            kScoreToMaskV3FtV3MaxBatchGates, gates.size() - offset);
+        const auto packed_bytes = (2ULL * count + 7U) / 8U;
+        std::vector<std::uint8_t> body;
+        body.reserve(12U + static_cast<std::size_t>(packed_bytes));
+        put_u32(body, layer);
+        put_u32(body, static_cast<std::uint32_t>(batch));
+        put_u32(body, static_cast<std::uint32_t>(count));
+        body.resize(12U + static_cast<std::size_t>(packed_bytes), 0);
+        std::vector<ScoreToMaskV3BeaverTripleShare> triples;
+        triples.reserve(count);
+        for (std::size_t i = 0; i < count; ++i) {
+          const auto& gate = gates[offset + i];
+          if (gate.id >= material_.info.gate_count || consumed_[gate.id] != 0 ||
+              gate.x > 1 || gate.y > 1)
+            fail("F_T/v3 invalid, repeated, or out-of-range gate id/input");
+          consumed_[gate.id] = 1;
+          const auto triple = material_.triple(gate.id);
+          triples.push_back(triple);
+          const auto d = static_cast<std::uint8_t>(gate.x ^ triple.a);
+          const auto e = static_cast<std::uint8_t>(gate.y ^ triple.b);
+          if (d != 0) body[12U + (2U * i) / 8U] |=
+              static_cast<std::uint8_t>(1U << ((2U * i) % 8U));
+          if (e != 0) body[12U + (2U * i + 1U) / 8U] |=
+              static_cast<std::uint8_t>(1U << ((2U * i + 1U) % 8U));
+        }
+        std::vector<std::uint8_t> remote;
+        exchange_phase(channel_, next_phase_, material_.info, party_, kTagBeaver,
+                       body, &remote);
+        if (remote.size() != body.size())
+          fail("F_T/v3 Beaver opening frame length mismatch");
+        std::size_t at = 0;
+        if (read_u32(remote, at) != layer ||
+            read_u32(remote, at) != batch || read_u32(remote, at) != count)
+          fail("F_T/v3 Beaver layer/batch/count mismatch");
+        for (std::size_t i = 0; i < count; ++i) {
+          const auto own_d = static_cast<std::uint8_t>(
+              (body[12U + (2U * i) / 8U] >> ((2U * i) % 8U)) & 1U);
+          const auto own_e = static_cast<std::uint8_t>(
+              (body[12U + (2U * i + 1U) / 8U] >> ((2U * i + 1U) % 8U)) & 1U);
+          const auto other_d = static_cast<std::uint8_t>(
+              (remote[12U + (2U * i) / 8U] >> ((2U * i) % 8U)) & 1U);
+          const auto other_e = static_cast<std::uint8_t>(
+              (remote[12U + (2U * i + 1U) / 8U] >> ((2U * i + 1U) % 8U)) & 1U);
+          const auto d = static_cast<std::uint8_t>(own_d ^ other_d);
+          const auto e = static_cast<std::uint8_t>(own_e ^ other_e);
+          const auto& triple = triples[i];
+          outputs[offset + i] = static_cast<std::uint8_t>(
+              triple.c ^ (d & triple.b) ^ (e & triple.a) ^
+              ((party_ == 0) ? (d & e) : 0U));
+        }
+      }
+      return outputs;
+    }
+#endif
     const auto packed_bytes = (2ULL * gates.size() + 7U) / 8U;
     if (4U + packed_bytes > kMaxPayload - (4 + 4 + 16 + 16 + 32 + 32))
       fail("v3 AND layer exceeds one gate-batch frame");
@@ -290,6 +351,9 @@ class GmwParty {
   ProtocolIFramedChannel& channel_;
   std::uint16_t next_phase_ = 1;
   std::vector<std::uint8_t> consumed_;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+  std::uint32_t next_layer_ordinal_ = 0;
+#endif
 };
 
 std::uint8_t xor_bit(std::uint8_t a, std::uint8_t b) {
@@ -477,15 +541,29 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     if (!escrow_submitter) fail("v3 escrow submitter is required");
     if (input.additive_score_share.size() != package.parameters.n)
       fail("v3 additive input share length mismatch");
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    const bool ft_v3 = package.ft_version == kScoreToMaskV3FtVersionV3;
+    const auto budget = ft_v3
+        ? score_to_mask_v3_gate_budget_ft_v3(package.parameters.n)
+        : score_to_mask_v3_gate_budget(package.parameters.n);
+#else
     const auto budget = score_to_mask_v3_gate_budget(package.parameters.n);
+#endif
     if (package.gate_count != budget.gate_count ||
         material.packed_triple_bits.size() != (3ULL * budget.gate_count + 7U) / 8U ||
         material.packed_permutation_bits.size() !=
             (static_cast<std::uint64_t>(budget.padded_n) * budget.padded_n + 7U) / 8U)
       fail("v3 local material package preflight failed");
-    if (package.parameters.k == 0 || package.parameters.k > package.parameters.n ||
-        package.parameters.n > kScoreToMaskV3MaxN)
+    if (package.parameters.k == 0 || package.parameters.k > package.parameters.n)
       fail("v3 N/K preflight failed");
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    if ((!ft_v3 && package.parameters.n > kScoreToMaskV3MaxN) ||
+        (ft_v3 && package.parameters.n > kScoreToMaskV3FtV3MaxN))
+      fail("v3 N/profile preflight failed");
+#else
+    if (package.parameters.n > kScoreToMaskV3MaxN)
+      fail("v3 N/K preflight failed");
+#endif
     if (estimated_peak_bytes(budget, budget.gate_count) > peak_memory_cap_bytes)
       fail("v3 checked peak-memory estimate exceeds configured cap");
     check_channel(peer_channel, package, party);
@@ -632,6 +710,11 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
                                    std::uint32_t sample_size) {
       ProjectDerivedSelect5PublicSeed seed{};
       engine->seed(iteration, seed);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+      if (ft_v3)
+        return protocol_i_project_derived_select5_sample_from_public_seed_ft_v3(
+            candidate, sample_size, seed, session64, fingerprint64, iteration);
+#endif
       return protocol_i_project_derived_select5_sample_from_public_seed(
           candidate, sample_size, seed, session64, fingerprint64, iteration);
     };
@@ -663,8 +746,16 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
       }
       return result;
     };
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    const auto selected = ft_v3
+        ? protocol_i_project_derived_select5_control_with_sampler_ft_v3(
+              n, package.parameters.k, sample_source, compare_wave)
+        : protocol_i_project_derived_select5_control_with_sampler(
+              n, package.parameters.k, sample_source, compare_wave);
+#else
     const auto selected = protocol_i_project_derived_select5_control_with_sampler(
         n, package.parameters.k, sample_source, compare_wave);
+#endif
     if (selected.selected_position >= n) fail("v3 Select5 returned invalid handle");
 
     std::vector<std::uint8_t> membership_shuffled(n, 0);

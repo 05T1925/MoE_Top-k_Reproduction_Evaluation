@@ -410,3 +410,11 @@ vfss-baseline-2026-09-03
 - S46 决策、报告、gates、逐案 JSON、source/build/evidence manifest 文件位于 `docs/decisions/` 与 `docs/reproduction/` 的 `M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_*_2026-10-22` 同名前缀项；清单记录所有新增文件与相关源码哈希、构建哈希、错误 target 尝试及未运行项。仅本地提交，不推送/合并。
 
 - 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。
+
+## 21. M6B S47 F_T/v3 N=1000 功能与资源准入
+
+- 来源固定为 S46 commit `d48a41062ba2f86edbac3bcb3663692a641e95bd`、tree `3f70ae5999400781f37f871420a26988afa146c9` 及 S46 source/build/evidence manifest。S46 原件保留；S47 source manifest 列出实际修改后的 source/test 文件 raw SHA-256 与 Git blob 身份，并与 S46 树及历史 S45/S46 来源增量分开。
+- F_T/v3 只经独立显式 opt-in，默认 OFF；FTv1/v2 继续 N≤256。F_T、sampler、package 和 escrow receipt version 是分开的签名/上下文参数。N=1000 padded m=1024 时预算 G=88,626,688、每方 package 33,366,516 B、双包 66,733,032 B、最大 frame 1 MiB；固定 retry cap 7 和语义投影 reject 界仅在理想 IID tape 假设下成立。
+- 同机实测 N=1000 K={1,8,500,999,1000} 五案 oracle PASS；N=1 profile、FTv3 N128/256 及 FTv1/v2 兼容 smoke 也通过，合计 10 案 `PASS_WITH_SCOPE`。N1000 每方 peak RSS、package、最大 payload、phase 和磁盘目录观察列于 S47 cases，不是正式性能数据。五算法迭代、依赖层、exchange phase、RTT 分别记录。
+- 复核者 `/root/s45_non_author_review` 未参与 S47 实现/推导，最终只读复核规格、概率界、版本绑定和 TEST_ONLY 路径；没有构建或测试。执行者参与 S45/S46 历史工作，不作为非作者接收者。低概率 `ISSUANCE_ABORT` 产品接受继续 `OPEN_CONFIRMATION`。
+- 真实部署 DRBG、全序随机流、私有信道、完整 GMW party-view 仍 OPEN；自然业务 I/O fault 沿用 S40 `NOT_REPRODUCED`；N>1000 未准入。无 secure alias，正式 LAN/WAN/RTT/性能和 AAV86 对比未运行/测量。详见 [S47 decision](decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_DECISION_2026-10-23.md)、[报告](reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_REPORT_2026-10-23.md)、gates、cases 和 source/build/evidence manifest。

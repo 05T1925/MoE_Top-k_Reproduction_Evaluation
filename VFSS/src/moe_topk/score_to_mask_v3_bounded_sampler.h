@@ -45,4 +45,22 @@ inline std::uint32_t bounded_retry_limit(std::uint32_t lambda,
   return 0;
 }
 
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+// Exact integer test for ceil((lambda + log2(m - 1)) / 22).
+// The S45 F_T/v2 helper above deliberately retains its m<=256 contract.
+inline std::uint32_t bounded_retry_limit_ft_v3(std::uint32_t lambda,
+                                              std::uint32_t m) {
+  if (m <= 1U) return 0;
+  if (m > 1024U) return 0;
+  for (std::uint32_t r = 0; r <= 32U; ++r) {
+    const std::uint64_t scaled = 22ULL * r;
+    if (scaled < lambda) continue;
+    const std::uint64_t exponent = scaled - lambda;
+    if (exponent >= 63U || (std::uint64_t{1} << exponent) >= m - 1U)
+      return r;
+  }
+  return 0;
+}
+#endif
+
 }  // namespace moe_topk::score_to_mask_v3_detail

@@ -30,6 +30,8 @@ option(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL
     "Enable the opt-in opaque random receipt/v2 format for score-to-mask-v3" OFF)
 option(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL
     "Enable explicit F_T/v2 bounded-rejection issuance for score-to-mask-v3" OFF)
+option(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    "Enable explicit F_T/v3 bounded-rejection issuance for score-to-mask-v3 N<=1000" OFF)
 if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL AND
    NOT MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
     message(FATAL_ERROR
@@ -39,6 +41,12 @@ if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL AND
    NOT MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
     message(FATAL_ERROR
         "F_T/v2 requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON")
+endif()
+if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL AND
+   (NOT MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL OR
+    NOT MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL))
+    message(FATAL_ERROR
+        "F_T/v3 requires GMW/v3 and receipt/v2 opt-ins")
 endif()
 if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
     find_package(SQLite3 REQUIRED)
@@ -117,6 +125,14 @@ if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
         if(BUILD_TESTING)
             target_compile_definitions(${PROJECT_NAME} PRIVATE
                 MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING=1)
+        endif()
+    endif()
+    if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC
+            MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL=1)
+        if(BUILD_TESTING)
+            target_compile_definitions(${PROJECT_NAME} PRIVATE
+                MOE_TOPK_SCORE_TO_MASK_V3_FT_V3_TESTING=1)
         endif()
     endif()
     target_sources(${PROJECT_NAME} PRIVATE
@@ -363,6 +379,22 @@ if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL)
             PRIVATE ${PROJECT_NAME})
         target_compile_definitions(moe_topk_score_to_mask_v3_ft_v2_process_e2e_test
             PRIVATE MOE_TOPK_SCORE_TO_MASK_V3_FT_V2_TESTING=1)
+    endif()
+    if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL AND BUILD_TESTING)
+        add_executable(moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test
+            tests/moe_topk/score_to_mask_v3_ft_v3_bounded_conformance_test.cpp)
+        target_link_libraries(moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test
+            PRIVATE ${PROJECT_NAME})
+        target_include_directories(moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test
+            PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_compile_definitions(moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test
+            PRIVATE MOE_TOPK_SCORE_TO_MASK_V3_FT_V3_TESTING=1)
+        add_executable(moe_topk_score_to_mask_v3_ft_v3_process_e2e_test
+            tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp)
+        target_link_libraries(moe_topk_score_to_mask_v3_ft_v3_process_e2e_test
+            PRIVATE ${PROJECT_NAME})
+        target_compile_definitions(moe_topk_score_to_mask_v3_ft_v3_process_e2e_test
+            PRIVATE MOE_TOPK_SCORE_TO_MASK_V3_FT_V3_TESTING=1)
     endif()
 endif()
 add_executable(moe_topk_m2_cmpagg_conformance_test tests/moe_topk/protocol_i_cmpagg_conformance_test.cpp)
@@ -772,6 +804,12 @@ if(BUILD_TESTING)
         if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL)
             add_test(NAME moe_topk_score_to_mask_v3_receipt_v2_process_e2e_test
                      COMMAND moe_topk_score_to_mask_v3_process_e2e_test --receipt-v2-only)
+        endif()
+        if(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL)
+            add_test(NAME moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test
+                     COMMAND moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test)
+            add_test(NAME moe_topk_score_to_mask_v3_ft_v3_process_e2e_test
+                     COMMAND moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000)
         endif()
     endif()
     if(MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL)

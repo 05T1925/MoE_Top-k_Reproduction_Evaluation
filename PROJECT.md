@@ -972,4 +972,12 @@ S46 从 S45 commit `6fd6bed0718be28d677892ca40125d0f52323f0e` 的隔离 worktree
 
 S46 仅增加 TEST_ONLY E2E 目标 K 入口及接收记录，没有改 Dealer/runtime。自然业务 I/O 故障沿用 `NOT_REPRODUCED`；人工采样耗尽是单独故障注入。S35 195 案与 S40 211 案未重跑，N>256 继续 `NOT_ADMITTED`；正式 LAN/WAN、RTT 与性能未运行/测量，v3 与 F_T/v2 默认关闭，不创建 `secure` alias。详见 S46 decision、报告、gates、cases 和 source/build/evidence manifest。
 
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S47（2026-10-23）
+
+S47 从 S46 精确 commit `d48a41062ba2f86edbac3bcb3663692a641e95bd`（tree `3f70ae5999400781f37f871420a26988afa146c9`）的隔离 worktree 开始，扩展一个显式 opt-in 的 F_T/v3 候选到实际 N≤1000、padded m≤1024。F_T/v1/v2 仍为 N≤256，F_T 版本、sampler 版本、package format 和 escrow receipt-format 是不同绑定字段；v3、TEST_ONLY 源及 target 默认关闭。signed Q20.12、降序、原索引稳定同分、五迭代项目派生 Select 和原序恰 K 位 mask 语义未变。
+
+对 N=1000，G=88,626,688，单方 package=33,366,516 B、两包=66,733,032 B、最大 frame≤1 MiB；`Qmax=88,786,404 B`、`Cmax=7,247` 次 RAND_bytes、请求≤1 MiB。固定 retry cap=7 的理想 IID 语义材料投影拒绝界为 `delta_reject≤1023·2^-154<2^-144<2^-128`；不适用于完整签名 package/transcript，也不关闭真实 DRBG 桥。N=1000 五个 K={1,8,500,999,1000} 多进程 oracle 案例均 PASS；另运行 N=1 profile、FTv3 N=128/256 和 FTv1/v2 兼容 smoke。S47 为目标案例 `PASS_WITH_SCOPE`，不是全 K 矩阵、完整安全或正式性能接收。FTv3 平台 package/RSS/frame/phase 明细见 [S47 报告](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_REPORT_2026-10-23.md) 和逐案 JSON。
+
+非作者 `/root/s45_non_author_review` 只读复核最终 retry 规格、概率、包/context 绑定和 TEST_ONLY 隔离，未构建/运行；reviewer 指出的测试 issuer 动态 retry 字段已统一为固定 7，并在最终二进制上重跑相关验证。低概率有效请求发材 `ISSUANCE_ABORT` 的产品接受仍 `OPEN_CONFIRMATION`。目标部署 DRBG/provider/熵源、联合随机流、私有信道、完整 party view 仍 OPEN；自然业务 I/O fault 沿用 `NOT_REPRODUCED`，本轮不重试。N>1000 未准入；正式 LAN/WAN、RTT、AAV86 对比与性能矩阵未运行/测量；不创建 `secure` alias。S46 的 S40 211 案和 S46 十案例仅作为其原配置的历史证据，不重标为 S47 结果。详见 [S47 decision](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_DECISION_2026-10-23.md)、报告、gates、cases 和 source/build/evidence manifest。
+
 - 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。

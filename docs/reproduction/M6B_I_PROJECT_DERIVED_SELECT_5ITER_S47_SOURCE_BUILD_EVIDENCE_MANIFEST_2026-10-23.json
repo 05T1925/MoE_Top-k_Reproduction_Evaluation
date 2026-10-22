@@ -1,0 +1,462 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s47-source-build-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S47",
+  "date": "2026-10-23",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "full_security_pass": false,
+    "secure_alias_created": false,
+    "formal_performance_claim": false,
+    "v3_default": "OFF",
+    "ft_v3_default": "OFF",
+    "N_gt_1000": "NOT_ADMITTED"
+  },
+  "identity": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-project-select5-s47\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s47",
+    "starting_commit": "d48a41062ba2f86edbac3bcb3663692a641e95bd",
+    "starting_tree": "3f70ae5999400781f37f871420a26988afa146c9",
+    "parent_commit": "6fd6bed0718be28d677892ca40125d0f52323f0e",
+    "start_worktree_clean": true,
+    "S45_runtime_commit": "6fd6bed0718be28d677892ca40125d0f52323f0e",
+    "S39_runtime_origin": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "current_HEAD_before_S47_commit": "d48a41062ba2f86edbac3bcb3663692a641e95bd",
+    "resulting_local_commit": "reported after local commit; intentionally not self-referenced",
+    "primary_worktree_modified": false,
+    "VFSS_baseline_modified": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "S46_source_receipt": {
+    "manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json",
+    "manifest_raw_sha256": "f19f8be05b590b8c3e4c888a513e9b37540d80ff3de6f712f99e8f575d0b8438",
+    "manifest_claims_S45_source_count": 85,
+    "recorded_S46_delta": [
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "status": "TEST_ONLY target K case entry; no runtime/Dealer changes",
+        "baseline_s45_git_blob": "d1ae4fb6f1951c5677cf91118746c2187221c286",
+        "checkout_raw_sha256": "4658931edf3013995eacde5a508e326a7f44fc8dbce4bb4edfe75897c4e4ff64",
+        "normalized_git_blob": "48b46f4c6b33cb849133846cf33593cc74112e13"
+      }
+    ],
+    "S46_deliverable_blob_checks": [
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_DECISION_2026-10-22.md",
+        "expected_git_blob": "69c8cefb6bf6e715fae254fa698602a82150a583",
+        "actual_git_blob": "69c8cefb6bf6e715fae254fa698602a82150a583",
+        "match": true,
+        "checkout_raw_sha256": "5520b345c190eb6eff65f62c95f55bdaef344a2be6994feeaaea6a22c39665d2"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_REPORT_2026-10-22.md",
+        "expected_git_blob": "0e205aeeba153c67a26f98e3411fee2a32489835",
+        "actual_git_blob": "0e205aeeba153c67a26f98e3411fee2a32489835",
+        "match": true,
+        "checkout_raw_sha256": "8b3ad2264cb77ee6a1b1337d971e98317398ba0e8af3493b5fa868e7cc603fc0"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_GATES_2026-10-22.json",
+        "expected_git_blob": "b1d28e23526ec445e4a8efb98536a1def6dee045",
+        "actual_git_blob": "b1d28e23526ec445e4a8efb98536a1def6dee045",
+        "match": true,
+        "checkout_raw_sha256": "02a2f2689ece66adbe69d13099ee845b183e672dcb0b97d34deae6ceea19a77e"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S46_CASES_2026-10-22.json",
+        "expected_git_blob": "5d6a24f9cce6cc3272f26dfa994641773d04ab23",
+        "actual_git_blob": "5d6a24f9cce6cc3272f26dfa994641773d04ab23",
+        "match": true,
+        "checkout_raw_sha256": "2fde149e29228d23bfda9c7ceb9b73cb28d60e59292b7e9a4d754df12106e2a0"
+      }
+    ],
+    "checkout_line_endings": "S46 report and decision raw SHA-256 differ from the historical raw values due Windows checkout conversion, but git hash-object --path matches their recorded blobs; gates/cases raw hashes also match. Historical source identities are not rewritten.",
+    "source_chain": "S46 exact Git tree is authoritative; its manifest carries S45 85-file source identity and one TEST_ONLY harness delta; no main/worktree substitution."
+  },
+  "source_snapshot": {
+    "delta_file_count": 19,
+    "canonical_delta_sha256": "5e70ff463f6e8593604fef320953e0df59ab2762bae1b39fb32c8a7fb1f70f7c",
+    "canonical_definition": "SHA-256 of sorted UTF-8 lines <path><TAB><raw_sha256><LF>",
+    "source_delta": [
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_DECISION_2026-10-23.md",
+        "status": "added",
+        "raw_sha256": "dfc63a70851106fbeb7d530b586f1e8888792b5c9f3e620c2c0ebc294d00aaff",
+        "git_blob_sha1": "be03ae70b0213315fb7cb8500e06ff7a25bf2cde"
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "status": "modified",
+        "raw_sha256": "3f211f1a28c84a6bb9bca1b848a04334c4ab62fc163532856ffa8235fafec336",
+        "git_blob_sha1": "623db38954d74fdf2899483dc205e454a7ef2481"
+      },
+      {
+        "path": "docs/REFERENCE_MANIFEST.md",
+        "status": "modified",
+        "raw_sha256": "c60c212599f5b54e30d0c295a3b71b04eb597764d76dea7a0246b4350d9ba8f6",
+        "git_blob_sha1": "03028f4bddd550cdc275e51e2cceacd1a6a8b34c"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_CASES_2026-10-23.json",
+        "status": "added",
+        "raw_sha256": "9176e2a3f37a9f3373682142d2d9fae5647b4e735c1be8199c3e975a7d50a6dc",
+        "git_blob_sha1": "7e16866c29a424ff77271c6795c5dd1a6e874a3d"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_FT_V3_SPEC_2026-10-23.md",
+        "status": "added",
+        "raw_sha256": "b58e4f6a6d665ce6a5d7949de1520e7b2a27f33b1957675f81058e2a949704f3",
+        "git_blob_sha1": "d4abd698279d680fd9b9b74e05bd58665bffc891"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_GATES_2026-10-23.json",
+        "status": "added",
+        "raw_sha256": "3085cce70a3ea26d6756e3c52d5dc891fa27be7011e35e5c6169dd6c2e10e230",
+        "git_blob_sha1": "eef101d64db43618c2e9b543e2c9048d8fcba352"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_REPORT_2026-10-23.md",
+        "status": "added",
+        "raw_sha256": "81bc60a397f1d80746f59265eab8885469a035016beeae777cdfab73ffa268dc",
+        "git_blob_sha1": "7cbc7c01ddc0f0bdc3333bc26cc9449463838691"
+      },
+      {
+        "path": "PROJECT.md",
+        "status": "modified",
+        "raw_sha256": "22f4d7f421a4f45e6c5b9bab81eeb3e8ba8b5fbd3355fed752c685ff6cf3ac0b",
+        "git_blob_sha1": "deba48f4665c4aab6636ebc3662755721cd8cada"
+      },
+      {
+        "path": "VFSS/CMakeLists.txt",
+        "status": "modified",
+        "raw_sha256": "42da1e6a4acccf7bcd47308832c48b2e1e04a1f0c3cfe2c369f9fd01eff744a4",
+        "git_blob_sha1": "16bd97d1ddc6ee8d62644200c1e21fb309a5178e"
+      },
+      {
+        "path": "VFSS/include/moe_topk/project_derived_select5.h",
+        "status": "modified",
+        "raw_sha256": "46d24cff6501342a9d9a4f0b91c12aacce75ab0212f6b6e3b48f091aee2a2092",
+        "git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c"
+      },
+      {
+        "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+        "status": "modified",
+        "raw_sha256": "cdb7b0679013fcd59a5855b9b3dfdf78f4f785719e073e0a8c79d68e764dc5c8",
+        "git_blob_sha1": "f91b978b3e62b4b7288d3c755163057c38a1d33c"
+      },
+      {
+        "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+        "status": "modified",
+        "raw_sha256": "b454d8975bb6f398440de601617aa0404e30bb75625fb2753b9e4d0c3200e0fd",
+        "git_blob_sha1": "fae75b3ba7007e0fd978a5a401c27cf440c163e3"
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+        "status": "modified",
+        "raw_sha256": "458a47fbdde4bf0ee9575a6b60b628d8750f0732bd51c1ed46239bc00090912f",
+        "git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c"
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+        "status": "modified",
+        "raw_sha256": "bc3a549ea028ca35e3196d26ada1a185c4420db3c39d956c37aa187847f930b0",
+        "git_blob_sha1": "506d23329bc9f78f528bce369fc98d8138fd21a2"
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "status": "modified",
+        "raw_sha256": "6870cf9f1fb92cae8dcfaa385c7beb17effefab04afbc0e010f382565b3afc9f",
+        "git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6"
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+        "status": "modified",
+        "raw_sha256": "c1be2e9b5880c299f56eca6da4d4a9319839b03fe960d183f73f3029bb2c6465",
+        "git_blob_sha1": "b779a7d36a14b7dcc993984f32b24b308e5e065d"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_bounded_conformance_test.cpp",
+        "status": "added",
+        "raw_sha256": "2566a1968c2db8951db261a4e692cfcbe27261d9bcf23edbc09eccce0b3d9ee7",
+        "git_blob_sha1": "b47337fbf915b76123f6476a904364aabf25048d"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_test_support.h",
+        "status": "added",
+        "raw_sha256": "fc801ce2db510a850d11708ef4a33b3817a43ef0372b7833a890b979be9e1d5d",
+        "git_blob_sha1": "f2e6c6d01b8d609691cf9ce91a7bd560cbfd2248"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "status": "modified",
+        "raw_sha256": "3696dfa271e93ab673a42f5fee7ea33a500d7316565a55f952b28cae540a9149",
+        "git_blob_sha1": "a873de945f05cd9a3c76a2685e39a15db8b8324e"
+      }
+    ],
+    "VFSS_baseline_diff": "empty",
+    "S46_historical_files_unchanged": true,
+    "prohibited_files_in_diff": "none (VFSS-baseline, key/material/certificate/build/raw logs)"
+  },
+  "reviewer": {
+    "identity": "/root/s45_non_author_review",
+    "participated_in_S47_implementation_or_proof_authoring": false,
+    "scope": "read-only final check of retry cap, rejection bound, package/context mapping, receipt-version separation, N=1 tests, TEST_ONLY gate and interpretation",
+    "result": "PASS_WITH_SCOPE",
+    "reviewer_build": false,
+    "reviewer_test": false,
+    "finding": "TEST_ONLY issuer originally used dynamic r_min rather than the fixed signed cap 7; corrected and final mapping re-reviewed",
+    "executor_participated_in_S45_S46": true
+  },
+  "environment": {
+    "host": "Windows desktop / WSL2 Ubuntu 24.04.4 LTS",
+    "kernel": "Linux 6.6.87.2-microsoft-standard-WSL2",
+    "cmake": "3.28.3",
+    "ninja": "1.11.1",
+    "compiler": "GCC 13.3.0-6ubuntu2~24.04.1",
+    "openssl_build_host": "OpenSSL 3.0.13",
+    "sqlite_runtime": "3.45.1 system libsqlite3.so.0; dev headers from libsqlite3-dev=3.45.1-1ubuntu2 extracted under /tmp only",
+    "logical_cpus": 32,
+    "memory_total_bytes": 8122388480,
+    "memory_available_bytes_preflight_approx": 7506657280,
+    "memory_available_bytes_post_run": 7110053888,
+    "swap_bytes": 2147483648,
+    "tmp_free_bytes_preflight_approx": 984600000000,
+    "tmp_free_bytes_post_run": 983490580480,
+    "windows_drive_free_bytes_preflight_approx": 81900000000,
+    "windows_drive_free_bytes_post_run": 85493571584,
+    "ulimit_virtual_memory": "unlimited",
+    "ulimit_file_size": "unlimited",
+    "target_deployment_profile": "UNKNOWN; build-host observations do not establish deployed libcrypto/provider/entropy/lifecycle"
+  },
+  "build": [
+    {
+      "name": "fresh Release default-OFF",
+      "directory": "/tmp/m6b-s47-default-off",
+      "build_type": "Release",
+      "BUILD_TESTING": false,
+      "GMW": false,
+      "receipt_v2": false,
+      "FTv2": false,
+      "FTv3": false,
+      "configure_exit": 0,
+      "build_exit": 0,
+      "archive_sha256": "4da54879f18f681ccef5ef93329b68138391bbdda20473faa19e345838f6c920",
+      "v3_FTv3_target_count": 0,
+      "v3_FTv3_symbol_count": 0,
+      "header_no_optin_probe": {
+        "exit": 1,
+        "expected_rejection": true,
+        "diagnostic": "score-to-mask-v3 is opt-in and must be built explicitly"
+      }
+    },
+    {
+      "name": "explicit Release TEST_ONLY FTv3 + compatibility",
+      "directory": "/tmp/m6b-s47-ftv3-build",
+      "build_type": "Release",
+      "BUILD_TESTING": true,
+      "GMW": true,
+      "receipt_v2": true,
+      "FTv2": true,
+      "FTv3": true,
+      "configure_exit": 0,
+      "build_exit": 0,
+      "SQLite3_INCLUDE_DIR": "/tmp/m6b-s47-sqlite-dev/usr/include",
+      "SQLite3_LIBRARY": "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0",
+      "targets": [
+        "moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test",
+        "moe_topk_score_to_mask_v3_runtime_conformance_test",
+        "moe_topk_score_to_mask_v3_process_e2e_test",
+        "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test",
+        "moe_topk_score_to_mask_v3_ft_v2_process_e2e_test"
+      ],
+      "binary_sha256": {
+        "FTv3_bounded_conformance": "43f9fb06438d4d98cc3da592b14fb6e46cec7fdc909373cbd424f30e49d07cd7",
+        "runtime_conformance": "5dac078ce3f6634009f79b3510e84fb6026072b188bdcd73a35228557731b660",
+        "FTv3_process_E2E": "b01c46dd787bca7d310f60b1de3ae75f1dfdf1f97f754d6115182a9a17ce4c97",
+        "regular_process_E2E_built_not_run": "0855418c7050d3225c9e884c84cb4c9255db1f1bcd52ab1cdabfe4eef5c2ab3c",
+        "FTv2_process_E2E_built_not_run": "bcb451b4daca404ffabe33ff23240a320c782313f618e7a5cf9683fb41c4474c"
+      }
+    },
+    {
+      "name": "explicit Release production FTv3",
+      "directory": "/tmp/m6b-s47-ftv3-prod",
+      "build_type": "Release",
+      "BUILD_TESTING": false,
+      "GMW": true,
+      "receipt_v2": true,
+      "FTv2": false,
+      "FTv3": true,
+      "configure_exit": 0,
+      "build_exit": 0,
+      "archive_sha256": "3de5d97d0f9460a27d6a7afa999a93ca28d501e3f13105d3192d60d4c63afdf1",
+      "with_test_random_symbol_count": 0
+    },
+    {
+      "name": "FTv3 missing GMW expected negative configure",
+      "directory": "/tmp/m6b-s47-invalid-ftv3-no-gmw-final",
+      "exit": 1,
+      "expected_rejection": true,
+      "diagnostic": "F_T/v3 requires GMW/v3 and receipt/v2 opt-ins"
+    },
+    {
+      "name": "FTv3 missing receipt/v2 expected negative configure",
+      "directory": "/tmp/m6b-s47-invalid-ftv3-no-receipt2",
+      "exit": 1,
+      "expected_rejection": true,
+      "diagnostic": "F_T/v3 requires GMW/v3 and receipt/v2 opt-ins"
+    }
+  ],
+  "artifacts": {
+    "default_off_symbols": "none",
+    "default_off_targets": "none",
+    "FTv3_test_hook_in_production": "absent",
+    "explicit_test_build_contains_FTv3_TEST_ONLY_hook": "present only under BUILD_TESTING"
+  },
+  "test_execution": [
+    {
+      "name": "FTv3 bounded sampler and issuance conformance",
+      "command": "/tmp/m6b-s47-ftv3-build/moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test",
+      "exit": 0,
+      "stdout": "S47_FT_V3_BOUNDED_CONFORMANCE PASS gates=88626688 Qmax=88786404 Cmax=7247 issuance_abort=PASS",
+      "stdout_sha256": "c3ac552105e12f60c1adb67c4d54b0e1456aae650354f4e07069df281617080c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "binary_sha256": "43f9fb06438d4d98cc3da592b14fb6e46cec7fdc909373cbd424f30e49d07cd7"
+    },
+    {
+      "name": "runtime package/triple/permutation/one-shot lease conformance",
+      "command": "/tmp/m6b-s47-ftv3-build/moe_topk_score_to_mask_v3_runtime_conformance_test",
+      "exit": 0,
+      "stdout": "S32_V3_RUNTIME_CONFORMANCE package_signature=PASS;triple_shares=PASS;permutation_shares=PASS;one_shot_lease=PASS;package_faults=PASS;N128=1289280;N256=5281664",
+      "stdout_sha256": "cd41c271a4beae7385feb5fcc2b11deb1f0cccd4e7e70f93b86e8b2b2032bfda",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "binary_sha256": "5dac078ce3f6634009f79b3510e84fb6026072b188bdcd73a35228557731b660"
+    },
+    {
+      "name": "N1000 FTv3 targeted multi-process E2E and compatibility smoke",
+      "command": "S35_KEEP_TEST_TMP=1 /tmp/m6b-s47-ftv3-build/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "binary_sha256": "b01c46dd787bca7d310f60b1de3ae75f1dfdf1f97f754d6115182a9a17ce4c97",
+      "stdout_path": "/tmp/m6b-s47-ft-v3-final.stdout",
+      "stdout_sha256": "9de1e97c7f834196d1a9c5180c0b4c7977fe94adc9d3594bc0f134508cbc4a98",
+      "stderr_path": "/tmp/m6b-s47-ft-v3-final.stderr",
+      "stderr_sha256": "22e0fae58b803fb28b198d6985b45d772fec4fd0feb718c4130868c958d27eb7",
+      "case_count": 10,
+      "all_oracle_pass": true
+    }
+  ],
+  "resource_derivation": {
+    "N": 1000,
+    "padded_m": 1024,
+    "index_bits": 10,
+    "key_width_bits": 42,
+    "pair_comparators": 523776,
+    "gate_formula": "G=63m+m^2*W+P*(2W-1)+m^2",
+    "gate_count": 88626688,
+    "triple_share_bytes_each": 33235008,
+    "permutation_share_bytes_each": 131072,
+    "payload_each": 33366080,
+    "header_signature_bytes": 436,
+    "package_each": 33366516,
+    "package_both": 66733032,
+    "package_limit_each": 67108864,
+    "max_frame_bytes": 1048576,
+    "max_observed_frame_payload_bytes": 1048572,
+    "max_route_layer_gates": 44040192,
+    "route_batches": 11,
+    "max_compare_generation_layer_gates": 21998592,
+    "compare_generation_batches": 6,
+    "fixed_core_phases_including_READY": 91,
+    "select5_max_phase_addition": 13,
+    "inverse_output_phase_addition": 2,
+    "max_success_path_phases": 106,
+    "max_success_path_phases_are_RTT": false,
+    "planning_peak_bytes_each": 1061122036,
+    "planning_peak_mib_each": 1012,
+    "planning_peak_proved_bound": false,
+    "largest_temp_case_directory_bytes": 66794349,
+    "N1000_max_party_peak_rss_kib": 981868,
+    "N1000_max_aggregate_party_peak_rss_kib": 1963480
+  },
+  "decision_gate_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_GATES_2026-10-23.json",
+  "cases_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_CASES_2026-10-23.json",
+  "deliverables": [
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_DECISION_2026-10-23.md",
+      "raw_sha256": "dfc63a70851106fbeb7d530b586f1e8888792b5c9f3e620c2c0ebc294d00aaff",
+      "git_blob_sha1": "be03ae70b0213315fb7cb8500e06ff7a25bf2cde"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_REPORT_2026-10-23.md",
+      "raw_sha256": "81bc60a397f1d80746f59265eab8885469a035016beeae777cdfab73ffa268dc",
+      "git_blob_sha1": "7cbc7c01ddc0f0bdc3333bc26cc9449463838691"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_FT_V3_SPEC_2026-10-23.md",
+      "raw_sha256": "b58e4f6a6d665ce6a5d7949de1520e7b2a27f33b1957675f81058e2a949704f3",
+      "git_blob_sha1": "d4abd698279d680fd9b9b74e05bd58665bffc891"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_GATES_2026-10-23.json",
+      "raw_sha256": "3085cce70a3ea26d6756e3c52d5dc891fa27be7011e35e5c6169dd6c2e10e230",
+      "git_blob_sha1": "eef101d64db43618c2e9b543e2c9048d8fcba352"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_CASES_2026-10-23.json",
+      "raw_sha256": "9176e2a3f37a9f3373682142d2d9fae5647b4e735c1be8199c3e975a7d50a6dc",
+      "git_blob_sha1": "7e16866c29a424ff77271c6795c5dd1a6e874a3d"
+    },
+    {
+      "path": "PROJECT.md",
+      "raw_sha256": "22f4d7f421a4f45e6c5b9bab81eeb3e8ba8b5fbd3355fed752c685ff6cf3ac0b",
+      "git_blob_sha1": "deba48f4665c4aab6636ebc3662755721cd8cada"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "raw_sha256": "3f211f1a28c84a6bb9bca1b848a04334c4ab62fc163532856ffa8235fafec336",
+      "git_blob_sha1": "623db38954d74fdf2899483dc205e454a7ef2481"
+    },
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "raw_sha256": "c60c212599f5b54e30d0c295a3b71b04eb597764d76dea7a0246b4350d9ba8f6",
+      "git_blob_sha1": "03028f4bddd550cdc275e51e2cceacd1a6a8b34c"
+    }
+  ],
+  "failure_attempts": [
+    {
+      "attempt": "Ubuntu 20.04 fresh configure",
+      "result": "CMake 3.16.3 below required 3.17; environment setup stop, no source/resource finding"
+    },
+    {
+      "attempt": "initial FTv3 build target name",
+      "result": "wrong temporary target label; actual CMake target list queried and build rerun"
+    },
+    {
+      "attempt": "initial TEST_ONLY private-header include",
+      "result": "compile failed; corrected to canonical moe_topk/score_to_mask_v3_bounded_sampler.h include-root path"
+    },
+    {
+      "attempt": "non-author profile check",
+      "result": "TEST_ONLY issuer had dynamic r_min while signed production profile used fixed cap 7; corrected and final reviewer confirmed"
+    }
+  ],
+  "not_run": {
+    "S35_195": "NOT_RUN",
+    "S40_211": "NOT_RUN",
+    "S46_10_case_matrix": "historical FTv2 only; not relabelled",
+    "full_N_le_1000_matrix": "NOT_RUN",
+    "N_gt_1000": "NOT_ADMITTED",
+    "natural_IO": "S40 NOT_REPRODUCED; not rerun",
+    "human_kill": "NOT_RUN",
+    "formal_LAN_WAN": "NOT_RUN",
+    "RTT": "NOT_MEASURED",
+    "formal_performance": "NOT_MEASURED",
+    "AAV86": "NOT_RUN",
+    "target_DRBG": "OPEN"
+  },
+  "manifest_self_hash": "NOT_SELF_REFERENCED"
+}

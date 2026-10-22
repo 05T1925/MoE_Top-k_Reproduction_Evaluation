@@ -1277,3 +1277,11 @@ S44 为文档和源码审查；BUILD/TEST=NOT_RUN，不重跑 S35 195 案或 S40
 - 自然业务 I/O fault 仍继承 `NOT_REPRODUCED`；人工采样耗尽不等于自然 I/O 错误。N>256 `NOT_ADMITTED`；无正式 LAN/WAN、RTT 或性能测量；secure alias 未创建；v3 与 F_T/v2 默认关闭。目标部署资料清单、reviewer 身份、构建/二进制哈希和失败尝试见 S46 report/gates/cases/manifest。
 
 - 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S47（2026-10-23）
+
+S47 固定从 S46 commit `d48a41062ba2f86edbac3bcb3663692a641e95bd`、tree `3f70ae5999400781f37f871420a26988afa146c9` 开始，在隔离 worktree 实现默认关闭、显式版本化的 F_T/v3 N=1000 候选。FTv1/v2 的 N≤256 上限不变，receipt-format version 与 F_T/sampler/package format 独立绑定；输出和角色合同不变。padded m=1024 时 G=88,626,688、每方 package 33,366,516 B、`Qmax=88,786,404 B`、`Cmax=7,247`、每次随机请求≤1 MiB。fixed retry cap 7 在理想 IID 32-bit 字下给语义材料投影 `delta_reject≤1023·2^-154<2^-144<2^-128`；完整 signed transcript 不继承该统计界。
+
+fresh Release default-OFF、FTv3 explicit opt-in TEST_ONLY/production builds、两项必需 opt-in 缺失时的 expected configure rejection、header/API OFF probe、sampler/runtime conformance 和 N=1000 `{1,8,500,999,1000}` 多进程 oracle E2E 均记录在 S47 manifest。最终 10 个指定案例均通过，包括 N=1 fixed retry field、FTv3 N=128/256 及 FTv1 N=128、FTv2 N=256 smoke；每案独立 session/package/lease。N=1000 每方 observed peak RSS 约 920–960 MiB，frame payload 最大 1,048,572 B，临时目录每案约 66,794,349 B。该证据是本机功能/资源 `PASS_WITH_SCOPE`，不是正式性能数据或完整 N≤1000 矩阵。
+
+非作者 `/root/s45_non_author_review` 未参与本轮实现/推导，最终只读复核版本/profile/概率和 TEST_ONLY 映射为 `PASS_WITH_SCOPE`，没有运行构建/测试。执行者参与 S45/S46 历史工作，故不自称独立接收者。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`；DRBG deployment、joint RNG stream、private-channel 与 party-view 仍 OPEN；自然业务 I/O fault 沿用 `NOT_REPRODUCED`；N>1000 未准入。无 `secure` alias，不跑 S35 195 案、S40 211 案、完整 LAN/WAN、RTT、AAV86 或正式性能矩阵；遵守既有 V3→V4 前置门。S47 decision/report/gates/cases/source-build-evidence manifest 是本阶段完整交付。

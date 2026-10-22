@@ -121,7 +121,7 @@ std::vector<std::uint8_t> make_request(
     std::uint8_t operation, const std::string& transaction,
     const std::vector<std::uint8_t>& ciphertext) {
   if (transaction.empty() || transaction.size() > 128 ||
-      ciphertext.size() > kScoreToMaskV3MaxPackageBytes)
+      ciphertext.size() > kScoreToMaskV3MaxCiphertextBytes)
     fail("v3 escrow request size or transaction id invalid");
   std::vector<std::uint8_t> out;
   append_u32(out, kMessageMagic);
@@ -464,7 +464,7 @@ std::vector<std::uint8_t> fetch_ciphertext(const std::string& db_path,
   if (context_hash == nullptr || sqlite3_column_bytes(stmt.get(), 1) != 32 ||
       !std::equal(context.context_sha256.begin(), context.context_sha256.end(), context_hash))
     fail("v3 escrow fetch context identity mismatch");
-  if (bytes == nullptr || size <= 0 || size > static_cast<int>(kScoreToMaskV3MaxPackageBytes))
+  if (bytes == nullptr || size <= 0 || size > static_cast<int>(kScoreToMaskV3MaxCiphertextBytes))
     fail("v3 escrow recipient ciphertext missing or invalid");
   return {bytes, bytes + size};
 }
@@ -823,8 +823,15 @@ void score_to_mask_v3_run_escrow_service(
     fail("v3 escrow service configuration invalid");
   const auto context = score_to_mask_v3_validate_escrow_context(
       config.signed_context_path, config.dealer_ed25519_public_key_pem);
-  if (context.n == 0 || context.n > kScoreToMaskV3MaxN)
+  if (context.n == 0 ||
+      (context.format_version == kScoreToMaskV3EscrowContextFormatVersion &&
+       context.n > kScoreToMaskV3MaxN))
     fail("v3 escrow context N is outside the admitted range");
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+  if (context.format_version == kScoreToMaskV3EscrowContextFormatVersionFtV3 &&
+      context.n > kScoreToMaskV3FtV3MaxN)
+    fail("F_T/v3 escrow context N is outside the admitted range");
+#endif
   if (score_to_mask_v3_certificate_sha256(config.tls_credentials.certificate_file) !=
       context.escrow_identity_sha256)
     fail("v3 escrow certificate does not match the signed context identity");

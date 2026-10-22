@@ -10,6 +10,9 @@
 namespace moe_topk {
 
 inline constexpr std::uint32_t kProjectDerivedSelect5MaxN = 256;
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+inline constexpr std::uint32_t kProjectDerivedSelect5FtV3MaxN = 1024;
+#endif
 inline constexpr std::size_t kProjectDerivedSelect5PublicSeedBytes = 32;
 using ProjectDerivedSelect5PublicSeed =
     std::array<std::uint8_t, kProjectDerivedSelect5PublicSeedBytes>;
@@ -102,5 +105,17 @@ ProjectDerivedSelect5Result protocol_i_project_derived_select5_control_with_samp
     std::uint32_t n, std::uint32_t k,
     const ProjectDerivedSelect5SampleSource& sample_source,
     const ProjectDerivedSelect5CompareWave& compare_wave);
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+std::vector<std::uint32_t>
+protocol_i_project_derived_select5_sample_from_public_seed_ft_v3(
+    const std::vector<std::uint32_t>& population, std::uint32_t sample_size,
+    const ProjectDerivedSelect5PublicSeed& seed, std::uint64_t session,
+    std::uint64_t fingerprint, std::uint8_t iteration);
+ProjectDerivedSelect5Result
+protocol_i_project_derived_select5_control_with_sampler_ft_v3(
+    std::uint32_t n, std::uint32_t k,
+    const ProjectDerivedSelect5SampleSource& sample_source,
+    const ProjectDerivedSelect5CompareWave& compare_wave);
+#endif
 
 }  // namespace moe_topk

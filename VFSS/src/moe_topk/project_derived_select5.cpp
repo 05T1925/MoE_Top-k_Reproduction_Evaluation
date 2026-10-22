@@ -175,8 +175,9 @@ class PublicSampleRandomStream {
 std::vector<std::uint32_t> sample_from_public_seed(
     const std::vector<std::uint32_t>& population, std::uint32_t count,
     const ProjectDerivedSelect5PublicSeed& seed, std::uint64_t session,
-    std::uint64_t fingerprint, std::uint8_t iteration) {
-  require(!population.empty() && population.size() <= kProjectDerivedSelect5MaxN &&
+    std::uint64_t fingerprint, std::uint8_t iteration,
+    std::uint32_t maximum_population) {
+  require(!population.empty() && population.size() <= maximum_population &&
               count >= 1U && count <= population.size() && iteration < 4U,
           "Select5 public sample parameters");
   const std::set<std::uint32_t> distinct(population.begin(), population.end());
@@ -307,8 +308,21 @@ protocol_i_project_derived_select5_sample_from_public_seed(
     const ProjectDerivedSelect5PublicSeed& seed, std::uint64_t session,
     std::uint64_t fingerprint, std::uint8_t iteration) {
   return sample_from_public_seed(population, sample_size, seed, session,
-                                 fingerprint, iteration);
+                                 fingerprint, iteration,
+                                 kProjectDerivedSelect5MaxN);
 }
+
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+std::vector<std::uint32_t>
+protocol_i_project_derived_select5_sample_from_public_seed_ft_v3(
+    const std::vector<std::uint32_t>& population, std::uint32_t sample_size,
+    const ProjectDerivedSelect5PublicSeed& seed, std::uint64_t session,
+    std::uint64_t fingerprint, std::uint8_t iteration) {
+  return sample_from_public_seed(population, sample_size, seed, session,
+                                 fingerprint, iteration,
+                                 kProjectDerivedSelect5FtV3MaxN);
+}
+#endif
 
 void ProjectDerivedSelect5DisclosureState::mark_forward_shuffle_complete() {
   require(!forward_shuffle_complete_,
@@ -338,11 +352,12 @@ ProjectDerivedSelect5Result protocol_i_project_derived_select5_control(
       n, k, sample_source, compare_wave);
 }
 
-ProjectDerivedSelect5Result protocol_i_project_derived_select5_control_with_sampler(
+static ProjectDerivedSelect5Result control_with_sampler_limit(
     std::uint32_t n, std::uint32_t k,
     const ProjectDerivedSelect5SampleSource& sample_source,
-    const ProjectDerivedSelect5CompareWave& compare_wave) {
-  require(n >= 1 && n <= kProjectDerivedSelect5MaxN && k >= 1 && k <= n &&
+    const ProjectDerivedSelect5CompareWave& compare_wave,
+    std::uint32_t maximum_n) {
+  require(n >= 1 && n <= maximum_n && k >= 1 && k <= n &&
               static_cast<bool>(sample_source) && static_cast<bool>(compare_wave),
           "Select5 supported input");
 
@@ -505,5 +520,24 @@ ProjectDerivedSelect5Result protocol_i_project_derived_select5_control_with_samp
           "Select5 failed to terminate in five iterations");
   return result;
 }
+
+ProjectDerivedSelect5Result protocol_i_project_derived_select5_control_with_sampler(
+    std::uint32_t n, std::uint32_t k,
+    const ProjectDerivedSelect5SampleSource& sample_source,
+    const ProjectDerivedSelect5CompareWave& compare_wave) {
+  return control_with_sampler_limit(n, k, sample_source, compare_wave,
+                                    kProjectDerivedSelect5MaxN);
+}
+
+#ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+ProjectDerivedSelect5Result
+protocol_i_project_derived_select5_control_with_sampler_ft_v3(
+    std::uint32_t n, std::uint32_t k,
+    const ProjectDerivedSelect5SampleSource& sample_source,
+    const ProjectDerivedSelect5CompareWave& compare_wave) {
+  return control_with_sampler_limit(n, k, sample_source, compare_wave,
+                                    kProjectDerivedSelect5FtV3MaxN);
+}
+#endif
 
 }  // namespace moe_topk
