@@ -373,3 +373,13 @@ vfss-baseline-2026-09-03
 - S24 添加独立枚举 `FullKeyZeroSumRefreshV2`。刷新在完整键环中保持 share sum。局部右移语义不保持，故 v2 不提供可重构 q；consumer 使用完整 Q′。刷新材料使用 M6B5/v4 monolithic 或 M6S2/v3 streamed 版本，不兼容旧包，并绑定输出 ABI。
 - `getrandom`/`RAND_bytes` 联合随机带优势、BCG+21 DCF 转换项与 TLS 信道优势仍须量化/明确适用条件。该刷新只条件支持 F_scoreconv 本地输出视图；不是整池或完整 Protocol I 安全证明。S24 执行者参与 S19–S23，独立密码学 review 为 `NOT_SATISFIED`。
 - S24 决策、报告、门禁与 source/build/evidence manifest：`docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_DECISION_2026-10-17.md` 与同前缀 `docs/reproduction/` 文件。M6A V3 仍 OPEN、V4 未获准、正式矩阵 NOT_RUN。
+
+
+## 17. M6B S43 F_T/v1 到真实 Dealer 联合材料分布审查来源
+
+- 固定 runtime 来源链：S35 `77f9684e1a50794004fd31f3e5ee7f193e9b12ec`（85 项 canonical `af693eb61183a606c64a1f1b16ee5c3ad6e4b382ec5456e541c7915b8f95faa0`）；S39 `8028c0fece69fe0c648b1e0f1e12ad7fca723f20`（S39 source manifest 重算 canonical `09444abd50c41357eb63e9050b7e39c3b2948588205d9d70f02561d7d8ec49d9`）；S40 `b04618117b11cffe0e899947726ab1c66807ffdd` 保留目标规模功能 evidence。S42 source manifest 固定 85 项工作树源哈希及 S42 文档快照，S43 只审 fixed Git 对象中的离线 issuer 与 lease 实现。
+- 实际实现映射：`VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp` 的 `random_bytes`、`next_uniform`、`score_to_mask_v3_dealer_issue_packages`、header/context/signature 与 `durable_create`；`VFSS/src/moe_topk/score_to_mask_v3_party.cpp` 的 package preflight/READY 前 lease；对应声明见 `VFSS/include/moe_topk/score_to_mask_v3_gmw.h`。S43 报告附有精确范围与联合概率推导。
+- 外部标准/实现文档：OpenSSL 3.0 [RAND_bytes](https://docs.openssl.org/3.0/man3/RAND_bytes/) 与 [EVP_RAND](https://docs.openssl.org/3.0/man7/EVP_RAND/) 说明 RAND API 的 CSPRNG/DRBG、seed-source 与自动 reseed 语义；RFC 8032 §5.1.6 说明 Ed25519 的消息依赖 nonce/signing 算法。它们用于限定实现假设，不替代当前部署下的 `Adv_DRBG_T(q)` 或完整协议证明。
+- S41 manifest 的历史汇总字段 `bfa8ba9c…67ab726c` 与逐项值重算 `e0bb4d25…b5f8a69` 不一致；新增 [S41 来源勘误](reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S41_PROVENANCE_ERRATUM_2026-10-22.md)，不改 S41 原件。S43 作者参与 S35–S42；非作者 `/root/s39_crypto_review` 已复核理想 tape 下单次成功发材联合 law（`PASS_WITH_SCOPE`），真实 DRBG bridge 仍开放；范围见 manifest。
+- S43 的 ideal-tape 复核范围为：材料联合 law 精确匹配；package/context/signature 在 `receipt_format_version` 参数匹配时逐值耦合。S39 v2 与 S35 v1 的签名状态字段值差异已在报告中单列。非作者复核未运行 build/test，且未重查其意见并入后的措辞编辑。真实 RNG bridge 与全协议 party-view 维持 `CONDITIONAL/OPEN`。
+- S43 未构建/测试/执行 toy enumeration；不重跑 S35 195 案或 S40 211 案，不启动 LAN/WAN/RTT。理想 IID tape 下的上述范围性联合采样为 `PASS_WITH_SCOPE`，不改 VFSS-baseline、不推送/合并、不创建 `secure` alias。

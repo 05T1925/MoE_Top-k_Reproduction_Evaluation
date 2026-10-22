@@ -941,3 +941,11 @@ S42 固定在 S41 提交 `486026ba425a2d17ca15173d056db6eb309747d1`；85 项来�
 本轮构造本方可见成功转录的直接 sampler：S36 H4 本方前缀模拟之后，本方密文由已知理想输出和 public recipient key 按源 envelope 分布生成；同次 `F_T/v1`、`F_TOPK` 调用的诚实对端使用自己的 package/output/凭据真实 authenticated deposit；A 运行真实格式状态机并只向本方通道返回 submit receipt 与本方 committed fetch。模拟器不接收 peer package/share、A context、T 私钥或 reduction-only `J_b`，没有伪造 peer-success 事件，也未证明或假设完整隐藏状态 `H_b` 条件 law 相等。未参与 S41 推导的独立接收者 `/root/s40_independent_receiver` 已复核投影因子分解和角色权限，结论为范围限定的 `CONDITIONAL_PASS_REVIEWED`；该状态只覆盖本方可见成功应用/API transcript，不覆盖完整安全。
 
 S39/S40 的 receipt/v2 token 理想独立 A RNG 局部均匀引理只按原范围继承；真实 RNG/Dealer/signature/TLS 桥仍 OPEN。自然读写故障沿用 S40 `NOT_REPRODUCED`；任意 crash/abort prefix、A-only 腐化和掉电耐久仍未证明。N≤256 功能证据沿用 `PASS_WITH_SCOPE`，N>256 `NOT_ADMITTED`；本轮 BUILD/TEST、正式 LAN/WAN 与 RTT 均 `NOT_RUN/NOT_MEASURED`，不创建 `secure` alias，v3 默认关闭，不推送或合并。下一步仅整理并证明 ideal `F_T/v1` 到真实 Dealer 的材料联合分布、签名、RNG/DRBG、TLS/认证传输与 one-shot 消费桥；未完成前完整 GMW 安全仍 OPEN。详细范围见 S42 报告、决策、gates 和 source/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S43（2026-10-22）
+
+S43 固定 S42 本地提交 `72a23fc067b5bfbf10edf110eeff45ec1f0ed6bd` 和已核验的 S42 85 项 source snapshot；S35/S39/S40 runtime、证据与 S41/S42 文档来源分开记录。S41 85 项摘要重算值 `e0bb4d25…b5f8a69` 与原 summary `bfa8ba9c…67ab726c` 不一致；S40 原始 canonical `10c508b3…05b804f6` 可重现。新增 S43 erratum 保留原 S41 文件并说明现有证据不能还原错误 summary 的具体序列化原因。
+
+S39 Dealer 在理想 IID 字节带下的 triple shares、Fisher–Yates permutation 与 one-hot permutation XOR shares 联合律精确匹配单次成功 `F_T/v1`。package/context 的确定性摘要和签名只在 public `receipt_format_version` 参数匹配时逐值耦合；S39 receipt-v2 opt-in 将 context 的已签字段从 1 改为 2，和 S35 v1 context 有可解释的确定性字节差异。非作者 `/root/s39_crypto_review` 复核理想 IID tape 下的范围性联合律为 `PASS_WITH_SCOPE`。真实 `RAND_bytes` 联合输出替换仍需未量化的 `Adv_DRBG_T(q)` 与 provider/entropy/reseed/fork/并发条件；拒绝采样有期望界但无最大重试次数。lease 成功路径仅在同一未回滚 DB/package 下有范围性保证；跨重启、重复签发和发材部分文件恢复未定义/未验证。详见 S43 报告、决策、gates 和 source/build/evidence manifest。
+
+本轮执行者参与 S35–S42，属于作者；非作者 `/root/s39_crypto_review` 已只读复核理想 IID tape 下单次成功发材的条件联合 law（`PASS_WITH_SCOPE`），真实 DRBG bridge 仍 `OPEN/CONDITIONAL`，复核者未检查之后的澄清编辑。没有可复现运行时缺陷，因此只修改文档，BUILD/TEST=`NOT_RUN`；S35 195 案和 S40 211 案均不重跑。自然业务 I/O 故障沿用 `NOT_REPRODUCED`；崩溃前缀隐私未证明；N>256 `NOT_ADMITTED`；正式 LAN/WAN/RTT 未运行/未测量；不创建 `secure` alias，v3 默认关闭，不改 `VFSS-baseline/`，不推送/合并。完整 party-view 安全与性能仍是独立 OPEN 门。

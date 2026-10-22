@@ -1238,3 +1238,12 @@ S42 以 S41 固定提交 `486026ba425a2d17ca15173d056db6eb309747d1` 为对象；
 构造了一方静态半诚实 party 的成功路径本方可见 transcript sampler：沿用 S36 H4 prefix 和 S39/S40 v2 token 局部条件结论，由真实诚实对端按同次 `F_T/v1`/`F_TOPK` 的自身输出份额及 package 做 authenticated deposit，A 再按真实状态机返回本方 receipt 和已提交 fetch。S42 通过直接 projection factorization 回答 S41 gap；不以完整 `Law(H_b|Q_b)` 相等作为条件，也不把隐藏 context/peer metadata 交给 simulator。未参与 S41 推导的独立接收者 `/root/s40_independent_receiver` 已复核条件因子分解、同次调用绑定及 endpoint/A 信息权限，结果为 `CONDITIONAL_PASS_REVIEWED`，范围限于本方可见成功应用/API transcript，不等于完整安全通过。
 
 仅文档变更，BUILD/TEST=NOT_RUN；S40 211 案功能证据继承不重跑。真实 ideal-to-Dealer/RNG/signature/TLS 桥、完整 GMW 安全和任意故障前缀仍 OPEN；自然业务 I/O 故障仍 NOT_REPRODUCED，N>256 NOT_ADMITTED，正式 LAN/WAN/RTT 未运行/测量，未创建 secure alias，未推送或合并。下一步只推进 ideal `F_T/v1` 到真实 Dealer 的联合材料分布、签名、RNG/DRBG、TLS/认证传输和 one-shot 消费证明义务，不扩大本轮定理。详见 S42 报告、决策、machine-readable gates 与 source/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S43（2026-10-22）
+
+- S42 已固定为本地提交 `72a23fc067b5bfbf10edf110eeff45ec1f0ed6bd`；S42 manifest 85 项 source hash、5 项 artifact hash 均复核一致。S41 逐项 `sha256_s41_checkout` 的重算 canonical 是 `e0bb4d25…b5f8a69`，与历史 summary `bfa8ba9c…67ab726c` 不一致；S40 原始值可复现。S43 新增 provenance erratum，不改历史 S41 文件。
+- 在理想 IID tape、单次成功发材和固定 key/签名 oracle 下，triple、Fisher–Yates 与 permutation share 的联合 law 与 `F_T/v1` 精确匹配；package/context/hash/signature 仅在 public `receipt_format_version` 同值时逐值匹配。S39 v2 opt-in 与 S35 v1 context 的状态字段差异是确定性的，非随机分布论据。非作者 `/root/s39_crypto_review` 已复核该范围内的 ideal-tape 结论为 `PASS_WITH_SCOPE`。实际 `RAND_bytes` 联合输出的 `Adv_DRBG_T(q)`、熵源/provider/state/reseed/fork/并发条件没有证明或量化；这是参数匹配之后 `F_T_TO_DEALER_JOINT_DISTRIBUTION` 的首个概率桥接断点。`next_uniform` 无 retry cap，当前只支持 expected-PPT 论述。
+- package hash/session/invocation/party lease 在同一完整未回滚 DB 内唯一，并在 READY 前提交；DB rollback、新 lease dir、同 tuple 新发 package 和跨文件发行恢复不在当前 one-shot 合同证明内。逐文件 `O_EXCL`/fsync 不是三文件原子 transaction，也不证明掉电耐久。以上为源码审查发现，没有做 failpoint 实测，不称自然故障。
+- 执行者参与 S35–S42；非作者 `/root/s39_crypto_review` 已只读复核理想 IID tape 下的单次成功发材联合 law，裁定 `PASS_WITH_SCOPE`；真实 DRBG bridge 仍 `OPEN/CONDITIONAL`，且本次澄清编辑未被复核者复查。BUILD/TEST 均 `NOT_RUN`，不重跑 S35 195 案或 S40 211 案，不测性能。private-channel/TLS、完整 party-view composition、安全别名及正式性能仍 OPEN/NOT_READY；自然业务 I/O 仍 `NOT_REPRODUCED`，N>256 `NOT_ADMITTED`，正式 LAN/WAN/RTT `NOT_RUN/NOT_MEASURED`，v3 OFF，不改 `VFSS-baseline/`，不推送/合并。
+
+详见 [S43 决策](decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S43_DECISION_2026-10-22.md)、报告、gates、来源勘误和 source/build/evidence manifest。后续先固定实际 OpenSSL DRBG 部署与查询界，并推进材料桥；若严格 PPT 要求保留，则应版本化设置 bounded rejection 与显式失败概率。

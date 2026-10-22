@@ -1,0 +1,168 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s43-gates/v1",
+  "date": "2026-10-22",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S43",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "bb90_dcf_result": false,
+    "full_security_pass": false,
+    "secure_alias_created": false,
+    "v3_default": "OFF",
+    "n_gt_256": "NOT_ADMITTED"
+  },
+  "identity": {
+    "s42_commit": "72a23fc067b5bfbf10edf110eeff45ec1f0ed6bd",
+    "s42_tree": "1d72a0942adff4a39253a73f4a12e2989559064e",
+    "s41_commit": "486026ba425a2d17ca15173d056db6eb309747d1",
+    "s40_commit": "b04618117b11cffe0e899947726ab1c66807ffdd",
+    "s39_runtime_commit": "8028c0fece69fe0c648b1e0f1e12ad7fca723f20",
+    "s35_runtime_commit": "77f9684e1a50794004fd31f3e5ee7f193e9b12ec",
+    "s42_source_manifest_sha256": "d6884503e9aff9997b8a0f5e59ec37b2e6a7ade50b1915d748b238ff051442ab",
+    "s42_source_canonical_sha256": "2ea2896cce7dd284f3d317a7462dde528c188cc15cb32af16c744dad4e5e6837",
+    "starting_worktree_clean": true,
+    "user_main_worktree_modified": false,
+    "vfss_baseline_modified": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "authorship_and_review": {
+    "s43_executor_participated_in_s35_s42": true,
+    "executor_is_independent_reviewer": false,
+    "independent_reviewer_status": "COMPLETED_SCOPED_REVIEW",
+    "reviewed_subclaim": "IDEAL_IID_TAPE_SINGLE_SUCCESSFUL_ISSUANCE_JOINT_LAW_PASS_WITH_SCOPE",
+    "overall_real_dealer_bridge_reviewed_pass": false,
+    "reviewer_edits_rechecked": false,
+    "independent_review_scope": [
+      "ideal and real F_T/v1 joint distribution",
+      "Beaver triple joint law and cross-material independence",
+      "Fisher-Yates rejection sampling and runtime bound",
+      "package/context signature and tuple binding",
+      "one-shot lease and issuance restart scope"
+    ],
+    "independent_reviewer_ran_build_or_tests": "NOT_RUN"
+  },
+  "gates": {
+    "S42_SOURCE_RECEIPT": {
+      "status": "PASS",
+      "basis": "S42 source manifest 85/85 source entries and 5/5 artifact hashes recomputed; canonical digest and fixed S42 Git tree checked."
+    },
+    "F_T_TO_DEALER_JOINT_DISTRIBUTION": {
+      "status": "CONDITIONAL",
+      "ideal_tape_subclaim": "PASS_WITH_SCOPE_REVIEWED",
+      "scope": "One successful issuance call, fixed public tuple, ideal IID random byte tape, fixed T signing oracle/key, canonical S35/F_T/v1 format. Beaver shares, shuffle and permutation shares match exactly; package/context, digests and signatures match by exact coupling only when receipt_format_version matches.",
+      "format_parameter_precondition": "The ideal F_T/v1 public state must use the same receipt_format_version as the real signed escrow context. S35 accepts v1; S39 receipt-v2 opt-in signs state.receipt_format_version=2. If compared to fixed v1 context, this is an explicit deterministic byte difference, not a randomness claim.",
+      "first_open_step": "After the ideal F_T/v1 public receipt_format_version is matched to the signed context, replace the actual OpenSSL RAND_bytes output stream, including adaptive rejection draws and lifecycle/concurrency conditioning, with IID uniform bytes."
+    },
+    "RNG_DRBG_BRIDGE": {
+      "status": "OPEN",
+      "symbolic_term": "Adv_DRBG_T(q)",
+      "missing": [
+        "deployment OpenSSL provider and entropy/seed source",
+        "joint multi-call output indistinguishability under material hashes/signatures and online post-processing",
+        "call/output query bound despite unbounded rejection loop",
+        "fork, restart, reseed, thread and concurrent invocation lifecycle assumptions",
+        "quantified advantage parameters"
+      ],
+      "source_checks_rand_bytes_error": true
+    },
+    "SIGNATURE_BINDING": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Exact purpose/version/canonical-body signing and header/context field mapping under fixed verification key and conforming Ed25519 signer oracle, when the ideal and real public receipt_format_version parameter match.",
+      "not_proved": [
+        "malicious issuer authenticity",
+        "EUF-CMA advantage against active modification",
+        "deployment private-key custody/provisioning"
+      ],
+      "hash_randomness_claim": false
+    },
+    "ONE_SHOT_CONSUMPTION": {
+      "status": "CONDITIONAL",
+      "same_package_same_intact_lease_db": "PASS_WITH_SCOPE",
+      "scope": "Unique package hash insertion with session/invocation/party fields commits before READY; package mutation after validation leaves lease burned.",
+      "open": [
+        "database deletion/rollback/copy or new lease directory",
+        "reissue of new package material under the same public tuple",
+        "global idempotent issuance semantics",
+        "power-loss durability"
+      ]
+    },
+    "PRIVATE_CHANNEL_BRIDGE": {
+      "status": "OPEN",
+      "s43_reviewed": false,
+      "prior_transport_evidence": "INHERITED_ONLY"
+    },
+    "PARTY_VIEW_COMPOSITION": {
+      "status": "OPEN",
+      "s42_application_api_sampler": "CONDITIONAL_PASS_REVIEWED_INHERITED",
+      "s43_full_composition": "NOT_PROVED",
+      "reason": "The actual Dealer RNG bridge and online GMW/private-channel transcript are not established by this conditional preprocessing lemma."
+    },
+    "CRASH_RELIABILITY_SCOPE": {
+      "status": "NOT_PROVED",
+      "natural_business_io_fault": "NOT_REPRODUCED_INHERITED_FROM_S40",
+      "dealer_partial_output_on_failure": "SOURCE_PATH_OBSERVED_NOT_INJECTED",
+      "arbitrary_crash_prefix_privacy": "OUT_OF_SCOPE",
+      "power_loss_durability": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "secure_alias_created": false,
+      "v3_default": "OFF"
+    },
+    "PERFORMANCE_READY": {
+      "status": "NOT_READY",
+      "formal_lan_wan": "NOT_RUN",
+      "rtt": "NOT_MEASURED",
+      "performance_matrix": "NOT_STARTED",
+      "n_gt_256": "NOT_ADMITTED"
+    }
+  },
+  "verification": {
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "s35_195_case_matrix": "NOT_RERUN",
+    "s40_211_case_matrix": "NOT_RERUN",
+    "toy_probability_enumeration": "NOT_RUN",
+    "runtime_modified": false,
+    "performance_measurement": "NOT_MEASURED",
+    "natural_io_failure_reproduced": false
+  },
+  "independent_review": {
+    "reviewer": "/root/s39_crypto_review",
+    "status": "COMPLETED_SCOPED_REVIEW",
+    "reviewed_scope": [
+      "ideal and real F_T/v1 joint distribution",
+      "Beaver triple law and cross-material independence",
+      "Fisher-Yates rejection distribution and runtime bound",
+      "package/context signature and tuple mapping",
+      "one-shot lease and restart boundary"
+    ],
+    "verdict": {
+      "ideal_tape_single_successful_issuance_joint_law": "PASS_WITH_SCOPE",
+      "real_openssl_drbg_bridge": "OPEN_CONDITIONAL",
+      "runtime_defect_found": false
+    },
+    "reviewer_changed_files": false,
+    "reviewer_build": "NOT_RUN",
+    "reviewer_tests": "NOT_RUN",
+    "post_review_report_edits_rechecked": false
+  },
+  "first_exact_stop": {
+    "variable": "W_T: complete ordered output stream returned by RAND_bytes during one Dealer issuance",
+    "preceding_precondition": "Match the ideal F_T/v1 public receipt_format_version to the real signed context; otherwise package/context byte equality differs deterministically at that signed state field.",
+    "missing_relation": "After matching receipt_format_version: Law(W_T | public tuple, fixed-environment RAND-success execution, provider/lifecycle/concurrency) ≈ Law(U | public tuple, fixed-environment RAND-success execution)",
+    "interpretation": "Unclosed proof/assumption bridge, not an attack and not an impossibility result.",
+    "minimal_next_step": "Fix the deployment RNG/provider/lifecycle model and query bound, then provide a joint DRBG indistinguishability bound; if strict PPT is required, version the sampler with bounded rejection and include delta_reject."
+  },
+  "next_obligations": [
+    "independent review of any future DRBG bridge proof or substantive change to the joint-law derivation",
+    "OpenSSL DRBG/entropy/provider/restart/fork/concurrency bridge and symbolic or quantitative advantage",
+    "explicit expected-PPT or bounded-rejection F_T version",
+    "tuple-keyed atomic issuance/retry semantics only if restart recovery becomes part of the required contract",
+    "private-channel/TLS and full GMW party-view composition in later independent gates"
+  ]
+}
