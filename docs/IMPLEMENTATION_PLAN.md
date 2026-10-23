@@ -1292,3 +1292,7 @@ fresh Release default-OFF、FTv3 explicit opt-in TEST_ONLY/production builds、�
 - default-OFF Release 未注册 v3/Select5 targets/symbols，未 opt-in header/API probe 被拒；显式 FTv3 production Release 与 TEST_ONLY Release 分离，production 不含测试随机 hook。N=1000 `m=1024` 资源为 88,626,688 gates、每方 package 33,366,516 B、最大 observed payload 1,048,572 B，外层 56 B frame header 单独计入。RSS、目录、包与 phase 只作本机功能/资源诊断。
 - retry-cap 发材失败验证只覆盖离线预发布边界：package/context/在线服务 DB 与 lease 路径未创建，T 私有 burn marker 保留且 invocation 重放被拒；A/P0/P1 未启动，因此 online DB row query=`NOT_RUN`。低概率合法输入中止的产品接受仍 `OPEN_CONFIRMATION`。
 - `DRBG_DEPLOYMENT_PROFILE`、`JOINT_RNG_STREAM_BRIDGE`、`PRIVATE_CHANNEL_BRIDGE`、`PARTY_VIEW_COMPOSITION` 与 `SHUFFLE_OUTPUT_ESCROW_COMPOSITION` 维持 OPEN。`N_GT_1000=NOT_ADMITTED`；自然业务 I/O fault=`NOT_REPRODUCED`；正式 LAN/WAN、RTT、性能与 AAV86 均未运行/测量。详情见 S48 decision/report/gates/cases/source-build-evidence manifest。
+
+### S49：FTv3 条件材料律、H4 迁移与真实 DRBG 门（2026-10-23）
+
+固定 S48 commit `e05b01d5c7e3899297b76a5e0fca212d38d24229`。已由非作者复核理想 IID tape 下 FTv3 semantic-material success law 与 `δ_reject≤1023·2^-154`；界不适用于完整版本化签名 transcript。S42 H4 的 FTv1/N≤256/旧 schedule 证明不能直接移植：先定义适配 FTv3 的本方 `Kpre_3`，证明批次、phase、frame 和长度字段由公开参数与批准 `L_S29` 决定，之后才可讨论 N≤1000 扩展。目标 OpenSSL/provider/entropy/lifecycle 与 TLS 部署 profile 未提供，联合随机流/私有信道/完整 party-view 仍 OPEN。低概率发材 abort 接受仍待负责人确认。S49 BUILD/TEST=`NOT_RUN`；N≤1000 功能、自然 I/O、性能状态沿用 S48 原范围，不扩大。本阶段不启动 LAN/WAN、RTT 或 AAV86 比较。

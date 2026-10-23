@@ -426,3 +426,11 @@ vfss-baseline-2026-09-03
 - default-OFF / 显式 FTv3 Release、TEST_ONLY target hashes、逐案结果、N=1000 gate/package/RSS/temp/frame 数、Qmax/Cmax 和失败尝试见 S48 source/build/evidence manifest 与 cases JSON。payload cap 为 1 MiB；FTv3 最大合法 payload 1,048,572 B，4 B slack 来自 gate batching/bit packing，56 B frame header 在 payload 外。所有本机 resource/phase 数据仅为功能诊断，不是正式性能或 RTT。
 - cap 失败用例只直接证明离线发行尚未发布：无 package/context 与在线 DB/lease paths、一个私有 burn marker、同调用 replay 被拒；在线服务未启动，online DB rows=`NOT_RUN`。低概率合法输入 `ISSUANCE_ABORT` 仍 `OPEN_CONFIRMATION`。DRBG/私有信道/完整 party-view 与 shuffle-output-escrow composition 仍 OPEN；自然 I/O 故障 `NOT_REPRODUCED`，N>1000 未准入，secure alias 与正式性能未就绪。
 - S48 decision、报告、machine-readable gates、逐案 JSON、source/build/evidence manifest 以及两项 TEST_ONLY 源码文件均以 `M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_` 前缀记录。仅本地隔离提交，不推送、不合并。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S49 证明桥接记录（2026-10-23）
+
+- 对象：S48 `e05b01d5c7e3899297b76a5e0fca212d38d24229`；S47 父链与 19 个增量文件 identity 逐项核对。S49 新增决策、报告、门禁和 source/evidence manifest 路径见同名前缀 reproduction 记录。
+- 理想 FTv3：`ft=3/sampler=2/lambda=128/retry=7/package=6`，context format 2、receipt format 2 分开绑定；IID tape 下语义材料条件于 cap 成功与精确均匀 Fisher–Yates law 相同，`δ_reject≤1023·2^-154` 只作用于语义材料投影。
+- 首个 proof migration gap：S42 的 FTv1/N≤256/旧 schedule `Kpre` 未映射到 FTv3 新签名 package/profile 和公开批次/phase/frame transcript。真实目标 `RAND_bytes` ordered-stream bridge、TLS部署桥、全 party-view composition 仍 OPEN；本地构建 OpenSSL 版本不能替代部署证据。
+- 单次 N=1000 FTv3 Dealer 请求上界为 Qmax 88,786,404 B、Cmax 7,247 calls、单次≤1 MiB；不是安全优势或性能结果。S48 功能收据只继承其 13 案 `PASS_WITH_SCOPE`。
+- 本轮不运行 build/test/performance；低概率发材 `ISSUANCE_ABORT` 合同接受 `OPEN_CONFIRMATION`，N>1000 未准入，无 `secure` alias。

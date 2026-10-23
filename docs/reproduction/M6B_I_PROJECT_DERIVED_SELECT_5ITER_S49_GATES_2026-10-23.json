@@ -1,0 +1,73 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s49-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S49",
+  "date": "2026-10-23",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall": "OPEN_WITH_EXACT_GAPS",
+  "scope": "Ideal-IID FTv3 semantic-material issuance law plus source/proof audit; no complete party-view, real deployment DRBG, or performance conclusion.",
+  "baseline": {
+    "S48_commit": "e05b01d5c7e3899297b76a5e0fca212d38d24229",
+    "S48_tree": "14cc78cb20080dd11326d1f9beb69279872e4aaa",
+    "S47_parent": "feb5e6677568d649906f46d0e611d5d52349c07f",
+    "S48_manifest_sha256": "62e7cbf05ef7946232e4e322a6fe8e0a3d3927d2fe600fdf98899efd9aefc9f8",
+    "S47_manifest_sha256": "3e4be30fdbd0c0463b39ad1ec8dcd1893a096f7bc92d35c6f86b850a936480ef",
+    "initial_worktree_clean": true,
+    "runtime_changed": false,
+    "VFSS_baseline_changed": false
+  },
+  "gates": {
+    "S48_SOURCE_RECEIPT": {"status": "PASS_WITH_SCOPE", "evidence": "Exact commit/tree/parent verified; S48 9-file canonical digest recomputed; 9/9 S48 baseline commit Git blobs match. Three governance files have expected S49 status additions; among the remaining six files, three raw SHA values match and three match after CRLF-to-LF normalization."},
+    "S47_SOURCE_IDENTITY": {"status": "PASS_WITH_SCOPE", "evidence": "19/19 source-delta Git blobs match exact S47 commit. Recorded canonical is reproduced with the historical culture-sensitive path ordering; ordinal ordering differs because collation was not explicit in that manifest."},
+    "S48_FUNCTIONAL_N1000": {"status": "INHERITED_PASS_WITH_SCOPE_NOT_RERUN", "evidence": "S48's 13/13 targeted cases only; not exhaustive N/K correctness, security, or performance."},
+    "IDEAL_IID_FTV3_SEMANTIC_SUCCESS_LAW": {"status": "CONDITIONAL_PASS_REVIEWED", "scope": "Under independent IID uniform bytes, fixed supported profile, sampler success, and semantic-material projection only, accepted residues remain uniform conditional on cap success and match exact Fisher-Yates semantic material law."},
+    "IDEAL_IID_FTV3_ABORT_BOUND": {"status": "PASS_WITH_SCOPE", "scope": "For m<=1024 and retry cap 7: δ_reject<=1023*2^-154<2^-144<2^-128; applies only to semantic-material projection and ideal IID tape."},
+    "FTV3_VERSIONED_IDEAL_FUNCTION": {"status": "PASS_WITH_SCOPE", "scope": "Specified in S49 as a separate v3 ideal issuance interface with fixed signed profile, context/receipt version separation, T-side burn marker, cap abort, per-party package and A-only context. No FTv1 full-transcript equivalence claimed."},
+    "S42_H4_TO_FTV3_N_LE_256": {"status": "OPEN_WITH_EXACT_GAP", "scope": "No reviewed Kpre_3 for FTv3 package/profile and exposed batch/phase/frame schedule; must map each field to public parameters/approved L_S29 and rederive the conditional transcript kernel."},
+    "S42_H4_TO_FTV3_N_257_1000": {"status": "OPEN_SCOPE_LIMIT", "scope": "S42 H4 proof is explicitly limited to N<=256; extension requires a new conditional simulator for the FTv3 schedule."},
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {"status": "OPEN_CONFIRMATION", "scope": "No new project-owner acceptance record; one separate non-implementer confirmation question is included in the report."},
+    "FINITE_Q_C_BOUND_N1000": {"status": "PASS_WITH_SCOPE", "scope": "One Dealer FTv3 call only: Qmax=88786404 bytes; Cmax=7247 RAND_bytes calls; max request=1048576. Excludes party/A/TLS RNG calls and lifetime aggregation."},
+    "DRBG_DEPLOYMENT_PROFILE": {"status": "OPEN_NOT_AVAILABLE", "scope": "Target OpenSSL/provider/config/entropy/reseed/fork/restart/concurrency and aggregate query profile not provided; S48 build host is not target deployment evidence."},
+    "JOINT_RNG_STREAM_BRIDGE": {"status": "OPEN", "scope": "Need a whole ordered adaptive request/status stream indistinguishability game and deployment-matched Adv_DRBG_T(Q_total,C_total;E), including success conditioning."},
+    "PRIVATE_CHANNEL_BRIDGE": {"status": "OPEN", "scope": "Source enforces TLS 1.3 mTLS and identity checks; target deployment and advantage model are unavailable."},
+    "PARTY_VIEW_COMPOSITION": {"status": "OPEN", "scope": "No complete FTv3 GMW/Beaver simulator/composition proof; S42's FTv1 result does not automatically transfer."},
+    "SHUFFLE_OUTPUT_ESCROW_COMPOSITION": {"status": "OPEN", "scope": "Must compose after Kpre_3: active Select, membership, forward/inverse routing, output refresh, encryption, escrow commit/fetch."},
+    "FTV3_CAP_ABORT_SOURCE_BOUNDARY": {"status": "PASS_WITH_SCOPE_INHERITED", "scope": "S48 directly tested T-side prepublication failure, retained private burn marker and replay rejection. Online A/P0/P1 were not started; online DB state is NOT_RUN; memory zeroization not established."},
+    "NATURAL_BUSINESS_IO_FAILURE": {"status": "NOT_REPRODUCED_IN_S40_S48; NOT_RUN_IN_S49", "scope": "No new communication experiment."},
+    "BUILD_TEST": {"status": "NOT_RUN"},
+    "FORMAL_LAN_WAN": {"status": "NOT_RUN"},
+    "RTT": {"status": "NOT_MEASURED"},
+    "AAV86_COMPARISON": {"status": "NOT_RUN"},
+    "PERFORMANCE_READY": {"status": "NOT_READY"},
+    "SECURE_ALIAS_READY": {"status": "NOT_READY"},
+    "N_GT_1000": {"status": "NOT_ADMITTED"}
+  },
+  "review": {
+    "reviewer": "/root/s49_crypto_independent_review",
+    "independence": "Not an S49 proof author or co-deriver and not involved in S47/S48 implementation; prior scope was read-only S40-S42 reviews. Provided an independent S49 source first pass and a final-draft read-only review.",
+    "reviewed": ["ideal IID success conditioning", "δ_reject derivation", "S42-to-FTv3 H4 gap", "Qmax/Cmax", "statistical conditional-success lemma", "DRBG success conditioning", "TLS source scope", "abort boundary"],
+    "built": false,
+    "tested": false,
+    "modified_files": false,
+    "verdict": "CONDITIONAL_PASS for ideal semantic-material lemma; no complete security pass"
+  },
+  "execution": {
+    "runtime_fixes": 0,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices_repeated": false,
+    "performance": "NOT_RUN/NOT_MEASURED",
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "secure_alias_created": false
+  },
+  "prohibited_inferences": [
+    "Not BB90 original algorithm reproduction or BMW16 implementation",
+    "No complete GMW/Beaver-v3 security pass",
+    "No inference from S48 functionality to all N/K correctness or security",
+    "No inference from semantic δ_reject to full versioned package/signature transcript",
+    "No inference from local OpenSSL version/API or IID functional test to target deployment DRBG security",
+    "No LAN/WAN, RTT, AAV86, or formal performance claim",
+    "No assertion that online database rows were inspected during S48 issuance abort case"
+  ],
+  "source_evidence_manifest": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json"
+}

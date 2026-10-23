@@ -989,3 +989,11 @@ S48 从 S47 固定提交 `feb5e6677568d649906f46d0e611d5d52349c07f` 在隔离 wo
 最终 S48 E2E 二进制新跑 13 个多进程 oracle 案例：N=1000 的 K={1,8,500,999,1000} 五案、三个固定 seed/结构额外案、FTv3 N=1/128/256 smoke，以及 FTv1/v2 兼容 smoke。13/13 的 oracle、双方提交/各取本方 share 和重启取回通过，接收范围为 `PASS_WITH_SCOPE`，并非全矩阵。N=1000 资源、RSS、包和 frame 数据仅用于本机功能/资源诊断。
 
 达到 retry cap 的离线发行失败用例观察到未发布 package/context、未创建 escrow/party lease 路径、唯一 T 私有 burn marker 与重放拒绝；在线服务未启动，故在线 DB 行状态为 `NOT_RUN`。低概率合法输入 `ISSUANCE_ABORT` 的产品接受继续 `OPEN_CONFIRMATION`。DRBG 部署桥、认证私有信道和完整 GMW/Beaver party-view/Shuffle-output-escrow 组合均 OPEN；自然业务 I/O 错误 `NOT_REPRODUCED`；N>1000 未准入。正式 LAN/WAN、RTT、性能和 AAV86 对比未运行/测量，无 `secure` alias。路线保持 `Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL`，不是 BB90/BMW16 复现或完整安全通过。详见 [S48 decision](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_DECISION_2026-10-23.md)、[报告](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_REPORT_2026-10-23.md)、[gates](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_GATES_2026-10-23.json)、cases 和 source/build/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S49（2026-10-23）
+
+S49 固定 S48 commit `e05b01d5c7e3899297b76a5e0fca212d38d24229`，复算 S48 九项快照摘要，并在 S47 精确提交核对其 19 项增量 Git blob。理想 IID 字节 tape 下，FTv3 最多 7 次 Fisher–Yates 拒绝采样在成功条件下保持语义材料分布精确均匀；整体 cap abort 界 `δ_reject≤1023·2^-154<2^-144` 仅适用于语义材料投影。由非作者只读复核，未推出完整 package transcript 或真实 DRBG 安全。
+
+S42 H4 只覆盖 ideal F_T/v1、N≤256 和旧 message schedule。FTv3 使用显式 profile、v3 签名域、context format 2/receipt format 2 与批次/phase/frame schedule；对该新 schedule 的 `Kpre_3` transcript kernel 未闭合，N=257..1000 也超出 S42 已审输入范围。真实目标部署 DRBG/熵源生命周期、TLS 配置与优势仍 OPEN；单次 N=1000 Dealer 上界 `Qmax=88,786,404 B/Cmax=7,247 calls` 不证明联合流伪随机。低概率有效输入 `ISSUANCE_ABORT` 的产品接受继续 `OPEN_CONFIRMATION`。
+
+S49 没有 runtime 变更、构建、测试或性能测量；S48 的 13 个 N≤1000 功能用例作为原配置 `PASS_WITH_SCOPE` 继承，不重标为安全或正式性能。自然业务 I/O fault 为 `NOT_REPRODUCED`；N>1000 不准入；不创建 `secure` alias。详见 S49 decision、报告、gates 和 source/evidence manifest。
