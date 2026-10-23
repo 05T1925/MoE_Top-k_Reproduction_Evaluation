@@ -997,3 +997,9 @@ S49 固定 S48 commit `e05b01d5c7e3899297b76a5e0fca212d38d24229`，复算 S48 �
 S42 H4 只覆盖 ideal F_T/v1、N≤256 和旧 message schedule。FTv3 使用显式 profile、v3 签名域、context format 2/receipt format 2 与批次/phase/frame schedule；对该新 schedule 的 `Kpre_3` transcript kernel 未闭合，N=257..1000 也超出 S42 已审输入范围。真实目标部署 DRBG/熵源生命周期、TLS 配置与优势仍 OPEN；单次 N=1000 Dealer 上界 `Qmax=88,786,404 B/Cmax=7,247 calls` 不证明联合流伪随机。低概率有效输入 `ISSUANCE_ABORT` 的产品接受继续 `OPEN_CONFIRMATION`。
 
 S49 没有 runtime 变更、构建、测试或性能测量；S48 的 13 个 N≤1000 功能用例作为原配置 `PASS_WITH_SCOPE` 继承，不重标为安全或正式性能。自然业务 I/O fault 为 `NOT_REPRODUCED`；N>1000 不准入；不创建 `secure` alias。详见 S49 decision、报告、gates 和 source/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S50（2026-10-23）
+
+S50 从最新 `main` 创建隔离分支，并按 S47→S48→S49 提交链重建候选；S48 九项源/交付 canonical SHA-256 `e6dde491a1cf7696173a6690dcb65d6473b5f5b589702b84f013705eecd59e84` 及固定 Git blobs 已复核。S50 构造 N≤256 的 `Kpre_3`：以 S36 H4 package-conditioned 条件 sampler 和 S49 理想 IID FTv3 两方 semantic-material joint law 为基础，将旧抽象 transcript 确定性编码为 FTv3 wire view。FTv1/FTv3 联合材料律使用共同 `P_sem` 条件化，版本专属 profile 分开处理。最大 route AND layer 为 2,621,440 gates，低于 batch cap 4,193,824；在 S36/S42 记录的既有 `L_S29` 摘要下，layer/batch/count、phase/sequence/frame length 是公开调用元组及 active seed/outcome/endpoint/comparison-count/communication-length 的确定函数，没有扩大泄露。非作者复核已确认限定范围的 `KPRE_3_N_LE_256=PASS_WITH_SCOPE`；`S42_SUFFIX_TO_FTV3` 仍 OPEN。
+
+S50 只覆盖理想 IID FTv3、cap success、新鲜单次 package、一方静态半诚实、N≤256、无 I/O/进程故障的 GMW pre-escrow 成功转录；不自动迁移 S42 receipt/escrow suffix，完整 party-view、真实 RNG/DRBG、TLS、材料/签名桥和 shuffle/output/escrow composition 继续 OPEN。S48 的 13 个 N≤1000 用例仅作为 `PASS_WITH_SCOPE` 功能证据继承，本轮不重跑。BUILD/TEST=`NOT_RUN`；自然业务 I/O 沿用 `NOT_REPRODUCED`；性能/RTT未运行或测量；低概率 `ISSUANCE_ABORT` 接受仍 `OPEN_CONFIRMATION`。没有 runtime 改动，不修改 `VFSS-baseline/`，不创建 `secure` alias，不推送/合并。详见 S50 decision、报告、gates 和 source/evidence manifest。

@@ -1,0 +1,410 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s50-source-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S50",
+  "date": "2026-10-23",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "identity": {
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-s50-kpre3/MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s50",
+    "latest_main_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "S47": {
+      "commit": "feb5e6677568d649906f46d0e611d5d52349c07f",
+      "tree": "7c494b5cfcc67843410e683556a1792074d0ca1e"
+    },
+    "S48": {
+      "commit": "e05b01d5c7e3899297b76a5e0fca212d38d24229",
+      "tree": "14cc78cb20080dd11326d1f9beb69279872e4aaa"
+    },
+    "S49": {
+      "commit": "50bc223c19e24bdf052eacbd47be8df6a1d56d98",
+      "tree": "19f6febae92b8f95a15acf50c24002028723f7d0",
+      "parent": "e05b01d5c7e3899297b76a5e0fca212d38d24229"
+    },
+    "reconstruction": [
+      "main",
+      "S47",
+      "S48",
+      "S49"
+    ],
+    "initial_worktree_clean": true,
+    "S49_is_on_main": false,
+    "source_worktree_copied_from_desktop": false,
+    "delivery_commit": "recorded in final response; self-referential manifest excluded"
+  },
+  "provenance": {
+    "S48_manifest": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-23.json",
+      "file_count": 9,
+      "recomputed_canonical_sha256": "e6dde491a1cf7696173a6690dcb65d6473b5f5b589702b84f013705eecd59e84",
+      "commit_blob_match": "9/9"
+    },
+    "S49_snapshot": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json",
+      "file_count": 6,
+      "recomputed_canonical_sha256": "984d8f2dadec789d985f1d97ee7edb7920bc7ba1e3067c8cb75a8e39c3d60e00",
+      "commit_blob_match": "6/6"
+    },
+    "S29_source": "S29 original decision file is not in the S47-S49 fixed commit chain; use the reviewed S36 §3.3 / S42 §3 disclosure summary without expanding L_S29."
+  },
+  "canonical_delivery_snapshot": {
+    "file_count": 5,
+    "sha256": "c731a67bb60818515593ea51f6647b3b8c6ef9d5ff0454287634ebec71c58fb3",
+    "definition": "SHA-256 of ordinal path-sorted UTF-8 lines <path><TAB><raw_sha256><LF>; this S50 source/evidence manifest is excluded."
+  },
+  "source_files": [
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "raw_sha256": "cdb7b0679013fcd59a5855b9b3dfdf78f4f785719e073e0a8c79d68e764dc5c8",
+      "current_git_blob_sha1": "f91b978b3e62b4b7288d3c755163057c38a1d33c",
+      "s49_expected_git_blob_sha1": "f91b978b3e62b4b7288d3c755163057c38a1d33c",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+      "raw_sha256": "458a47fbdde4bf0ee9575a6b60b628d8750f0732bd51c1ed46239bc00090912f",
+      "current_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+      "s49_expected_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+      "raw_sha256": "6870cf9f1fb92cae8dcfaa385c7beb17effefab04afbc0e010f382565b3afc9f",
+      "current_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "s49_expected_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+      "raw_sha256": "c1be2e9b5880c299f56eca6da4d4a9319839b03fe960d183f73f3029bb2c6465",
+      "current_git_blob_sha1": "b779a7d36a14b7dcc993984f32b24b308e5e065d",
+      "s49_expected_git_blob_sha1": "b779a7d36a14b7dcc993984f32b24b308e5e065d",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/include/moe_topk/project_derived_select5.h",
+      "raw_sha256": "46d24cff6501342a9d9a4f0b91c12aacce75ab0212f6b6e3b48f091aee2a2092",
+      "current_git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+      "s49_expected_git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+      "raw_sha256": "b454d8975bb6f398440de601617aa0404e30bb75625fb2753b9e4d0c3200e0fd",
+      "current_git_blob_sha1": "fae75b3ba7007e0fd978a5a401c27cf440c163e3",
+      "s49_expected_git_blob_sha1": "fae75b3ba7007e0fd978a5a401c27cf440c163e3",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "raw_sha256": "64f9b2bc0940c4459c81291edc70dbb19a228a735995b8fcd4c4e96650ba276e",
+      "current_git_blob_sha1": "cab691d353b953fe5afecf7afa2b076c073b0596",
+      "s49_expected_git_blob_sha1": "cab691d353b953fe5afecf7afa2b076c073b0596",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "raw_sha256": "78ccc1db0b4b533f9c139f440581b81cc41bef2642721f7387847dbe80890d57",
+      "current_git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+      "s49_expected_git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/include/moe_topk/protocol_i_transport.h",
+      "raw_sha256": "bd86b8578dc50796134babdc89808486457d97dc0520c711518ef1404c4acbbf",
+      "current_git_blob_sha1": "dc60307c5afbdc937fa50ea105645968622c05f7",
+      "s49_expected_git_blob_sha1": "dc60307c5afbdc937fa50ea105645968622c05f7",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "raw_sha256": "7018044af8475e1fc87ca0aeb80538685bfafe304ded67642faad6195beeb5b4",
+      "current_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "s49_expected_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "runtime_source",
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "raw_sha256": "bc3a549ea028ca35e3196d26ada1a185c4420db3c39d956c37aa187847f930b0",
+      "current_git_blob_sha1": "506d23329bc9f78f528bce369fc98d8138fd21a2",
+      "s49_expected_git_blob_sha1": "506d23329bc9f78f528bce369fc98d8138fd21a2",
+      "matches_s49_blob": true
+    }
+  ],
+  "evidence_files": [
+    {
+      "kind": "fixed_evidence",
+      "path": "AGENTS.md",
+      "raw_sha256": "a260f872d0a9058fe9f0b2b94dc78c06272dcbba7c0d28488cccee7bf34897aa",
+      "current_git_blob_sha1": "da8e3e455b25b35a4d7d1b45c5996829a1d9753e",
+      "s49_expected_git_blob_sha1": "da8e3e455b25b35a4d7d1b45c5996829a1d9753e",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S36_DECISION_2026-10-21.md",
+      "raw_sha256": "95417a594ba48692e942ea58a840cc1128779cde5c4daae178a8306ebb75a852",
+      "current_git_blob_sha1": "2cc40a885f53c03587304c64fb34c48ff6cbd86a",
+      "s49_expected_git_blob_sha1": "2cc40a885f53c03587304c64fb34c48ff6cbd86a",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S36_REPORT_2026-10-21.md",
+      "raw_sha256": "766a2b70cf2b3b959daac6a84d1fade93061266aac074691f289567241bcc1f8",
+      "current_git_blob_sha1": "acb2e8870071d565f89e79b94c1c04dc4629bc28",
+      "s49_expected_git_blob_sha1": "acb2e8870071d565f89e79b94c1c04dc4629bc28",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S36_GATES_2026-10-21.json",
+      "raw_sha256": "43cae71bdf13609f15bd18f1c0008e555c4ecd76251bbb0e88a6d2c8df8223c2",
+      "current_git_blob_sha1": "f1c129d949c310dec686439db352aa31c53ee8e9",
+      "s49_expected_git_blob_sha1": "f1c129d949c310dec686439db352aa31c53ee8e9",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S36_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-21.json",
+      "raw_sha256": "fe2fb92a362022413756d8916d014150280f63138d0c8ca999b134dc0074e82e",
+      "current_git_blob_sha1": "7ff20f75b47d8f9c2a93e90e12277d9a7cc86767",
+      "s49_expected_git_blob_sha1": "7ff20f75b47d8f9c2a93e90e12277d9a7cc86767",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S42_DECISION_2026-10-22.md",
+      "raw_sha256": "5878475dc5f5ffeff363885630ea580b55f4c714d3ebf678d5743598011da84d",
+      "current_git_blob_sha1": "6c315a2e16f9fa73a2e71e4acdee1d6c4a5b55c0",
+      "s49_expected_git_blob_sha1": "6c315a2e16f9fa73a2e71e4acdee1d6c4a5b55c0",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S42_REPORT_2026-10-22.md",
+      "raw_sha256": "d0a8311ffee9a913a62d1ba1439179121b3f2482b74618b4b8ab00d3cfe47dbc",
+      "current_git_blob_sha1": "67de65d0dfd1f654251b6fe25c82f244501d43e7",
+      "s49_expected_git_blob_sha1": "67de65d0dfd1f654251b6fe25c82f244501d43e7",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S42_GATES_2026-10-22.json",
+      "raw_sha256": "63757ea2945f31bd83f27686f3f3512613dce5c6bb1b7ac0a64dce2c13864fe1",
+      "current_git_blob_sha1": "774d4b2d6e37226b0cbdc49a17a5a4629971fa59",
+      "s49_expected_git_blob_sha1": "774d4b2d6e37226b0cbdc49a17a5a4629971fa59",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S42_SOURCE_EVIDENCE_MANIFEST_2026-10-22.json",
+      "raw_sha256": "cf076566272b420c58509e585a0da255706c78713846d6b184be11788b4440bb",
+      "current_git_blob_sha1": "58e5cdef5c56a5db44a7e0eb31be45f0af728520",
+      "s49_expected_git_blob_sha1": "58e5cdef5c56a5db44a7e0eb31be45f0af728520",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_FT_V3_SPEC_2026-10-23.md",
+      "raw_sha256": "b79539dca684d1e321a95e7fd47ce8662476cb8b43ead17bdca59230bb6d6a0f",
+      "current_git_blob_sha1": "d4abd698279d680fd9b9b74e05bd58665bffc891",
+      "s49_expected_git_blob_sha1": "d4abd698279d680fd9b9b74e05bd58665bffc891",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_REPORT_2026-10-23.md",
+      "raw_sha256": "2e6e5b04fcc9e5c7c72e2f1a1cf4060007fbc84053cb70b9290a395a13d046de",
+      "current_git_blob_sha1": "7cbc7c01ddc0f0bdc3333bc26cc9449463838691",
+      "s49_expected_git_blob_sha1": "7cbc7c01ddc0f0bdc3333bc26cc9449463838691",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_GATES_2026-10-23.json",
+      "raw_sha256": "6658dd6d519f05de8ac5019b69b721f71f4938c94eb7488dcc07a425b02d0d2b",
+      "current_git_blob_sha1": "eef101d64db43618c2e9b543e2c9048d8fcba352",
+      "s49_expected_git_blob_sha1": "eef101d64db43618c2e9b543e2c9048d8fcba352",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-23.json",
+      "raw_sha256": "3e4be30fdbd0c0463b39ad1ec8dcd1893a096f7bc92d35c6f86b850a936480ef",
+      "current_git_blob_sha1": "6b73b2ab6f5f605f95c30066a509df9b7fc94848",
+      "s49_expected_git_blob_sha1": "6b73b2ab6f5f605f95c30066a509df9b7fc94848",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_DECISION_2026-10-23.md",
+      "raw_sha256": "551f26bd4ead6682be2e2f043ecd331608a05e46e5ab13aa4e16243e0f0f796c",
+      "current_git_blob_sha1": "c3bbf65b7e018f965826256ead786863ce362104",
+      "s49_expected_git_blob_sha1": "c3bbf65b7e018f965826256ead786863ce362104",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_REPORT_2026-10-23.md",
+      "raw_sha256": "12d2b95643ad99298f037117815f67e9c0c863f03cdecfa064d77b3851e2172e",
+      "current_git_blob_sha1": "2a7d10d8530db0024514acba71a4af2acf125e5a",
+      "s49_expected_git_blob_sha1": "2a7d10d8530db0024514acba71a4af2acf125e5a",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_GATES_2026-10-23.json",
+      "raw_sha256": "c7e41beee14f139418f59c1c5bdb21a09aa2688f90c76eb87c18c7d7c66046ef",
+      "current_git_blob_sha1": "6c232901602f74b67e16ab6c26d6c9bf2a40b4e1",
+      "s49_expected_git_blob_sha1": "6c232901602f74b67e16ab6c26d6c9bf2a40b4e1",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_CASES_2026-10-23.json",
+      "raw_sha256": "5534d3144a8979c648dc8ee968a869a3c119546ee47908f465a9806b4bfa3299",
+      "current_git_blob_sha1": "8f013f3467b59755017c3887decb44adf8937a2e",
+      "s49_expected_git_blob_sha1": "8f013f3467b59755017c3887decb44adf8937a2e",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-23.json",
+      "raw_sha256": "62e7cbf05ef7946232e4e322a6fe8e0a3d3927d2fe600fdf98899efd9aefc9f8",
+      "current_git_blob_sha1": "7c2d4f3776c19d4a4497fc505c0163d97aca6bf9",
+      "s49_expected_git_blob_sha1": "7c2d4f3776c19d4a4497fc505c0163d97aca6bf9",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_DECISION_2026-10-23.md",
+      "raw_sha256": "c3941d6c49bdbd3b9afec0d959846404e49633f8ed411271245564ab0e4b4c39",
+      "current_git_blob_sha1": "dd0d2bd76ced4812d568f646a48b5f2c2aafff4c",
+      "s49_expected_git_blob_sha1": "dd0d2bd76ced4812d568f646a48b5f2c2aafff4c",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_REPORT_2026-10-23.md",
+      "raw_sha256": "f98bd136cdfbf65f986309245ad73b74dae924cd25faddf1f3b65e7259b82bf4",
+      "current_git_blob_sha1": "bb2e3c1ff9fb1cfae77eec533be20ddeeb7b68d9",
+      "s49_expected_git_blob_sha1": "bb2e3c1ff9fb1cfae77eec533be20ddeeb7b68d9",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_GATES_2026-10-23.json",
+      "raw_sha256": "2298e1e0e73f568b295492e7708ee5799a7e8c5db5fa053c442b9b1fcdeecb63",
+      "current_git_blob_sha1": "e40460c5dd22c8bb7ebf073876b7387a8379b285",
+      "s49_expected_git_blob_sha1": "e40460c5dd22c8bb7ebf073876b7387a8379b285",
+      "matches_s49_blob": true
+    },
+    {
+      "kind": "fixed_evidence",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json",
+      "raw_sha256": "444fd86f7a0ec33f531030a38119b6c81aa12e7863b3ca4c45dc712b46f4747b",
+      "current_git_blob_sha1": "e892bceb9bd61ba87ea4c4b2b6265060b02dd63e",
+      "s49_expected_git_blob_sha1": "e892bceb9bd61ba87ea4c4b2b6265060b02dd63e",
+      "matches_s49_blob": true
+    }
+  ],
+  "S50_deliverables": [
+    {
+      "kind": "S50_deliverable",
+      "path": "PROJECT.md",
+      "raw_sha256": "2c366e9831d79b8da9c8f1e3bb335af3a390875cce1ccee1652f71a93f8d5755",
+      "current_git_blob_sha1": "64539b9695eb96fd4d6e7820845a54e4ad8306ee",
+      "s49_expected_git_blob_sha1": null,
+      "matches_s49_blob": null
+    },
+    {
+      "kind": "S50_deliverable",
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "raw_sha256": "ca77e0777303d3cf84642133589b6383cc99879ba7822e6f5f577040952b7df4",
+      "current_git_blob_sha1": "4908683d57b96f4e3c234603461483115169ac1e",
+      "s49_expected_git_blob_sha1": null,
+      "matches_s49_blob": null
+    },
+    {
+      "kind": "S50_deliverable",
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_DECISION_2026-10-23.md",
+      "raw_sha256": "749666384e8f4b96cb1a169d7a6cbf358823eba0b3b3ea03d89b7945bcdca660",
+      "current_git_blob_sha1": "4257d04fdd3d6c6bb50c3ec0dbf398e5de884007",
+      "s49_expected_git_blob_sha1": null,
+      "matches_s49_blob": null
+    },
+    {
+      "kind": "S50_deliverable",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_REPORT_2026-10-23.md",
+      "raw_sha256": "8c596bd1da95568e5dd25eb144470bb39f55d0a91e2c60beab55908eb7a2c26f",
+      "current_git_blob_sha1": "fdb98cb901225959e1c07e6382834f43c59ca0d2",
+      "s49_expected_git_blob_sha1": null,
+      "matches_s49_blob": null
+    },
+    {
+      "kind": "S50_deliverable",
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_GATES_2026-10-23.json",
+      "raw_sha256": "2f38658b8b9a448dd02af55f99cdd38c7e5ca0f2bed35c23fc200811ba606f4a",
+      "current_git_blob_sha1": "553acf21f6198ea86732a03257ade1f38497986f",
+      "s49_expected_git_blob_sha1": null,
+      "matches_s49_blob": null
+    }
+  ],
+  "proof": {
+    "scope": "Ideal IID FTv3 tape conditioned on cap_success; one fresh package; one static semi-honest party; no I/O/process fault; successful GMW pre-escrow transcript; 1<=K<=N<=256; output share formed.",
+    "Kpre3": "PASS_WITH_SCOPE after independent read-only review",
+    "new_field_leakage": "PASS_WITH_SCOPE; B3=f3(P3,L_S29) within stated scope; L_S29/L_A not changed",
+    "S42_escrow_suffix": "OPEN; not included in Kpre3",
+    "delta_reject": "<=1023*2^-154 < 2^-144 only for S49 semantic-material projection; not full signed package/transcript or deployed probability",
+    "real_DRBG": "OPEN",
+    "party_channel": "OPEN",
+    "complete_party_view": "OPEN",
+    "low_probability_issuance_abort_acceptance": "OPEN_CONFIRMATION"
+  },
+  "reviewer": {
+    "identity": "/root/s40_independent_receiver",
+    "prior_read_only_scope": [
+      "S42",
+      "S48"
+    ],
+    "not_involved_in_S47_S50_implementation_or_derivation": true,
+    "verdict": "PASS_WITH_SCOPE",
+    "reviewed": [
+      "P_sem parameter type correction and joint-to-conditional material kernel",
+      "P0/P1 H4 sampler",
+      "N<=256 layer/batch cap",
+      "phase/sequence/frame/payload/API counters mapped to existing L_S29",
+      "S49 delta scope",
+      "S42 suffix remains OPEN"
+    ],
+    "first_review_issue": "FTv1/FTv3 semantic laws had been conditioned on a single FTv3-specific P; report corrected to common P_sem and separate P1/P3 profiles, then reviewer confirmed.",
+    "built": false,
+    "tested": false,
+    "modified_files": false
+  },
+  "execution": {
+    "runtime_changed": false,
+    "test_source_changed": false,
+    "BUILD": "NOT_RUN",
+    "TEST": "NOT_RUN",
+    "historical_S35_S40_S46_S48_matrices": "NOT_REPEATED",
+    "natural_business_io": "NOT_REPRODUCED (inherited; no S50 communication run)",
+    "formal_LAN_WAN_RTT_AAV86_performance": "NOT_RUN_NOT_MEASURED",
+    "VFSS_baseline": "UNCHANGED",
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "secure_alias": "NOT_CREATED"
+  },
+  "manifest_self_hash": "Not self-referenced; use Git blob in containing delivery commit."
+}

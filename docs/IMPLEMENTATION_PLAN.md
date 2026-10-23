@@ -1296,3 +1296,9 @@ fresh Release default-OFF、FTv3 explicit opt-in TEST_ONLY/production builds、�
 ### S49：FTv3 条件材料律、H4 迁移与真实 DRBG 门（2026-10-23）
 
 固定 S48 commit `e05b01d5c7e3899297b76a5e0fca212d38d24229`。已由非作者复核理想 IID tape 下 FTv3 semantic-material success law 与 `δ_reject≤1023·2^-154`；界不适用于完整版本化签名 transcript。S42 H4 的 FTv1/N≤256/旧 schedule 证明不能直接移植：先定义适配 FTv3 的本方 `Kpre_3`，证明批次、phase、frame 和长度字段由公开参数与批准 `L_S29` 决定，之后才可讨论 N≤1000 扩展。目标 OpenSSL/provider/entropy/lifecycle 与 TLS 部署 profile 未提供，联合随机流/私有信道/完整 party-view 仍 OPEN。低概率发材 abort 接受仍待负责人确认。S49 BUILD/TEST=`NOT_RUN`；N≤1000 功能、自然 I/O、性能状态沿用 S48 原范围，不扩大。本阶段不启动 LAN/WAN、RTT 或 AAV86 比较。
+
+### S50：FTv3 N≤256 `Kpre_3` 条件模拟（2026-10-23）
+
+S50 依据 S49 固定 commit `50bc223c19e24bdf052eacbd47be8df6a1d56d98`，按 S47/S48/S49 精确链在最新 main 派生的隔离分支重建。基于 S49 ideal IID/cap-success 两方 semantic-material joint law，将 S36 package-conditioned H4 sampler 通过确定性 FTv3 framing 迁移到 N≤256。FTv1/FTv3 材料律使用共同 `P_sem` 条件化，并将版本专属 profile 分开处理。最大 route layer 2,621,440 gates，小于 4,193,824 cap；新增 layer/batch/count、phase/sequence/frame length 在已记录 `L_S29` 摘要下可由公开调用元组及活动 seed/outcome/edge/count/communication length 确定，因此未扩大泄露。非作者 reviewer 复核后 `KPRE_3_N_LE_256=PASS_WITH_SCOPE`，仅覆盖理想发行、cap成功、单方静态半诚实和无故障 pre-escrow GMW 转录；FTv3 escrow suffix 仍 OPEN。
+
+S42 的 FTv1 H4 gate opening、活动 outcome 条件填充、自适应 Select 和固定输出 share 续接可在上述条件下复用；FTv3 escrow receipt/fetch suffix、真实 F_T/Dealer/DRBG/party RNG、TLS、完整 party-view 与 shuffle/output/escrow 组合仍 OPEN。S48 13 个 N≤1000 功能案例只继承原 `PASS_WITH_SCOPE`；本轮 BUILD/TEST=`NOT_RUN`，自然业务 I/O 沿用 `NOT_REPRODUCED`，正式性能/RTT 未运行或测量。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`，不推送/合并、不建 `secure` alias。见 S50 decision/report/gates/source-evidence manifest。

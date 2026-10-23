@@ -1,0 +1,122 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s50-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S50",
+  "date": "2026-10-23",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall": "CONDITIONAL",
+  "baseline": {
+    "main_start_commit": "c3926c68fd14f270faa8b55234311071947fa080",
+    "S47_commit": "feb5e6677568d649906f46d0e611d5d52349c07f",
+    "S47_tree": "7c494b5cfcc67843410e683556a1792074d0ca1e",
+    "S48_commit": "e05b01d5c7e3899297b76a5e0fca212d38d24229",
+    "S48_tree": "14cc78cb20080dd11326d1f9beb69279872e4aaa",
+    "S49_commit": "50bc223c19e24bdf052eacbd47be8df6a1d56d98",
+    "S49_tree": "19f6febae92b8f95a15acf50c24002028723f7d0",
+    "branch": "codex/m6b-i-project-select5-s50",
+    "S49_is_on_main": false,
+    "reconstruction": ["main", "S47", "S48", "S49"],
+    "initial_worktree_clean": true,
+    "runtime_changed": false,
+    "VFSS_baseline_changed": false
+  },
+  "scope": {
+    "N": "1..256",
+    "K": "1..N",
+    "corruption": "one static semi-honest party",
+    "A_T": "conditionally trusted, non-colluding with corrupted party",
+    "preprocessing": "ideal F_T/v3 IID tape, conditioned on cap_success",
+    "execution": "successful GMW prefix, no I/O/process failure",
+    "prefix_end": "output share formed/refreshed before escrow submit",
+    "L_S29_expanded": false,
+    "L_A_expanded": false,
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "crash_abort_prefix": "OUT_OF_SCOPE",
+    "N_257_1000_proof": "NOT_IN_SCOPE"
+  },
+  "gates": {
+    "S49_S48_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fixed S49 tree and S48 manifest identity verified; S48 9-file canonical SHA256 recomputed as e6dde491a1cf7696173a6690dcb65d6473b5f5b589702b84f013705eecd59e84; 9/9 fixed commit blobs match."
+    },
+    "FTV3_IDEAL_SEMANTIC_JOINT_LAW": {
+      "status": "INHERITED_PASS_WITH_SCOPE",
+      "scope": "Ideal IID tape, cap_success, joint two-party semantic-material projection only; S49 δ does not bound full package/transcript."
+    },
+    "KPRE_3_N_LE_256": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Independently reviewed ideal-IID, cap_success, fresh-package, one static semi-honest party, successful pre-escrow GMW transcript for 1<=K<=N<=256; ends at own output share. Not a full security pass."
+    },
+    "P0_P1_CONDITIONAL_SYMMETRY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Independent reviewer checked party-indexed H4 Beaver formula, active comparison outcome fill, seed direction and output-share continuation for both parties within Kpre_3 scope."
+    },
+    "NEW_FIELD_L_S29_MAPPING": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Independent reviewer confirmed layer/batch/count/phase/sequence/frame length and API counters are deterministic functions of public invocation/profile plus S36/S42 recorded L_S29 for N<=256; openings and payload bits remain H4-sampled. No L expansion."
+    },
+    "N_LE_256_NO_SECRET_BATCH_SPLIT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "At m=256, maximum route layer m^2*W=2621440 < FTv3 cap 4193824; all other layer formulas are smaller."
+    },
+    "S42_H4_REUSE": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Only package-conditioned H4 openings, active outcomes/adaptive trace, and fixed ideal output-share prefix under S49 joint semantic law and the stated schedule mapping."
+    },
+    "S42_ESCROW_SUFFIX_TO_FTV3": {
+      "status": "OPEN",
+      "scope": "FTv3 context/package-set/A route and receipt/fetch suffix not re-proven in S50."
+    },
+    "FULL_PARTY_VIEW_COMPOSITION": {
+      "status": "OPEN",
+      "scope": "No full real F_T, RNG, TLS, encryption, escrow, or complete protocol composition theorem."
+    },
+    "DRBG_AND_PARTY_RNG_BRIDGE": {
+      "status": "OPEN",
+      "scope": "Target provider/entropy/lifecycle and whole ordered stream advantage unavailable."
+    },
+    "PRIVATE_CHANNEL_BRIDGE": {
+      "status": "OPEN",
+      "scope": "Deployment-matched TLS/authentication advantage not established."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new owner acceptance record; a separate concise question is included in the report."
+    },
+    "NATURAL_BUSINESS_IO_FAILURE": {
+      "status": "NOT_REPRODUCED",
+      "scope": "No communication run in S50; inherits S40/S48 status only."
+    },
+    "BUILD_TEST": {"status": "NOT_RUN"},
+    "FORMAL_LAN_WAN": {"status": "NOT_RUN"},
+    "RTT_PERFORMANCE_AAV86": {"status": "NOT_MEASURED_NOT_RUN"},
+    "SECURE_ALIAS_READY": {"status": "NOT_READY"},
+    "PUSH_MERGE": {"status": "NOT_PERFORMED"}
+  },
+  "review": {
+    "reviewer": "/root/s40_independent_receiver",
+    "prior_scope": "Read-only S42 and S48 reviews",
+    "not_involved_S47_S50_implementation_or_derivation": true,
+    "scope": ["Kpre_3 conditional laws", "P0/P1 symmetry", "new-field-to-L_S29 mapping", "S49 delta applicability", "scope wording"],
+    "built": false,
+    "tested": false,
+    "verdict": "PASS_WITH_SCOPE",
+    "notes": "Initial review found a type mismatch from conditioning FTv1 and FTv3 semantic laws on one FTv3-specific tuple. The report was revised to use common P_sem and separate P1/P3 profiles; reviewer confirmed the correction and the Kpre_3, P0/P1, and field-mapping conclusions. Escrow suffix remains OPEN."
+  },
+  "execution": {
+    "runtime_fixes": 0,
+    "runtime_or_test_code_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices_repeated": false,
+    "formal_performance": "NOT_RUN_NOT_MEASURED",
+    "VFSS_baseline_modified": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "secure_alias_created": false
+  },
+  "deliverables": {
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_REPORT_2026-10-23.md",
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_DECISION_2026-10-23.md",
+    "source_evidence_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json"
+  }
+}
