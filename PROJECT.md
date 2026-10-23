@@ -981,3 +981,11 @@ S47 从 S46 精确 commit `d48a41062ba2f86edbac3bcb3663692a641e95bd`（tree `3f7
 非作者 `/root/s45_non_author_review` 只读复核最终 retry 规格、概率、包/context 绑定和 TEST_ONLY 隔离，未构建/运行；reviewer 指出的测试 issuer 动态 retry 字段已统一为固定 7，并在最终二进制上重跑相关验证。低概率有效请求发材 `ISSUANCE_ABORT` 的产品接受仍 `OPEN_CONFIRMATION`。目标部署 DRBG/provider/熵源、联合随机流、私有信道、完整 party view 仍 OPEN；自然业务 I/O fault 沿用 `NOT_REPRODUCED`，本轮不重试。N>1000 未准入；正式 LAN/WAN、RTT、AAV86 对比与性能矩阵未运行/测量；不创建 `secure` alias。S46 的 S40 211 案和 S46 十案例仅作为其原配置的历史证据，不重标为 S47 结果。详见 [S47 decision](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_DECISION_2026-10-23.md)、报告、gates、cases 和 source/build/evidence manifest。
 
 - 低概率 `ISSUANCE_ABORT` 的 runtime 语义及“无 package/context/party lease”已在定向测试中通过；项目文件未找到负责人单独接受合法输入下预处理偶发中止的明确记录，因此产品级接受状态保留 `OPEN_CONFIRMATION`。该项不改在线输出合同。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S48（2026-10-23）
+
+S48 从 S47 固定提交 `feb5e6677568d649906f46d0e611d5d52349c07f` 在隔离 worktree 独立接收。S47 原 worktree 最终只读状态为 clean；S48 的构建和编辑仅在新 S48 worktree 进行，未写入原 worktree。19 项源码增量在接收前与 Git blob 身份逐项一致。S48 fresh Release default-OFF 与显式 FTv3 构建通过：OFF 无 v3/Select5 target 或符号，未 opt-in 头文件 probe 被拒；production archive 不含 TEST_ONLY 随机源 hook。
+
+最终 S48 E2E 二进制新跑 13 个多进程 oracle 案例：N=1000 的 K={1,8,500,999,1000} 五案、三个固定 seed/结构额外案、FTv3 N=1/128/256 smoke，以及 FTv1/v2 兼容 smoke。13/13 的 oracle、双方提交/各取本方 share 和重启取回通过，接收范围为 `PASS_WITH_SCOPE`，并非全矩阵。N=1000 资源、RSS、包和 frame 数据仅用于本机功能/资源诊断。
+
+达到 retry cap 的离线发行失败用例观察到未发布 package/context、未创建 escrow/party lease 路径、唯一 T 私有 burn marker 与重放拒绝；在线服务未启动，故在线 DB 行状态为 `NOT_RUN`。低概率合法输入 `ISSUANCE_ABORT` 的产品接受继续 `OPEN_CONFIRMATION`。DRBG 部署桥、认证私有信道和完整 GMW/Beaver party-view/Shuffle-output-escrow 组合均 OPEN；自然业务 I/O 错误 `NOT_REPRODUCED`；N>1000 未准入。正式 LAN/WAN、RTT、性能和 AAV86 对比未运行/测量，无 `secure` alias。路线保持 `Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL`，不是 BB90/BMW16 复现或完整安全通过。详见 [S48 decision](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_DECISION_2026-10-23.md)、[报告](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_REPORT_2026-10-23.md)、[gates](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_GATES_2026-10-23.json)、cases 和 source/build/evidence manifest。

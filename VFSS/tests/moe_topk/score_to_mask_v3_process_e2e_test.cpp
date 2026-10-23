@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <memory>
+#include <random>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -1475,7 +1476,8 @@ void run_communication_fault_case(const std::string& binary,
                                   const std::string& evidence_logs_root,
                                   const std::vector<std::int32_t>& scores = {7, 7, -3},
                                   std::uint32_t k = 2,
-                                  std::uint8_t receipt_format_version = 1) {
+                                  std::uint8_t receipt_format_version = 1,
+                                  std::uint32_t ft_version = 1) {
   const std::string name = communication_fault_name(fault);
   const auto directory = (std::filesystem::path(root) / name).string();
   std::filesystem::create_directory(directory);
@@ -1505,13 +1507,22 @@ void run_communication_fault_case(const std::string& binary,
   const auto p0_package = (std::filesystem::path(directory) / "p0.v3pkg").string();
   const auto p1_package = (std::filesystem::path(directory) / "p1.v3pkg").string();
   const auto context_path = (std::filesystem::path(directory) / "escrow.context").string();
+  const auto issuance_registry =
+      (std::filesystem::path(directory) / "dealer-issuance-registry").string();
+  std::vector<std::string> dealer_arguments = {"--dealer", session_path, p0_package,
+      p1_package, context_path, identities.dealer_private, "15000",
+      std::to_string(static_cast<unsigned>(receipt_format_version)),
+      std::to_string(ft_version)};
+  if (ft_version == 2 || ft_version == 3) {
+    std::filesystem::create_directory(issuance_registry);
+    if (::chmod(issuance_registry.c_str(), 0700) != 0)
+      throw std::runtime_error("frame trace issuance registry permissions failed");
+    dealer_arguments.push_back(issuance_registry);
+  }
   write_session_file(session_path, session);
   const auto dealer_stdout = (std::filesystem::path(logs) / "dealer.stdout").string();
   const auto dealer_stderr = (std::filesystem::path(logs) / "dealer.stderr").string();
-  ChildProcess dealer(exec_child(binary, {"--dealer", session_path, p0_package,
-      p1_package, context_path, identities.dealer_private, "15000",
-      std::to_string(static_cast<unsigned>(receipt_format_version)), "1"},
-      dealer_stdout, dealer_stderr));
+  ChildProcess dealer(exec_child(binary, dealer_arguments, dealer_stdout, dealer_stderr));
   const int dealer_status = dealer.wait();
   require(dealer_status == 0, "fault test T process failed");
   const auto info0 = score_to_mask_v3_validate_package(
@@ -1615,12 +1626,16 @@ void run_communication_fault_case(const std::string& binary,
           trace << "P0->proxy phase=" << static_cast<unsigned>(phase)
                 << " seq=" << (to_p0.received_frames() - 1U)
                 << " tag=" << static_cast<unsigned>(from_p0[7])
-                << " read=OK payload_bytes=" << from_p0.size() << '\n';
+                << " read=OK payload_bytes=" << from_p0.size()
+                << " protocol_header_bytes=56 protocol_frame_bytes="
+                << (from_p0.size() + 56U) << '\n';
           to_p1.send(from_p0);
           trace << "proxy->P1 phase=" << static_cast<unsigned>(phase)
                 << " seq=" << (to_p1.sent_frames() - 1U)
                 << " tag=" << static_cast<unsigned>(from_p0[7])
-                << " write=OK payload_bytes=" << from_p0.size() << '\n';
+                << " write=OK payload_bytes=" << from_p0.size()
+                << " protocol_header_bytes=56 protocol_frame_bytes="
+                << (from_p0.size() + 56U) << '\n';
           if (fault == CommunicationFault::kDuplicateReady && phase == 1) {
             to_p1.send(from_p0);
             trace << "INJECT duplicate inner READY phase=1 outer-seq="
@@ -1634,7 +1649,9 @@ void run_communication_fault_case(const std::string& binary,
           trace << "P1->proxy phase=" << static_cast<unsigned>(phase)
                 << " seq=" << (to_p1.received_frames() - 1U)
                 << " tag=" << static_cast<unsigned>(from_p1[7])
-                << " read=OK payload_bytes=" << from_p1.size() << '\n';
+                << " read=OK payload_bytes=" << from_p1.size()
+                << " protocol_header_bytes=56 protocol_frame_bytes="
+                << (from_p1.size() + 56U) << '\n';
           if (fault == CommunicationFault::kReadyMismatch && phase == 1 &&
               from_p1[7] == kReadyTag) {
             from_p1[kInnerBodyOffset] = 0;
@@ -1653,7 +1670,9 @@ void run_communication_fault_case(const std::string& binary,
           trace << "proxy->P0 phase=" << static_cast<unsigned>(phase)
                 << " seq=" << (to_p0.sent_frames() - 1U)
                 << " tag=" << static_cast<unsigned>(from_p1[7])
-                << " write=OK payload_bytes=" << from_p1.size() << '\n';
+                << " write=OK payload_bytes=" << from_p1.size()
+                << " protocol_header_bytes=56 protocol_frame_bytes="
+                << (from_p1.size() + 56U) << '\n';
           if ((fault == CommunicationFault::kReadyMismatch ||
                fault == CommunicationFault::kDuplicateReady) && phase == 1)
             break;
@@ -1747,6 +1766,14 @@ void run_communication_fault_case(const std::string& binary,
             "A stored escrow material before the communication fault resolved");
   }
 
+  std::string post_success_teardown_eof;
+  if (normal_path && p0_status == 0 && p1_status == 0 &&
+      transaction_count == 1 && share_count == 2 &&
+      proxy_error.find("unexpected eof while reading") != std::string::npos) {
+    post_success_teardown_eof = proxy_error;
+    proxy_error.clear();
+  }
+
   service.signal(SIGTERM);
   const int service_status = service.wait();
   require(service_status >= 128, "fault escrow service did not stop on SIGTERM");
@@ -1755,6 +1782,7 @@ void run_communication_fault_case(const std::string& binary,
                        std::ios::trunc);
   result << "{\"case\":\"" << name << "\",\"receipt_format_version\":"
          << static_cast<unsigned>(receipt_format_version)
+         << ",\"ft_version\":" << ft_version
          << ",\"N\":" << scores.size() << ",\"K\":" << k
          << ",\"scores\":[";
   for (std::size_t i = 0; i < scores.size(); ++i) {
@@ -1806,7 +1834,9 @@ void run_communication_fault_case(const std::string& binary,
          << ",\"p1_restore\":\""
          << (normal_path ? "committed; recovery path separately verified"
                          : "unavailable from A; no commit") << "\""
-         << ",\"proxy_exception\":\"" << proxy_error << "\"}\n";
+         << ",\"proxy_exception\":\"" << proxy_error
+         << "\",\"post_success_teardown_eof\":\""
+         << post_success_teardown_eof << "\"}\n";
   result.close();
   std::cout << (normal_path ? "S34_V3_NORMAL_PATH_TRACE "
                             : "S34_V3_COMMUNICATION_FAULT ") << name
@@ -1814,7 +1844,8 @@ void run_communication_fault_case(const std::string& binary,
             << " p1_exit=" << p1_status << " escrow_exit=" << service_status
             << " leases=burned A_rows=" << transaction_count << ',' << share_count
             << " p0_api=" << p0_api << " p1_api=" << p1_api
-            << " proxy_error=" << proxy_error << '\n';
+            << " proxy_error=" << proxy_error
+            << " post_success_teardown_eof=" << post_success_teardown_eof << '\n';
 }
 
 }  // namespace
@@ -1828,6 +1859,30 @@ int main(int argc, char** argv) {
     TempDirectory directory;
     const auto identities = create_test_identities(directory.path);
 #ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    if (argc > 1 && std::string(argv[1]) == "--s48-ft-v3-frame-trace") {
+      if (argc != 3)
+        throw std::runtime_error("--s48-ft-v3-frame-trace requires a trace directory");
+      std::vector<std::int32_t> scores(1000U);
+      for (std::uint32_t i = 0; i < scores.size(); ++i) {
+        switch (i % 10U) {
+          case 0: scores[i] = INT32_MAX; break;
+          case 1: scores[i] = INT32_MIN; break;
+          case 2: scores[i] = -1; break;
+          case 3: scores[i] = 0; break;
+          case 4: scores[i] = 17; break;
+          case 5: scores[i] = INT32_MAX; break;
+          case 6: scores[i] = -17; break;
+          case 7: scores[i] = 4096; break;
+          case 8: scores[i] = -4096; break;
+          default: scores[i] = 17; break;
+        }
+      }
+      std::filesystem::create_directories(argv[2]);
+      run_communication_fault_case(binary, directory.path, identities,
+          CommunicationFault::kNoFault, argv[2], scores, 500U,
+          kScoreToMaskV3ReceiptFormatV2, 3U);
+      return 0;
+    }
     if (argc > 1 && std::string(argv[1]) == "--ft-v3-n1000") {
       const auto make_scores = [](std::uint32_t n) {
         std::vector<std::int32_t> scores(n);
@@ -1873,6 +1928,45 @@ int main(int argc, char** argv) {
           "s47-legacy-ft-v2-n256-k128");
 #endif
       std::cout << "S47_FT_V3_TARGETED_CASES PASS cases=" << count << '\n';
+      return 0;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--s48-ft-v3-n1000-extra") {
+      const auto run = [&](std::vector<std::int32_t> scores, std::uint32_t k,
+                           const std::string& id) {
+        const auto case_dir = (std::filesystem::path(directory.path) / id).string();
+        std::filesystem::create_directory(case_dir);
+        run_one_e2e(binary, case_dir, identities, scores, k, false,
+                    false, false, kScoreToMaskV3ReceiptFormatV2, id, 3U);
+      };
+
+      std::mt19937 generator(0x48c0ffeeU);
+      std::vector<std::int32_t> seeded(1000U);
+      for (auto& score : seeded)
+        score = static_cast<std::int32_t>(generator() % 8193U) - 4096;
+      seeded[0] = INT32_MIN;
+      seeded[1] = INT32_MAX;
+      seeded[2] = INT32_MAX;
+      seeded[3] = INT32_MIN;
+      for (std::size_t i = 300; i < 420; ++i) seeded[i] = -17;
+      for (std::size_t i = 700; i < 820; ++i) seeded[i] = 17;
+      run(std::move(seeded), 500U, "s48-ft-v3-n1000-seed48c0ffee-k500");
+
+      std::vector<std::int32_t> interleaved(1000U);
+      for (std::uint32_t i = 0; i < interleaved.size(); ++i)
+        interleaved[i] = static_cast<std::int32_t>((i * 7919U) % 2001U) - 1000;
+      interleaved[0] = INT32_MAX;
+      interleaved[1] = INT32_MAX;
+      interleaved[998] = INT32_MIN;
+      interleaved[999] = INT32_MIN;
+      run(std::move(interleaved), 1U, "s48-ft-v3-n1000-interleaved-k1");
+
+      std::vector<std::int32_t> many_ties(1000U);
+      for (std::size_t i = 0; i < many_ties.size(); ++i)
+        many_ties[i] = (i % 2U == 0U) ? 42 : -17;
+      run(std::move(many_ties), 999U, "s48-ft-v3-n1000-many-ties-k999");
+
+      std::cout << "S48_FT_V3_N1000_EXTRA PASS cases=3 seed=0x48c0ffee "
+                   "K=1,500,999 fixtures=mixed-extremes/interleaved/many-ties\n";
       return 0;
     }
 #endif

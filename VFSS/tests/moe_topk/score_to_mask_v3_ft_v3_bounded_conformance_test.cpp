@@ -85,6 +85,7 @@ void write_bytes(const std::string& path, const std::vector<std::uint8_t>& bytes
   out.write(reinterpret_cast<const char*>(bytes.data()),
             static_cast<std::streamsize>(bytes.size()));
 }
+
 }  // namespace
 
 int main() {
@@ -209,12 +210,26 @@ int main() {
           wrong_receipt, public_key); },
           "F_T/v3 context accepted receipt/v1 mismatch");
 
-      const auto abort_registry = (std::filesystem::path(root) / "abort-registry").string();
+      const auto abort_root = (std::filesystem::path(root) / "abort-case").string();
+      std::filesystem::create_directory(abort_root);
+      ::chmod(abort_root.c_str(), 0700);
+      const auto abort_registry =
+          (std::filesystem::path(abort_root) / "registry").string();
       std::filesystem::create_directory(abort_registry); ::chmod(abort_registry.c_str(), 0700);
       auto abort_session = test_session(1000, 500);
-      const auto abort_p0 = (std::filesystem::path(root) / "abort-p0.pkg").string();
-      const auto abort_p1 = (std::filesystem::path(root) / "abort-p1.pkg").string();
-      const auto abort_context = (std::filesystem::path(root) / "abort.context").string();
+      const auto abort_p0 = (std::filesystem::path(abort_root) / "p0.pkg").string();
+      const auto abort_p1 = (std::filesystem::path(abort_root) / "p1.pkg").string();
+      const auto abort_context = (std::filesystem::path(abort_root) / "context.bin").string();
+      const auto abort_escrow_db =
+          (std::filesystem::path(abort_root) / "escrow.sqlite3").string();
+      const auto abort_p0_lease_dir =
+          (std::filesystem::path(abort_root) / "p0-leases").string();
+      const auto abort_p1_lease_dir =
+          (std::filesystem::path(abort_root) / "p1-leases").string();
+      const auto abort_p0_lease_db =
+          (std::filesystem::path(abort_p0_lease_dir) / "leases.sqlite3").string();
+      const auto abort_p1_lease_db =
+          (std::filesystem::path(abort_p1_lease_dir) / "leases.sqlite3").string();
       std::size_t bytes = 0, random_calls = 0, max_request = 0;
       bool aborted = false;
       try {
@@ -243,17 +258,38 @@ int main() {
                 "private burn marker missing or unreadable");
       }
       require(markers == 1, "ISSUANCE_ABORT must retain exactly one private burn marker");
+      const auto marker_path = std::filesystem::directory_iterator(abort_registry)->path().string();
+      const auto marker_bytes = read_bytes(marker_path);
+      require(!std::filesystem::exists(abort_escrow_db) &&
+                  !std::filesystem::exists(abort_p0_lease_dir) &&
+                  !std::filesystem::exists(abort_p1_lease_dir),
+              "offline ISSUANCE_ABORT unexpectedly created online-service state paths");
       bool replay_rejected = false;
+      bool replay_message_bound = false;
       try {
         test_only::score_to_mask_v3_dealer_issue_packages_ft_v3_with_test_random(
             abort_session, abort_p0, abort_p1, abort_context, private_key,
             abort_registry, state, &bytes, &random_calls, &max_request);
-      } catch (const std::exception&) { replay_rejected = true; }
+      } catch (const std::exception& e) {
+        replay_rejected = true;
+        replay_message_bound =
+            std::string(e.what()).find("already issued or burned") != std::string::npos;
+      }
       require(replay_rejected && !std::filesystem::exists(abort_p0) &&
-                  !std::filesystem::exists(abort_context),
+                  !std::filesystem::exists(abort_p1) &&
+                  !std::filesystem::exists(abort_context) && replay_message_bound &&
+                  read_bytes(marker_path) == marker_bytes &&
+                  !std::filesystem::exists(abort_escrow_db) &&
+                  !std::filesystem::exists(abort_p0_lease_dir) &&
+                  !std::filesystem::exists(abort_p1_lease_dir),
               "burned invocation was reused after sampler abort");
-      std::cout << "S47_FT_V3_BOUNDED_CONFORMANCE PASS gates=88626688 "
+      std::cout << "S48_FT_V3_BOUNDED_CONFORMANCE PASS gates=88626688 "
                    "Qmax=88786404 Cmax=7247 issuance_abort=PASS\n";
+      std::cout << "S48_ABORT_STATE escrow_db=NOT_CREATED"
+                << " p0_lease_db=NOT_CREATED p1_lease_db=NOT_CREATED"
+                << " online_services=NOT_STARTED"
+                << " package_files=0 context_files=0 burn_markers=" << markers
+                << " replay_rejected=true\n";
     } catch (...) { cleanup(); throw; }
     cleanup();
     return 0;

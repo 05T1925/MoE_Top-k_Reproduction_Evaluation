@@ -1,0 +1,508 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s48-source-build-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S48",
+  "date": "2026-10-23",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "classification": {
+    "project_derived": true,
+    "experimental": true,
+    "bb90_original_reproduction": false,
+    "bmw16_implementation": false,
+    "complete_security_pass": false,
+    "secure_alias_created": false,
+    "formal_performance_claim": false,
+    "v3_default": "OFF",
+    "N_gt_1000": "NOT_ADMITTED"
+  },
+  "identity": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-project-select5-s48\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s48",
+    "starting_commit": "feb5e6677568d649906f46d0e611d5d52349c07f",
+    "starting_tree": "7c494b5cfcc67843410e683556a1792074d0ca1e",
+    "parent_commit": "d48a41062ba2f86edbac3bcb3663692a641e95bd",
+    "initial_worktree_clean": true,
+    "S47_original_worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-i-project-select5-s47\\MoE_Top-k_Reproduction_Evaluation",
+    "S47_original_worktree_status": "clean; final read-only porcelain status empty",
+    "primary_worktree_modified": false,
+    "VFSS_baseline_modified": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "PR": "NOT_CREATED",
+    "final_commit": "reported after local commit; not self-referenced",
+    "S47_original_worktree_status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "primary_worktree_final_status_by_S48": "dirty; 24 status entries observed read-only; S48 did not write there",
+    "primary_worktree_status_entry_count": 24,
+    "primary_worktree_status_sha256": "7b06f08659aac081469b76505bb44a71c136567b34b2420efdb5688718af7ec9",
+    "primary_worktree_final_recheck": {
+      "status_entry_count": 24,
+      "status_sha256_utf8_lines_joined_lf_no_trailing_lf": "d84ff3f63e345b61076a6e8ca5bbd274471a208df30b55492612de6a39b069ca",
+      "difference_from_prior_read_only_snapshot": "Only the first porcelain status marker changed from 'M ' (staged modification) to ' M' (unstaged modification) for .agents/skills/protocol-reproduction/SKILL.md; all remaining entries match.",
+      "attribution": "Unknown; S48 executed no write operation in the primary worktree and did not attempt to restore or restage it."
+    },
+    "primary_worktree_status_lines": [
+      "M .agents/skills/protocol-reproduction/SKILL.md",
+      " M PROJECT.md",
+      " M docs/IMPLEMENTATION_PLAN.md",
+      " M docs/PAPERS.sha256",
+      " M docs/REFERENCE_MANIFEST.md",
+      "?? IDPF_IDCF_TopK_Experiment_Packag.rar",
+      "?? Protocol_I_AAV86_Core_Demo_2026-10-06.zip",
+      "?? VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp",
+      "?? docs/decisions/M6A_AAV86_ALGORITHM_AND_STABLE_ORDER_DECISION_2026-09-27.md",
+      "?? docs/decisions/M6A_PROTOCOL_I_AAV86_PREPROCESSING_AND_SECURITY_DESIGN_2026-09-28.md",
+      "?? docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_DECISION_2026-10-20.md",
+      "?? docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_DECISION_2026-10-20.md",
+      "?? docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_DECISION_2026-10-20.md",
+      "?? docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_GATES_2026-10-20.json",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_REPORT_2026-10-20.md",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-20.json",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_GATES_2026-10-20.json",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_REPORT_2026-10-20.md",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_GATES_2026-10-20.json",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_REPORT_2026-10-20.md",
+      "?? docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_SOURCE_TEST_EVIDENCE_MANIFEST_2026-10-20.json",
+      "?? siamjdiscrmath.pdf",
+      "?? \"\\357\\201\\234\""
+    ]
+  },
+  "S47_source_receipt": {
+    "manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-23.json",
+    "manifest_raw_sha256": "3e4be30fdbd0c0463b39ad1ec8dcd1893a096f7bc92d35c6f86b850a936480ef",
+    "baseline_commit": "feb5e6677568d649906f46d0e611d5d52349c07f",
+    "baseline_tree": "7c494b5cfcc67843410e683556a1792074d0ca1e",
+    "baseline_parent": "d48a41062ba2f86edbac3bcb3663692a641e95bd",
+    "recorded_source_delta_file_count": 19,
+    "recorded_canonical_sha256": "5e70ff463f6e8593604fef320953e0df59ab2762bae1b39fb32c8a7fb1f70f7c",
+    "canonical_definition": "SHA-256 of sorted UTF-8 lines <path><TAB><raw_sha256><LF> from S47 manifest source_snapshot.source_delta",
+    "recomputed_canonical_matches": true,
+    "git_blob_matches_before_S48_edits": "19/19, recorded during initial receipt before editing tests",
+    "current_matches_after_S48_edits": 14,
+    "current_mismatches_due_to_S48_changes": [
+      "docs/IMPLEMENTATION_PLAN.md",
+      "docs/REFERENCE_MANIFEST.md",
+      "PROJECT.md",
+      "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_bounded_conformance_test.cpp",
+      "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp"
+    ],
+    "current_blob_comparison": [
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_DECISION_2026-10-23.md",
+        "expected_git_blob_sha1": "be03ae70b0213315fb7cb8500e06ff7a25bf2cde",
+        "current_git_blob_sha1": "be03ae70b0213315fb7cb8500e06ff7a25bf2cde",
+        "matches_current": true
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "expected_git_blob_sha1": "623db38954d74fdf2899483dc205e454a7ef2481",
+        "current_git_blob_sha1": "9ae5c5e17fc07dc2afe16e75e9356ad5c1201e55",
+        "matches_current": false
+      },
+      {
+        "path": "docs/REFERENCE_MANIFEST.md",
+        "expected_git_blob_sha1": "03028f4bddd550cdc275e51e2cceacd1a6a8b34c",
+        "current_git_blob_sha1": "c3262b66a84309886bce5eca523635f8890a1052",
+        "matches_current": false
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_CASES_2026-10-23.json",
+        "expected_git_blob_sha1": "7e16866c29a424ff77271c6795c5dd1a6e874a3d",
+        "current_git_blob_sha1": "7e16866c29a424ff77271c6795c5dd1a6e874a3d",
+        "matches_current": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_FT_V3_SPEC_2026-10-23.md",
+        "expected_git_blob_sha1": "d4abd698279d680fd9b9b74e05bd58665bffc891",
+        "current_git_blob_sha1": "d4abd698279d680fd9b9b74e05bd58665bffc891",
+        "matches_current": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_GATES_2026-10-23.json",
+        "expected_git_blob_sha1": "eef101d64db43618c2e9b543e2c9048d8fcba352",
+        "current_git_blob_sha1": "eef101d64db43618c2e9b543e2c9048d8fcba352",
+        "matches_current": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S47_REPORT_2026-10-23.md",
+        "expected_git_blob_sha1": "7cbc7c01ddc0f0bdc3333bc26cc9449463838691",
+        "current_git_blob_sha1": "7cbc7c01ddc0f0bdc3333bc26cc9449463838691",
+        "matches_current": true
+      },
+      {
+        "path": "PROJECT.md",
+        "expected_git_blob_sha1": "deba48f4665c4aab6636ebc3662755721cd8cada",
+        "current_git_blob_sha1": "a146e6b65d2abb708aefd85ab9b5f83661b3dc5b",
+        "matches_current": false
+      },
+      {
+        "path": "VFSS/CMakeLists.txt",
+        "expected_git_blob_sha1": "16bd97d1ddc6ee8d62644200c1e21fb309a5178e",
+        "current_git_blob_sha1": "16bd97d1ddc6ee8d62644200c1e21fb309a5178e",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/project_derived_select5.h",
+        "expected_git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+        "current_git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+        "expected_git_blob_sha1": "f91b978b3e62b4b7288d3c755163057c38a1d33c",
+        "current_git_blob_sha1": "f91b978b3e62b4b7288d3c755163057c38a1d33c",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+        "expected_git_blob_sha1": "fae75b3ba7007e0fd978a5a401c27cf440c163e3",
+        "current_git_blob_sha1": "fae75b3ba7007e0fd978a5a401c27cf440c163e3",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+        "expected_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+        "current_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+        "expected_git_blob_sha1": "506d23329bc9f78f528bce369fc98d8138fd21a2",
+        "current_git_blob_sha1": "506d23329bc9f78f528bce369fc98d8138fd21a2",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+        "expected_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+        "current_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+        "expected_git_blob_sha1": "b779a7d36a14b7dcc993984f32b24b308e5e065d",
+        "current_git_blob_sha1": "b779a7d36a14b7dcc993984f32b24b308e5e065d",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_bounded_conformance_test.cpp",
+        "expected_git_blob_sha1": "b47337fbf915b76123f6476a904364aabf25048d",
+        "current_git_blob_sha1": "1def918034733af88f538cde352c87f6c62e61f6",
+        "matches_current": false
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_test_support.h",
+        "expected_git_blob_sha1": "f2e6c6d01b8d609691cf9ce91a7bd560cbfd2248",
+        "current_git_blob_sha1": "f2e6c6d01b8d609691cf9ce91a7bd560cbfd2248",
+        "matches_current": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "expected_git_blob_sha1": "a873de945f05cd9a3c76a2685e39a15db8b8324e",
+        "current_git_blob_sha1": "889cbe342c54c842201b22bccfcc3f3ccc6bcaab",
+        "matches_current": false
+      }
+    ],
+    "checkout_line_endings": "At S48 receipt 19/19 S47 source-delta Git blobs matched. Five added S47 document raw hashes differed from recorded raw bytes due Windows checkout newline conversion, while Git blob identities matched. At final audit, five entries differ because S48 modified two TEST_ONLY sources and PROJECT/IMPLEMENTATION_PLAN/REFERENCE_MANIFEST; the remaining 14 still match."
+  },
+  "S48_source_snapshot": {
+    "file_count": 9,
+    "canonical_raw_sha256": "e6dde491a1cf7696173a6690dcb65d6473b5f5b589702b84f013705eecd59e84",
+    "canonical_definition": "SHA-256 of sorted UTF-8 lines <path><TAB><raw_sha256><LF> over the nine S48 changed source/delivery files; the source/build/evidence manifest itself is excluded to avoid self-reference.",
+    "files": [
+      {
+        "path": "PROJECT.md",
+        "status": "modified",
+        "raw_sha256": "4a9fce830b3d88256abe7229df89c2d032fa3d1a564f605efeb1850c760715ad",
+        "git_blob_sha1": "a146e6b65d2abb708aefd85ab9b5f83661b3dc5b",
+        "baseline_git_blob_sha1": "deba48f4665c4aab6636ebc3662755721cd8cada"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_bounded_conformance_test.cpp",
+        "status": "modified",
+        "raw_sha256": "08536fe1d73dc880f21b7a28e2c3220ae5aaa31f3a31a91ddd4758ee38f4dd53",
+        "git_blob_sha1": "1def918034733af88f538cde352c87f6c62e61f6",
+        "baseline_git_blob_sha1": "b47337fbf915b76123f6476a904364aabf25048d"
+      },
+      {
+        "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+        "status": "modified",
+        "raw_sha256": "bb7f35589c35fcc5f2e4e73f664b175c82b873048f12b7751aae1ad6a8b8d5f1",
+        "git_blob_sha1": "889cbe342c54c842201b22bccfcc3f3ccc6bcaab",
+        "baseline_git_blob_sha1": "a873de945f05cd9a3c76a2685e39a15db8b8324e"
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "status": "modified",
+        "raw_sha256": "179dd29d9fe61b15a70a7575cfe5e6322276b65a64687eb230523e47c1fc1ee8",
+        "git_blob_sha1": "9ae5c5e17fc07dc2afe16e75e9356ad5c1201e55",
+        "baseline_git_blob_sha1": "623db38954d74fdf2899483dc205e454a7ef2481"
+      },
+      {
+        "path": "docs/REFERENCE_MANIFEST.md",
+        "status": "modified",
+        "raw_sha256": "053b6e18787a8888de92d3bf709c1d82c2a291963bf57b2f41c5bc6296771961",
+        "git_blob_sha1": "c3262b66a84309886bce5eca523635f8890a1052",
+        "baseline_git_blob_sha1": "03028f4bddd550cdc275e51e2cceacd1a6a8b34c"
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_DECISION_2026-10-23.md",
+        "status": "added",
+        "raw_sha256": "25687c2716079c80565972802d9773680df35a16af7c2726f74e8965b7429c64",
+        "git_blob_sha1": "c3bbf65b7e018f965826256ead786863ce362104",
+        "baseline_git_blob_sha1": null
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_CASES_2026-10-23.json",
+        "status": "added",
+        "raw_sha256": "5534d3144a8979c648dc8ee968a869a3c119546ee47908f465a9806b4bfa3299",
+        "git_blob_sha1": "8f013f3467b59755017c3887decb44adf8937a2e",
+        "baseline_git_blob_sha1": null
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_GATES_2026-10-23.json",
+        "status": "added",
+        "raw_sha256": "65c4455edc6d87a4d9ad4bdf45569ddfb95ef766a62ac55e6a195093c9614ac3",
+        "git_blob_sha1": "6c232901602f74b67e16ab6c26d6c9bf2a40b4e1",
+        "baseline_git_blob_sha1": null
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_REPORT_2026-10-23.md",
+        "status": "added",
+      "raw_sha256": "4147d64255eb14a01f3eb3c585729c1edda7e257140bc268c6dc6b947aeeab2c",
+      "git_blob_sha1": "2a7d10d8530db0024514acba71a4af2acf125e5a",
+        "baseline_git_blob_sha1": null
+      }
+    ],
+    "runtime_source_changed": false,
+    "CMake_changed": false,
+    "TEST_ONLY_sources_changed": true
+  },
+  "build_environment": {
+    "host": "WSL2 Ubuntu 24.04",
+    "kernel": "6.6.87.2-microsoft-standard-WSL2",
+    "cmake": "3.28.3",
+    "ninja": "1.11.1",
+    "gcc": "13.3.0",
+    "openssl": "3.0.13",
+    "deployment_profile_inferred_from_host": false,
+    "resource_preflight": {
+      "vcpus": 32,
+      "ram_total_bytes": 8122372096,
+      "ram_available_before_bytes": 7502974976,
+      "ram_available_after_bytes": 7464984576,
+      "swap_bytes": 2147483648,
+      "tmp_available_before_bytes": 983679049728,
+      "tmp_available_after_bytes": 982413516800
+    }
+  },
+  "builds_and_runs": [
+    {
+      "name": "Fresh Release default-OFF configure/build",
+      "command": "cmake -S /mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s48/MoE_Top-k_Reproduction_Evaluation/VFSS -B /tmp/m6b-s48-default-off -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL=OFF; cmake --build /tmp/m6b-s48-default-off --target sytorch --parallel 2",
+      "exit": 0,
+      "artifact": "/tmp/m6b-s48-default-off/libsytorch.a",
+      "artifact_sha256": "7691eae29478bbb2fa7462aff6690558b81ee73de3dd70b4d4e9eb30e7610127"
+    },
+    {
+      "name": "Fresh Release explicit FTv3 production configure/build",
+      "command": "cmake -S /mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s48/MoE_Top-k_Reproduction_Evaluation/VFSS -B /tmp/m6b-s48-ftv3-prod -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=OFF -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL=ON; cmake --build /tmp/m6b-s48-ftv3-prod --target sytorch --parallel 2",
+      "exit": 0,
+      "artifact": "/tmp/m6b-s48-ftv3-prod/libsytorch.a",
+      "artifact_sha256": "76b999f7bc5400da9c72f1c35eaaa44cb46cef6a8d4f32b5ea27407a6e2d76e1"
+    },
+    {
+      "name": "Fresh Release TEST_ONLY configure/build",
+      "command": "cmake -S /mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s48/MoE_Top-k_Reproduction_Evaluation/VFSS -B /tmp/m6b-s48-ftv3-test -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL=ON; cmake --build /tmp/m6b-s48-ftv3-test --parallel 2 --target moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test moe_topk_score_to_mask_v3_runtime_conformance_test moe_topk_score_to_mask_v3_ft_v3_process_e2e_test",
+      "exit": 0,
+      "artifact": "/tmp/m6b-s48-ftv3-test/libsytorch.a",
+      "artifact_sha256": "fb6c6d5fe5321441af2f7779ab73fe68700fab3dffa33842bb7b0c056dc8b8c0"
+    },
+    {
+      "name": "Default-OFF target/symbol/header/API checks",
+      "command": "ninja -C /tmp/m6b-s48-default-off -t targets all; nm -g --defined-only /tmp/m6b-s48-default-off/libsytorch.a; compile standalone score_to_mask_v3 header probe without opt-in",
+      "exit": 0,
+      "result": "0 FTv3/Select5 targets; 0 matching symbols; header probe rejected with opt-in diagnostic",
+      "header_probe_log_sha256": "a0636b7f0ade34e7da9bea9d803cffb50c6a13af47f5f1228f3ce8b70242441b"
+    },
+    {
+      "name": "Expected configure negative: FTv3/receipt without GMW",
+      "command": "cmake configure with FTv3=ON, receipt/v2=ON, GMW=OFF",
+      "exit": "expected nonzero",
+      "result": "Rejected: Receipt/v2 requires MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON",
+      "log_sha256": "e633f01fb97cf8e62c41f22acfae66546b8d82bc08b5bd5d513566b9f8ad554c"
+    },
+    {
+      "name": "Expected configure negative: FTv3 without receipt/v2",
+      "command": "cmake configure with GMW=ON, FTv3=ON, receipt/v2=OFF",
+      "exit": "expected nonzero",
+      "result": "Rejected: F_T/v3 requires GMW/v3 and receipt/v2 opt-ins",
+      "log_sha256": "f70ca5ef97b772589856af78f2d53150932dbd6a057a2a08b0503be17c07f6ae"
+    },
+    {
+      "name": "Bounded sampler and issuance abort conformance",
+      "command": "/tmp/m6b-s48-ftv3-test/moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test",
+      "exit": 0,
+      "binary_sha256": "fd2d51990bc0bf5c024574cb0c3c58ac6073eda7dd955e8abad4d0fc0ed496db",
+      "stdout_sha256": "e2fb5be6d90c596bc7080fbe3f7fa66cc33caa4740bf641323b2093a6d3eb445",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "Runtime conformance",
+      "command": "/tmp/m6b-s48-ftv3-test/moe_topk_score_to_mask_v3_runtime_conformance_test",
+      "exit": 0,
+      "binary_sha256": "5dac078ce3f6634009f79b3510e84fb6026072b188bdcd73a35228557731b660",
+      "stdout_sha256": "cd41c271a4beae7385febf5fcc2b11deb1f0cccd4e7e70f93b86e8b2b2032bfda"
+    },
+    {
+      "name": "S47 fixed targeted cases replayed on S48 binary",
+      "command": "/tmp/m6b-s48-ftv3-test/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "binary_sha256": "bc29468dadfd344985c6f2138cdd4a7242578da7aed5a4ad63023a2083de0060",
+      "stdout_sha256": "b5cb6ef359118e3161b0b281cefeb1094566422b36b2b12c5286d34ba1f7467a",
+      "cases": 10
+    },
+    {
+      "name": "S48 extra fixed seed/structured cases",
+      "command": "/tmp/m6b-s48-ftv3-test/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s48-ft-v3-n1000-extra",
+      "exit": 0,
+      "binary_sha256": "bc29468dadfd344985c6f2138cdd4a7242578da7aed5a4ad63023a2083de0060",
+      "stdout_sha256": "4a8379b46ae241b9c69e53a377623b9662527477a2d5d939c9c545e3bb894666",
+      "cases": 3
+    },
+    {
+      "name": "No-injection normal multiprocess frame trace",
+      "command": "/tmp/m6b-s48-ftv3-test/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s48-ft-v3-frame-trace /tmp/m6b-s48-final-frame-trace",
+      "exit": 0,
+      "binary_sha256": "bc29468dadfd344985c6f2138cdd4a7242578da7aed5a4ad63023a2083de0060",
+      "stdout_sha256": "b50b5bfcba5638bce6b9a21141e9e25f67c2851d33606ea6ece3106b8b09265f",
+      "trace_rows": 424,
+      "trace_sha256": "70dd7c3965ec5ea803c427eec44447a498b7d317dedfdc672a6698a5e62278c7"
+    }
+  ],
+  "independent_receiver": {
+    "identity": "/root/s40_independent_receiver",
+    "prior_scope": "S40-S42 read-only reviews only",
+    "not_involved_in_S47_or_S48": true,
+    "independent_builds": [
+      {
+        "name": "bounded conformance",
+        "sha256": "726258065bbad1a6818ad83881efa9d137a9530307168d1febb044bfcd9ccf5d",
+        "exit": 0
+      },
+      {
+        "name": "process E2E",
+        "sha256": "21a6cb4aefddb4ee71b1d29e78ece8b6e408f0098906aa9e38bb64330ed1774e",
+        "exit": 0
+      }
+    ],
+    "ran": [
+      "bounded conformance",
+      "FTv3 N=1000 specified cases 5",
+      "FTv3 N=1/128/256 smoke 3",
+      "S48 extra cases 3",
+      "normal no-injection frame trace"
+    ],
+    "did_not_run": [
+      "runtime conformance",
+      "FTv1/v2 compatibility smoke",
+      "complete default-OFF build (configured and inspected target graph only)"
+    ],
+    "reviewed_abort_scope": "Correctly limited to Dealer pre-publication failure; online services were not started.",
+    "failed_attempts": [
+      "Initial reviewer build could not configure because SQLite development headers were missing; reviewer used a temporary /tmp header package and the existing system libsqlite3.so.0, without installing packages or modifying the repository.",
+      "One PowerShell quoting attempt failed before the command launched; reviewer reran through a here-string."
+    ],
+    "scope_clarification": "Reviewer built and ran FTv3 test targets; default-OFF configuration was configured and target graph inspected but not fully built by reviewer. The primary executor built the default-OFF sytorch target."
+  },
+  "cases_file": {
+    "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_CASES_2026-10-23.json",
+    "raw_sha256": "5534d3144a8979c648dc8ee968a869a3c119546ee47908f465a9806b4bfa3299",
+    "case_count": 13,
+    "case_result": "13/13 PASS with scoped oracle/commit/recovery checks"
+  },
+  "resource_and_frame": {
+    "padded_m": 1024,
+    "gate_count": 88626688,
+    "package_payload_per_party_bytes": 33366080,
+    "signed_header_metadata_per_party_bytes": 436,
+    "package_per_party_bytes": 33366516,
+    "both_packages_bytes": 66733032,
+    "max_payload_bytes": 1048572,
+    "outer_protocol_header_bytes": 56,
+    "max_protocol_frame_pre_tls_bytes": 1048628,
+    "payload_cap_bytes": 1048576,
+    "max_payload_slack_bytes": 4,
+    "max_p0_peak_rss_kib": 986228,
+    "max_p1_peak_rss_kib": 986236,
+    "max_aggregate_party_peak_rss_kib": 1972464,
+    "max_case_directory_bytes": 66794349,
+    "max_normal_trace_directory_bytes": 66826470,
+    "phase_observation": "96-106; trace parties each 106; not algorithm iteration count or RTT",
+    "random_request_bound": {
+      "Qmax_bytes": 88786404,
+      "Cmax_calls": 7247,
+      "max_single_request_bytes": 1048576,
+      "delta_reject": "<=1023*2^-154 < 2^-144 < 2^-128",
+      "scope": "ideal IID random tape semantic-material projection only; no full signed transcript or real DRBG conclusion"
+    }
+  },
+  "abort_boundary": {
+    "result": "PASS_WITH_SCOPE",
+    "scope": "Dealer-side prepublication only; one private burn marker persisted, same invocation replay refused; no package/context and service DB/lease paths created. Online A/P0/P1 not started, so online DB row state NOT_RUN. No claim about memory zeroization, cross-database rollback, or crash durability.",
+    "failure_attempts": [
+      "Initial test draft seeded empty SQLite files and asserted zero rows; assertion removed because it did not observe service behavior. Final test checks actual issuance output paths and explicitly records services NOT_STARTED."
+    ],
+    "direct_test_assertions": [
+      "No package/context files published",
+      "No escrow SQLite DB or P0/P1 lease paths created",
+      "Exactly one private burn marker retained",
+      "Same invocation replay rejected with already-issued-or-burned result and marker unchanged",
+      "A/P0/P1 not started; online DB row state NOT_RUN"
+    ]
+  },
+  "limitations": {
+    "low_probability_issuance_abort_acceptance": "OPEN_CONFIRMATION",
+    "DRBG_DEPLOYMENT_PROFILE": "OPEN",
+    "JOINT_RNG_STREAM_BRIDGE": "OPEN",
+    "PRIVATE_CHANNEL_BRIDGE": "OPEN",
+    "PARTY_VIEW_COMPOSITION": "OPEN",
+    "SHUFFLE_OUTPUT_ESCROW_COMPOSITION": "OPEN",
+    "N_GT_1000": "NOT_ADMITTED",
+    "natural_business_io_fault": "NOT_REPRODUCED",
+    "formal_LAN_WAN": "NOT_RUN",
+    "RTT": "NOT_MEASURED",
+    "AAV86": "NOT_RUN",
+    "formal_performance": "NOT_MEASURED",
+    "online_db_abort_rows": "NOT_RUN",
+    "S35_195": "NOT_REPEATED",
+    "S40_211": "NOT_REPEATED",
+    "S46_10": "NOT_REPEATED"
+  },
+  "failures_and_corrections": [
+    "Initial PowerShell nested command expanded $SRC; corrected to fixed WSL source path.",
+    "Initial broad default-OFF all-target build stopped at 65/180 by choice; sytorch target build succeeded.",
+    "A wrapper did not propagate pipeline exit status; direct output redirection and direct return-code capture used.",
+    "Initial proxy trace EOF after phase success was reclassified as post-success teardown only when P0/P1 exited 0 and A was COMMITTED with two rows.",
+    "Initial abort test zero-row assertion against pre-created empty databases was removed; final evidence only claims pre-publication path absence.",
+    "Expected OFF header rejection and missing-opt-in configure failures are expected negative controls, not implementation failures."
+  ],
+  "evidence_artifacts_external_to_repo": {
+    "builds_and_raw_logs": "/tmp/m6b-s48-* and /tmp/s32-v3-process-*; not committed",
+    "main_e2e_stdout_sha256": "b5cb6ef359118e3161b0b281cefeb1094566422b36b2b12c5286d34ba1f7467a",
+    "extra_e2e_stdout_sha256": "4a8379b46ae241b9c69e53a377623b9662527477a2d5d939c9c545e3bb894666",
+    "frame_trace_stdout_sha256": "b50b5bfcba5638bce6b9a21141e9e25f67c2851d33606ea6ece3106b8b09265f",
+    "bounded_abort_stdout_sha256": "e2fb5be6d90c596bc7080fbe3f7fa66cc33caa4740bf641323b2093a6d3eb445",
+    "runtime_stdout_sha256": "cd41c271a4beae7385febf5fcc2b11deb1f0cccd4e7e70f93b86e8b2b2032bfda",
+    "policy": "No keys, material packages, certificates, binaries or raw large logs committed."
+  },
+  "manifest_self_hash": "Not self-referenced; final committed Git blob hash is the immutable manifest identity.",
+  "final_worktree_diff_checks": "PASS: git diff --check and git diff --cached --check; exact staged scope is ten expected S48 files; all three JSON files parse; nine non-self manifest file raw hashes/Git blobs and canonical recomputation match; VFSS-baseline diff empty.",
+  "push": "NOT_PERFORMED",
+  "merge": "NOT_PERFORMED",
+  "retry_cap_source_mapping": {
+    "public_constant": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h: kScoreToMaskV3FtV3MaxRetryLimit=7",
+    "production_entry": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp: score_to_mask_v3_dealer_issue_packages_ft_v3_bounded uses the constant in PackageProfile",
+    "test_only_entry": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp: score_to_mask_v3_dealer_issue_packages_ft_v3_with_test_random uses the same constant in PackageProfile",
+    "package_context_validation": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp validates retry cap against the same constant and minimum required retry count",
+    "conformance": "VFSS/tests/moe_topk/score_to_mask_v3_ft_v3_bounded_conformance_test.cpp forces cap exhaustion using TEST_ONLY byte source; retry count remains seven"
+  }
+}
