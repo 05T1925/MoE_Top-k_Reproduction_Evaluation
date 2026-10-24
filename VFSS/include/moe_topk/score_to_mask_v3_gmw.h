@@ -16,6 +16,7 @@
 namespace moe_topk {
 
 inline constexpr std::uint32_t kScoreToMaskV3ProtocolVersion = 3;
+inline constexpr std::uint32_t kScoreToMaskV3PartyApiVersion = 2;
 inline constexpr std::uint32_t kScoreToMaskV3PackageFormatVersion = 4;
 inline constexpr std::uint32_t kScoreToMaskV3EscrowContextFormatVersion = 1;
 inline constexpr std::uint8_t kScoreToMaskV3ReceiptFormatV1 = 1;
@@ -146,8 +147,8 @@ struct ScoreToMaskV3PartyInput {
 };
 
 struct ScoreToMaskV3PartyOutput {
-  // A transport failure may race with A's durable commit. In that case the
-  // caller has no API-visible share and must recover/query by transaction id.
+  // An ambiguous submit or failed committed fetch yields no API-visible
+  // share; the caller retains the transaction id for recipient-only recovery.
   enum class State { kAborted, kRecoveryRequired, kCommitted } state = State::kAborted;
   std::vector<std::uint8_t> local_mask_share;
   std::string transaction_id;
@@ -190,6 +191,8 @@ struct ScoreToMaskV3EscrowFetchedRecord {
 using ScoreToMaskV3EscrowSubmitter = std::function<std::string(
     const std::string& transaction_id, std::uint8_t party,
     const std::vector<std::uint8_t>& recipient_ciphertext)>;
+using ScoreToMaskV3EscrowFetcher = std::function<ScoreToMaskV3EscrowFetchedRecord(
+    const std::string& transaction_id, std::uint8_t party)>;
 
 ScoreToMaskV3GateBudget score_to_mask_v3_gate_budget(std::uint32_t n);
 #ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
@@ -268,11 +271,12 @@ std::array<std::uint8_t, 32> score_to_mask_v3_public_key_sha256(
     const std::string& public_key_pem);
 
 // Execute the fixed v3 GMW circuit over an already authenticated,
-// session-bound Protocol I framed channel. The callback must submit only the
-// recipient ciphertext to escrow and return only after A's durable atomic
-// F_TOPK-ATOMIC commit receipt. The local share remains internal until then;
-// a lost/invalid receipt yields kRecoveryRequired, never a false ABORT.
-ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
+// session-bound Protocol I framed channel. On success, the callbacks submit
+// and then fetch only this party's recipient ciphertext. The API releases the
+// share only after the fetched receipt matches the commit receipt and the
+// fetched envelope decrypts to the locally computed share. An ambiguous
+// submit/fetch result yields kRecoveryRequired, never a false ABORT.
+ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party_v2(
     const std::string& package_path,
     const std::string& dealer_ed25519_public_key_pem,
     const ScoreToMaskV3Session& expected_session,
@@ -282,7 +286,9 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     std::uint64_t peak_memory_cap_bytes,
     ProtocolIFramedChannel& peer_channel,
     const std::string& own_recipient_rsa_public_key_pem,
-    const ScoreToMaskV3EscrowSubmitter& escrow_submitter);
+    const std::string& own_recipient_rsa_private_key_pem,
+    const ScoreToMaskV3EscrowSubmitter& escrow_submitter,
+    const ScoreToMaskV3EscrowFetcher& escrow_fetcher);
 
 std::array<std::uint8_t, 32> score_to_mask_v3_certificate_sha256(
     const std::string& certificate_pem);

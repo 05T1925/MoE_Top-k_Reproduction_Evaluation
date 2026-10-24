@@ -1,0 +1,226 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s51-cases/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S51",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "source_commit": "ff77b9694a1259c3f314f145e06fcb980cda0bfb",
+  "binary": {
+    "path": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test",
+    "sha256": "48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c",
+    "build_type": "Release",
+    "environment": "WSL2 Ubuntu 20.04; GCC 9.4.0; CMake 3.31.6; Unix Makefiles; OpenSSL 1.1.1f; SQLite runtime 3.31.1 with dev package 3.31.1-4ubuntu0.7 unpacked outside repository",
+    "configuration": {
+      "MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL": true,
+      "MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL": true,
+      "MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL": true,
+      "MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL": false,
+      "BUILD_TESTING": true,
+      "test_only_rng_or_fault_hooks": "compiled in this TEST_ONLY test target only"
+    }
+  },
+  "cases": [
+    {
+      "case_id": "S51-FTV3-RV2-N128-K64-SUCCESS",
+      "kind": "normal_success_path",
+      "command": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-fetch-success",
+      "exit_code": 0,
+      "parameters": {
+        "N": 128,
+        "K": 64,
+        "padded_N": 128,
+        "ft_version": 3,
+        "receipt_format_version": 2,
+        "score_pattern": "i mod 8 selects INT32_MAX, INT32_MIN, -17, 17, 0, INT32_MAX, -1, 4096",
+        "oracle": "frozen C++ stable Top-K oracle; signed Q20.12 descending, original index ascending"
+      },
+      "process_exit_codes": {
+        "dealer": 0,
+        "P0": 0,
+        "P1": 0,
+        "escrow_service": 143,
+        "restarted_escrow_service": 143
+      },
+      "observed": {
+        "party_api": "BOTH_COMMITTED",
+        "both_apis_fetch_before_return": true,
+        "shares_reconstruct_to_oracle": true,
+        "mask_length": 128,
+        "selected_bits": 64,
+        "restart_recipient_fetch": "PASS; same persisted token and recipient-only shares",
+        "peer_exchange_phases": 88,
+        "max_application_payload_bytes": 159860,
+        "context_format": 2,
+        "package_format": 6,
+        "failure_injection": false
+      },
+      "classification": "PASS_WITH_SCOPE; functional/API contract evidence only; payload/phase values are not performance or RTT results"
+    },
+    {
+      "case_id": "S51-FTV3-RV2-N128-K64-INJECTED-P0-FETCH-FAILURE",
+      "kind": "injected_post_commit_fetch_failure_and_recovery",
+      "command": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-fetch-failure",
+      "exit_code": 0,
+      "parameters": {
+        "N": 128,
+        "K": 64,
+        "padded_N": 128,
+        "ft_version": 3,
+        "receipt_format_version": 2,
+        "score_pattern": "same fixed boundary/tie pattern as success case",
+        "oracle": "frozen C++ stable Top-K oracle"
+      },
+      "process_exit_codes": {
+        "dealer": 0,
+        "P0": 11,
+        "P1": 0,
+        "escrow_service": 143,
+        "restarted_escrow_service": 143
+      },
+      "injection": {
+        "location": "P0 TEST_ONLY fetch callback after authenticated submit returned COMMITTED receipt",
+        "mechanism": "callback throws before issuing fetch request",
+        "natural_io_failure": false
+      },
+      "observed": {
+        "P0_api_state": "kRecoveryRequired",
+        "P0_status": "COMMITTED_FETCH_REQUIRED",
+        "P0_share_returned": false,
+        "P0_transaction_and_receipt_retained": true,
+        "P1_api_state": "kCommitted",
+        "P1_share_returned": true,
+        "service_restart_recipient_fetch": "PASS for P0 and P1",
+        "same_receipt_reused": true,
+        "recovered_shares_reconstruct_to_oracle": true,
+        "mask_length": 128,
+        "selected_bits": 64
+      },
+      "classification": "PASS_WITH_SCOPE for injected recovery behavior; not evidence of natural protocol I/O failure or crash-prefix privacy"
+    },
+    {
+      "case_id": "S51-FTV3-RV2-N128-K64-INJECTED-NONSTD-P0-FETCH-EXCEPTION",
+      "kind": "injected_post_commit_non_standard_fetch_exception_and_recovery",
+      "command": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-fetch-nonstd-failure",
+      "exit_code": 0,
+      "parameters": {
+        "N": 128,
+        "K": 64,
+        "ft_version": 3,
+        "receipt_format_version": 2,
+        "injected_exception": "integer 23 thrown by P0 TEST_ONLY fetch callback after COMMITTED response"
+      },
+      "process_exit_codes": {
+        "dealer": 0,
+        "P0": 11,
+        "P1": 0,
+        "escrow_service": 143,
+        "restarted_escrow_service": 143
+      },
+      "observed": {
+        "P0_status": "COMMITTED_FETCH_REQUIRED",
+        "P0_share_returned": false,
+        "transaction_and_receipt_retained": true,
+        "P1_state": "kCommitted",
+        "post_restart_fetch_and_token_reuse": "PASS",
+        "shares_reconstruct_to_oracle": true,
+        "selected_bits": 64,
+        "max_application_payload_bytes": 159860
+      },
+      "classification": "PASS_WITH_SCOPE for non-standard callback exception recovery; injected condition, not natural I/O failure"
+    },
+    {
+      "case_id": "S51-FTV3-RV2-N128-K64-INJECTED-NONSTD-P0-SUBMIT-EXCEPTION",
+      "kind": "injected_post_commit_non_standard_submit_exception_and_recovery",
+      "command": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-submit-nonstd-failure",
+      "exit_code": 0,
+      "parameters": {
+        "N": 128,
+        "K": 64,
+        "ft_version": 3,
+        "receipt_format_version": 2,
+        "injected_exception": "integer 17 thrown by P0 TEST_ONLY submit callback after A committed"
+      },
+      "process_exit_codes": {
+        "dealer": 0,
+        "P0": 11,
+        "P1": 0,
+        "escrow_service": 143,
+        "restarted_escrow_service": 143
+      },
+      "observed": {
+        "P0_status": "COMMIT_STATUS_UNKNOWN",
+        "P0_share_returned": false,
+        "P0_receipt_returned": false,
+        "P1_state": "kCommitted",
+        "post_restart_fetch_recovers_both_shares": "PASS",
+        "shares_reconstruct_to_oracle": true,
+        "selected_bits": 64,
+        "max_application_payload_bytes": 159860
+      },
+      "classification": "PASS_WITH_SCOPE for unknown-commit recovery mapping; injected condition, not natural I/O failure"
+    }
+  ],
+  "build_attempts": [
+    {
+      "attempt": 1,
+      "result": "NOT_BUILT",
+      "reason": "fresh configure pointed at system /usr/include, where SQLite3 development headers were absent"
+    },
+    {
+      "attempt": 2,
+      "result": "CONFIGURED",
+      "reason": "SQLite3 development package 3.31.1-4ubuntu0.7 unpacked to external s51-env; linker symlink pointed to system SQLite runtime"
+    },
+    {
+      "attempt": 3,
+      "result": "BUILD_FAILED",
+      "reason": "Ubuntu 20.04 OpenSSL 1.1.1f compile exposed EVP_PKEY_get_size use although the declared minimum is 1.1.1; changed to EVP_PKEY_size"
+    },
+    {
+      "attempt": 4,
+      "result": "PASS",
+      "reason": "fresh Release configure and targeted build succeeded after the cross-version EVP_PKEY_size correction"
+    }
+  ],
+  "not_run": [
+    "S48 13-case inherited N<=1000 matrix",
+    "S40 211-case matrix",
+    "S35 195-case matrix",
+    "full FTv3 conformance/oracle matrix",
+    "N=1000 resource diagnostic",
+    "default-OFF fresh build (inherited S48 evidence only)",
+    "natural business I/O failure reproduction",
+    "formal LAN/WAN, RTT, AAV86, or performance matrix",
+    "external caller source/ABI compatibility for renamed score_to_mask_v3_execute_party_v2 entrypoint"
+  ],
+  "runtime_findings": [
+    {
+      "finding": "Non-std exceptions from the new v2 submit/fetch callbacks escaped recovery-state handling",
+      "reproduction": "Before fix, same TEST_ONLY submit callback throw 17 after A COMMITTED produced P0=134/P1=0 and E2E exit 1 (pre-fix binary b85d121594d9070162f2226785e08048ada3a40137eef74e07ad0617c6ca8d48); final binary maps to COMMIT_STATUS_UNKNOWN and recovery (SHA-256 48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c).",
+      "fix": "catch-all at submit/fetch boundaries; preserve COMMIT_STATUS_UNKNOWN or COMMITTED_FETCH_REQUIRED without returning a share",
+      "validation": "two dedicated process E2Es and post-restart recovery"
+    },
+    {
+      "finding": "OpenSSL 1.1.1 minimum-version build compatibility (not a protocol runtime semantic defect)",
+      "reproduction": "Fresh compile failed on OpenSSL 1.1.1f at EVP_PKEY_get_size; after using EVP_PKEY_size, fresh Release target built successfully.",
+      "fix": "Use EVP_PKEY_size",
+      "validation": "Fresh Release target built with OpenSSL 1.1.1f; no cryptographic claim."
+    }
+  ],
+  "pre_fix_reproduction": {
+    "source_state": "S51 callback boundaries temporarily restored to catch(const std::exception&); this contrast was not retained as source state",
+    "command": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-submit-nonstd-failure",
+    "configuration": "same Release target and TEST_ONLY injected submit callback as final case",
+    "binary_sha256": "b85d121594d9070162f2226785e08048ada3a40137eef74e07ad0617c6ca8d48",
+    "build_exit_code": 0,
+    "test_exit_code": 1,
+    "observed_output": "S32_V3_PROCESS_E2E_FAIL party E2E failed: P0=134 P1=0",
+    "interpretation": "A commit had completed before the callback threw integer 17; the non-standard exception escaped the std::exception-only boundary and terminated P0 before COMMIT_STATUS_UNKNOWN recovery mapping.",
+    "natural_io_failure": false,
+    "final_fix_contrast": {
+      "binary_sha256": "48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c",
+      "command": "/mnt/c/Users/28641/.codex/worktrees/m6b-i-project-select5-s51-review/s51-env/build-ftv3/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-submit-nonstd-failure",
+      "test_exit_code": 0,
+      "observed_state": "P0_COMMIT_RECOVERY_REQUIRED_P1_COMMITTED",
+      "post_restart_fetch_and_oracle": "PASS"
+    }
+  }
+}

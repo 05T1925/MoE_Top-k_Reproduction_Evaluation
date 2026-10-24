@@ -752,7 +752,7 @@ std::vector<std::uint8_t> decrypt_ciphertext(
       EVP_PKEY_CTX_set_rsa_mgf1_md(rsa_ctx.get(), EVP_sha256()) <= 0)
     fail("v3 recipient RSA-OAEP initialization failed");
   std::vector<std::uint8_t> aes_key_buffer(
-      static_cast<std::size_t>(EVP_PKEY_get_size(key.get())));
+      static_cast<std::size_t>(EVP_PKEY_size(key.get())));
   std::size_t aes_key_size = aes_key_buffer.size();
   if (EVP_PKEY_decrypt(rsa_ctx.get(), aes_key_buffer.data(), &aes_key_size,
       envelope.data() + at, encrypted_key_size) <= 0 || aes_key_size != 32)

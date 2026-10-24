@@ -447,10 +447,16 @@ ProcessOutput read_process_output(const std::string& path) {
   output.transaction.resize(count);
   in.read(output.transaction.data(), count);
   count = read_u32(in);
+  const bool committed_fetch_recovery =
+      output.state == static_cast<std::uint8_t>(
+          ScoreToMaskV3PartyOutput::State::kRecoveryRequired) &&
+      output.status_code == "COMMITTED_FETCH_REQUIRED";
   if ((output.state == static_cast<std::uint8_t>(
            ScoreToMaskV3PartyOutput::State::kCommitted) && count != 64) ||
+      (committed_fetch_recovery && count != 64) ||
       (output.state != static_cast<std::uint8_t>(
-           ScoreToMaskV3PartyOutput::State::kCommitted) && count != 0))
+           ScoreToMaskV3PartyOutput::State::kCommitted) &&
+       !committed_fetch_recovery && count != 0))
     throw std::runtime_error("commit receipt length mismatch");
   output.receipt.resize(count);
   in.read(output.receipt.data(), count);
@@ -862,6 +868,13 @@ int party_worker(int argc, char** argv) {
       std::string(argv[16]) == "drop-receipt-after-commit";
   const bool fail_before_submit =
       std::string(argv[16]) == "p1-fail-before-submit";
+  const bool fail_fetch_after_commit =
+      std::string(argv[17]) == "fail-fetch-after-commit";
+  const bool throw_nonstd_fetch_after_commit =
+      std::string(argv[17]) == "throw-nonstd-fetch-after-commit";
+  const bool throw_nonstd_submit_after_commit =
+      std::string(argv[16]) == "throw-nonstd-submit-after-commit";
+  const auto recipient_private = std::string(argv[19]);
   const auto& peer_name = party == 0 ? "p1" : "p0";
   auto info = score_to_mask_v3_validate_package(package_path, dealer_public,
                                                 session, party);
@@ -884,7 +897,16 @@ int party_worker(int argc, char** argv) {
           escrow, info, recipient, transaction, cipher);
       if (drop_receipt_after_commit && party == 0)
         throw std::runtime_error("TEST_ONLY lost receipt after durable commit");
+      if (throw_nonstd_submit_after_commit && party == 0) throw 17;
       return receipt;
+    };
+    const auto fetcher = [&](const std::string& transaction,
+                             std::uint8_t recipient) {
+      if (fail_fetch_after_commit && party == 0)
+        throw std::runtime_error("TEST_ONLY P0 fetch failed after commit");
+      if (throw_nonstd_fetch_after_commit && party == 0) throw 23;
+      return score_to_mask_v3_escrow_fetch(
+          escrow, info, recipient, transaction);
     };
 #ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
     const auto party_memory_cap = info.ft_version == kScoreToMaskV3FtVersionV3
@@ -893,9 +915,9 @@ int party_worker(int argc, char** argv) {
 #else
     const auto party_memory_cap = 256ULL * 1024ULL * 1024ULL;
 #endif
-    output = score_to_mask_v3_execute_party(package_path, dealer_public,
+    output = score_to_mask_v3_execute_party_v2(package_path, dealer_public,
         session, {input}, party, lease_dir, party_memory_cap,
-        channel, recipient_public, submitter);
+        channel, recipient_public, recipient_private, submitter, fetcher);
   }
   protocol_i_tls13_context_free(tls_context);
   write_process_output(output_path, output);
@@ -988,7 +1010,10 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                  bool timeout_precommit = false,
                  std::uint8_t receipt_format_version = 1,
                  const std::string& case_id = "unspecified",
-                 std::uint32_t ft_version = 1) {
+                 std::uint32_t ft_version = 1,
+                 bool fail_fetch_after_commit = false,
+                 bool throw_nonstd_submit_after_commit = false,
+                 bool throw_nonstd_fetch_after_commit = false) {
   if (std::getenv("S35_TRACE_CASES") != nullptr)
     std::cerr << "S35_CASE_START dir=" << directory << " n=" << scores.size()
               << " k=" << k << " lost_receipt=" << lose_receipt_p0
@@ -1093,8 +1118,14 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       session_path, p0_input, lease0, identities.p0_recipient.public_key,
       identities.ca_certificate, identities.p0_tls.certificate,
       identities.p0_tls.private_key, std::to_string(port0), p0_output,
-      lose_receipt_p0 ? "drop-receipt-after-commit" : "reserved",
-      "reserved", "reserved", "reserved"}, p0_stdout, p0_stderr));
+      lose_receipt_p0 ? "drop-receipt-after-commit"
+          : (throw_nonstd_submit_after_commit
+              ? "throw-nonstd-submit-after-commit" : "reserved"),
+      fail_fetch_after_commit ? "fail-fetch-after-commit"
+          : (throw_nonstd_fetch_after_commit
+              ? "throw-nonstd-fetch-after-commit" : "reserved"),
+      "reserved", identities.p0_recipient.private_key},
+      p0_stdout, p0_stderr));
   ::close(channels[0]);
   channels[0] = -1;
   ChildProcess p1_process(exec_child(binary, {"--party", "1", std::to_string(channels[1]),
@@ -1104,7 +1135,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       std::to_string(port1), p1_output,
       (fail_p1_before_submit || timeout_precommit)
           ? "p1-fail-before-submit" : "reserved",
-      "reserved", "reserved", "reserved"}, p1_stdout, p1_stderr));
+      "reserved", "reserved", identities.p1_recipient.private_key},
+      p1_stdout, p1_stderr));
   ::close(channels[1]);
   channels[1] = -1;
   long p0_rss_kib = 0;
@@ -1125,19 +1157,43 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     p0_status = p0_process.wait(&p0_rss_kib);
     p1_status = p1_process.wait(&p1_rss_kib);
   }
-  if (p0_status != (lose_receipt_p0 || fail_p1_before_submit || timeout_precommit ? 11 : 0) ||
+  if (p0_status != (lose_receipt_p0 || fail_fetch_after_commit ||
+                    throw_nonstd_submit_after_commit ||
+                    throw_nonstd_fetch_after_commit ||
+                    fail_p1_before_submit || timeout_precommit ? 11 : 0) ||
       p1_status != (fail_p1_before_submit || timeout_precommit ? 11 : 0)) {
     throw std::runtime_error("party E2E failed: P0=" + std::to_string(p0_status) +
                              " P1=" + std::to_string(p1_status));
   }
   auto output0 = read_process_output(p0_output);
   auto output1 = read_process_output(p1_output);
-  if (lose_receipt_p0 || fail_p1_before_submit || timeout_precommit) {
+  if (lose_receipt_p0 || fail_fetch_after_commit ||
+      throw_nonstd_submit_after_commit || throw_nonstd_fetch_after_commit ||
+      fail_p1_before_submit || timeout_precommit) {
     require(output0.state == static_cast<std::uint8_t>(
                 ScoreToMaskV3PartyOutput::State::kRecoveryRequired) &&
-                output0.status_code == "COMMIT_STATUS_UNKNOWN" &&
                 output0.share.empty(),
-            "lost receipt did not yield no-share recovery-required state");
+            "post-submit failure did not yield no-share recovery-required state");
+    if (lose_receipt_p0) {
+      require(output0.status_code == "COMMIT_STATUS_UNKNOWN" &&
+                  output0.receipt.empty(),
+              "lost receipt did not preserve unknown-commit recovery state");
+    }
+    if (fail_fetch_after_commit) {
+      require(output0.status_code == "COMMITTED_FETCH_REQUIRED" &&
+                  output0.receipt.size() == 64,
+              "post-commit fetch failure did not preserve committed recovery data");
+    }
+    if (throw_nonstd_submit_after_commit) {
+      require(output0.status_code == "COMMIT_STATUS_UNKNOWN" &&
+                  output0.receipt.empty(),
+              "non-standard submit exception did not preserve unknown-commit state");
+    }
+    if (throw_nonstd_fetch_after_commit) {
+      require(output0.status_code == "COMMITTED_FETCH_REQUIRED" &&
+                  output0.receipt.size() == 64,
+              "non-standard fetch exception did not preserve committed recovery data");
+    }
     if (fail_p1_before_submit || timeout_precommit) {
       require(output1.state == static_cast<std::uint8_t>(
                   ScoreToMaskV3PartyOutput::State::kRecoveryRequired) &&
@@ -1159,12 +1215,14 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   }
   require(output0.transaction == output1.transaction,
           "parties received different escrow transaction ids");
-  if (!lose_receipt_p0 && !fail_p1_before_submit)
+  if (!lose_receipt_p0 && !throw_nonstd_submit_after_commit &&
+      !fail_p1_before_submit && !timeout_precommit)
     require(output0.receipt == output1.receipt,
             "parties received different durable escrow commit receipts");
   if (receipt_format_version == 2 &&
       !fail_p1_before_submit && !timeout_precommit) {
-    const auto& delivered_token = lose_receipt_p0 ? output1.receipt : output0.receipt;
+    const auto& delivered_token = (lose_receipt_p0 ||
+        throw_nonstd_submit_after_commit) ? output1.receipt : output0.receipt;
     require(delivered_token.size() == 64 &&
                 std::all_of(delivered_token.begin(), delivered_token.end(),
                     [](char c) { return (c >= '0' && c <= '9') ||
@@ -1180,7 +1238,10 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
               output0.max_payload_received <= kScoreToMaskV3MaxGateBatchFrameBytes &&
               output1.max_payload_received <= kScoreToMaskV3MaxGateBatchFrameBytes,
           "observed v3 frame exceeds S31 one-MiB limit");
-  require(((lose_receipt_p0 || fail_p1_before_submit || timeout_precommit) ? output0.share.empty()
+  require(((lose_receipt_p0 || fail_fetch_after_commit ||
+            throw_nonstd_submit_after_commit ||
+            throw_nonstd_fetch_after_commit ||
+            fail_p1_before_submit || timeout_precommit) ? output0.share.empty()
                             : output0.share.size() == scores.size()) &&
               ((fail_p1_before_submit || timeout_precommit) ? output1.share.empty()
                                      : output1.share.size() == scores.size()),
@@ -1189,7 +1250,9 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   std::transform(scores.begin(), scores.end(), raw_scores.begin(),
       [](std::int32_t value) { return static_cast<std::uint32_t>(value); });
   const auto oracle = top_k_mask(raw_scores, k);
-  if (!lose_receipt_p0 && !fail_p1_before_submit && !timeout_precommit) {
+  if (!lose_receipt_p0 && !fail_fetch_after_commit &&
+      !throw_nonstd_submit_after_commit && !throw_nonstd_fetch_after_commit &&
+      !fail_p1_before_submit && !timeout_precommit) {
     std::size_t selected_count = 0;
     for (std::size_t i = 0; i < scores.size(); ++i)
       {
@@ -1250,7 +1313,9 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     const auto recovered1 = score_to_mask_v3_decrypt_recipient_share(
         recovered_cipher1.recipient_ciphertext,
         identities.p1_recipient.private_key, package_info_p1, 1);
-    require((lose_receipt_p0 ? recovered0.size() == scores.size()
+    require((lose_receipt_p0 || fail_fetch_after_commit ||
+             throw_nonstd_submit_after_commit || throw_nonstd_fetch_after_commit
+                 ? recovered0.size() == scores.size()
                              : recovered0 == output0.share) &&
                 recovered1 == output1.share,
             "post-restart recipient-only escrow recovery differs from API shares");
@@ -1304,10 +1369,11 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
           identities.dealer_public, output0.transaction);
       std::cout << "S35_ESCROW_CA_SAME_SAN_WRONG_PIN PASS\n";
     }
-    if (lose_receipt_p0) {
+    if (lose_receipt_p0 || fail_fetch_after_commit ||
+        throw_nonstd_submit_after_commit || throw_nonstd_fetch_after_commit) {
       for (std::size_t i = 0; i < scores.size(); ++i)
         require(static_cast<std::uint8_t>(recovered0[i] ^ recovered1[i]) == oracle[i],
-                "recovered shares after lost receipt differ from the frozen oracle");
+                "recovered shares after post-submit failure differ from the frozen oracle");
     }
   }
   restart_service.signal(SIGTERM);
@@ -1351,8 +1417,11 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
             << "\",\"party_api\":\""
             << ((fail_p1_before_submit || timeout_precommit)
                 ? "BOTH_RECOVERY_REQUIRED_NO_SHARE"
-                : (lose_receipt_p0 ? "P0_RECOVERY_REQUIRED_P1_COMMITTED"
-                                   : "BOTH_COMMITTED"))
+                : (fail_fetch_after_commit || throw_nonstd_fetch_after_commit
+                    ? "P0_FETCH_RECOVERY_REQUIRED_P1_COMMITTED"
+                    : (lose_receipt_p0 || throw_nonstd_submit_after_commit
+                        ? "P0_COMMIT_RECOVERY_REQUIRED_P1_COMMITTED"
+                        : "BOTH_COMMITTED")))
             << "\",\"escrow_post_restart_recovery\":\""
             << ((fail_p1_before_submit || timeout_precommit)
                     ? "ABORTED_NO_FETCH" : "PASS") << "\","
@@ -1385,7 +1454,13 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
             << ",\"injected_precommit_escrow_crash\":"
             << (fail_p1_before_submit ? "true" : "false")
             << ",\"injected_precommit_timeout\":"
-            << (timeout_precommit ? "true" : "false") << "}\n";
+            << (timeout_precommit ? "true" : "false")
+            << ",\"injected_fetch_failure_after_commit\":"
+            << (fail_fetch_after_commit ? "true" : "false") << ","
+            << "\"injected_nonstd_submit_exception_after_commit\":"
+            << (throw_nonstd_submit_after_commit ? "true" : "false") << ","
+            << "\"injected_nonstd_fetch_exception_after_commit\":"
+            << (throw_nonstd_fetch_after_commit ? "true" : "false") << "}\n";
 }
 
 #if defined(MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V2_BOUNDED_EXPERIMENTAL) && \
@@ -1572,7 +1647,7 @@ void run_communication_fault_case(const std::string& binary,
       identities.p0_recipient.public_key, identities.ca_certificate,
       identities.p0_tls.certificate, identities.p0_tls.private_key,
       std::to_string(port0), p0_output, "reserved", "reserved", "reserved",
-      "reserved"}, p0_log_out, p0_log_err));
+      identities.p0_recipient.private_key}, p0_log_out, p0_log_err));
   ::close(p0_pair[0]);
   p0_pair[0] = -1;
   int p1_pair[2] = {-1, -1};
@@ -1584,7 +1659,8 @@ void run_communication_fault_case(const std::string& binary,
       identities.p1_recipient.public_key, identities.ca_certificate,
       identities.p1_tls.certificate, identities.p1_tls.private_key,
       std::to_string(port1), p1_output, "reserved", "reserved", "reserved",
-      "reserved", std::to_string(p0_pair[1])}, p1_log_out, p1_log_err));
+      identities.p1_recipient.private_key, std::to_string(p0_pair[1])},
+      p1_log_out, p1_log_err));
   ::close(p1_pair[0]);
   p1_pair[0] = -1;
 
@@ -1859,6 +1935,42 @@ int main(int argc, char** argv) {
     TempDirectory directory;
     const auto identities = create_test_identities(directory.path);
 #ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
+    if (argc > 1 &&
+        (std::string(argv[1]) == "--s51-ft-v3-fetch-success" ||
+         std::string(argv[1]) == "--s51-ft-v3-fetch-failure" ||
+         std::string(argv[1]) == "--s51-ft-v3-fetch-nonstd-failure" ||
+         std::string(argv[1]) == "--s51-ft-v3-submit-nonstd-failure")) {
+      const bool fail_fetch =
+          std::string(argv[1]) == "--s51-ft-v3-fetch-failure";
+      const bool throw_nonstd_fetch =
+          std::string(argv[1]) == "--s51-ft-v3-fetch-nonstd-failure";
+      const bool throw_nonstd_submit =
+          std::string(argv[1]) == "--s51-ft-v3-submit-nonstd-failure";
+      std::vector<std::int32_t> scores(128U);
+      for (std::uint32_t i = 0; i < scores.size(); ++i) {
+        switch (i % 8U) {
+          case 0: scores[i] = INT32_MAX; break;
+          case 1: scores[i] = INT32_MIN; break;
+          case 2: scores[i] = -17; break;
+          case 3: scores[i] = 17; break;
+          case 4: scores[i] = 0; break;
+          case 5: scores[i] = INT32_MAX; break;
+          case 6: scores[i] = -1; break;
+          default: scores[i] = 4096; break;
+        }
+      }
+      const auto case_name = fail_fetch ? "s51-ft-v3-fetch-failure"
+          : (throw_nonstd_fetch ? "s51-ft-v3-fetch-nonstd-failure"
+              : (throw_nonstd_submit ? "s51-ft-v3-submit-nonstd-failure"
+                                     : "s51-ft-v3-fetch-success"));
+      const auto case_dir = (std::filesystem::path(directory.path) / case_name).string();
+      std::filesystem::create_directory(case_dir);
+      run_one_e2e(binary, case_dir, identities, scores, 64U, false,
+          false, false, kScoreToMaskV3ReceiptFormatV2,
+          std::string(case_name) + "-n128-k64", 3U, fail_fetch,
+          throw_nonstd_submit, throw_nonstd_fetch);
+      return 0;
+    }
     if (argc > 1 && std::string(argv[1]) == "--s48-ft-v3-frame-trace") {
       if (argc != 3)
         throw std::runtime_error("--s48-ft-v3-frame-trace requires a trace directory");

@@ -519,7 +519,7 @@ std::string transaction_id(const ScoreToMaskV3PackageInfo& package) {
 
 }  // namespace
 
-ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
+ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party_v2(
     const std::string& package_path,
     const std::string& dealer_ed25519_public_key_pem,
     const ScoreToMaskV3Session& expected_session,
@@ -527,10 +527,22 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     const std::string& lease_directory, std::uint64_t peak_memory_cap_bytes,
     ProtocolIFramedChannel& peer_channel,
     const std::string& own_recipient_rsa_public_key_pem,
-    const ScoreToMaskV3EscrowSubmitter& escrow_submitter) {
+    const std::string& own_recipient_rsa_private_key_pem,
+    const ScoreToMaskV3EscrowSubmitter& escrow_submitter,
+    const ScoreToMaskV3EscrowFetcher& escrow_fetcher) {
   ScoreToMaskV3PartyOutput output;
   std::unique_ptr<ScoreToMaskV3LocalMaterial> material_ptr;
   std::unique_ptr<GmwParty> engine;
+  const auto capture_metrics = [&] {
+    output.party_channel_bytes_sent = peer_channel.sent_bytes();
+    output.party_channel_bytes_received = peer_channel.received_bytes();
+    output.party_channel_frames_sent = peer_channel.sent_frames();
+    output.party_channel_frames_received = peer_channel.received_frames();
+    output.party_channel_phases = engine == nullptr ? 0
+        : static_cast<std::uint16_t>(engine->next_phase() - 1U);
+    output.party_channel_max_payload_sent = peer_channel.max_payload_sent();
+    output.party_channel_max_payload_received = peer_channel.max_payload_received();
+  };
   try {
     material_ptr = std::make_unique<ScoreToMaskV3LocalMaterial>(
         score_to_mask_v3_open_material(package_path,
@@ -539,6 +551,9 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     const auto& package = material.info;
     if (party > 1 || package.party != party) fail("v3 party/package mismatch");
     if (!escrow_submitter) fail("v3 escrow submitter is required");
+    if (!escrow_fetcher) fail("v3 escrow fetcher is required");
+    if (own_recipient_rsa_private_key_pem.empty())
+      fail("v3 recipient private key is required for escrow fetch");
     if (input.additive_score_share.size() != package.parameters.n)
       fail("v3 additive input share length mismatch");
 #ifdef MOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL
@@ -819,7 +834,7 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
     std::string receipt;
     try {
       receipt = escrow_submitter(expected_transaction, party, ciphertext);
-    } catch (const std::exception&) {
+    } catch (...) {
       // The request may have reached A and been durably committed even though
       // this process lost the response. Never report ABORT for this ambiguity.
       output.state = ScoreToMaskV3PartyOutput::State::kRecoveryRequired;
@@ -850,17 +865,34 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party(
       output.party_channel_max_payload_received = peer_channel.max_payload_received();
       return output;
     }
+
+    std::vector<std::uint8_t> fetched_share;
+    try {
+      const auto fetched = escrow_fetcher(expected_transaction, party);
+      if (fetched.commit_receipt != receipt)
+        fail("v3 escrow fetch receipt differs from submit receipt");
+      fetched_share = score_to_mask_v3_decrypt_recipient_share(
+          fetched.recipient_ciphertext, own_recipient_rsa_private_key_pem,
+          package, party);
+      if (fetched_share != local_output)
+        fail("v3 fetched recipient share differs from computed share");
+    } catch (...) {
+      // A's commit is already known, but the recipient-only fetch/decryption
+      // did not complete. Preserve the transaction and receipt for recovery;
+      // never return the pre-submit in-memory share on this path.
+      output.state = ScoreToMaskV3PartyOutput::State::kRecoveryRequired;
+      output.transaction_id = expected_transaction;
+      output.commit_receipt = receipt;
+      output.abort_code = "COMMITTED_FETCH_REQUIRED";
+      capture_metrics();
+      return output;
+    }
+
     output.state = ScoreToMaskV3PartyOutput::State::kCommitted;
-    output.local_mask_share = std::move(local_output);
+    output.local_mask_share = std::move(fetched_share);
     output.transaction_id = expected_transaction;
     output.commit_receipt = receipt;
-    output.party_channel_bytes_sent = peer_channel.sent_bytes();
-    output.party_channel_bytes_received = peer_channel.received_bytes();
-    output.party_channel_frames_sent = peer_channel.sent_frames();
-    output.party_channel_frames_received = peer_channel.received_frames();
-    output.party_channel_phases = static_cast<std::uint16_t>(engine->next_phase() - 1U);
-    output.party_channel_max_payload_sent = peer_channel.max_payload_sent();
-    output.party_channel_max_payload_received = peer_channel.max_payload_received();
+    capture_metrics();
     return output;
   } catch (const std::exception&) {
     if (engine != nullptr) engine->abort_best_effort();

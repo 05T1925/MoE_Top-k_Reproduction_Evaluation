@@ -1,0 +1,171 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s51-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S51",
+  "date": "2026-10-24",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall": "CONDITIONAL",
+  "baseline": {
+    "latest_main_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "S47": "feb5e6677568d649906f46d0e611d5d52349c07f",
+    "S48": "e05b01d5c7e3899297b76a5e0fca212d38d24229",
+    "S49": "50bc223c19e24bdf052eacbd47be8df6a1d56d98",
+    "S50": "ff77b9694a1259c3f314f145e06fcb980cda0bfb",
+    "S50_tree": "04bda3a66fec7e37a012b91d8aafae91857a49e6",
+    "branch": "codex/m6b-i-project-select5-s51-kpost-review",
+    "working_tree_started_clean": true,
+    "main_is_ancestor_of_S50": true,
+    "desktop_main_workspace_modified": false,
+    "VFSS_baseline_modified": false
+  },
+  "scope": {
+    "N": "1..256 security proof; functional evidence only inherits S48's listed 13 cases through N=1000",
+    "K": "1..N",
+    "corruption": "one static semi-honest party",
+    "T": "ideal F_T/v3 for this theorem; trusted offline T excluded from collusion",
+    "A": "conditionally trusted online escrow, non-colluding with T and the corrupted party; stores ciphertext only",
+    "execution": "successful application message path, no I/O/process fault; successful scheduling before finite timeout is an explicit exogenous condition",
+    "output": "original-order stable Top-K XOR mask shares; API returns only after own authenticated fetch and decrypt check",
+    "L_S29_expanded": false,
+    "L_A_merged_into_L_S29": false,
+    "crash_abort_prefix_privacy": "OUT_OF_SCOPE",
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "N_257_plus_security": "NOT_IN_SCOPE"
+  },
+  "gates": {
+    "S47_S50_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fixed S47-S50 commit ancestry and manifest-listed blobs were rechecked. S50 source manifest lists 11 source entries. S48/S49/S50 raw hash versus Git blob line-ending distinctions are preserved rather than silently normalized. See S51 source/evidence manifest."
+    },
+    "L_S29_SOURCE_AND_CLASSIFICATION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "M6B S29 report recovered from Git snapshot 502c9cc68a23b06b3347d34d60e679d98d3f60a4, report blob 760962e1cdaba1f8459d415da5e3f7b1f6cbe934 and raw SHA-256 aa8dde4bde549c59bffa4ce2f2d2343e52d53912f734d7cc2134c6e15cccf717. Snapshot derives from S25 worktree and records candidate_committed=false; this is source recovery, not owner security approval. No leakage expansion."
+    },
+    "KPRE_3_N_LE_256": {
+      "status": "INHERITED_PASS_WITH_SCOPE",
+      "scope": "S50 non-author review; ideal IID F_T/v3, cap_success, single fresh package, one static semi-honest party, successful pre-escrow transcript through own output share."
+    },
+    "API_V2_FETCH_BEFORE_RETURN_ORDERING": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "S51 adds an explicitly versioned execute_party_v2 ordering for the requested view. Earlier S31/S32/S42 records allow return after COMMITTED with separate recovery fetch; the S48 ordering is not classified as a defect against that earlier contract."
+    },
+    "API_V2_CALLBACK_EXCEPTION_RECOVERY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Final S51 Release binary and the listed TEST_ONLY cases only; does not cover every callback failure or every N/K.",
+      "evidence": "Final binary 48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c passes standard fetch, non-standard fetch throw 23, and non-standard submit throw 17 post-commit cases with no premature API share and successful recovery. A pre-fix contrast binary b85d121594d9070162f2226785e08048ada3a40137eef74e07ad0617c6ca8d48 reproducibly exits P0=134/P1=0 (E2E exit 1)."
+    },
+    "KPOST_3_CAUSAL_HONEST_PEER_ROUTE": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Ideal F_T/v3/F_TOPK route gives each honest endpoint only its own same-invocation share/package/credentials; second deposit reaches actual A state machine. Party simulator receives no peer secret, A context, T key, or J_b. Successful pre-timeout scheduling is explicit."
+    },
+    "KPOST_3_IDEAL_A_TOKEN_AND_FETCH_JOINT_LAW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Ideal independent A token source sampled once after valid second deposit within COMMITTED transaction; same token is deterministic postprocessing in submit response, fetch response and retry. Exact application-message projection for fixed q_b^3/Vpre_b^3/C_b and exogenous successful schedule. Does not prove real A RNG or timing view."
+    },
+    "KPRE3_KPOST3_COMPOSITION_UNDER_EX_POST_TIMEOUT_SUCCESS": {
+      "status": "CONDITIONAL",
+      "gap": "No proof/sampler for Law(Vpre_b^3 | q_b^3, cap_success, Success_escrow) = Law(Vpre_b^3 | q_b^3, cap_success); finite timeout/scheduling may select on prefix processing time. If successful scheduling is instead part of the theorem environment as an exogenous fence, the message-kernel chain composes within that abstraction."
+    },
+    "WALL_CLOCK_TIMING_AND_TIMEOUT_SELECTION": {
+      "status": "OPEN",
+      "scope": "Party may observe waiting duration; not added to L_S29. No deployment/scheduler law or non-selection proof."
+    },
+    "S42_SUFFIX_MIGRATION": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Reuse only abstract submit/token/fetch continuation shape after mapping to FTv3 context format 2, package format 6, receipt v2 and fixed S51 API. S42/S48 old implementation assumptions do not independently establish S51."
+    },
+    "REAL_FT_DEALER_DRBG_SIGNATURE_BRIDGE": {
+      "status": "OPEN",
+      "scope": "Ideal FTv3 only here; real dealer, ordered DRBG stream, signatures and issuance composition not proven."
+    },
+    "REAL_A_TOKEN_RNG": {
+      "status": "OPEN",
+      "scope": "Ideal independent token RNG only; real RAND_bytes deployment bridge and failure conditioning not established."
+    },
+    "TLS_MTLS_RECIPIENT_ENCRYPTION_HASH_BINDING": {
+      "status": "OPEN",
+      "scope": "Source mapping and functional behavior reviewed; no deployment-matched cryptographic advantage bound."
+    },
+    "OPENSSL_MINIMUM_API_BUILD_COMPATIBILITY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "The declared OpenSSL >=1.1.1 build failed on 1.1.1f because EVP_PKEY_get_size was used; the escrow helper now calls compatible EVP_PKEY_size. Fresh Release target builds on this environment. This is compile compatibility evidence, not a cryptographic bridge."
+    },
+    "COMPLETE_PARTY_VIEW_GMW_SHUFFLE_OUTPUT_ESCROW": {
+      "status": "OPEN",
+      "scope": "S50 pre-view plus S51 ideal successful message suffix only; no full real composition or wall-clock view proof."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new owner acceptance record. Only confirmation question is included in S51 report."
+    },
+    "NATURAL_BUSINESS_IO_FAULT": {
+      "status": "NOT_REPRODUCED",
+      "scope": "S51 uses an explicit TEST_ONLY callback failpoint after COMMITTED; it is not a natural I/O error."
+    },
+    "N_LE_1000_FUNCTIONAL_CLAIM": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Inherits only S48's 13 listed functional cases, not exhaustive N/K coverage and not security. S51 adds two N=128/K=64 FTv3 receipt-v2 API/recovery cases."
+    },
+    "BUILD_TEST": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Fresh Release TEST_ONLY target built and four S51 E2Es passed. Initial SQLite dev dependency/config and link attempts failed in environment then were corrected using temporary extraction; see cases. No full matrix/default-OFF rebuild."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN_NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY"
+    },
+    "PUSH_MERGE": {
+      "status": "NOT_PERFORMED"
+    },
+    "PRE_FIX_NONSTD_CALLBACK_FAILURE_REPRODUCTION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "With the two callback boundaries temporarily reverted to std::exception-only catches, the submit-nonstd case produced P0=134/P1=0 and E2E exit 1 on binary b85d121594d9070162f2226785e08048ada3a40137eef74e07ad0617c6ca8d48; restoring catch-all yielded final four-case pass on binary 48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c.",
+      "scope": "TEST_ONLY injected integer exception after A COMMITTED; not a natural I/O failure."
+    },
+    "PARTY_V2_EXTERNAL_SOURCE_ABI_COMPATIBILITY": {
+      "status": "NOT_RUN",
+      "scope": "S51 experimental candidate replaces the old entrypoint name/signature with score_to_mask_v3_execute_party_v2; in-repository callsites were migrated, but external consumers were not compiled or checked."
+    }
+  },
+  "review": {
+    "reviewer": "/root/s51_independent_review",
+    "eligible": true,
+    "not_involved_S47_S51_implementation_or_derivation": true,
+    "review_scope": [
+      "L_S29 provenance and classification",
+      "Kpre3 to Kpost3 conditional-kernel composition",
+      "honest peer actual second-deposit route",
+      "A PENDING to COMMITTED/token/fetch mapping",
+      "P0/P1 symmetry and API share return",
+      "timeout-selection gap and theorem scope"
+    ],
+    "rederived": true,
+    "built": false,
+    "tested": false,
+    "final_draft_review": "INDEPENDENT_REVIEWER_CONFIRMED_SCOPED_KPOST_AND_TIMEOUT_GAP; FINAL_STATUS_FIELD_RECORDED_AFTER_REVIEW"
+  },
+  "execution": {
+    "runtime_defect_reproduced": true,
+    "runtime_defect_scope": "One protocol API defect: non-std exceptions from new v2 submit/fetch callbacks escaped recovery mapping. Separate build-compatibility correction: EVP_PKEY_get_size was unavailable under declared OpenSSL >=1.1.1.",
+    "runtime_fix_count": 1,
+    "test_code_changed": true,
+    "fresh_release_build": true,
+    "targeted_e2e_cases": 4,
+    "historical_matrices_repeated": false,
+    "formal_performance": "NOT_RUN_NOT_MEASURED",
+    "VFSS_baseline_modified": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "secure_alias_created": false,
+    "runtime_defect_count": 1,
+    "build_compatibility_fix_count": 1,
+    "source_fix_count": 2
+  },
+  "deliverables": {
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_DECISION_2026-10-24.md",
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_REPORT_2026-10-24.md",
+    "cases": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_CASES_2026-10-24.json",
+    "source_evidence_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_SOURCE_EVIDENCE_MANIFEST_2026-10-24.json"
+  }
+}
