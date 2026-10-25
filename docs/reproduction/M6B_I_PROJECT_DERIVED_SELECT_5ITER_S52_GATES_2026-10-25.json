@@ -1,0 +1,173 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s52-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S52",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "overall": "CONDITIONAL",
+  "baseline": {
+    "S51_commit": "1cc1e5202b3a603b55aaae985704933d70db0794",
+    "S51_tree": "6b1ce4bbcd6a962edeeaa8a5b862dfd15e786021",
+    "S51_parent": "ff77b9694a1259c3f314f145e06fcb980cda0bfb",
+    "S51_manifest_blob_matches": "10/10",
+    "S51_manifest_canonical_delivery_sha256": "1c3433d326379e69a982511207fad2f0ae0cf858213b951ddc783ba1609daf90",
+    "branch": "codex/m6b-i-project-select5-s52-receiver",
+    "initial_worktree_clean": true,
+    "VFSS_baseline_diff": "empty",
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "scope": {
+    "function": "stable signed Q20.12 descending, original-index ascending tie, original-order Top-K XOR mask shares",
+    "fresh_S52_cases": "7 API/escrow status cases at N=128,K=64; 5 N=1000 K values plus N=1/128/256 smoke",
+    "security_scope_inherited": "S50/S51 ideal IID F_T/v3; cap_success; one static semi-honest party; trusted non-colluding T/A; honest peer causal deposit; exogenous SuccessFence; N<=256; successful application-message view",
+    "L_S29_expanded": false,
+    "crash_prefix_privacy": "OUT_OF_SCOPE",
+    "A_only_corruption": "OUT_OF_SCOPE",
+    "N_gt_256_security": "NOT_IN_SCOPE"
+  },
+  "gates": {
+    "S51_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "The 10 S51 manifest-listed Git blobs were rechecked against commit 1cc1e5202b3a603b55aaae985704933d70db0794. Four S51 text files had checkout line-ending normalization; Git blob identities remain exact. S51 historical records were not edited."
+    },
+    "FRESH_RELEASE_REPRODUCTION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "New sibling build directories from the fixed S51 source: build-off, build-on-prod, build-on-test. GCC 9.4.0, CMake 3.31.6, OpenSSL 1.1.1f, SQLite runtime 3.31.1. Final binary and libraries are hashed in the source/build/evidence manifest."
+    },
+    "DEFAULT_OFF_ISOLATION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fresh Release BUILD_TESTING=OFF with v3/GMW/receipt-v2/FTv2/FTv3/Select5 switches OFF; target help contains no v3/Select5 experimental target, libsytorch.a has no matching symbols, and unopted header compilation receives the expected opt-in #error."
+    },
+    "API_V2_EXPLICIT_OPT_IN": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Production Release enabled GMW, receipt-v2 and FTv3 bounded options; FTv2 and TEST_ONLY hooks OFF. score_to_mask_v3_execute_party_v2 is present in the production library."
+    },
+    "TEST_ONLY_HOOK_PRODUCTION_ISOLATION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Production library symbol scan found no test_only/with_test_random symbols. Test hooks are confined to the separate BUILD_TESTING=ON artifact."
+    },
+    "RUNTIME_CONFORMANCE": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Final S52 Release TEST_ONLY runtime conformance exited 0: package signature, triple shares, permutation shares, one-shot lease, package fault cases; N=128 and N=256 gate formulas checked."
+    },
+    "FTV3_BOUNDED_CONFORMANCE": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Final test exited 0: 88,626,688 gates; Qmax=88,786,404; Cmax=7,247; retry-cap ISSUANCE_ABORT observed; party lease DBs, package/context files and online services not created; burn marker retained and replay rejected."
+    },
+    "API_V2_ESCROW_TARGETED_CASES": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Seven final-binary cases: normal; submit standard exception after durable commit; fetch standard exception; submit non-standard throw; fetch non-standard throw; explicit server transaction timeout; injected missing transaction row. Outcomes, per-party exits, states, share lengths, A recovery and oracle applicability are in the cases JSON."
+    },
+    "N_LE_1000_LISTED_FUNCTIONAL_CASES": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Eight new final-binary cases: N=1000 with K={1,8,500,999,1000}, plus N=1,128,256 compatibility smoke. Every successful case matched the frozen oracle; both API-v2 parties fetched only their own N-byte share. S48 historical 13 cases are inherited only and were not rerun."
+    },
+    "ESCROW_ABORT_VS_UNKNOWN_CLASSIFICATION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Persisted ABORTED state is returned as ABORT only after the response's TLS peer pin, frame, length, transaction ID, zero receipt and empty ciphertext are checked. Missing or invalid state fails closed and maps to unknown; only the built-in submit function can construct the typed definite-abort exception."
+    },
+    "API_V2_CALLBACK_RECOVERY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Standard/non-standard submit failures yield no API-visible share and retain unknown status when commit may have occurred; fetch failures after known commit yield no share and COMMITTED_FETCH_REQUIRED; restart recovery is recorded per case."
+    },
+    "IDEAL_SUCCESSFENCE_KPRE3_KPOST3_COMPOSITION": {
+      "status": "INHERITED_PASS_WITH_SCOPE",
+      "evidence": "S50/S51 proof/review only: ideal IID F_T/v3, cap_success, ideal A token RNG, static semi-honest party, honest peer's causal second deposit, and an exogenous fence guaranteeing deadline success. S52 made no new cryptographic proof."
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_CONDITIONED_COMPOSITION": {
+      "status": "OPEN",
+      "gap": "No sampler/proof for Law(Vpre_b^3 | Q_b^3, cap_success, S_actual) approximately Law(Vpre_b^3 | Q_b^3, cap_success). Actual success depends on party frame deadlines, A's transaction wait deadline, connection/handshake and scheduler/processing."
+    },
+    "WALL_CLOCK_TIMING_AND_SELECTION": {
+      "status": "OPEN",
+      "scope": "Timing and timeout result are not added to L_S29. No deployment scheduler law or non-selection proof; finite frame timeouts are per operation and there is no single end-to-end deadline."
+    },
+    "REAL_FT_DEALER_DRBG_SIGNATURE_BRIDGE": {
+      "status": "OPEN",
+      "scope": "Ideal F_T/v3 inheritance only; target provider/entropy/reseed/lifecycle and joint transcript bridge remain unproven."
+    },
+    "REAL_A_TOKEN_RNG": {
+      "status": "OPEN",
+      "scope": "Ideal independent token RNG only; deployed A RNG bridge not proven."
+    },
+    "TLS_MTLS_RECIPIENT_ENCRYPTION_HASH_BINDING": {
+      "status": "OPEN",
+      "scope": "Functional source path tested; no deployment-matched advantage bound for TLS/mTLS, RSA-OAEP/AES-GCM, signatures or hash binding."
+    },
+    "COMPLETE_GMW_SELECT_SHUFFLE_OUTPUT_ESCROW_PARTY_VIEW": {
+      "status": "OPEN",
+      "scope": "S50/S51 ideal bounded transcript results do not establish a full deployed single-party composition or wall-clock view."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new explicit owner acceptance record. Confirmation question retained in S52 report."
+    },
+    "NATURAL_BUSINESS_IO_FAULT": {
+      "status": "NOT_REPRODUCED",
+      "scope": "The server timeout and DB row deletion are explicit TEST_ONLY injections; no natural business read/write fault was observed."
+    },
+    "N_GT_256_SECURITY": {
+      "status": "NOT_IN_SCOPE",
+      "scope": "S50/S51 simulator scope is N<=256; N=1000 evidence in S48/S52 is functional only."
+    },
+    "EXTERNAL_API_ABI_COMPATIBILITY": {
+      "status": "NOT_RUN",
+      "scope": "In-repository API v2 callsites were searched; no external consumer or ABI promise was tested."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN_NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY"
+    },
+    "PUSH_MERGE": {
+      "status": "NOT_PERFORMED"
+    },
+    "NONAUTHOR_INDEPENDENT_FUNCTIONAL_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Reviewer uninvolved in S51/S52 implementation or derivation independently fresh-built from S51 plus the four manifest-fixed S52 VFSS files. The test binary SHA-256 exactly matched the primary final E2E binary; seven API-v2 cases and all eight N=1000/compatibility cases exited 0. 15 cases × 16 core outcome fields matched the cases JSON. This is limited functional receipt, not full-domain correctness, security, or performance."
+    },
+    "NONAUTHOR_SUCCESSFENCE_TIMEOUT_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Reviewer independently rederived the conditional success gap and confirmed the report boundary. Ideal SuccessFence composition remains inherited only; reviewer did not reprove S50/S51 lemmas. The actual finite-timeout condition remains OPEN."
+    }
+  },
+  "review": {
+    "reviewer": "/root/s51_independent_review",
+    "not_involved_S51_implementation_or_derivation": true,
+    "review_scope": [
+      "S52 definite ABORT and unknown/missing-row source paths",
+      "typed exception construction permission",
+      "case/log outcome consistency",
+      "independent fresh Release build and 7 API-v2 + 8 target/compatibility cases",
+      "independent rederivation of SuccessFence versus actual finite-timeout conditional law gap; S50/S51 inherited lemmas not re-proved"
+    ],
+    "built_or_tested_by_reviewer": true,
+    "final_reviewer_status": "PASS_WITH_SCOPE; actual finite-timeout view remains OPEN",
+    "not_involved_S52_implementation_or_derivation": true,
+    "rederived": "Reviewer independently rederived the exact actual finite-timeout success-conditioned law gap; S50/S51 inherited lemmas not re-proved."
+  },
+  "execution": {
+    "runtime_findings_fixed": 2,
+    "defect_scope": "Related escrow status classification only; timeout status mismatch directly contrasted against the S51 runtime log; missing-row response error confirmed in S51 source and corrected behavior exercised by the S52 injected case. Not a cryptographic attack.",
+    "runtime_files_changed": 3,
+    "test_file_changed": 1,
+    "S35_195_matrix": "NOT_RUN",
+    "S40_211_matrix": "NOT_RUN",
+    "formal_performance": "NOT_RUN_NOT_MEASURED",
+    "VFSS_baseline_modified": false,
+    "secure_alias_created": false,
+    "independent_receiver_exit": "0",
+    "independent_receiver_binary_sha256": "81a5f05e6a9c75d85ea19c2e59729cd2cc0c9e724b68fae77c0c4333668043b9",
+    "independent_api_cases": "7 PASS",
+    "independent_target_scale_cases": "8 PASS; N=1000 K=1,8,500,999,1000",
+    "independent_receiver_initial_tmpdir_attempt": "NOT_A_VALID_RUN; retried with default WSL /tmp"
+  },
+  "deliverables": {
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_DECISION_2026-10-25.md",
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_REPORT_2026-10-25.md",
+    "gates": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_GATES_2026-10-25.json",
+    "cases": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_CASES_2026-10-25.json",
+    "manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-25.json"
+  }
+}

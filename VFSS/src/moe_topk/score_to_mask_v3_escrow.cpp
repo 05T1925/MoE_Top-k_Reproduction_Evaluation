@@ -294,10 +294,13 @@ CommitState query_state(const std::string& db_path,
   sqlite_check(sqlite3_bind_text(stmt.get(), 1, transaction.c_str(), -1, SQLITE_TRANSIENT),
                db.get(), "bind v3 escrow transaction status");
   const int step = sqlite3_step(stmt.get());
-  if (step == SQLITE_DONE) return {2, {}};
+  if (step == SQLITE_DONE)
+    fail("v3 escrow transaction status row is missing");
   sqlite_check(step, db.get(), "query v3 escrow status");
   CommitState result;
   result.state = sqlite3_column_int(stmt.get(), 0);
+  if (result.state < 0 || result.state > 2)
+    fail("v3 escrow transaction state is invalid");
   if (result.state == 1) {
     const auto* receipt = static_cast<const std::uint8_t*>(sqlite3_column_blob(stmt.get(), 1));
     const auto size = sqlite3_column_bytes(stmt.get(), 1);
@@ -597,8 +600,10 @@ void serve_connection(int fd, std::uint8_t party,
       if (state.state == 1) {
         channel.send(make_response(kStatusCommitted, state.receipt,
                                    request.transaction, {}));
-      } else {
+      } else if (state.state == 2) {
         channel.send(make_response(kStatusAbort, {}, request.transaction, {}));
+      } else {
+        fail("v3 escrow transaction did not reach a terminal state");
       }
     } else {
       std::array<std::uint8_t, 32> receipt{};
@@ -642,7 +647,9 @@ std::vector<std::uint8_t> app_context(const ScoreToMaskV3PackageInfo& package,
 std::vector<std::uint8_t> parse_response(const std::vector<std::uint8_t>& in,
                                          std::uint8_t expected_status,
                                          const std::string& transaction,
-                                         std::array<std::uint8_t, 32>& receipt) {
+                                         std::array<std::uint8_t, 32>& receipt,
+                                         bool& definite_abort) {
+  definite_abort = false;
   if (in.size() < 1 + 2 + 4 + 32) fail("v3 escrow response truncated");
   std::size_t at = 0;
   const auto status = in[at++];
@@ -656,6 +663,14 @@ std::vector<std::uint8_t> parse_response(const std::vector<std::uint8_t>& in,
                              in.begin() + static_cast<std::ptrdiff_t>(at + transaction_size));
   at += transaction_size;
   if (returned != transaction) fail("v3 escrow response transaction mismatch");
+  if (status == kStatusAbort && expected_status == kStatusCommitted) {
+    if (ciphertext_size != 0 ||
+        std::any_of(receipt.begin(), receipt.end(),
+                    [](std::uint8_t byte) { return byte != 0; }))
+      fail("v3 escrow ABORT response carries commit data");
+    definite_abort = true;
+    return {};
+  }
   if (status != expected_status) fail("v3 escrow transaction not committed");
   return {in.begin() + static_cast<std::ptrdiff_t>(at), in.end()};
 }
@@ -665,7 +680,8 @@ std::vector<std::uint8_t> request_service(
     const ScoreToMaskV3PackageInfo& package, std::uint8_t party,
     std::uint8_t operation, const std::string& transaction,
     const std::vector<std::uint8_t>& ciphertext,
-    std::array<std::uint8_t, 32>& receipt) {
+    std::array<std::uint8_t, 32>& receipt,
+    bool* definite_abort = nullptr) {
   if (party > 1) fail("v3 escrow client party invalid");
   const int fd = connect_tcp(config.host, config.port);
   SSL_CTX* tls_context = nullptr;
@@ -691,7 +707,14 @@ std::vector<std::uint8_t> request_service(
     channel.set_phase(kRequestPhase);
     channel.send(app_context(package, party, operation, transaction, ciphertext));
     const auto response = channel.receive();
-    result = parse_response(response, kStatusCommitted, transaction, receipt);
+    bool response_is_abort = false;
+    result = parse_response(response, kStatusCommitted, transaction, receipt,
+                            response_is_abort);
+    if (definite_abort != nullptr) {
+      *definite_abort = response_is_abort;
+    } else if (response_is_abort) {
+      fail("v3 escrow fetch received ABORT instead of a committed record");
+    }
   } catch (...) {
     if (tls_context != nullptr) protocol_i_tls13_context_free(tls_context);
     if (!channel_owns_fd) ::close(fd);
@@ -857,8 +880,10 @@ std::string score_to_mask_v3_escrow_submit(
     const std::vector<std::uint8_t>& recipient_ciphertext) {
   if (transaction != transaction_id(package)) fail("v3 escrow transaction id is not session bound");
   std::array<std::uint8_t, 32> receipt{};
+  bool definite_abort = false;
   (void)request_service(config, package, party, kOpSubmit, transaction,
-                        recipient_ciphertext, receipt);
+                        recipient_ciphertext, receipt, &definite_abort);
+  if (definite_abort) throw ScoreToMaskV3DefiniteEscrowAbort();
   return hex(receipt.data(), receipt.size());
 }
 

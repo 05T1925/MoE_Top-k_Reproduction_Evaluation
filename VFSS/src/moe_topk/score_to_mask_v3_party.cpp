@@ -834,6 +834,12 @@ ScoreToMaskV3PartyOutput score_to_mask_v3_execute_party_v2(
     std::string receipt;
     try {
       receipt = escrow_submitter(expected_transaction, party, ciphertext);
+    } catch (const ScoreToMaskV3DefiniteEscrowAbort&) {
+      output.state = ScoreToMaskV3PartyOutput::State::kAborted;
+      output.transaction_id = expected_transaction;
+      output.abort_code = "ESCROW_ABORTED";
+      capture_metrics();
+      return output;
     } catch (...) {
       // The request may have reached A and been durably committed even though
       // this process lost the response. Never report ABORT for this ambiguity.

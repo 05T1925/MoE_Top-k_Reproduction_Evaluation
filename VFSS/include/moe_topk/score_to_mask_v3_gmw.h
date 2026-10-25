@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 #include <functional>
+#include <stdexcept>
 #include <vector>
 
 namespace moe_topk {
@@ -149,6 +150,8 @@ struct ScoreToMaskV3PartyInput {
 struct ScoreToMaskV3PartyOutput {
   // An ambiguous submit or failed committed fetch yields no API-visible
   // share; the caller retains the transaction id for recipient-only recovery.
+  // A validated service ABORT is kAborted, while an ambiguous submit remains
+  // kRecoveryRequired.
   enum class State { kAborted, kRecoveryRequired, kCommitted } state = State::kAborted;
   std::vector<std::uint8_t> local_mask_share;
   std::string transaction_id;
@@ -186,6 +189,19 @@ struct ScoreToMaskV3EscrowServerConfig {
 struct ScoreToMaskV3EscrowFetchedRecord {
   std::vector<std::uint8_t> recipient_ciphertext;
   std::string commit_receipt;
+};
+
+// Submit callbacks may use this exception only after receiving and validating
+// an authenticated escrow ABORT response. Other exceptions leave commit state
+// ambiguous and are reported as COMMIT_STATUS_UNKNOWN.
+class ScoreToMaskV3DefiniteEscrowAbort final : public std::runtime_error {
+ private:
+  friend std::string score_to_mask_v3_escrow_submit(
+      const ScoreToMaskV3EscrowClientConfig&,
+      const ScoreToMaskV3PackageInfo&, std::uint8_t,
+      const std::string&, const std::vector<std::uint8_t>&);
+  ScoreToMaskV3DefiniteEscrowAbort()
+      : std::runtime_error("escrow explicitly aborted the transaction") {}
 };
 
 using ScoreToMaskV3EscrowSubmitter = std::function<std::string(

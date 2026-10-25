@@ -812,20 +812,27 @@ std::pair<int, int> escrow_state_and_share_count(const std::string& path,
   return result;
 }
 
-void wait_for_one_precommit_ciphertext(const std::string& db_path) {
+std::string wait_for_one_precommit_ciphertext(const std::string& db_path) {
   const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
   while (std::chrono::steady_clock::now() < deadline) {
     sqlite3* db = nullptr;
     if (sqlite3_open_v2(db_path.c_str(), &db, SQLITE_OPEN_READONLY, nullptr) == SQLITE_OK) {
       sqlite3_stmt* stmt = nullptr;
       const char* query =
-          "SELECT count(*) FROM transactions t WHERE state=0 AND "
+          "SELECT t.transaction_id FROM transactions t WHERE state=0 AND "
           "(SELECT count(*) FROM shares WHERE transaction_id=t.transaction_id)=1";
       if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) == SQLITE_OK &&
-          sqlite3_step(stmt) == SQLITE_ROW && sqlite3_column_int(stmt, 0) == 1) {
+          sqlite3_step(stmt) == SQLITE_ROW) {
+        const auto* transaction = sqlite3_column_text(stmt, 0);
+        if (transaction == nullptr) {
+          sqlite3_finalize(stmt);
+          sqlite3_close(db);
+          throw std::runtime_error("staged escrow transaction id is null");
+        }
+        const std::string result(reinterpret_cast<const char*>(transaction));
         sqlite3_finalize(stmt);
         sqlite3_close(db);
-        return;
+        return result;
       }
       if (stmt != nullptr) sqlite3_finalize(stmt);
       sqlite3_close(db);
@@ -835,6 +842,40 @@ void wait_for_one_precommit_ciphertext(const std::string& db_path) {
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
   }
   throw std::runtime_error("A did not durably stage exactly one pre-commit ciphertext");
+}
+
+void delete_pending_transaction_record(const std::string& db_path,
+                                      const std::string& transaction) {
+  sqlite3* db = nullptr;
+  require(sqlite3_open_v2(db_path.c_str(), &db,
+                          SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX,
+                          nullptr) == SQLITE_OK,
+          "test controller could not open escrow DB for missing-row injection");
+  try {
+    require(sqlite3_exec(db, "BEGIN IMMEDIATE", nullptr, nullptr, nullptr) == SQLITE_OK,
+            "test controller could not begin missing-row injection");
+    for (const char* query : {
+             "DELETE FROM shares WHERE transaction_id=?1",
+             "DELETE FROM transactions WHERE transaction_id=?1"}) {
+      sqlite3_stmt* stmt = nullptr;
+      if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) != SQLITE_OK)
+        throw std::runtime_error("test controller could not prepare missing-row injection");
+      const int bind_status = sqlite3_bind_text(
+          stmt, 1, transaction.c_str(), -1, SQLITE_TRANSIENT);
+      const int step_status = bind_status == SQLITE_OK
+          ? sqlite3_step(stmt) : bind_status;
+      sqlite3_finalize(stmt);
+      require(step_status == SQLITE_DONE && sqlite3_changes(db) == 1,
+              "test controller could not delete exactly one staged escrow row");
+    }
+    require(sqlite3_exec(db, "COMMIT", nullptr, nullptr, nullptr) == SQLITE_OK,
+            "test controller could not commit missing-row injection");
+  } catch (...) {
+    sqlite3_exec(db, "ROLLBACK", nullptr, nullptr, nullptr);
+    sqlite3_close(db);
+    throw;
+  }
+  sqlite3_close(db);
 }
 
 bool has_aborted_precommit_record(const std::string& db_path,
@@ -1013,7 +1054,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                  std::uint32_t ft_version = 1,
                  bool fail_fetch_after_commit = false,
                  bool throw_nonstd_submit_after_commit = false,
-                 bool throw_nonstd_fetch_after_commit = false) {
+                 bool throw_nonstd_fetch_after_commit = false,
+                 bool delete_pending_transaction_row = false) {
   if (std::getenv("S35_TRACE_CASES") != nullptr)
     std::cerr << "S35_CASE_START dir=" << directory << " n=" << scores.size()
               << " k=" << k << " lost_receipt=" << lose_receipt_p0
@@ -1133,7 +1175,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
       lease1, identities.p1_recipient.public_key, identities.ca_certificate,
       identities.p1_tls.certificate, identities.p1_tls.private_key,
       std::to_string(port1), p1_output,
-      (fail_p1_before_submit || timeout_precommit)
+      (fail_p1_before_submit || timeout_precommit ||
+       delete_pending_transaction_row)
           ? "p1-fail-before-submit" : "reserved",
       "reserved", "reserved", identities.p1_recipient.private_key},
       p1_stdout, p1_stderr));
@@ -1144,9 +1187,12 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   int p0_status = 0;
   int p1_status = 0;
   int service_status = -1;
-  if (fail_p1_before_submit || timeout_precommit) {
+  if (fail_p1_before_submit || timeout_precommit ||
+      delete_pending_transaction_row) {
     p1_status = p1_process.wait(&p1_rss_kib);
-    wait_for_one_precommit_ciphertext(db_path);
+    const auto staged_transaction = wait_for_one_precommit_ciphertext(db_path);
+    if (delete_pending_transaction_row)
+      delete_pending_transaction_record(db_path, staged_transaction);
     if (fail_p1_before_submit) {
       service.signal(SIGKILL);
       service_status = service.wait();
@@ -1157,11 +1203,15 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     p0_status = p0_process.wait(&p0_rss_kib);
     p1_status = p1_process.wait(&p1_rss_kib);
   }
-  if (p0_status != (lose_receipt_p0 || fail_fetch_after_commit ||
+  const int expected_p0_status = timeout_precommit ? 10 :
+      (lose_receipt_p0 || fail_fetch_after_commit ||
                     throw_nonstd_submit_after_commit ||
                     throw_nonstd_fetch_after_commit ||
-                    fail_p1_before_submit || timeout_precommit ? 11 : 0) ||
-      p1_status != (fail_p1_before_submit || timeout_precommit ? 11 : 0)) {
+                    fail_p1_before_submit || delete_pending_transaction_row
+                    ? 11 : 0);
+  if (p0_status != expected_p0_status ||
+      p1_status != (fail_p1_before_submit || timeout_precommit ||
+                    delete_pending_transaction_row ? 11 : 0)) {
     throw std::runtime_error("party E2E failed: P0=" + std::to_string(p0_status) +
                              " P1=" + std::to_string(p1_status));
   }
@@ -1169,11 +1219,20 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   auto output1 = read_process_output(p1_output);
   if (lose_receipt_p0 || fail_fetch_after_commit ||
       throw_nonstd_submit_after_commit || throw_nonstd_fetch_after_commit ||
-      fail_p1_before_submit || timeout_precommit) {
-    require(output0.state == static_cast<std::uint8_t>(
-                ScoreToMaskV3PartyOutput::State::kRecoveryRequired) &&
-                output0.share.empty(),
-            "post-submit failure did not yield no-share recovery-required state");
+      fail_p1_before_submit || timeout_precommit ||
+      delete_pending_transaction_row) {
+    if (timeout_precommit) {
+      require(output0.state == static_cast<std::uint8_t>(
+                  ScoreToMaskV3PartyOutput::State::kAborted) &&
+                  output0.status_code == "ESCROW_ABORTED" &&
+                  output0.receipt.empty() && output0.share.empty(),
+              "authenticated escrow ABORT did not yield definite no-share state");
+    } else {
+      require(output0.state == static_cast<std::uint8_t>(
+                  ScoreToMaskV3PartyOutput::State::kRecoveryRequired) &&
+                  output0.share.empty(),
+              "ambiguous submit/fetch did not yield no-share recovery state");
+    }
     if (lose_receipt_p0) {
       require(output0.status_code == "COMMIT_STATUS_UNKNOWN" &&
                   output0.receipt.empty(),
@@ -1194,7 +1253,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
                   output0.receipt.size() == 64,
               "non-standard fetch exception did not preserve committed recovery data");
     }
-    if (fail_p1_before_submit || timeout_precommit) {
+    if (fail_p1_before_submit || timeout_precommit ||
+        delete_pending_transaction_row) {
       require(output1.state == static_cast<std::uint8_t>(
                   ScoreToMaskV3PartyOutput::State::kRecoveryRequired) &&
                   output1.share.empty(),
@@ -1216,11 +1276,12 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   require(output0.transaction == output1.transaction,
           "parties received different escrow transaction ids");
   if (!lose_receipt_p0 && !throw_nonstd_submit_after_commit &&
-      !fail_p1_before_submit && !timeout_precommit)
+      !fail_p1_before_submit && !timeout_precommit &&
+      !delete_pending_transaction_row)
     require(output0.receipt == output1.receipt,
             "parties received different durable escrow commit receipts");
-  if (receipt_format_version == 2 &&
-      !fail_p1_before_submit && !timeout_precommit) {
+  if (receipt_format_version == 2 && !fail_p1_before_submit &&
+      !timeout_precommit && !delete_pending_transaction_row) {
     const auto& delivered_token = (lose_receipt_p0 ||
         throw_nonstd_submit_after_commit) ? output1.receipt : output0.receipt;
     require(delivered_token.size() == 64 &&
@@ -1241,9 +1302,11 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   require(((lose_receipt_p0 || fail_fetch_after_commit ||
             throw_nonstd_submit_after_commit ||
             throw_nonstd_fetch_after_commit ||
-            fail_p1_before_submit || timeout_precommit) ? output0.share.empty()
+            fail_p1_before_submit || timeout_precommit ||
+            delete_pending_transaction_row) ? output0.share.empty()
                             : output0.share.size() == scores.size()) &&
-              ((fail_p1_before_submit || timeout_precommit) ? output1.share.empty()
+      ((fail_p1_before_submit || timeout_precommit ||
+        delete_pending_transaction_row) ? output1.share.empty()
                                      : output1.share.size() == scores.size()),
           "party output share length mismatch");
   std::vector<std::uint32_t> raw_scores(scores.size());
@@ -1252,7 +1315,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   const auto oracle = top_k_mask(raw_scores, k);
   if (!lose_receipt_p0 && !fail_fetch_after_commit &&
       !throw_nonstd_submit_after_commit && !throw_nonstd_fetch_after_commit &&
-      !fail_p1_before_submit && !timeout_precommit) {
+      !fail_p1_before_submit && !timeout_precommit &&
+      !delete_pending_transaction_row) {
     std::size_t selected_count = 0;
     for (std::size_t i = 0; i < scores.size(); ++i)
       {
@@ -1285,7 +1349,21 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
   ScoreToMaskV3EscrowClientConfig recovery1{"127.0.0.1", port1, "escrow",
       {identities.ca_certificate, identities.p1_tls.certificate,
        identities.p1_tls.private_key}};
-  if (fail_p1_before_submit || timeout_precommit) {
+  if (delete_pending_transaction_row) {
+    require(escrow_state_and_share_count(db_path, output0.transaction) ==
+                std::pair<int, int>{-1, 0},
+            "missing-row injection left escrow transaction or share rows");
+    bool p0_fetch_rejected = false;
+    bool p1_fetch_rejected = false;
+    try { (void)score_to_mask_v3_escrow_fetch(recovery0, package_info, 0,
+                                              output0.transaction); }
+    catch (const std::exception&) { p0_fetch_rejected = true; }
+    try { (void)score_to_mask_v3_escrow_fetch(recovery1, package_info_p1, 1,
+                                              output1.transaction); }
+    catch (const std::exception&) { p1_fetch_rejected = true; }
+    require(p0_fetch_rejected && p1_fetch_rejected,
+            "missing escrow state unexpectedly allowed a recipient fetch");
+  } else if (fail_p1_before_submit || timeout_precommit) {
     require(has_aborted_precommit_record(db_path, output0.transaction),
             "A restart did not durably abort the staged one-share transaction");
     bool p0_fetch_rejected = false;
@@ -1412,19 +1490,32 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     std::cout << scores[i];
   }
   std::cout << "],\"oracle\":\""
-            << ((fail_p1_before_submit || timeout_precommit)
+            << ((fail_p1_before_submit || timeout_precommit ||
+                 delete_pending_transaction_row)
                     ? "NOT_APPLICABLE_NO_SHARE" : "PASS")
             << "\",\"party_api\":\""
-            << ((fail_p1_before_submit || timeout_precommit)
-                ? "BOTH_RECOVERY_REQUIRED_NO_SHARE"
+            << (timeout_precommit
+                ? "P0_DEFINITE_ABORT_P1_RECOVERY_REQUIRED_NO_SHARE"
+                : (delete_pending_transaction_row
+                    ? "P0_COMMIT_RECOVERY_REQUIRED_P1_RECOVERY_REQUIRED_NO_SHARE"
+                    : (fail_p1_before_submit
+                    ? "BOTH_RECOVERY_REQUIRED_NO_SHARE"
                 : (fail_fetch_after_commit || throw_nonstd_fetch_after_commit
                     ? "P0_FETCH_RECOVERY_REQUIRED_P1_COMMITTED"
                     : (lose_receipt_p0 || throw_nonstd_submit_after_commit
                         ? "P0_COMMIT_RECOVERY_REQUIRED_P1_COMMITTED"
-                        : "BOTH_COMMITTED")))
-            << "\",\"escrow_post_restart_recovery\":\""
-            << ((fail_p1_before_submit || timeout_precommit)
-                    ? "ABORTED_NO_FETCH" : "PASS") << "\","
+                        : "BOTH_COMMITTED")))))
+            << "\",\"p0_state\":" << static_cast<unsigned>(output0.state)
+            << ",\"p1_state\":" << static_cast<unsigned>(output1.state)
+            << ",\"p0_abort_code\":\"" << output0.status_code
+            << "\",\"p1_abort_code\":\"" << output1.status_code
+            << "\",\"p0_share_bytes\":" << output0.share.size()
+            << ",\"p1_share_bytes\":" << output1.share.size()
+            << ",\"escrow_post_restart_recovery\":\""
+            << (delete_pending_transaction_row
+                    ? "STATE_ROW_REMOVED_NO_FETCH"
+                    : ((fail_p1_before_submit || timeout_precommit)
+                        ? "ABORTED_NO_FETCH" : "PASS")) << "\","
             << "\"gate_count\":" << budget.gate_count
             << ",\"material_payload_bytes_per_party\":" << material_bytes
             << ",\"package_format_version\":" << test_package_format(package_info)
@@ -1455,6 +1546,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
             << (fail_p1_before_submit ? "true" : "false")
             << ",\"injected_precommit_timeout\":"
             << (timeout_precommit ? "true" : "false")
+            << ",\"injected_missing_transaction_row\":"
+            << (delete_pending_transaction_row ? "true" : "false")
             << ",\"injected_fetch_failure_after_commit\":"
             << (fail_fetch_after_commit ? "true" : "false") << ","
             << "\"injected_nonstd_submit_exception_after_commit\":"
@@ -1969,6 +2062,49 @@ int main(int argc, char** argv) {
           false, false, kScoreToMaskV3ReceiptFormatV2,
           std::string(case_name) + "-n128-k64", 3U, fail_fetch,
           throw_nonstd_submit, throw_nonstd_fetch);
+      return 0;
+    }
+    if (argc > 1 &&
+        std::string(argv[1]) == "--s52-ft-v3-api-v2-targeted") {
+      std::vector<std::int32_t> scores(128U);
+      for (std::uint32_t i = 0; i < scores.size(); ++i) {
+        switch (i % 8U) {
+          case 0: scores[i] = INT32_MAX; break;
+          case 1: scores[i] = INT32_MIN; break;
+          case 2: scores[i] = -17; break;
+          case 3: scores[i] = 17; break;
+          case 4: scores[i] = 0; break;
+          case 5: scores[i] = INT32_MAX; break;
+          case 6: scores[i] = -1; break;
+          default: scores[i] = 4096; break;
+        }
+      }
+      const auto run = [&](const std::string& id, bool lose_receipt,
+                           bool timeout_precommit, bool fail_fetch,
+                           bool nonstd_submit, bool nonstd_fetch,
+                           bool delete_pending_row = false) {
+        const auto case_dir =
+            (std::filesystem::path(directory.path) / id).string();
+        std::filesystem::create_directory(case_dir);
+        run_one_e2e(binary, case_dir, identities, scores, 64U,
+            lose_receipt, false, timeout_precommit,
+            kScoreToMaskV3ReceiptFormatV2, id, 3U, fail_fetch,
+            nonstd_submit, nonstd_fetch, delete_pending_row);
+      };
+      run("s52-ft-v3-api-v2-normal", false, false, false, false, false);
+      run("s52-ft-v3-api-v2-submit-standard-unknown", true, false,
+          false, false, false);
+      run("s52-ft-v3-api-v2-fetch-standard-failure", false, false,
+          true, false, false);
+      run("s52-ft-v3-api-v2-submit-nonstandard-unknown", false, false,
+          false, true, false);
+      run("s52-ft-v3-api-v2-fetch-nonstandard-failure", false, false,
+          false, false, true);
+      run("s52-ft-v3-api-v2-server-timeout", false, true,
+          false, false, false);
+      run("s52-ft-v3-api-v2-missing-state-row", false, false,
+          false, false, false, true);
+      std::cout << "S52_FT_V3_API_V2_TARGETED PASS cases=7\n";
       return 0;
     }
     if (argc > 1 && std::string(argv[1]) == "--s48-ft-v3-frame-trace") {
