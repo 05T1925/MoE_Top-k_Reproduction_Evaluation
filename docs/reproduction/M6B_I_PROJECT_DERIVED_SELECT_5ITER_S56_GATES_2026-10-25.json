@@ -1,0 +1,147 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s56-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S56",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "0c4a35fb7bdf5d234e98eb1616cb65aae03ab3fd",
+    "tree": "a37fe6edc5cb0f5d1cb702347bee534c6d84e200",
+    "parent": "4695d70a4bb9a7f2bbce5c6fc7e163cb3f93d978",
+    "s55_manifest_canonical_delivery_sha256": "cfe208960db5a26c545f0bf04aea020e34a72d900d76e4ed03fda3754ce85b81",
+    "s55_fixed_source_files": 15,
+    "fixed_source_hashes_match": true,
+    "fixed_source_git_blobs_match": true,
+    "s55_delivery_git_blobs_match": true,
+    "windows_checkout_line_ending_differences": [
+      "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S55_DECISION_2026-10-25.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S55_REPORT_2026-10-25.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S55_GATES_2026-10-25.json"
+    ]
+  },
+  "gates": {
+    "S55_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "S55 source manifest rechecked in isolated S55 commit; 15 source raw hashes and Git blobs match. Four delivery Git blobs and canonical delivery digest match. Three Windows checkout raw hashes differ due CRLF; blobs are authoritative."
+    },
+    "TOKEN_V2_SOURCE_CALL_AND_TX_ORDER": {
+      "status": "PASS_WITH_SCOPE",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp:245-260,314-443",
+      "scope": "One 32-byte RAND_bytes call after two authenticated ciphertext rows exist and before state=COMMITTED/receipt update, all in the finalize transaction. Source review only."
+    },
+    "TOKEN_FAILURE_AND_RECOVERY_STATE_MAPPING": {
+      "status": "PASS_WITH_SCOPE",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp:281-311,427-442,445-473,537-564,615-624; VFSS/src/moe_topk/score_to_mask_v3_party.cpp:831-902",
+      "scope": "No token / locally generated but commit outcome unknown / committed persisted token distinguished. Rollback result is unchecked; no physical durability or universal rollback claim."
+    },
+    "IDEAL_TOKEN_JOINT_CONDITIONAL_LAW": {
+      "status": "PASS_WITH_SCOPE",
+      "assumptions": [
+        "Ideal independent uniform 256-bit token source",
+        "Both TLS-authenticated deposits pass context/request/envelope-format checks before sampling; A does not decrypt or validate the encrypted share plaintext",
+        "Commit/fetch/API success event does not select on token value",
+        "Honest peer follows the actual endpoint route"
+      ],
+      "scope": "Token remains uniform conditional on party prefix and A-only hidden context/ciphertexts under the stated nonselective ideal state machine. Does not prove peer-route simulation or full party view."
+    },
+    "A_STATUS_AWARE_DRBG_GAME_FORM": {
+      "status": "CONDITIONAL",
+      "expression": "epsilon_A = Adv_DRBG_A(Q_A,total,C_A,total;E_A,P)",
+      "required_observables": [
+        "adaptive RAND request boundaries and lengths",
+        "returned token bytes and RAND success/error status",
+        "interleavings and relevant shared-context RNG calls",
+        "transaction state outcome",
+        "submit response, receipt, authenticated fetch result and API-visible outcome"
+      ],
+      "scope": "A symbolic whole-state-machine replacement is available only under a concrete target deployment E_A and request model; no numerical advantage claimed."
+    },
+    "A_DEPLOYMENT_PROFILE": {
+      "status": "OPEN",
+      "availability": "NOT_AVAILABLE",
+      "gap": "No target A binary/image, loaded libcrypto/provider/OSSL_LIB_CTX profile, entropy/reseed/lifecycle/concurrency description, or deployment declaration found in the fixed repository."
+    },
+    "A_AGGREGATE_RNG_QUERIES": {
+      "status": "OPEN",
+      "gap": "A single finalize attempt contributes 32 API bytes and one RAND_bytes call; retry count, concurrent/service-wide calls, shared RNG users and provider-internal operations are unknown."
+    },
+    "A_RAND_SUCCESS_CONDITIONING": {
+      "status": "CONDITIONAL",
+      "bound": "For a joint (S,V) advantage epsilon_A and p_I=Pr_I[S], p_R>=p_I-epsilon_A and Adv_cond<=2*epsilon_A/(p_I-epsilon_A), requiring epsilon_A<p_I. For token RAND success alone p_I=1 in the ideal token-source game.",
+      "gap": "No target A RAND status/error model or instantiated epsilon_A."
+    },
+    "A_COMMIT_FETCH_SUCCESS_CONDITIONING": {
+      "status": "OPEN",
+      "gap": "No evidence-backed p_min for SQL COMMIT, authenticated recovery fetch or complete API success; historical E2E counts are not a probability lower bound."
+    },
+    "KPOST_SUCCESSFENCE_COMPOSITION": {
+      "status": "PASS_WITH_SCOPE",
+      "inherited_from": "S51",
+      "scope": "Ideal FTv3, ideal A token RNG, honest peer causal deposit and externally guaranteed successful schedule; application-message view only."
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW": {
+      "status": "OPEN",
+      "inherited_from": "S53",
+      "scope": "Real timeout/wall-clock success selection and its relation to pre-view are not simulated or proved here."
+    },
+    "L_S29_AND_ROLE_OUTPUT_CONTRACT": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "No leakage, input, output, role, or normal commit/fetch contract change. A-only state remains outside L_S29."
+    },
+    "S52_N_LE_1000_FUNCTIONAL_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Inherited finite S52 cases only; not rerun in S56 and not a security statement."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new explicit owner decision found or requested."
+    },
+    "T_DRBG_SIGNATURE_PUBLICATION_TLS_RECIPIENT_ENCRYPTION": {
+      "status": "OPEN",
+      "scope": "Independent S55/S53 gates; S56 A-token result does not close these."
+    },
+    "FULL_PARTY_VIEW_COMPOSITION": {
+      "status": "OPEN",
+      "scope": "No overall GMW/Select/shuffle/output/escrow proof."
+    },
+    "NATURAL_BUSINESS_IO_FAILURE": {
+      "status": "NOT_REPRODUCED",
+      "evidence": "Inherited prior scope; no runtime test rerun in S56."
+    },
+    "RUNTIME_DEFECT_REPRODUCED": {
+      "status": "NOT_REPRODUCED",
+      "evidence": "Read-only source review found no reproducible defect; no tests/build run."
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN",
+      "reason": "No runtime/test source change and no reproduced defect."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "alias_created": false
+    },
+    "PUSH_MERGE": {
+      "status": "NOT_PERFORMED"
+    },
+    "NONAUTHOR_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "reviewer": "/root/s56_token_independent_review",
+      "scope": "Read-only independent review of exact source, ideal token conditional law, status state machine, recovery and success-conditioning formula. Reviewer did not build/test/edit and had no A deployment profile."
+    }
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "formal_performance": "NOT_RUN_NOT_MEASURED",
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "vfss_baseline_modified": false
+  }
+}

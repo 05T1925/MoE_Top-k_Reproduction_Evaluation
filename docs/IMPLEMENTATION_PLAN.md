@@ -1335,3 +1335,13 @@ S55 在隔离 worktree 从固定 S54 commit `4695d70a4bb9a7f2bbce5c6fc7e163cb3f9
 S55 分开保留 `S_RNG`（RAND 全成功且 sampler 未 cap-abort）与 `S_issue`（随机阶段、签名/序列化及三文件发布成功）。对 `S_RNG`，必须把请求边界/长度、实际返回字节、成功/错误状态、cap 中止位置和 issuer 输出纳入同一优势游戏；隐藏初始和 reseed 熵依实际 law 求平均。完整 `S_issue` 条件还需联合游戏覆盖该状态并有可审查 `Pr_I[S_issue]≥p_min>ε_T`；当前无目标 provider/error、签名器或文件发布成功下界，保持 `OPEN`。文件源码为 O_EXCL 私有 burn marker 后采样，且 package0→package1→context 顺序写入；仅同一未回滚 registry 的重放拒绝有范围性依据，不推导跨版本/目录防重、跨文件原子性或掉电耐久。
 
 目标资料需由 T 部署/SRE、构建发布和密码服务/PKI 负责人以脱敏 profile 提供，范围见 S55 report 第 10 节；不得收集 seed、熵、私钥、证书私密部分或生产凭据。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`；`ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW`、A token RNG、TLS/mTLS、recipient encryption、完整 party-view 与性能门继续分开 OPEN/NOT_RUN。仅文档变更，BUILD/TEST=`NOT_RUN`，不重跑历史矩阵，不跑正式 LAN/WAN/RTT/AAV86，不创建 `secure` alias，不推送或合并。详见 S55 decision、report、gates 和 source/evidence manifest。
+
+### S56：receipt/v2 token 随机性及提交状态桥接（2026-10-25）
+
+S56 固定 S55 commit 0c4a35fb7bdf5d234e98eb1616cb65aae03ab3fd，并重核 S55 manifest 的 15 项源码 raw hash/Git blob、四个交付 Git blob 与 canonical delivery digest。Windows checkout 中三份 S55 文本交付 raw hash 因 CRLF 不同，但 Git blob 匹配；不视为来源变化。
+
+固定 escrow 源码中，receipt/v2 仅在两份经 TLS 身份/context/request/envelope 格式检查的密文行齐备且旧状态为 PENDING 时调用一次 RAND_bytes(token,32)；A 不解密 share 明文，随后在同一 BEGIN IMMEDIATE 事务写入 COMMITTED 与 token 并 COMMIT。重复同密文 submit 和 committed fetch 复用存储的 token；fetch 只返回请求方自己的密文。理想独立 A token RNG 下，给定任一方前缀、本方提交密文、隐藏 context/package-set、对端密文及认证 deposit 后，若 commit/fetch 成功不按 token 内容筛选，则 token 的完整条件 law 仍为 256-bit uniform，响应和恢复是该 token 的确定性后处理。该局部引理不提供诚实对端路由，也不等同完整 party-view 证明。
+
+源码级随机接口桥保留为 ε_A=Adv_DRBG_A(Q_A,total,C_A,total;E_A,P)，需联合覆盖请求边界/长度、字节、成功/错误状态、并发/共享调用、提交状态、响应与 fetch。对联合成功事件 S，仅在同一游戏下有 p_I=Pr_I[S] 且 ε_A<p_I 时，条件视图界才可写成 2ε_A/(p_I−ε_A)。单次 token RAND 成功在理想源下 p_I=1；SQL COMMIT、恢复 fetch 和完整 API success 没有证据支持的 p_min。目标 A 服务/provider/熵-reseed/lifecycle/共享 RNG profile 未找到，故 deployment bridge=OPEN/NOT_AVAILABLE，实际 commit/fetch success conditioning=OPEN。
+
+S51 的理想 token/SuccessFence 成功消息后缀结论仅按原范围继承；S53 实际 finite-timeout 成功 view 继续 OPEN。S52 N≤1000 有限功能收据只继承，不是本轮测试或安全证明。T DRBG、签名及文件发布、TLS/mTLS、recipient encryption、完整 GMW/Select/shuffle/output/escrow、N>256 安全扩域与 LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE 均维持各自开放门。没有发现可复现代码缺陷；runtime/test 未改，BUILD/TEST=NOT_RUN，历史矩阵与正式性能未运行/测量。独立 reviewer 只读复核源码状态次序、理想条件分布与优势公式，未构建/测试或实例化 A 部署。详见 S56 decision/report/gates/source-evidence manifest。
