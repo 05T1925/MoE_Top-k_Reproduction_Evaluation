@@ -1355,3 +1355,13 @@ S57 固定 S56 commit `66a3db485ffa9ac752a49fd0f8a0f100fcef4cbe`，在隔离 wor
 S57 提出 proof-only `F_TOPK-ISSUE-ESCROW/v1` 组合规格候选：绑定同次 invocation，显式列 issuer 内部发行 outcome、同 invocation party-launch/delivery 映射、A latent state 与 party-visible API projection；不将 T/A 私有错误、context、peer material 或 controller database 权限交给 party simulator，也不扩大 `L_S29`。该 proposal 未实现、未获新合同批准，且不提供目标失败概率。未参与 S50–S57 的非作者 reviewer `/root/s57_independent_review` 只读复核了首个缺口、权限边界及 proposal；未编辑、构建或测试。
 
 `LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`；真实 T/A DRBG、签名/文件发布、SQLite durability/rollback、TLS/mTLS、recipient encryption、finite-timeout view、完整 GMW/Select/shuffle/output/escrow composition 与 N>256 安全扩域仍各自开放。S52 有限功能收据仅继承；S57 BUILD/TEST=`NOT_RUN`，未测性能，不运行历史矩阵或自然 I/O。无 runtime/test 变化，不改 `VFSS-baseline/`，不建 secure alias，不推送/合并。详见 S57 decision/report/gates/source-evidence manifest。
+
+### S58：正常执行、协议中止与部署故障的单方完整视图（2026-10-26）
+
+S58 固定 S57 commit `79f61f6298e0da65b7c64ea4e748bee1afd1ebb1`，核对 7 项 primary source、9 项 evidence input、15 项 S55 runtime source 的 hash/blob，并重算 S56/S57 历史 canonical delivery。S57 decision/report 的两项 manifest blob ID 与固定 HEAD blob 不符；其记录 SHA-256 与 HEAD blob 内容 SHA-256 一致，Windows checkout 的 raw 哈希另有 CRLF 差异。S58 manifest 按实际 HEAD blob 记录 erratum，未改历史材料。
+
+当前 `F_T/v3`、`F_TOPK`、A escrow 合同不足以支撑不按成功事件筛选的完整单方视图。S49 已定义理想 IID bounded sampler cap exhaustion 的 `ISSUANCE_ABORT`/private burn/no package outcome；缺口在该 outcome 与同一 invocation 的 package/context delivery、P0/P1 启动/通知、`F_TOPK` 输出、A 隐藏交易态及 party API/recovery 的联合状态核。对有效公开参数，最早运行时发行故障可在 signer key read/parse（`score_to_mask_v3_gmw.cpp:862–870`）发生；若其被外生化，首个持久状态缺口是 marker 的分阶段 I/O 和部分发布状态（`:492–543`）。两者是证明/接口缺口，不是攻击或不可能性结论。
+
+只继承 SuccessFence 下的范围性成功应用消息视图：理想 IID FTv3 cap-success、理想 A token RNG、至多一方静态半诚实、A/T 条件受信且不合谋、诚实 peer 因果提交、N≤256、无 I/O/进程故障且外生保证按期处理。真实有限 timeout/wall-clock 仍 OPEN。协议中止全视图、部署故障全视图也仍 OPEN；不得把 API no-share 写成进程从未形成临时 share。`F_TOPK-ISSUE-ESCROW/v1` 仅为未批准、未实现的 proof-only 候选，不能扩大 `L_S29`、角色或模拟器权限。
+
+三项负责人事项均为 `OPEN_CONFIRMATION`：低概率 cap abort 后烧掉 invocation 并用新 invocation 重试是否接受；非协议发材失败是否需双方同获明确失败且都不启动；隐私定理是否限于初始化/发材成功后的正常执行。非作者 `/root/s58_independent_review` 只读复核状态机与首个联合核缺口，未构建、测试或修改文件。S58 不改运行时/测试，BUILD/TEST=`NOT_RUN`，不重跑历史矩阵或自然 I/O；正式 LAN/WAN、RTT、AAV86 与性能未运行/未测量，不改 `VFSS-baseline/`，不创建 `secure` alias，不推送/合并。详见 S58 decision/report/gates/source-evidence manifest。

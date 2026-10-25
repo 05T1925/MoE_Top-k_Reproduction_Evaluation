@@ -1,0 +1,156 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s58-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S58",
+  "date": "2026-10-26",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "79f61f6298e0da65b7c64ea4e748bee1afd1ebb1",
+    "tree": "e18037236c7c58089a8ac58b792adf9716b56b29",
+    "parent": "66a3db485ffa9ac752a49fd0f8a0f100fcef4cbe",
+    "branch": "codex/m6b-i-project-select5-s58",
+    "initial_worktree_clean": true,
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-i-project-select5-s58/MoE_Top-k_Reproduction_Evaluation"
+  },
+  "gates": {
+    "S57_FIXED_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "S57 HEAD/tree/parent fixed. Manifest primary sources 7/7, evidence inputs 9/9 and fixed S55 runtime rows 15/15 match checkout raw hashes and Git blobs. S56 canonical delivery recomputed. S57 delivery manifest has incorrect Git blob IDs for its decision/report; S58 erratum records actual HEAD blobs and normalized content hashes."
+    },
+    "S57_DELIVERY_MANIFEST_ERRATUM": {
+      "status": "OPEN_METADATA_DIVERGENCE",
+      "scope": "S57 canonical hash recomputes from recorded delivery hash rows, but decision/report recorded blob IDs differ from S57 HEAD blobs. Raw-byte SHA values for Markdown equal LF-normalized Git blob content, while Windows checkout contains CRLF. No runtime/source blob mismatch found.",
+      "decision_manifest_blob_recorded": "ce04b80312df480e7ee676a7d2b6c5c4850173d6",
+      "decision_head_blob": "1056f3be7e873660932804d5483aa200210a21e4",
+      "decision_manifest_raw_sha256": "9f3815ec290b5c8997b10db4115fd43e874a8f3684f81076bacc80418538d2a0",
+      "decision_checkout_raw_sha256": "91c55d3f83d754525303cf2d6173a83369664d3186dd903edb6787ef00a63059",
+      "report_manifest_blob_recorded": "374644f75515e8b189f3915bddd442c41e5f1cf1",
+      "report_head_blob": "80b8ce60e82147ee773d1fd83c80f5f8abd5a243",
+      "report_manifest_raw_sha256": "2151e4a58699a24b0a4deee22c7e68959e8a33ed3eab7b202ecd6c8c55658366",
+      "report_checkout_raw_sha256": "acd2ec9b392ddd97dee064c5e2262394baf6c8c9c5eb00ac6339a8c1eb981ea3",
+      "recorded_canonical_delivery_sha256": "11dec51d82ec56ee73193b39f5f7e205f04ee2b681e5cc7426b508527bdd0389",
+      "recomputed_from_recorded_rows_sha256": "11dec51d82ec56ee73193b39f5f7e205f04ee2b681e5cc7426b508527bdd0389"
+    },
+    "NORMAL_SUCCESS_SUCCESSFENCE_VIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Inherited S50 Kpre3, S51 Kpost3, S53 SuccessFence",
+      "scope": "Ideal IID FTv3 with cap_success, ideal independent A token RNG, static semi-honest corruption of at most one party, trusted non-colluding T/A, honest peer causal deposit, 1<=K<=N<=256, no I/O/process fault, externally guaranteed on-time legal messages. Application-message view only; not actual timeout or deployment probability."
+    },
+    "FTV3_CAP_ABORT_LOCAL_FUNCTION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "S49 ideal FTv3 definition",
+      "scope": "Ideal IID bounded sampler exhaustion returns ISSUANCE_ABORT to issuance caller, retains ideal private burn, publishes no packages/context/online lease. This local outcome is not a joint F_TOPK launch/API failure law."
+    },
+    "UNCONDITIONAL_FULL_SINGLE_PARTY_VIEW": {
+      "status": "OPEN",
+      "scope": "Current FTv3, F_TOPK and escrow do not define a same-invocation joint kernel from issuance outcome through package/context delivery, party start/notice, online output, A state, response, fetch/recovery and API result, including share formed versus share returned."
+    },
+    "FIRST_UNMODELED_RUNTIME_FAILURE_PROJECTION": {
+      "status": "OPEN",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp:862-870",
+      "gap": "After valid public parameters, signer key read/parse can fail before before_material/marker. The ideal issuance interface has no matching outcome or projection to same-tau party delivery/start/notice. This is a modeling/interface gap, not an attack."
+    },
+    "FIRST_PERSISTENT_ISSUANCE_STATE_GAP": {
+      "status": "OPEN",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp:472-544,874; 361-385",
+      "gap": "Registry/marker open/stat/create/write/fsync/close/directory-fsync outcomes and partial artifacts are not represented by ideal private burn; package files are then created sequentially without cross-file rollback."
+    },
+    "PROTOCOL_ABORT_FULL_VIEW": {
+      "status": "OPEN",
+      "scope": "F_T cap-abort is locally specified; replay/already-burned projection, validation rejects, participant abort, peer connection loss and the parties' same-invocation launch/notice/API outcomes are not composed into a full view kernel."
+    },
+    "A_ESCROW_STATUS_AND_PARTY_API_SOURCE_MAP": {
+      "status": "PASS_WITH_SCOPE",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp:245-260,281-311,314-485,537-624; VFSS/src/moe_topk/score_to_mask_v3_party.cpp:799-920",
+      "scope": "Static source mapping only. A PENDING/COMMITTED/ABORTED are latent DB state; COMMIT_STATUS_UNKNOWN is a caller/API observation. Local share may form before submit and is returned only after verified fetch/decryption/equality. No rollback or durability proof."
+    },
+    "DEPLOYMENT_FAILURE_FULL_VIEW": {
+      "status": "OPEN",
+      "scope": "Actual signer, marker/filesystem, RAND/provider, package publication, A token RNG, SQLite transaction/rollback/restart, TLS/network and timeout joint laws are unavailable. May be excluded only by an explicit success-only theorem; no failure-privacy claim follows."
+    },
+    "ACTUAL_FINITE_TIMEOUT_VIEW": {
+      "status": "OPEN",
+      "evidence": "S53 inherited",
+      "scope": "No evidence-backed deployment scheduler law or permission-correct sampler for success-conditioned real timeout/wall-clock views; no expansion of L_S29."
+    },
+    "F_TOPK_ISSUE_ESCROW_V1_SPEC": {
+      "status": "CONDITIONAL",
+      "implemented": false,
+      "scope": "Proof-only proposed interface with typed issuance outcomes, same-tau delivery/start projection, hidden A state and separate party API/share-formed observations. Requires owner decisions and independent proof review; does not bridge real deployment."
+    },
+    "L_S29_ROLE_INPUT_OUTPUT_NORMAL_DELIVERY": {
+      "status": "UNCHANGED",
+      "scope": "No leakage, roles, output, input, normal escrow process or default switch changed."
+    },
+    "OWNER_CONTRACT_CONFIRMATIONS": {
+      "status": "OPEN_CONFIRMATION",
+      "questions": [
+        "Is low-probability FTv3 cap exhaustion acceptable for a valid input, burning the invocation and requiring a new invocation retry?",
+        "On non-protocol issuance errors such as signer or file publication failure, must both parties receive the same definitive failure and must neither start online execution?",
+        "Is the privacy theorem limited to normal execution after successful initialization/issuance, or must ideal functionality/proof cover deployment failures?"
+      ]
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new owner decision found."
+    },
+    "NATURAL_BUSINESS_IO_FAILURE": {
+      "status": "NOT_RUN",
+      "inherited_status": "NOT_REPRODUCED",
+      "scope": "No natural I/O experiment in S58."
+    },
+    "RUNTIME_DEFECT_REPRODUCED": {
+      "status": "NOT_RUN",
+      "scope": "Read-only source/model review only; no runtime test performed."
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN",
+      "reason": "No runtime/test source changes; scoped proof and contract audit."
+    },
+    "HISTORICAL_FUNCTION_MATRICES": {
+      "status": "NOT_RUN",
+      "scope": "S35/S40/S52 matrices not repeated; historical results are inherited only."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "N_GT_256_SECURITY": {
+      "status": "NOT_IN_SCOPE"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "alias_created": false
+    },
+    "VFSS_BASELINE": {
+      "status": "UNCHANGED"
+    },
+    "PUSH_MERGE_PR": {
+      "status": "NOT_PERFORMED"
+    },
+    "NONAUTHOR_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "reviewer": "/root/s58_independent_review",
+      "independent_of_s50_s58": true,
+      "scope": "Read-only review of issuance/escrow state machine, failure classes, role visibility, exact missing joint kernel and candidate ideal interface.",
+      "edits": "NONE",
+      "build": "NOT_RUN",
+      "tests": "NOT_RUN",
+      "limitation": "Contract/proof-scope review only; not full cryptographic proof or independent functional receipt."
+    }
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "ideal_functionality_implemented": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "natural_io": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "formal_performance": "NOT_RUN_NOT_MEASURED",
+    "vfss_baseline_modified": false,
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "pull_request_created": false
+  }
+}
