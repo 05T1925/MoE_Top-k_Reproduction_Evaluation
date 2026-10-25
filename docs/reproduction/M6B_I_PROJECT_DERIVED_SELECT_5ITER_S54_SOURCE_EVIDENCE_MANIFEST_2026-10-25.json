@@ -1,0 +1,254 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s54-source-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S54",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "dde7137c8fd185d5725d88980688caacde16da5b",
+    "tree": "589f12d813576ba0ba890d2ad6dbfbaa8792fa26",
+    "parent": "578ecadfe807748a3e2fada54ca11efe1b00d28c",
+    "branch": "codex/m6b-i-project-select5-s54-rng-bridge",
+    "origin_main": "c3926c68fd14f270faa8b55234311071947fa080",
+    "origin_main_is_ancestor": true,
+    "initial_worktree_clean": true,
+    "VFSS_baseline_unchanged": true
+  },
+  "history_chain": [
+    {
+      "stage": "S47",
+      "commit": "feb5e6677568d649906f46d0e611d5d52349c07f"
+    },
+    {
+      "stage": "S48",
+      "commit": "e05b01d5c7e3899297b76a5e0fca212d38d24229"
+    },
+    {
+      "stage": "S49",
+      "commit": "50bc223c19e24bdf052eacbd47be8df6a1d56d98"
+    },
+    {
+      "stage": "S50",
+      "commit": "ff77b9694a1259c3f314f145e06fcb980cda0bfb"
+    },
+    {
+      "stage": "S51",
+      "commit": "1cc1e5202b3a603b55aaae985704933d70db0794"
+    },
+    {
+      "stage": "S52",
+      "commit": "578ecadfe807748a3e2fada54ca11efe1b00d28c"
+    },
+    {
+      "stage": "S53",
+      "commit": "dde7137c8fd185d5725d88980688caacde16da5b"
+    }
+  ],
+  "s53_manifest": {
+    "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+    "checkout_raw_sha256": "2eedf262e4b6a89152434c7a05b66eaab33181d44ef4ced017aa0f1d806efceb",
+    "s53_git_blob_sha1": "f00a301672d36d133261112ebbe0dbd288615cc2",
+    "recorded_canonical_delivery_sha256": "43d5254d72f41d449356a9d8a3b8538219b7435a9b960f209c9efabe0a50437e",
+    "recomputed_recorded_canonical_delivery_sha256": "43d5254d72f41d449356a9d8a3b8538219b7435a9b960f209c9efabe0a50437e",
+    "delivery_files_checked": [
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "recorded_raw_sha256": "da7aabb1a5d8ddba3eaa447b980e9eedfddc4685e28b120ef5f5f0090026a278",
+        "recorded_git_blob_sha1": "d044dc44e565cffba0a2b225e6bfb4ba893e195b",
+        "s53_commit_git_blob_sha1": "d044dc44e565cffba0a2b225e6bfb4ba893e195b",
+        "blob_matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_DECISION_2026-10-25.md",
+        "recorded_raw_sha256": "117b2c87fe4defd8ac56946f672413c4473db0c4e85735850129ee67b0a04401",
+        "recorded_git_blob_sha1": "d3f928611febec7e7a262b3afc6e27d1bba9431b",
+        "s53_commit_git_blob_sha1": "d3f928611febec7e7a262b3afc6e27d1bba9431b",
+        "blob_matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_REPORT_2026-10-25.md",
+        "recorded_raw_sha256": "d9093e1ae97e9f060a4beaa73268990893695753ba6ff3d51cd516ca3b7d23f9",
+        "recorded_git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+        "s53_commit_git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+        "blob_matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_GATES_2026-10-25.json",
+        "recorded_raw_sha256": "2147a52f5e44628b0ef8d5b97061b25604126314949a5e2d358350f66ca2dd12",
+        "recorded_git_blob_sha1": "9fab59c52dc3821da53f1cbfed1d6845ce22e1d2",
+        "s53_commit_git_blob_sha1": "9fab59c52dc3821da53f1cbfed1d6845ce22e1d2",
+        "blob_matches": true
+      }
+    ],
+    "delivery_blobs_all_match": true,
+    "checkout_raw_reconciliation": "At S54 start, three text/JSON delivery raw hashes differed because core.autocrlf=true while Git blobs matched; IMPLEMENTATION_PLAN raw and blob matched before S54 append. The fixed commit blob is authoritative."
+  },
+  "fixed_runtime_sources": [
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+      "raw_sha256": "6870cf9f1fb92cae8dcfaa385c7beb17effefab04afbc0e010f382565b3afc9f",
+      "s53_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "current_checkout_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "listed_in_s53_reviewed_sources": true,
+      "recorded_s53_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "matches_s53_commit": true,
+      "reviewed_lines": "36-55,147-160,186-287,361-386,472-544,718-741,839-1008,1126-1144"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+      "raw_sha256": "458a47fbdde4bf0ee9575a6b60b628d8750f0732bd51c1ed46239bc00090912f",
+      "s53_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+      "current_checkout_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+      "listed_in_s53_reviewed_sources": false,
+      "recorded_s53_git_blob_sha1": null,
+      "matches_s53_commit": true,
+      "reviewed_lines": "7-30,48-63"
+    },
+    {
+      "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "raw_sha256": "b55b2908efa97f9fdc6a85f337bee8ea30e0b76057ab88ce2bdab0647fbdecc1",
+      "s53_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "current_checkout_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "listed_in_s53_reviewed_sources": true,
+      "recorded_s53_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "matches_s53_commit": true,
+      "reviewed_lines": "33-45"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+      "raw_sha256": "cf99f62a50145faa4b6dcce31f1e0237c2975647293191cc830b8397178531a8",
+      "s53_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "current_checkout_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "listed_in_s53_reviewed_sources": true,
+      "recorded_s53_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "matches_s53_commit": true,
+      "reviewed_lines": "follow-on RNG callers; excluded from Dealer Q/C"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "raw_sha256": "f6aca56cfe156892e861649cc5513513e12e3328eae2c55ba357c61d1e28c755",
+      "s53_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "current_checkout_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "listed_in_s53_reviewed_sources": true,
+      "recorded_s53_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "matches_s53_commit": true,
+      "reviewed_lines": "cross-component RNG context; not an S54 dependency proof"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "raw_sha256": "7018044af8475e1fc87ca0aeb80538685bfafe304ded67642faad6195beeb5b4",
+      "s53_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "current_checkout_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "listed_in_s53_reviewed_sources": true,
+      "recorded_s53_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "matches_s53_commit": true,
+      "reviewed_lines": "TLS/transport RNG outside Dealer Q/C; SuccessFence inherited"
+    }
+  ],
+  "inherited_evidence": {
+    "S50": "Kpre_3 PASS_WITH_SCOPE: ideal IID FTv3, cap_success, N<=256; not reproved",
+    "S51": "Kpost_3 PASS_WITH_SCOPE: ideal A token RNG/causal peer/SuccessFence; not reproved",
+    "S53": "SuccessFence application-message composition PASS_WITH_SCOPE; real finite-timeout success-conditioned view OPEN",
+    "N1000": "S48/S52 finite functional cases only; not a security expansion",
+    "natural_business_io_fault": "NOT_REPRODUCED"
+  },
+  "random_ledger": {
+    "N": 1000,
+    "padded_m": 1024,
+    "index_bits": 10,
+    "W": 42,
+    "pair_count": 523776,
+    "G": 88626688,
+    "triple_tape_bytes": 88626688,
+    "permutation_share_tape_bytes": 131072,
+    "max_fisher_yates_word_bytes": 28644,
+    "Qmax_bytes": 88786404,
+    "Cmax_rand_bytes_calls": 7247,
+    "max_single_request_bytes": 1048576,
+    "rho_max": "1023/2^32 < 2^-22",
+    "retry_limit": 7,
+    "delta_reject_bound": "1023*2^-154 = (1023/1024)*2^-144 < 2^-144 < 2^-128",
+    "delta_scope": "P_sem semantic-material projection under IID tape; excludes versions, encoding, hashes, signatures, package/context, and deployed transcript"
+  },
+  "proof_boundary": {
+    "iid_semantic_joint_law": "PASS_WITH_SCOPE",
+    "status_aware_random_stream": "CONDITIONAL under deployment Adv_DRBG_T(Q,C;E_T,P) for whole adaptive stream/status/output",
+    "deployment_profile": "OPEN/NOT_AVAILABLE",
+    "rand_success_condition": "OPEN without instantiated status-aware advantage/error bound",
+    "full_package_publication_condition": "OPEN; require Pr_I[S_issue]>=p_min>epsilon_T",
+    "successfence": "Inherited PASS_WITH_SCOPE only",
+    "actual_finite_timeout_view": "OPEN",
+    "issuance_abort_acceptance": "OPEN_CONFIRMATION",
+    "N_gt_256_security": "NOT_IN_SCOPE"
+  },
+  "review": {
+    "status": "PASS_WITH_SCOPE",
+    "reviewer": "fresh read-only subagent /root/s54_rng_non_author_review, fork_turns=none",
+    "scope": "Independently rederived request ledger, bounded rejection conditional joint law/delta, status-aware conditioning denominator, deterministic postprocessing, burn/publication scope, and SuccessFence boundary; reviewed corrected report/decision/gates.",
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "edits": "NONE"
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "formal_network": "NOT_RUN",
+    "performance": "NOT_RUN/NOT_MEASURED",
+    "runtime_defect_reproduced": false,
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "delivery_files": [
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "raw_sha256": "78f78e32dbb449c6fd87fb21af49efdd0e7656d1645ee203ce7c02eaca3eb44f",
+      "git_blob_sha1": "51a7fdd9859980ee105607360206cb3531252532"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_DECISION_2026-10-25.md",
+      "raw_sha256": "c56b7a518aa1564da52d488982dfbc031ba8c8caee46859273061003c5e05743",
+      "git_blob_sha1": "fc0ca2ddf0d3b4efc47f02909cd6dc0ac4334dbd"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_REPORT_2026-10-25.md",
+      "raw_sha256": "33c73cbf7342bc07fb35d8c0a87f51e834a2c0ec677eb076c145634bd97bcda2",
+      "git_blob_sha1": "44599a15135a710d711c0f1b9bd293ef07ee7392"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_GATES_2026-10-25.json",
+      "raw_sha256": "4791c644c098ed22baa34d67237f5deea585edad46150c13bc1ae39e6cfbc425",
+      "git_blob_sha1": "df3df31a47709f4c742e63afcfd30377339f165e"
+    }
+  ],
+  "canonical_delivery": {
+    "file_count": 4,
+    "sha256": "3e3f5786e14ec60c5469baedaca83e360bcd0ddb7d80e4c878c4de3f8eae41a2",
+    "definition": "SHA-256 of ordinal path-sorted UTF-8 lines <path><TAB><raw_sha256><LF>, excluding this manifest."
+  },
+  "self_reference": "This manifest is excluded from canonical_delivery to avoid a hash cycle; its raw/Git blob are not recorded within itself.",
+  "validation_attempts": [
+    {
+      "attempt": "Initial PowerShell manifest-validation command",
+      "result": "NOT_EXECUTED",
+      "reason": "Used the Pester Should assertion command outside a Describe block; command stopped before any repository checks."
+    },
+    {
+      "attempt": "Corrected explicit hash/JSON/diff validation",
+      "result": "PASS",
+      "details": "S54 delivery raw/blob hashes and canonical digest matched; S53 four delivery blobs and six fixed source blobs matched; JSON parsed; gates cross-checked; VFSS-baseline diff empty; git diff --check passed."
+    },
+    {
+      "attempt": "First staged git diff --check",
+      "result": "FAILED_THEN_FIXED",
+      "reason": "Reported Markdown hard-break trailing spaces on the new report/decision date lines; removed trailing spaces and reran the check."
+    },
+    {
+      "attempt": "Fixed-source manifest row cross-check",
+      "result": "PASS",
+      "details": "All six current checkout blobs compared directly with git objects at fixed S53 commit; bounded sampler header is checked directly against S53 tree because it is not separately enumerated in S53 reviewed_fixed_source_files."
+    }
+  ]
+}

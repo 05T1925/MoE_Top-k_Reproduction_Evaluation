@@ -1,0 +1,145 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s54-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S54",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "dde7137c8fd185d5725d88980688caacde16da5b",
+    "tree": "589f12d813576ba0ba890d2ad6dbfbaa8792fa26",
+    "parent": "578ecadfe807748a3e2fada54ca11efe1b00d28c",
+    "branch": "codex/m6b-i-project-select5-s54-rng-bridge",
+    "origin_main": "c3926c68fd14f270faa8b55234311071947fa080",
+    "origin_main_is_ancestor": true,
+    "initial_worktree_clean": true,
+    "VFSS_baseline_changed": false
+  },
+  "gates": {
+    "S53_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Exact commit/tree/parent verified. S53 manifest delivery blobs 4/4 match; canonical delivery digest recomputed from recorded raw rows matches 43d5254d72f41d449356a9d8a3b8538219b7435a9b960f209c9efabe0a50437e. Three checkout raw hashes differ under core.autocrlf=true while Git blobs match."
+    },
+    "FTV3_RANDOM_CALL_LEDGER": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "One fixed-source FTv3 issuance invocation, explicit RAND_bytes wrapper only.",
+      "derived": {
+        "N": 1000,
+        "padded_m": 1024,
+        "gate_count": 88626688,
+        "Qmax_bytes": 88786404,
+        "Cmax_rand_bytes_calls": 7247,
+        "max_request_bytes": 1048576
+      },
+      "evidence": "score_to_mask_v3_gmw.cpp:280-287,718-741,871-943,1126-1144. Does not include other process invocations, other RAND users, party/A/TLS random sources."
+    },
+    "FTV3_IID_SEMANTIC_JOINT_LAW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Fixed public P, fixed F_T/v3 profile, IID byte tape, successful deterministic post-processing; semantic material projection only.",
+      "evidence": "Per-gate 5-bit joint triple mapping, independent permutation-share bytes, and Fisher-Yates acceptance distribution were checked against fixed source. cap_success leaves semantic material law exact."
+    },
+    "BOUNDED_REJECTION_DELTA": {
+      "status": "PASS_WITH_SCOPE",
+      "bound": "rho_i <= 1023/2^32 < 2^-22; delta_reject <= 1023*2^(-22*7)=1023*2^-154 < 2^-144 < 2^-128",
+      "scope": "P_sem semantic-material projection under ideal IID tape only; not full signed package/context/transcript and not actual deployment probability."
+    },
+    "FTV3_VERSIONED_POSTPROCESSING": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "FTv3 package format 6/profile (ft=3,sampler=2,lambda=128,retry=7), context format 2 and escrow receipt-format 2 are separate fields; package/context hashes and signatures bind their fixed profile. Random-stream distance is preserved under the same deterministic postprocessing assumption. Signature unforgeability and provider fidelity remain separate OPEN terms."
+    },
+    "STATUS_AWARE_DRBG_REPLACEMENT": {
+      "status": "CONDITIONAL",
+      "assumption": "Deployment-specific adaptive joint-stream game covers request boundaries/lengths, returned bytes, all success/error statuses and issuer output; S is averaged under its actual hidden initial/reseed entropy law. T privately holds the fixed signer key in both issuer experiments; the key is not given to the distinguisher. epsilon_T=Adv_DRBG_T(Qmax,Cmax;E_T,P).",
+      "conditional_bound": "For S_RNG = all RAND_bytes calls succeeded and bounded sampler did not cap-abort: if the joint status-and-view advantage is epsilon_T and p_I=Pr_I[S_RNG]>=1-delta_reject, then p_R>=p_I-epsilon_T and conditional PPT view advantage <=2*epsilon_T/(p_I-epsilon_T) <=2*epsilon_T/(1-delta_reject-epsilon_T), requiring epsilon_T<1-delta_reject. This does not condition on successful signature/file publication.",
+      "evidence": "This is a sufficient conditional theorem, not an instantiated target deployment result."
+    },
+    "DRBG_DEPLOYMENT_PROFILE": {
+      "status": "OPEN",
+      "availability": "NOT_AVAILABLE",
+      "gap": "No target OpenSSL/libcrypto version/build, actual provider/config/OSSL_LIB_CTX, entropy/reseed policy, process/fork/restart/thread/concurrency profile, shared RNG aggregate Q/C or RAND failure evidence was supplied."
+    },
+    "RAND_SUCCESS_CONDITIONING": {
+      "status": "OPEN",
+      "gap": "Source aborts on RAND_bytes failure; no status-aware target advantage or probability of all-call success is available. A success-conditioned stream theorem cannot drop these statuses."
+    },
+    "ONE_SHOT_BURN_SCOPE": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Single fixed 0700 T registry directory, O_EXCL marker persisted before sampling, no backup/VM rollback, same FTv3 registry namespace.",
+      "outside_scope": "Cross-directory/cross-version global replay prevention, rollback resistance, cross-file atomic publication, power-loss guarantee."
+    },
+    "ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new owner acceptance/rejection record for the low-probability bounded-sampler abort contract."
+    },
+    "IDEAL_SUCCESSFENCE_COMPOSITION": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Inherited S53 SuccessFence success application-message view only, ideal F_T/v3 and A RNG assumptions; S54 does not reprove S50/S51."
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW": {
+      "status": "OPEN",
+      "evidence": "No Law(Vpre|Q,cap_success,S_actual) relation/sampler. SuccessFence does not model real timeout selection. L_S29 unchanged."
+    },
+    "A_TOKEN_RNG_TLS_SIGNATURE_RECIPIENT_CRYPTO": {
+      "status": "OPEN",
+      "scope": "A token RNG, TLS/mTLS, signature authenticity/provider implementation, recipient encryption and hash binding advantages are separate from the Dealer tape term."
+    },
+    "PARTY_VIEW_COMPOSITION": {
+      "status": "OPEN",
+      "scope": "No complete deployed GMW/Select/shuffle/output/escrow party-view proof. N>256 security expansion is not in the inherited Kpre3 scope."
+    },
+    "NATURAL_BUSINESS_IO_FAULT": {
+      "status": "NOT_REPRODUCED",
+      "evidence": "Inherited S40-S53 evidence only; no S54 runtime path executed."
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN",
+      "evidence": "No runtime/test changes or reproducible defect; static source and proof review only."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "evidence": "No full proof or independent full-protocol review; no alias created."
+    },
+    "PUSH_MERGE": {
+      "status": "NOT_PERFORMED"
+    },
+    "FULL_PACKAGE_PUBLICATION_CONDITIONING": {
+      "status": "OPEN",
+      "gap": "Conditioning on fully published packages additionally requires S_publish (successful signing/serialization and all three durable_create operations) and an ideal success lower bound Pr_I[S_issue]>=p_min>epsilon_T, S_issue=S_RNG AND S_publish. No signing/provider or filesystem publication success bound is available. Failure remains in the unconditional issuer-output game but is not silently conditioned away."
+    },
+    "NONAUTHOR_RNG_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Independent read-only rederivation of IID conditional law/delta, Qmax/Cmax/call order, status-aware conditioning, post-processing, burn/publication scope and SuccessFence boundary.",
+      "reviewer_build": "NOT_RUN",
+      "reviewer_tests": "NOT_RUN",
+      "runtime_changes_by_reviewer": false
+    }
+  },
+  "review": {
+    "S54_non_author_rng_review": "PASS_WITH_SCOPE",
+    "review_scope": [
+      "IID rejection/cap_success conditional joint law and delta scope",
+      "Qmax/Cmax derivation and request-call order",
+      "status-aware DRBG and conditional success reduction",
+      "deterministic package/context/signature post-processing boundaries",
+      "one-shot registry scope and multi-file publication caveat",
+      "SuccessFence versus actual timeout wording"
+    ],
+    "build_or_test_by_reviewer": "NOT_RUN",
+    "final_result": "Independent reviewer used a fresh no-history read-only task, rederived the core probability/call-ledger/status-conditioning claims, and reviewed the corrected publication-failure scope. Reviewer did not edit, build, or test. Final note: complete-issue conditioning needs p_min>epsilon_T; this is recorded as OPEN."
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "performance": "NOT_RUN_NOT_MEASURED",
+    "formal_network": "NOT_RUN",
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "required_confirmation_question": "合法输入下，离线材料准备若以极低概率达到拒绝采样上限而中止本次 invocation、保留 T 私有 burn marker 并需以新 invocation 重试，是否可接受？"
+}
