@@ -1,0 +1,287 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s53-source-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S53",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "578ecadfe807748a3e2fada54ca11efe1b00d28c",
+    "tree": "e81d8e201fcd69c262f4d18360249a748bdc1490",
+    "parent": "1cc1e5202b3a603b55aaae985704933d70db0794",
+    "branch": "codex/m6b-i-project-select5-s53",
+    "latest_origin_main": "c3926c68fd14f270faa8b55234311071947fa080",
+    "s52_descends_from_origin_main": true,
+    "s52_original_worktree_modified": false,
+    "desktop_main_worktree_modified": false,
+    "VFSS_baseline_diff": "empty",
+    "delivery_commit": "local commit id recorded in final report; self-reference excluded"
+  },
+  "history_chain": [
+    {
+      "stage": "S47",
+      "commit": "feb5e6677568d649906f46d0e611d5d52349c07f"
+    },
+    {
+      "stage": "S48",
+      "commit": "e05b01d5c7e3899297b76a5e0fca212d38d24229"
+    },
+    {
+      "stage": "S49",
+      "commit": "50bc223c19e24bdf052eacbd47be8df6a1d56d98"
+    },
+    {
+      "stage": "S50",
+      "commit": "ff77b9694a1259c3f314f145e06fcb980cda0bfb"
+    },
+    {
+      "stage": "S51",
+      "commit": "1cc1e5202b3a603b55aaae985704933d70db0794"
+    },
+    {
+      "stage": "S52",
+      "commit": "578ecadfe807748a3e2fada54ca11efe1b00d28c"
+    }
+  ],
+  "upstream_manifest_receipts": {
+    "S52": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-25.json",
+      "checkout_raw_sha256": "547bf0a9db112779a3571da032d37859c2ef87c18a086d40e76a9268b4c90c23",
+      "git_blob_sha1": "24dc93fa1e58432b9a631dddd24402e6e5925c5c",
+      "recorded_canonical_delivery_sha256": "0c7ff49958df42086f20f69fb7a5936092ef356876959e3fe049d4f908300ad9",
+      "recomputed_from_recorded_rows_sha256": "0c7ff49958df42086f20f69fb7a5936092ef356876959e3fe049d4f908300ad9",
+      "recorded_delivery_file_count": 9,
+      "s52_tree_git_blobs_matching": 9,
+      "current_checkout_old_git_blobs_matching": 8,
+      "current_checkout_old_raw_hashes_matching": 6,
+      "current_differences": "IMPLEMENTATION_PLAN.md intentionally updated for S53; S52 decision/report raw hashes differ under core.autocrlf=true while S52 base tree blobs match."
+    },
+    "S51": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_SOURCE_EVIDENCE_MANIFEST_2026-10-24.json",
+      "checkout_raw_sha256": "f5a61f0998a17f751a51d0114dbb79b310e090a62711a6f36a2d61c0f33df97b",
+      "git_blob_sha1": "76b11b4c322b70fe4e55d39b809df1a0e35b14fc",
+      "recorded_manifest_delivery_sha256": "1c3433d326379e69a982511207fad2f0ae0cf858213b951ddc783ba1609daf90",
+      "cases_json_count": 4,
+      "scope": "Kpost3 proof scope and four API-v2 cases inherited; not rerun"
+    },
+    "S50": {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json",
+      "checkout_raw_sha256": "5e7514a2b668d293dec85abda881ee58887df6e057607d2c38fb219dd1ae6acf",
+      "git_blob_sha1": "84a57b619615923bb9b301841815479b21926ae2",
+      "recorded_manifest_delivery_sha256": "c731a67bb60818515593ea51f6647b3b8c6ef9d5ff0454287634ebec71c58fb3",
+      "cases_json": "NOT_PRESENT_IN_S52_FIXED_TREE",
+      "scope": "Kpre3 proof-only delivery; no runtime build or tests"
+    }
+  },
+  "S52_manifest_delivery_recheck": [
+    {
+      "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "recorded_raw_sha256": "b55b2908efa97f9fdc6a85f337bee8ea30e0b76057ab88ce2bdab0647fbdecc1",
+      "recorded_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "s52_tree_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "b55b2908efa97f9fdc6a85f337bee8ea30e0b76057ab88ce2bdab0647fbdecc1",
+      "current_checkout_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "current_checkout_raw_matches": true,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "recorded_raw_sha256": "f6aca56cfe156892e861649cc5513513e12e3328eae2c55ba357c61d1e28c755",
+      "recorded_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "s52_tree_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "f6aca56cfe156892e861649cc5513513e12e3328eae2c55ba357c61d1e28c755",
+      "current_checkout_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "current_checkout_raw_matches": true,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+      "recorded_raw_sha256": "cf99f62a50145faa4b6dcce31f1e0237c2975647293191cc830b8397178531a8",
+      "recorded_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "s52_tree_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "cf99f62a50145faa4b6dcce31f1e0237c2975647293191cc830b8397178531a8",
+      "current_checkout_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "current_checkout_raw_matches": true,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+      "recorded_raw_sha256": "9b56ea46cc40cd79694c17532a62d1bcedf2fc32006f2b943fb5472f60ea4e81",
+      "recorded_git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+      "s52_tree_git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "9b56ea46cc40cd79694c17532a62d1bcedf2fc32006f2b943fb5472f60ea4e81",
+      "current_checkout_git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+      "current_checkout_raw_matches": true,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "recorded_raw_sha256": "3f6f903203996f859ba11153a2a826f6527a47841cc829e96a91933c97a03ee1",
+      "recorded_git_blob_sha1": "c8eb25a286a298c1842a7c4617ca3c9ccbbcccd4",
+      "s52_tree_git_blob_sha1": "c8eb25a286a298c1842a7c4617ca3c9ccbbcccd4",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "da7aabb1a5d8ddba3eaa447b980e9eedfddc4685e28b120ef5f5f0090026a278",
+      "current_checkout_git_blob_sha1": "d044dc44e565cffba0a2b225e6bfb4ba893e195b",
+      "current_checkout_raw_matches": false,
+      "current_checkout_blob_matches": false
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_DECISION_2026-10-25.md",
+      "recorded_raw_sha256": "ffda707a82a9626767afc93b6d24da3c3186424fa6fc5ded346b8d163ffaff80",
+      "recorded_git_blob_sha1": "b56c38b955f5b46b9c5caf16e0d2b9406c71ac8e",
+      "s52_tree_git_blob_sha1": "b56c38b955f5b46b9c5caf16e0d2b9406c71ac8e",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "256a9d09e369fa2252ce584df3ea30e26c58330d11c4255c73e43c39224ebddc",
+      "current_checkout_git_blob_sha1": "b56c38b955f5b46b9c5caf16e0d2b9406c71ac8e",
+      "current_checkout_raw_matches": false,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_CASES_2026-10-25.json",
+      "recorded_raw_sha256": "68c52e4f441f4feb1b0551810d4c6f3034d8283ab0bdd33214ff533396f7c4bb",
+      "recorded_git_blob_sha1": "db7afdadca0972871283cf6ce142ebe647a99010",
+      "s52_tree_git_blob_sha1": "db7afdadca0972871283cf6ce142ebe647a99010",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "68c52e4f441f4feb1b0551810d4c6f3034d8283ab0bdd33214ff533396f7c4bb",
+      "current_checkout_git_blob_sha1": "db7afdadca0972871283cf6ce142ebe647a99010",
+      "current_checkout_raw_matches": true,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_GATES_2026-10-25.json",
+      "recorded_raw_sha256": "a09cf3833476ab26a76c166d20e50fd683ef12dbc34e0ad36b8f40aa621f7d7f",
+      "recorded_git_blob_sha1": "11c47de3e82ab8c6ffe359358769aa4411d7e820",
+      "s52_tree_git_blob_sha1": "11c47de3e82ab8c6ffe359358769aa4411d7e820",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "a09cf3833476ab26a76c166d20e50fd683ef12dbc34e0ad36b8f40aa621f7d7f",
+      "current_checkout_git_blob_sha1": "11c47de3e82ab8c6ffe359358769aa4411d7e820",
+      "current_checkout_raw_matches": true,
+      "current_checkout_blob_matches": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_REPORT_2026-10-25.md",
+      "recorded_raw_sha256": "ccd7741d4168eb6e6f75ccba34375b533e17cd94d49b680519034ba350b1681a",
+      "recorded_git_blob_sha1": "de2c951b1b4ae5a953532c7afeebdb3507f5477e",
+      "s52_tree_git_blob_sha1": "de2c951b1b4ae5a953532c7afeebdb3507f5477e",
+      "s52_tree_blob_matches": true,
+      "current_checkout_raw_sha256": "6c75a228a56d2bb3803c5a7237fd11a79f1c0ed9218b51843a279b42516f0ae4",
+      "current_checkout_git_blob_sha1": "de2c951b1b4ae5a953532c7afeebdb3507f5477e",
+      "current_checkout_raw_matches": false,
+      "current_checkout_blob_matches": true
+    }
+  ],
+  "reviewed_fixed_source_files": [
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_transport.h",
+      "s52_tree_git_blob_sha1": "dc60307c5afbdc937fa50ea105645968622c05f7",
+      "current_checkout_raw_sha256": "bd86b8578dc50796134babdc89808486457d97dc0520c711518ef1404c4acbbf",
+      "current_checkout_git_blob_sha1": "dc60307c5afbdc937fa50ea105645968622c05f7",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "s52_tree_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "current_checkout_raw_sha256": "7018044af8475e1fc87ca0aeb80538685bfafe304ded67642faad6195beeb5b4",
+      "current_checkout_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "s52_tree_git_blob_sha1": "cab691d353b953fe5afecf7afa2b076c073b0596",
+      "current_checkout_raw_sha256": "64f9b2bc0940c4459c81291edc70dbb19a228a735995b8fcd4c4e96650ba276e",
+      "current_checkout_git_blob_sha1": "cab691d353b953fe5afecf7afa2b076c073b0596",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "s52_tree_git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+      "current_checkout_raw_sha256": "78ccc1db0b4b533f9c139f440581b81cc41bef2642721f7387847dbe80890d57",
+      "current_checkout_git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "s52_tree_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "current_checkout_raw_sha256": "b55b2908efa97f9fdc6a85f337bee8ea30e0b76057ab88ce2bdab0647fbdecc1",
+      "current_checkout_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+      "s52_tree_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "current_checkout_raw_sha256": "6870cf9f1fb92cae8dcfaa385c7beb17effefab04afbc0e010f382565b3afc9f",
+      "current_checkout_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "s52_tree_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "current_checkout_raw_sha256": "f6aca56cfe156892e861649cc5513513e12e3328eae2c55ba357c61d1e28c755",
+      "current_checkout_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+      "s52_tree_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "current_checkout_raw_sha256": "cf99f62a50145faa4b6dcce31f1e0237c2975647293191cc830b8397178531a8",
+      "current_checkout_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+      "s52_tree_git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+      "current_checkout_raw_sha256": "9b56ea46cc40cd79694c17532a62d1bcedf2fc32006f2b943fb5472f60ea4e81",
+      "current_checkout_git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+      "reviewed_as": "S52 fixed source; exact line anchors are in S53 report section 4"
+    }
+  ],
+  "inherited_evidence": {
+    "S50_Kpre3": "PASS_WITH_SCOPE: ideal IID FTv3, cap_success, N<=256, one static semi-honest party, no-fault pre-escrow transcript",
+    "S51_Kpost3": "PASS_WITH_SCOPE: ideal A token RNG, causal honest-peer deposit, exogenous-success application-message suffix",
+    "S52_functional": "PASS_WITH_SCOPE: 7 API-v2 status cases and 8 listed target/compatibility cases, inherited only",
+    "S52_final_e2e_binary_sha256": "81a5f05e6a9c75d85ea19c2e59729cd2cc0c9e724b68fae77c0c4333668043b9",
+    "natural_business_io_fault": "NOT_REPRODUCED",
+    "S52_nonauthor_reviewer": "/root/s51_independent_review; independently rederived timeout-conditioning gap, did not reprove S50/S51 lemmas"
+  },
+  "S53_execution": {
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "runtime_code_changed": false,
+    "test_code_changed": false,
+    "performance": "NOT_RUN_NOT_MEASURED",
+    "formal_network": "NOT_RUN",
+    "S53_nonauthor_crypto_review": "NOT_RUN because real finite-timeout theorem remains OPEN",
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED",
+    "secure_alias": "NOT_CREATED"
+  },
+  "delivery_files": [
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "raw_sha256": "da7aabb1a5d8ddba3eaa447b980e9eedfddc4685e28b120ef5f5f0090026a278",
+      "git_blob_sha1": "d044dc44e565cffba0a2b225e6bfb4ba893e195b"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_DECISION_2026-10-25.md",
+      "raw_sha256": "117b2c87fe4defd8ac56946f672413c4473db0c4e85735850129ee67b0a04401",
+      "git_blob_sha1": "d3f928611febec7e7a262b3afc6e27d1bba9431b"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_REPORT_2026-10-25.md",
+      "raw_sha256": "d9093e1ae97e9f060a4beaa73268990893695753ba6ff3d51cd516ca3b7d23f9",
+      "git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_GATES_2026-10-25.json",
+      "raw_sha256": "2147a52f5e44628b0ef8d5b97061b25604126314949a5e2d358350f66ca2dd12",
+      "git_blob_sha1": "9fab59c52dc3821da53f1cbfed1d6845ce22e1d2"
+    }
+  ],
+  "canonical_delivery": {
+    "file_count": 4,
+    "sha256": "43d5254d72f41d449356a9d8a3b8538219b7435a9b960f209c9efabe0a50437e",
+    "definition": "SHA-256 of ordinal path-sorted UTF-8 lines <path><TAB><raw_sha256><LF>, excluding this manifest."
+  }
+}
