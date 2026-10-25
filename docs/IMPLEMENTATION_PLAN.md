@@ -1345,3 +1345,13 @@ S56 固定 S55 commit 0c4a35fb7bdf5d234e98eb1616cb65aae03ab3fd，并重核 S55 m
 源码级随机接口桥保留为 ε_A=Adv_DRBG_A(Q_A,total,C_A,total;E_A,P)，需联合覆盖请求边界/长度、字节、成功/错误状态、并发/共享调用、提交状态、响应与 fetch。对联合成功事件 S，仅在同一游戏下有 p_I=Pr_I[S] 且 ε_A<p_I 时，条件视图界才可写成 2ε_A/(p_I−ε_A)。单次 token RAND 成功在理想源下 p_I=1；SQL COMMIT、恢复 fetch 和完整 API success 没有证据支持的 p_min。目标 A 服务/provider/熵-reseed/lifecycle/共享 RNG profile 未找到，故 deployment bridge=OPEN/NOT_AVAILABLE，实际 commit/fetch success conditioning=OPEN。
 
 S51 的理想 token/SuccessFence 成功消息后缀结论仅按原范围继承；S53 实际 finite-timeout 成功 view 继续 OPEN。S52 N≤1000 有限功能收据只继承，不是本轮测试或安全证明。T DRBG、签名及文件发布、TLS/mTLS、recipient encryption、完整 GMW/Select/shuffle/output/escrow、N>256 安全扩域与 LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE 均维持各自开放门。没有发现可复现代码缺陷；runtime/test 未改，BUILD/TEST=NOT_RUN，历史矩阵与正式性能未运行/测量。独立 reviewer 只读复核源码状态次序、理想条件分布与优势公式，未构建/测试或实例化 A 部署。详见 S56 decision/report/gates/source-evidence manifest。
+
+### S57：包含发材中止与托管恢复的无条件视图（2026-10-25）
+
+S57 固定 S56 commit `66a3db485ffa9ac752a49fd0f8a0f100fcef4cbe`，在隔离 worktree 核查其父链、tree、来源 manifest 与相关源码 Git blobs。结论 `OPEN_WITH_EXACT_GAP`：现有 `F_T/v3` 仅为理想 IID bounded sampler 的 cap-exhaustion 定义 `ISSUANCE_ABORT`；S50 `Kpre₃` 以 cap-success 为条件，S51 `Kpost₃` 以成功应用执行/SuccessFence 为条件，不能直接构成包含真实 issuer error、A transaction/fetch 和 party API failure state 的无条件联合模拟。
+
+源码顺序显示，在有效公开参数下，签名 key 的读取/解析可能在 FTv3 marker 前失败（`score_to_mask_v3_gmw.cpp:862–870`）；理想 F_T/v3 没有该结果与同调用 party 启动/交付门。假定 key 可用，FTv3 marker 的 registry/文件 I/O 是首个持久 burn/artifact 失败状态（`:492–543`），其部分持久化 law 同样未建模。后续 RAND 错误、签名/编码、P0/P1/context 顺序发布失败以及 A token RNG/SQL/响应/fetch 失败均无目标环境联合 kernel。A 的 PENDING/COMMITTED/ABORTED 是内部状态；party 的 `COMMIT_STATUS_UNKNOWN` 是 API 观察而非 DB 状态。无 API share 不推出本地临时 share 从未形成。
+
+S57 提出 proof-only `F_TOPK-ISSUE-ESCROW/v1` 组合规格候选：绑定同次 invocation，显式列 issuer 内部发行 outcome、同 invocation party-launch/delivery 映射、A latent state 与 party-visible API projection；不将 T/A 私有错误、context、peer material 或 controller database 权限交给 party simulator，也不扩大 `L_S29`。该 proposal 未实现、未获新合同批准，且不提供目标失败概率。未参与 S50–S57 的非作者 reviewer `/root/s57_independent_review` 只读复核了首个缺口、权限边界及 proposal；未编辑、构建或测试。
+
+`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`；真实 T/A DRBG、签名/文件发布、SQLite durability/rollback、TLS/mTLS、recipient encryption、finite-timeout view、完整 GMW/Select/shuffle/output/escrow composition 与 N>256 安全扩域仍各自开放。S52 有限功能收据仅继承；S57 BUILD/TEST=`NOT_RUN`，未测性能，不运行历史矩阵或自然 I/O。无 runtime/test 变化，不改 `VFSS-baseline/`，不建 secure alias，不推送/合并。详见 S57 decision/report/gates/source-evidence manifest。

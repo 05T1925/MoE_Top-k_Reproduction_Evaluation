@@ -1,0 +1,137 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s57-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S57",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "66a3db485ffa9ac752a49fd0f8a0f100fcef4cbe",
+    "tree": "8cd2c7e77c9577091bbba9405a44640e6bc446bd",
+    "parent": "0c4a35fb7bdf5d234e98eb1616cb65aae03ab3fd",
+    "branch": "codex/m6b-i-project-select5-s57",
+    "initial_clean": true,
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S56_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json"
+  },
+  "gates": {
+    "S56_FIXED_SOURCE_IDENTITY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Exact S56 HEAD/tree/parent checked; S56 source Git blobs match; S55 fixed 15-source hashes/blobs and S56 canonical delivery digest rechecked. CRLF raw-hash variance for historical text files is line-ending-only; Git blobs are authoritative."
+    },
+    "UNCONDITIONAL_FULL_SINGLE_PARTY_VIEW": {
+      "status": "OPEN",
+      "scope": "No simulator for the unscreened joint view of issuance errors, party launch/delivery, online messages, A outcomes and API recovery. S50 Kpre3 assumes cap_success; S51 Kpost3 assumes successful execution/SuccessFence."
+    },
+    "FIRST_RUNTIME_FAILURE_LAW": {
+      "status": "OPEN",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp:848-870",
+      "gap": "With valid public parameters, signer-key read/parse can still fail before FTv3 registration/material generation. F_T/v3 idealizes signing capability and gives no same-invocation outcome/party-delivery gate for this event."
+    },
+    "FIRST_PERSISTENT_ISSUANCE_STATE_LAW": {
+      "status": "OPEN",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp:472-544,874-880",
+      "gap": "Assuming signer key is available, registry/marker open/stat/create/write/fsync/close/directory-fsync can fail before sampling. Existing ideal private burn does not define partial marker/durability outcomes or party launch/delivery projection."
+    },
+    "FTV3_IDEAL_CAP_ABORT": {
+      "status": "PASS_WITH_SCOPE",
+      "source": "S49 report lines 104-110; S50 report cap_success scope",
+      "scope": "Ideal IID tape bounded sampler cap exhaustion is represented as issuer-visible ISSUANCE_ABORT with ideal private burn and no package/context/online lease. This does not cover actual RAND errors, key/sign/serialization failures or file publication failures."
+    },
+    "DEALER_RANDOM_SIGN_PUBLICATION_FAILURES": {
+      "status": "OPEN",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp:280-286,916-927,944-1007",
+      "scope": "RAND_bytes failure, sign/serialization errors and sequential partial file publication have no target deployment joint outcome law; no error probability or p_min is inferred."
+    },
+    "A_ESCROW_SOURCE_STATE_MAP": {
+      "status": "PASS_WITH_SCOPE",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp:245-260,281-311,314-443,445-485,537-624",
+      "scope": "Static mapping of PENDING/COMMITTED/ABORTED, token generation, submit response, restart/timeout and fetch. No DB durability/rollback or deployed probability conclusion."
+    },
+    "PARTY_API_STATUS_AND_SHARE_RELEASE": {
+      "status": "PASS_WITH_SCOPE",
+      "source": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp:831-919; VFSS/include/moe_topk/score_to_mask_v3_gmw.h:150-170,194-205",
+      "scope": "Source maps authenticated definite ABORT, ambiguous submit, committed fetch failure and verified share return. API no-share does not imply no temporary local_output."
+    },
+    "A_TOKEN_RNG_COMMIT_FETCH_JOINT_LAW": {
+      "status": "OPEN",
+      "inherited_from": "S56",
+      "scope": "Ideal independent 32-byte token uniformity is local and conditional on valid deposits/nonselective success; real A RNG, SQL commit/rollback, response and recovery joint law has no deployment model/p_min."
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW": {
+      "status": "OPEN",
+      "inherited_from": "S53",
+      "scope": "No permission-correct sampler or evidence-backed joint network/scheduler law for timeout-selected successful executions; no expansion of L_S29."
+    },
+    "SUCCESSFENCE_APPLICATION_VIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "inherited_from": "S50/S51/S53",
+      "scope": "Only ideal IID FTv3 cap-success, ideal A token RNG, static semi-honest one-party corruption, honest peer causal deposit, and externally guaranteed successful deadline execution. It does not cover failure prefixes or real wall-clock selection."
+    },
+    "VERSIONED_JOINT_FUNCTIONALITY_PROPOSAL": {
+      "status": "CONDITIONAL",
+      "name": "F_TOPK-ISSUE-ESCROW/v1",
+      "implemented": false,
+      "scope": "Proof-only candidate routes typed issuance outcomes, same-invocation party launch, A's latent transaction state and party-visible status without exposing T/A private state or enlarging L_S29. Requires owner/model review and an explicit fault/scheduler kernel; not a security result."
+    },
+    "L_S29_ROLE_INPUT_OUTPUT_CONTRACT": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "No leakage, role, input, output or normal delivery contract changed. A-only state remains separate."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new owner decision found."
+    },
+    "DRBG_SIGNATURE_FILESYSTEM_SQL_TLS_RECIPIENT_ENCRYPTION": {
+      "status": "OPEN",
+      "scope": "Actual T/A provider, entropy/reseed/lifecycle/concurrency, signing, filesystem publication, SQLite, TLS/mTLS and recipient-encryption composition remain uninstantiated or unproved."
+    },
+    "FULL_GMW_SELECT_SHUFFLE_OUTPUT_ESCROW_COMPOSITION": {
+      "status": "OPEN",
+      "scope": "No unconditional end-to-end single-party view proof."
+    },
+    "N_GT_256_SECURITY": {
+      "status": "NOT_IN_SCOPE"
+    },
+    "NATURAL_BUSINESS_IO_FAILURE": {
+      "status": "NOT_RUN",
+      "inherited_status": "NOT_REPRODUCED",
+      "scope": "No natural I/O execution was run in S57; prior NOT_REPRODUCED status is inherited only."
+    },
+    "RUNTIME_DEFECT_REPRODUCED": {
+      "status": "NOT_REPRODUCED",
+      "scope": "Read-only source review only; no defect was reproduced."
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN",
+      "reason": "Proof/interface review only; no runtime/test source change."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "alias_created": false
+    },
+    "PUSH_MERGE": {
+      "status": "NOT_PERFORMED"
+    },
+    "NONAUTHOR_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "reviewer": "/root/s57_independent_review",
+      "scope": "Independent read-only review of source state order, visibility, success-conditioned inherited kernels, exact first gap and proposed proof-only interface. Reviewer made no edits and ran no build/tests."
+    }
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "ideal_functionality_implemented": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "natural_io_reproduction": "NOT_RUN",
+    "formal_performance": "NOT_RUN_NOT_MEASURED",
+    "vfss_baseline_modified": false,
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  }
+}
