@@ -1,0 +1,131 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s55-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S55",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline_commit": "4695d70a4bb9a7f2bbce5c6fc7e163cb3f93d978",
+  "gates": {
+    "S54_SOURCE_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fixed S54 commit/tree/parent, S54 manifest/canonical delivery, four delivery Git blobs, six fixed runtime blobs; S55 extra RNG-call source blobs checked. Markdown raw SHA drift is line-ending-only; Git blobs match."
+    },
+    "FTV3_IDEAL_IID_SEMANTIC_MATERIAL_LAW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Inherited S49/S50/S54 result: fixed FTv3 profile, ideal IID tape, cap_success, semantic-material projection only. Not a target DRBG or full package theorem."
+    },
+    "FTV3_SOURCE_RANDOM_REQUEST_LEDGER": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Single issuer invocation, fixed S54 FTv3 source only; request boundaries are adaptive and include error/cap abort paths."
+    },
+    "SECURITY_DOMAIN_N_LE_256_SINGLE_ISSUE_QC": {
+      "status": "PASS_WITH_SCOPE",
+      "padded_m": 256,
+      "Qmax_bytes": 5296996,
+      "Cmax_rand_bytes_calls": 1792,
+      "max_single_request_bytes": 1048576,
+      "scope": "Single FTv3 invocation; not process/deployment aggregate."
+    },
+    "FUNCTIONAL_DOMAIN_N_LE_1000_SINGLE_ISSUE_QC": {
+      "status": "PASS_WITH_SCOPE",
+      "padded_m": 1024,
+      "Qmax_bytes": 88786404,
+      "Cmax_rand_bytes_calls": 7247,
+      "max_single_request_bytes": 1048576,
+      "scope": "Single FTv3 invocation for finite S48 functional domain; not N<=1000 security admission."
+    },
+    "TARGET_T_DEPLOYMENT_PROFILE": {
+      "status": "OPEN",
+      "availability": "NOT_AVAILABLE",
+      "gap": "No target service/image/binary identity, actual libcrypto path/version/build, provider/OSSL_LIB_CTX/config, OS entropy or DRBG reseed policy, process lifecycle/concurrency, or operator declaration was found."
+    },
+    "DEPLOYMENT_AGGREGATE_QC": {
+      "status": "OPEN",
+      "gap": "Per-invocation bounds are known; same-context FTv3 invocation count, other OpenSSL users, internal provider/TLS requests and lifecycle totals are unknown."
+    },
+    "STATUS_AWARE_DRBG_CONDITIONAL_BOUND": {
+      "status": "CONDITIONAL",
+      "bound": "For epsilon_T=Adv_DRBG_T(Q_total_API,C_total_API;E_T,P) in a joint status-and-issuer-view game and p_I=Pr_I[S_RNG]>=1-delta, p_R>=p_I-epsilon_T and Adv_cond<=2*epsilon_T/(p_I-epsilon_T)<=2*epsilon_T/(1-delta-epsilon_T), requiring epsilon_T<1-delta. Provider-internal counters are modeled separately by E_T and are not directly added to API units.",
+      "assumption": "Whole adaptive API stream: request boundaries/lengths, bytes, success/error statuses, cap abort, issuer output; hidden initial/reseed entropy averaged under actual E_T law."
+    },
+    "JOINT_RNG_STREAM_BRIDGE": {
+      "status": "OPEN",
+      "gap": "Conditional game cannot be instantiated without target E_T/P and aggregate Q_total_API/C_total_API evidence; provider-internal Q/C mapping is also unavailable. No concrete advantage value is claimed."
+    },
+    "RAND_SUCCESS_CONDITIONING_TARGET": {
+      "status": "OPEN",
+      "gap": "No target RAND error/status model or evidence; do not condition away failed requests."
+    },
+    "FULL_S_ISSUE_CONDITIONING": {
+      "status": "OPEN",
+      "required": "A joint issuer game covering signature/serialization and all publication statuses plus an evidence-backed Pr_I[S_issue]>=p_min>epsilon_T (or the corresponding full-game advantage).",
+      "gap": "No target signature/provider/filesystem success lower bound or publication status model."
+    },
+    "ONE_SHOT_BURN_SAME_UNROLLED_REGISTRY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "FTv3 O_EXCL marker under same private registry directory and unchanged filesystem state; marker persisted before materials."
+    },
+    "GLOBAL_REPLAY_ROLLBACK_RESISTANCE": {
+      "status": "OPEN",
+      "gap": "Different registry directories, FT version namespaces, backup/VM rollback, migration, multi-host registries and concurrent deployment scope are not globally bound."
+    },
+    "SIGNATURE_PROVIDER_AND_SECURITY": {
+      "status": "OPEN",
+      "scope": "Source shows EVP Ed25519 and deterministic field binding; target signer/provider/key custody and authenticity advantage are not instantiated."
+    },
+    "MULTI_FILE_PUBLICATION_DURABILITY": {
+      "status": "OPEN",
+      "scope": "Three sequential durable_create calls are not a cross-file transaction; target filesystem/power-loss behavior not measured."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new explicit owner acceptance/rejection record."
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW": {
+      "status": "OPEN",
+      "scope": "S53 SuccessFence remains an external ideal schedule only."
+    },
+    "A_TOKEN_TLS_RECIPIENT_ENCRYPTION_PARTY_VIEW": {
+      "status": "OPEN",
+      "scope": "Independent cryptographic/composition gates; not implied by Dealer DRBG review."
+    },
+    "PARTY_VIEW_COMPOSITION": {
+      "status": "OPEN",
+      "scope": "No full deployed GMW/Select/shuffle/output/escrow proof."
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN",
+      "reason": "No runtime or test source change and no reproduced code defect."
+    },
+    "HISTORICAL_MATRICES": {
+      "status": "NOT_RUN",
+      "scope": "S35/S40/S48/S52 matrices not repeated."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NOT_READY",
+      "alias_created": false
+    },
+    "PUSH_MERGE": {
+      "status": "NOT_PERFORMED"
+    },
+    "NONAUTHOR_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Non-author read-only reviewer independently checked fixed source identity, source call order, both Q/C bounds, API versus provider-internal accounting, status-aware conditional formulas, deployment evidence gap, and burn/publication scope. No runtime/security implementation acceptance.",
+      "build": "NOT_RUN",
+      "tests": "NOT_RUN"
+    }
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "runtime_defect_reproduced": false,
+    "performance": "NOT_RUN_NOT_MEASURED",
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  }
+}

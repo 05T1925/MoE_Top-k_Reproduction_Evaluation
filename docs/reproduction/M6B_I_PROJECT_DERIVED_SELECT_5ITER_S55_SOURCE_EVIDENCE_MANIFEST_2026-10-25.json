@@ -1,0 +1,494 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s55-source-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S55",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline": {
+    "commit": "4695d70a4bb9a7f2bbce5c6fc7e163cb3f93d978",
+    "tree": "8acd16e2ee891aed3be8f0021d8d1aaafd57ca1c",
+    "parent": "dde7137c8fd185d5725d88980688caacde16da5b",
+    "branch": "codex/m6b-i-project-select5-s55-drbg-deployment",
+    "origin_main": "c3926c68fd14f270faa8b55234311071947fa080",
+    "origin_main_is_ancestor": true,
+    "initial_worktree_clean": true,
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-i-project-select5-s55-drbg-deployment/MoE_Top-k_Reproduction_Evaluation",
+    "VFSS_baseline_modified": false
+  },
+  "s54_receipt": {
+    "manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+    "manifest_raw_sha256": "73bad36464ed8192d8e6ee1518380c43c7d8249f1cbbc6345cfc5b20ee2957e8",
+    "manifest_git_blob_sha1": "4454f8cdb54824785996f7a20174b1d0d02f80dd",
+    "recorded_canonical_delivery_sha256": "3e3f5786e14ec60c5469baedaca83e360bcd0ddb7d80e4c878c4de3f8eae41a2",
+    "recomputed_canonical_delivery_sha256": "3e3f5786e14ec60c5469baedaca83e360bcd0ddb7d80e4c878c4de3f8eae41a2",
+    "canonical_matches": true,
+    "delivery_git_blobs_match": true,
+    "fixed_runtime_git_blobs_match": true,
+    "checkout_line_ending_note": "Three Markdown/plan raw hashes differ under current core.autocrlf checkout; Git blobs match the fixed S54 commit. S54 JSON raw hashes match."
+  },
+  "fixed_source_files": [
+    {
+      "path": "VFSS/CMakeLists.txt",
+      "raw_sha256": "42da1e6a4acccf7bcd47308832c48b2e1e04a1f0c3cfe2c369f9fd01eff744a4",
+      "git_blob_sha1": "16bd97d1ddc6ee8d62644200c1e21fb309a5178e",
+      "scope": "minimum OpenSSL dependency and production/test target inventory"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+      "raw_sha256": "6870cf9f1fb92cae8dcfaa385c7beb17effefab04afbc0e010f382565b3afc9f",
+      "git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "scope": "FTv3 Dealer, RAND wrapper, error handling, signing, marker and three-file publication"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+      "raw_sha256": "458a47fbdde4bf0ee9575a6b60b628d8750f0732bd51c1ed46239bc00090912f",
+      "git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+      "scope": "bounded rejection sampler and retry profile"
+    },
+    {
+      "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "raw_sha256": "b55b2908efa97f9fdc6a85f337bee8ea30e0b76057ab88ce2bdab0647fbdecc1",
+      "git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "scope": "FTv3 profile constants and API contract"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+      "raw_sha256": "cf99f62a50145faa4b6dcce31f1e0237c2975647293191cc830b8397178531a8",
+      "git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "scope": "party-side RAND_bytes call-site inventory, excluded by role unless co-process"
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "raw_sha256": "f6aca56cfe156892e861649cc5513513e12e3328eae2c55ba357c61d1e28c755",
+      "git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "scope": "A receipt token RAND_bytes call-site inventory, excluded by role unless co-process"
+    },
+    {
+      "path": "VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp",
+      "raw_sha256": "a0064ea1ec547614fdfd5e0d2a4ca78b4a10d9d942a2dacabe6f8be5358f7d0c",
+      "git_blob_sha1": "deeed6904db8868cbe0d7ef5110344ff7a33b672",
+      "scope": "other direct RAND_bytes caller: two 16-byte DCF roots"
+    },
+    {
+      "path": "VFSS/include/moe_topk/dcf_bcg21_fig1_aes128_v1.h",
+      "raw_sha256": "074f6c713f297a77761eeb8253e8c67a8f8fcae0355ca19d8bc3a958af38b641",
+      "git_blob_sha1": "ac2693056b65e10dd4150956832e4bfe72c5284b",
+      "scope": "DCF root size definition"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_opv_emp.cpp",
+      "raw_sha256": "53c02e79c3330a76bf17448b3af270bbe63c64369c5e9e06ba15bd9fdb7ad3df",
+      "git_blob_sha1": "cc013b8b0992d59278af62c18f94e97abfaab2ae",
+      "scope": "other direct RAND_bytes caller: OPV seed"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_opv.h",
+      "raw_sha256": "ca96669d2128fa0bb0e358073b0908c7f120d8d34177df80bd2b7a621febcfa1",
+      "git_blob_sha1": "d0b46103cbf1249f94774a5708c87d06bee6d164",
+      "scope": "OPV seed and 24-byte block definitions"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_permute_share.cpp",
+      "raw_sha256": "e53fe7fb173729b5c342251338026e2ee42cc589808315b7b5d9f3612a4e4778",
+      "git_blob_sha1": "1e35f3b60e73341938da3ff4bebb8b3fb1ccc4ff",
+      "scope": "other direct RAND_bytes caller: 24*n-byte PermuteShare material"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "raw_sha256": "78ccc1db0b4b533f9c139f440581b81cc41bef2642721f7387847dbe80890d57",
+      "git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+      "scope": "OS getrandom call path, not libcrypto RAND_bytes"
+    },
+    {
+      "path": "VFSS/include/moe_topk/project_derived_select5.h",
+      "raw_sha256": "46d24cff6501342a9d9a4f0b91c12aacce75ab0212f6b6e3b48f091aee2a2092",
+      "git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+      "scope": "32-byte Select5 seed size"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "raw_sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+      "git_blob_sha1": "9b0e66378ee4cd22e86ff9bca7793be2873a6112",
+      "scope": "OS getrandom call path, not libcrypto RAND_bytes"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "raw_sha256": "7018044af8475e1fc87ca0aeb80538685bfafe304ded67642faad6195beeb5b4",
+      "git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "scope": "TLS source-level path; target provider/process use not instantiated"
+    }
+  ],
+  "reviewed_history_inputs": [
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_DECISION_2026-10-22.md",
+      "checkout_raw_sha256": "dee0705afdb06289064421944facba8389f2ea69b14a4f39e1d613f3352fabe6",
+      "fixed_commit_git_blob_sha1": "7035169b03e13d2c43ea70e0df1a3abff0d84ade",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_REPORT_2026-10-22.md",
+      "checkout_raw_sha256": "475965f784e560deeb540b3f4d7d4f103c77aa571ac98a27b6a80b8caf31c90c",
+      "fixed_commit_git_blob_sha1": "6034a3028b7460e5069ffcc2099f4a4e9595b1e2",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_GATES_2026-10-22.json",
+      "checkout_raw_sha256": "1b45395f4386c71278ef5032ee4016bb767058b2578c0c677ad36133a8dec9a9",
+      "fixed_commit_git_blob_sha1": "18b7d28f9e8a33b6c1a1ee3f0e6bc7a406785579",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_CASES_2026-10-22.json",
+      "checkout_raw_sha256": "fa6f8b0cac1c81e103b9b1f4d5eb03b9a7acaa2e94a2b1212cdd815d7a7802f6",
+      "fixed_commit_git_blob_sha1": "f3dadc4a78c2246f3690ff11a5fcce3201490ab6",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S45_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-22.json",
+      "checkout_raw_sha256": "292705d52ab3f25958d4c4f79748ade070012ab6b1bf1e80e6bf9a3ef4534c81",
+      "fixed_commit_git_blob_sha1": "0fb5d06ed33b77c857bba0658dbf5b251a110ef0",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_DECISION_2026-10-23.md",
+      "checkout_raw_sha256": "c3941d6c49bdbd3b9afec0d959846404e49633f8ed411271245564ab0e4b4c39",
+      "fixed_commit_git_blob_sha1": "dd0d2bd76ced4812d568f646a48b5f2c2aafff4c",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_REPORT_2026-10-23.md",
+      "checkout_raw_sha256": "f98bd136cdfbf65f986309245ad73b74dae924cd25faddf1f3b65e7259b82bf4",
+      "fixed_commit_git_blob_sha1": "bb2e3c1ff9fb1cfae77eec533be20ddeeb7b68d9",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_GATES_2026-10-23.json",
+      "checkout_raw_sha256": "2298e1e0e73f568b295492e7708ee5799a7e8c5db5fa053c442b9b1fcdeecb63",
+      "fixed_commit_git_blob_sha1": "e40460c5dd22c8bb7ebf073876b7387a8379b285",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json",
+      "checkout_raw_sha256": "444fd86f7a0ec33f531030a38119b6c81aa12e7863b3ca4c45dc712b46f4747b",
+      "fixed_commit_git_blob_sha1": "e892bceb9bd61ba87ea4c4b2b6265060b02dd63e",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_DECISION_2026-10-23.md",
+      "checkout_raw_sha256": "d906b3c0eb7a19faf707d0f88f5b1b8598907e28b4f09530cbd31a457a68c283",
+      "fixed_commit_git_blob_sha1": "4257d04fdd3d6c6bb50c3ec0dbf398e5de884007",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_REPORT_2026-10-23.md",
+      "checkout_raw_sha256": "edc50d2d4fdef9ae079f2e0985a409cb73d4a06b6ae3def926df12d83242afc6",
+      "fixed_commit_git_blob_sha1": "fdb98cb901225959e1c07e6382834f43c59ca0d2",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_GATES_2026-10-23.json",
+      "checkout_raw_sha256": "d3b8b4633edf1d9f0832ec553b666e3034b7c700ae0817e0f3f187815855bc33",
+      "fixed_commit_git_blob_sha1": "553acf21f6198ea86732a03257ade1f38497986f",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json",
+      "checkout_raw_sha256": "5e7514a2b668d293dec85abda881ee58887df6e057607d2c38fb219dd1ae6acf",
+      "fixed_commit_git_blob_sha1": "84a57b619615923bb9b301841815479b21926ae2",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_DECISION_2026-10-24.md",
+      "checkout_raw_sha256": "f87cec673af2da3ad120fb7dc52bb715fb10462a8485456a0f6a22f0254aae09",
+      "fixed_commit_git_blob_sha1": "0f5a9b5f43d860f1a6933a29632d68433781efca",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_REPORT_2026-10-24.md",
+      "checkout_raw_sha256": "66310b9c0b3f19384f85de0c053a5a6a349843e24068086af1356039886b8cc5",
+      "fixed_commit_git_blob_sha1": "f59c9469570998b5d2b37628c1dc66b4b3795c3e",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_GATES_2026-10-24.json",
+      "checkout_raw_sha256": "3e236e97af171ac7beb09286f60951b4a00d5eafe892ddaf7a8fe2180b79f234",
+      "fixed_commit_git_blob_sha1": "518e4f077f5457f5388ed76ff8cfe9fb93f11c4f",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_CASES_2026-10-24.json",
+      "checkout_raw_sha256": "c6cb4d8bc333d4e5a33b998802ebd2f8182c4720e6470c690f2efc63aa1b5693",
+      "fixed_commit_git_blob_sha1": "3a6171f3300431498803d748f5d59acac5b2daff",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_SOURCE_EVIDENCE_MANIFEST_2026-10-24.json",
+      "checkout_raw_sha256": "f5a61f0998a17f751a51d0114dbb79b310e090a62711a6f36a2d61c0f33df97b",
+      "fixed_commit_git_blob_sha1": "76b11b4c322b70fe4e55d39b809df1a0e35b14fc",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_DECISION_2026-10-25.md",
+      "checkout_raw_sha256": "256a9d09e369fa2252ce584df3ea30e26c58330d11c4255c73e43c39224ebddc",
+      "fixed_commit_git_blob_sha1": "b56c38b955f5b46b9c5caf16e0d2b9406c71ac8e",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_REPORT_2026-10-25.md",
+      "checkout_raw_sha256": "6c75a228a56d2bb3803c5a7237fd11a79f1c0ed9218b51843a279b42516f0ae4",
+      "fixed_commit_git_blob_sha1": "de2c951b1b4ae5a953532c7afeebdb3507f5477e",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_GATES_2026-10-25.json",
+      "checkout_raw_sha256": "a09cf3833476ab26a76c166d20e50fd683ef12dbc34e0ad36b8f40aa621f7d7f",
+      "fixed_commit_git_blob_sha1": "11c47de3e82ab8c6ffe359358769aa4411d7e820",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_CASES_2026-10-25.json",
+      "checkout_raw_sha256": "68c52e4f441f4feb1b0551810d4c6f3034d8283ab0bdd33214ff533396f7c4bb",
+      "fixed_commit_git_blob_sha1": "db7afdadca0972871283cf6ce142ebe647a99010",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S52_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-25.json",
+      "checkout_raw_sha256": "547bf0a9db112779a3571da032d37859c2ef87c18a086d40e76a9268b4c90c23",
+      "fixed_commit_git_blob_sha1": "24dc93fa1e58432b9a631dddd24402e6e5925c5c",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_DECISION_2026-10-25.md",
+      "checkout_raw_sha256": "132e35396f147a833eb3e48a95535225be963e6baf86cec8cfb71a54c3b9d8be",
+      "fixed_commit_git_blob_sha1": "d3f928611febec7e7a262b3afc6e27d1bba9431b",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_REPORT_2026-10-25.md",
+      "checkout_raw_sha256": "2d432aa1aa42d313132d833e8dca3cec5780a828121b9e48d10d5a6d251a73af",
+      "fixed_commit_git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_GATES_2026-10-25.json",
+      "checkout_raw_sha256": "75a81bec1a47cabf811db63347964dee001fc41ec4558a0058b07b1185565cde",
+      "fixed_commit_git_blob_sha1": "9fab59c52dc3821da53f1cbfed1d6845ce22e1d2",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+      "checkout_raw_sha256": "2eedf262e4b6a89152434c7a05b66eaab33181d44ef4ced017aa0f1d806efceb",
+      "fixed_commit_git_blob_sha1": "f00a301672d36d133261112ebbe0dbd288615cc2",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_DECISION_2026-10-25.md",
+      "checkout_raw_sha256": "dd711f0dfd1a4c45a6bbd098909dfc5347e48065ed9fb404c2fa66aa5e0453ef",
+      "fixed_commit_git_blob_sha1": "fc0ca2ddf0d3b4efc47f02909cd6dc0ac4334dbd",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_REPORT_2026-10-25.md",
+      "checkout_raw_sha256": "801c7e1bb254530d070ab8d62620be63f25f5c120ef50077a09d74ea2c920000",
+      "fixed_commit_git_blob_sha1": "44599a15135a710d711c0f1b9bd293ef07ee7392",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_GATES_2026-10-25.json",
+      "checkout_raw_sha256": "4791c644c098ed22baa34d67237f5deea585edad46150c13bc1ae39e6cfbc425",
+      "fixed_commit_git_blob_sha1": "df3df31a47709f4c742e63afcfd30377339f165e",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S54_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+      "checkout_raw_sha256": "73bad36464ed8192d8e6ee1518380c43c7d8249f1cbbc6345cfc5b20ee2957e8",
+      "fixed_commit_git_blob_sha1": "4454f8cdb54824785996f7a20174b1d0d02f80dd",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_DECISION_2026-10-23.md",
+      "checkout_raw_sha256": "551f26bd4ead6682be2e2f043ecd331608a05e46e5ab13aa4e16243e0f0f796c",
+      "fixed_commit_git_blob_sha1": "c3bbf65b7e018f965826256ead786863ce362104",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_REPORT_2026-10-23.md",
+      "checkout_raw_sha256": "12d2b95643ad99298f037117815f67e9c0c863f03cdecfa064d77b3851e2172e",
+      "fixed_commit_git_blob_sha1": "2a7d10d8530db0024514acba71a4af2acf125e5a",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_GATES_2026-10-23.json",
+      "checkout_raw_sha256": "c7e41beee14f139418f59c1c5bdb21a09aa2688f90c76eb87c18c7d7c66046ef",
+      "fixed_commit_git_blob_sha1": "6c232901602f74b67e16ab6c26d6c9bf2a40b4e1",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_CASES_2026-10-23.json",
+      "checkout_raw_sha256": "5534d3144a8979c648dc8ee968a869a3c119546ee47908f465a9806b4bfa3299",
+      "fixed_commit_git_blob_sha1": "8f013f3467b59755017c3887decb44adf8937a2e",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S48_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-23.json",
+      "checkout_raw_sha256": "62e7cbf05ef7946232e4e322a6fe8e0a3d3927d2fe600fdf98899efd9aefc9f8",
+      "fixed_commit_git_blob_sha1": "7c2d4f3776c19d4a4497fc505c0163d97aca6bf9",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "checkout_raw_sha256": "4973f1814ffb8fc6dcff186c2e94ef9c99d29a2e47fa5d024396d293f5fa7a49",
+      "fixed_commit_git_blob_sha1": "51a7fdd9859980ee105607360206cb3531252532",
+      "note": "Historical evidence read-only; fixed S54 Git object is authoritative."
+    }
+  ],
+  "deployment_profile": {
+    "status": "OPEN",
+    "availability": "NOT_AVAILABLE",
+    "repository_and_visible_checkout_search": "No target T deployment service, container/image identity, provider configuration, OSSL_LIB_CTX profile, entropy/reseed profile, lifecycle declaration or target execution logs found.",
+    "local_host_openssl_used_as_target": false,
+    "historical_build_versions_are_target_evidence": false,
+    "missing_fields": [
+      "T binary/container digest, OS/kernel baseline, loaded libcrypto path/hash and exact version/build",
+      "actual provider/module identities/hashes, property query, FIPS state, OSSL_LIB_CTX and redacted OPENSSL_CONF/OPENSSL_MODULES",
+      "OS entropy source category, DRBG hierarchy/type, instantiate and reseed policy/thresholds/error behavior",
+      "thread/worker/process count, concurrency, fork/exec, restart, snapshot/restore/migration and registry rollback behavior",
+      "same-context RNG users, aggregate Q_total_API/C_total_API and separate Q_internal/C_internal accounting, plus the E_T mapping between layers",
+      "RAND error/status records, signer/provider identity, publication filesystem and per-file failure status"
+    ]
+  },
+  "random_ledger": {
+    "formula": {
+      "G": "63*m + m^2*w + choose(m,2)*(2*w-1) + m^2",
+      "w": "32 + ceil(log2(m))",
+      "Qmax": "G + ceil(m^2/8) + 4*7*(m-1)",
+      "Cmax": "ceil(G/2^20) + 1 + 7*(m-1)",
+      "max_single_request_bytes": 1048576
+    },
+    "security_scope_n_le_256": {
+      "m": 256,
+      "w": 40,
+      "pairs": 32640,
+      "G": 5281664,
+      "permutation_bytes": 8192,
+      "fy_max_bytes": 7140,
+      "Qmax_bytes": 5296996,
+      "Cmax_calls": 1792,
+      "delta_iid_semantic_projection": "255*2^-168 < 2^-160"
+    },
+    "functional_scope_n_le_1000": {
+      "m": 1024,
+      "w": 42,
+      "pairs": 523776,
+      "G": 88626688,
+      "permutation_bytes": 131072,
+      "fy_max_bytes": 28644,
+      "Qmax_bytes": 88786404,
+      "Cmax_calls": 7247,
+      "delta_iid_semantic_projection": "1023*2^-154 < 2^-144"
+    },
+    "aggregation": "Q_total_API/C_total_API sum all per-invocation FTv3 and other direct RAND API users on a shared context. Provider-internal generate/reseed/entropy events use separate Q_internal/C_internal units and must not be added directly to API bytes/calls; target mapping and bounds are OPEN."
+  },
+  "conditional_bounds": {
+    "epsilon": "epsilon_T = Adv_DRBG_T(Q_total_API,C_total_API;E_T,P). API-level RAND_bytes request/byte totals are the query units; provider-internal generation/reseed/entropy counters are modeled separately by E_T unless an explicit mapping is supplied.",
+    "game_must_cover": [
+      "adaptive request boundaries",
+      "request lengths",
+      "returned bytes",
+      "success/error status",
+      "cap abort point",
+      "issuer output/status",
+      "hidden initial and reseed entropy averaged under actual law"
+    ],
+    "S_RNG": "If p_I>=1-delta and joint (S_RNG,V) advantage is epsilon_T: p_R>=p_I-epsilon_T; Adv_cond<=2*epsilon_T/(p_I-epsilon_T)<=2*epsilon_T/(1-delta-epsilon_T), epsilon_T<1-delta.",
+    "S_issue": "For full issuance, game must include signing/serialization/publication status and evidence must establish Pr_I[S_issue]>=p_min>epsilon_T; then conditional bound is 2*epsilon_T/(p_min-epsilon_T). No p_min evidence was found.",
+    "actual_instance": "OPEN; E_T, P deployment profile and aggregate Q/C are absent."
+  },
+  "publication_scope": {
+    "marker": "O_EXCL FTv3-domain marker under same private 0700 registry path, persisted before materials; not rollback/global cross-version protection.",
+    "signing": "EVP Ed25519; version/profile/hash fields are signed deterministic post-processing under fixed key/provider; deployment signer/provider and authenticity assumptions OPEN.",
+    "files": [
+      "package0",
+      "package1",
+      "signed context"
+    ],
+    "order": "Sequential durable_create, no cross-file rollback/transaction; current and prior artifacts may remain after failure.",
+    "power_loss": "OPEN; source fsync calls do not instantiate target filesystem/device/VM durability."
+  },
+  "review": {
+    "executor_participated_s45_s54": true,
+    "non_author_reviewer": "PASS_WITH_SCOPE: fresh-context reviewer not involved in S45-S55 implementation or derivation independently checked the fixed S54 source identity, all 15 source hashes/blobs, source call order and caps, N<=256/N<=1000 API Q/C ledgers, separation from provider-internal counters, S_RNG/S_issue conditional bounds, deployment-evidence gap, and burn/signature/sequential-publication scope. No build, tests, or file edits by reviewer; not a functional or deployment security acceptance.",
+    "required_scope": [
+      "N<=256/N<=1000 Q/C",
+      "aggregate query accounting",
+      "status-aware conditional bounds",
+      "target-profile evidence gap",
+      "signature and publication mapping",
+      "burn marker scope"
+    ],
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN"
+  },
+  "execution": {
+    "runtime_source_changed": false,
+    "test_source_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "formal_network": "NOT_RUN",
+    "performance": "NOT_RUN_NOT_MEASURED",
+    "VFSS_baseline_modified": false,
+    "secure_alias_created": false,
+    "push": "NOT_PERFORMED",
+    "merge": "NOT_PERFORMED"
+  },
+  "delivery_files": [
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "raw_sha256": "06e43bc68d37094ee2b97bf5d94d113760bce79421d37f33495fe3a885ca8911",
+      "git_blob_sha1": "e8399252b465c00f5dae6183467072c29f0636aa"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S55_DECISION_2026-10-25.md",
+      "raw_sha256": "871d0d6873f7aa2b07c237a2bfb685e5bc60240fb8afe45d352bf93e4d4a4897",
+      "git_blob_sha1": "193610b777063ab2782315af7b2f7611339127a6"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S55_REPORT_2026-10-25.md",
+      "raw_sha256": "bf1785b7cf9a12aead68fd1a3091fc916e660e924233595df47f976b6d262d5f",
+      "git_blob_sha1": "3da5df07a18009bc519e0b27bd640544cf483ad0"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S55_GATES_2026-10-25.json",
+      "raw_sha256": "36deb01d9795be12d9cd632f4325f507fdf1976a82c13db315ad4fc8ccaede14",
+      "git_blob_sha1": "1804fbb11334c268d4350386c3a9dd3978559ae9"
+    }
+  ],
+  "canonical_delivery": {
+    "file_count": 4,
+    "sha256": "cfe208960db5a26c545f0bf04aea020e34a72d900d76e4ed03fda3754ce85b81",
+    "definition": "SHA-256 of ordinal path-sorted UTF-8 lines <path><TAB><raw_sha256><LF>, excluding this manifest."
+  },
+  "self_reference": "This manifest is excluded from canonical_delivery to avoid a hash cycle; its raw/Git blob are recorded in final handoff only.",
+  "validation_attempts": [
+    {
+      "attempt": "S54 canonical digest first ad hoc PowerShell calculation",
+      "result": "FAILED_THEN_CORRECTED",
+      "details": "Initial row sort/serialization calculation did not match. Explicit ordinal sort and UTF-8/LF line construction reproduced the recorded 3e3f5786... digest; all Git blobs and fixed source blobs matched."
+    },
+    {
+      "attempt": "S55 canonical delivery digest validation using locale-aware Sort-Object",
+      "result": "FAILED_THEN_CORRECTED",
+      "details": "The first validation sort did not use the manifest's ordinal path order and produced a mismatch. Recomputed using StringComparer.Ordinal, UTF-8 and LF; the final cfe20896... digest matched all four delivery raw hashes and Git blobs."
+    },
+    {
+      "attempt": "Initial staged diff whitespace check",
+      "result": "FAILED_THEN_CORRECTED",
+      "details": "git diff --cached --check identified trailing Markdown hard-break spaces and an extra blank EOF line in the new decision/report. Removed them, restaged, and the final staged and committed diff checks passed."
+    },
+    {
+      "attempt": "Repo-specific tests/build",
+      "result": "NOT_RUN",
+      "reason": "No runtime/test changes and no reproduced defect."
+    }
+  ]
+}
