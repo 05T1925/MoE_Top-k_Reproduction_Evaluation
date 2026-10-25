@@ -1,0 +1,151 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s52-cases/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S52",
+  "date": "2026-10-25",
+  "base_commit": "1cc1e5202b3a603b55aaae985704933d70db0794",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "build_binary_sha256": {
+    "runtime_conformance": "683ac9ec4a32f7ee93ec5856874ff6a4a56a6c83cd643888b8fd0c08f8634195",
+    "process_e2e": "295ca414647546a222753b6454c6f5168dea0d9744e1524a71b5e1581329f842",
+    "ftv3_bounded_conformance": "b51967a350d5a387db1a9d3f50b51ec6d724fecd2af20bb8c30c2f8b32ca91ca",
+    "ftv3_process_e2e": "48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c"
+  },
+  "cases": [
+    {
+      "id": "runtime-v3-conformance",
+      "command": "moe_topk_score_to_mask_v3_runtime_conformance_test",
+      "exit": 0,
+      "result": "PASS",
+      "details": "package signature, triple/permutation shares, one-shot lease, package faults PASS; N128 formula=1289280; N256 formula=5281664",
+      "log": "runtime-conformance.log",
+      "log_sha256": "cd41c271a4beae7385feb5fcc2b11deb1f0cccd4e7e70f93b86e8b2b2032bfda"
+    },
+    {
+      "id": "ftv3-bounded-sampler-conformance",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test",
+      "exit": 0,
+      "result": "PASS",
+      "details": "gates=88626688; Qmax=88786404; Cmax=7247; issuance_abort PASS. On cap abort: no package/context/service/party lease publication; T private burn marker retained; replay rejected.",
+      "log": "ftv3-sampler-conformance.log",
+      "log_sha256": "e2fb5be6d90c596bc7080fbe3f7fa66cc33caa4740bf641323b2093a6d3eb445"
+    },
+    {
+      "id": "api-v2-normal-n128-k64-ftv3",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-fetch-success",
+      "exit": 0,
+      "parties": {"dealer": 0, "p0": 0, "p1": 0, "service_cleanup": 143, "service_cleanup_is_injected": true},
+      "result": "PASS_WITH_SCOPE",
+      "details": "oracle PASS; BOTH_COMMITTED; restart recovery PASS; each party received only its own share; N=128 K=64; 88 phases; max payload 159860; RSS about 23324 KiB per party",
+      "log": "api-v2-success.log",
+      "log_sha256": "f5542102f97937087c75ba7f7f79a67a06494c83f9b16c797479d204008a1df"
+    },
+    {
+      "id": "api-v2-fetch-standard-callback-exception",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-fetch-failure",
+      "exit": 0,
+      "parties": {"p0": 11, "p1": 0, "share_returned_to_p0": false},
+      "result": "PASS_WITH_SCOPE",
+      "details": "API P0_FETCH_RECOVERY_REQUIRED_P1_COMMITTED; commit already happened; restart authenticated fetch/recovery PASS; injected standard exception, not natural I/O fault",
+      "log": "api-v2-fetch-std-failure.log",
+      "log_sha256": "f52c960fcf9192e4746dd4ba8b0df543cb426bad1333f9f414d65071945cab2e"
+    },
+    {
+      "id": "api-v2-fetch-nonstandard-callback-exception",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-fetch-nonstd-failure",
+      "exit": 0,
+      "parties": {"p0": 11, "p1": 0, "share_returned_to_p0": false},
+      "result": "PASS_WITH_SCOPE",
+      "details": "API COMMITTED_FETCH_REQUIRED; receipt retained; restart fetch/recovery PASS; injected integer exception",
+      "log": "api-v2-fetch-nonstd-failure.log",
+      "log_sha256": "60ee4b73dc9fc948d4e0dbf4a77ffd0ec0c7214364369c428cf3cab0a464076e"
+    },
+    {
+      "id": "api-v2-submit-nonstandard-callback-exception-after-commit",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --s51-ft-v3-submit-nonstd-failure",
+      "exit": 0,
+      "parties": {"p0": 11, "p1": 0, "share_returned_to_p0": false},
+      "result": "PASS_WITH_SCOPE",
+      "details": "COMMIT_STATUS_UNKNOWN; no share returned; peer commit present; restart recovery of both shares PASS; injected integer exception",
+      "log": "api-v2-submit-nonstd-failure.log",
+      "log_sha256": "29c627cfd7d65d455d0d33100ee0b551b644878fc6547bce07f63f4def0b2736"
+    },
+    {
+      "id": "receipt-v2-standard-lost-submit-response-ftv1-smoke",
+      "command": "moe_topk_score_to_mask_v3_process_e2e_test --receipt-v2-only",
+      "exit": 0,
+      "result": "PASS_WITH_SCOPE",
+      "details": "FTv1 package with receipt/v2 only: normal N=4/K=2 oracle PASS; injected lost receipt after commit enters recovery-required, restart fetch recovers. Not FTv3 scale evidence.",
+      "log": "receipt-v2-submit-unknown-and-precommit.log",
+      "log_sha256": "8f0035a9f5273efcd0e187abd47fb4c71887bb6875dfd7c721a551351387f927"
+    },
+    {
+      "id": "receipt-v2-precommit-escrow-sigkill-ftv1-smoke",
+      "command": "moe_topk_score_to_mask_v3_process_e2e_test --receipt-v2-only",
+      "exit": 0,
+      "result": "PASS_WITH_SCOPE",
+      "details": "Artificial service SIGKILL before commit: P0/P1 exit 11 and no share; service exit 137; restart state ABORTED_NO_FETCH. Fault injection only.",
+      "log": "receipt-v2-submit-unknown-and-precommit.log",
+      "log_sha256": "8f0035a9f5273efcd0e187abd47fb4c71887bb6875dfd7c721a551351387f927"
+    },
+    {
+      "id": "ftv3-n1000-k1",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "parties": {"dealer": 0, "p0": 0, "p1": 0, "api": "BOTH_COMMITTED", "restart_recovery": "PASS"},
+      "result": "PASS_WITH_SCOPE",
+      "details": "oracle PASS; mask length 1000, exactly K bits; stable signed Q20.12 ordering; gates 88626688; package 33366516 B each; max payload 1048572 B; peak RSS KiB P0/P1=940432/940424",
+      "log": "n1000-ftv3-api-v2.log",
+      "log_sha256": "195e1abefc855d8c92e478d7dffc516a1d754230f15e1fb7d57478846b5d59e4"
+    },
+    {
+      "id": "ftv3-n1000-k8",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "parties": {"dealer": 0, "p0": 0, "p1": 0, "api": "BOTH_COMMITTED", "restart_recovery": "PASS"},
+      "result": "PASS_WITH_SCOPE",
+      "details": "oracle PASS; gates 88626688; package 33366516 B each; max payload 1048572 B; peak RSS KiB P0/P1=940456/940468",
+      "log": "n1000-ftv3-api-v2.log",
+      "log_sha256": "195e1abefc855d8c92e478d7dffc516a1d754230f15e1fb7d57478846b5d59e4"
+    },
+    {
+      "id": "ftv3-n1000-k500",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "parties": {"dealer": 0, "p0": 0, "p1": 0, "api": "BOTH_COMMITTED", "restart_recovery": "PASS"},
+      "result": "PASS_WITH_SCOPE",
+      "details": "oracle PASS; gates 88626688; package 33366516 B each; max payload 1048572 B; peak RSS KiB P0/P1=968084/967972",
+      "log": "n1000-ftv3-api-v2.log",
+      "log_sha256": "195e1abefc855d8c92e478d7dffc516a1d754230f15e1fb7d57478846b5d59e4"
+    },
+    {
+      "id": "ftv3-n1000-k999",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "parties": {"dealer": 0, "p0": 0, "p1": 0, "api": "BOTH_COMMITTED", "restart_recovery": "PASS"},
+      "result": "PASS_WITH_SCOPE",
+      "details": "oracle PASS; gates 88626688; package 33366516 B each; max payload 1048572 B; peak RSS KiB P0/P1=940428/940428",
+      "log": "n1000-ftv3-api-v2.log",
+      "log_sha256": "195e1abefc855d8c92e478d7dffc516a1d754230f15e1fb7d57478846b5d59e4"
+    },
+    {
+      "id": "ftv3-n1000-k1000",
+      "command": "moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000",
+      "exit": 0,
+      "parties": {"dealer": 0, "p0": 0, "p1": 0, "api": "BOTH_COMMITTED", "restart_recovery": "PASS"},
+      "result": "PASS_WITH_SCOPE",
+      "details": "oracle PASS; gates 88626688; package 33366516 B each; max payload 1048572 B; peak RSS KiB P0/P1=940684/940684",
+      "log": "n1000-ftv3-api-v2.log",
+      "log_sha256": "195e1abefc855d8c92e478d7dffc516a1d754230f15e1fb7d57478846b5d59e4"
+    }
+  ],
+  "not_run": [
+    "S35 195-case matrix",
+    "S40 211-case matrix",
+    "S48 full 13-case matrix as a rerun",
+    "formal LAN/WAN, RTT, AAV86, and performance matrix",
+    "natural timeout wait/failure experiment",
+    "N>1000 functional tests"
+  ],
+  "natural_business_io_failure": "NOT_REPRODUCED",
+  "all_timing_and_memory_numbers_are_diagnostic_not_performance": true
+}

@@ -1,0 +1,96 @@
+{
+  "schema": "m6b-i-project-derived-select5iter-s52-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S52",
+  "date": "2026-10-25",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "base_commit": "1cc1e5202b3a603b55aaae985704933d70db0794",
+  "base_tree": "6b1ce4bbcd6a962edeeaa8a5b862dfd15e786021",
+  "gates": {
+    "S51_SOURCE_IDENTITY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Pinned S51 commit/tree/parent and manifest source/delivery Git blobs; Windows CRLF checkout raw hash differences are recorded.",
+      "evidence": "S52 source/build/evidence manifest"
+    },
+    "API_V2_INDEPENDENT_FUNCTIONAL_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Fresh Release default-OFF and FTv3/receipt-v2/API-v2 opt-in builds; targeted conformance, callback recovery cases, and finite N=1000 K={1,8,500,999,1000} oracle cases only.",
+      "evidence": "S52 cases JSON; final TEST_ONLY E2E binary SHA-256 48355b3b3cae05ba4e8d4d9160a020fd8980c57652c9bf9fda41608b9a66dc3c"
+    },
+    "DEFAULT_OFF_ISOLATION": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "No v3/sampler symbol or experimental target detected; header rejected use without opt-in; sytorch Release target passed. Full all-target build stops on unrelated ext/bitpack undefined reference bitpack::mod(unsigned long,int).",
+      "evidence": "S52 report; OFF archive SHA-256 ee8116b0660a8e0c907a010a8898c4717aec7c6cd53b8180ee9c2f01cc4f1669"
+    },
+    "FTV3_RECEIPT_V2_API_V2_PRODUCTION_BUILD": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Explicit Release opt-in; TEST_ONLY random hook absent from production archive.",
+      "evidence": "S52 report; opt-in archive SHA-256 266a764f9586bf36c2d94133078eb53f063856971d2576e9f3dc33a4448f92bd"
+    },
+    "API_V2_SUBMIT_FETCH_RECOVERY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Normal, standard/nonstandard callback exceptions, unknown submit status, committed fetch recovery, service restart recovery; injected callbacks are engineering fault cases.",
+      "evidence": "S52 cases JSON and hashed logs in manifest"
+    },
+    "N1000_FINITE_ORACLE_FUNCTIONALITY": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Five finite FTv3 N=1000 K cases; not universal correctness, security admission, or performance measurement.",
+      "evidence": "S52 cases JSON; n1000-ftv3-api-v2.log"
+    },
+    "IDEAL_SUCCESSFENCE_PRE_POST_COMPOSITION": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Ideal IID FTv3 cap_success, N<=256, one static semi-honest party, ideal A token RNG, causal honest peer, exogenous deadline-safe scheduler; application/API success view only. Theory review inherited from S51 reviewer, not a new S52 review.",
+      "evidence": "S50 Kpre3; S51 Kpost3 and S51 review; S52 report"
+    },
+    "ACTUAL_FINITE_TIMEOUT_CONDITIONED_VIEW": {
+      "status": "OPEN",
+      "scope": "Missing proof or permission-correct sampler for Law(Vpre_b | Q_b, cap_success, S_actual=1) versus Law(Vpre_b | Q_b, cap_success); no deployment scheduler/network model supplied.",
+      "first_gap": "Whether Pr[S_actual=1 | Q_b, cap_success, Vpre_b=v] is invariant in v or has a proved bound.",
+      "not_an_attack_claim": true
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "scope": "No new owner acceptance record in this task."
+    },
+    "NATURAL_BUSINESS_IO_FAILURE": {
+      "status": "NOT_REPRODUCED",
+      "scope": "No natural I/O fault was observed; injected callback exceptions and SIGKILL are separate."
+    },
+    "REAL_DEALER_DRBG_SIGNATURE_PRIVATE_CHANNEL_AND_ENCRYPTION_BRIDGES": {
+      "status": "OPEN",
+      "scope": "S52 does not prove target deployment randomness, signatures, TLS/mTLS, recipient encryption, or complete party-view composition."
+    },
+    "CRASH_PREFIX_PRIVACY_AND_DURABILITY": {
+      "status": "NOT_IN_SCOPE",
+      "scope": "No arbitrary crash-prefix, physical power-loss, or durable storage guarantee is inferred."
+    },
+    "N_GT_256_SECURITY_SCOPE": {
+      "status": "OPEN",
+      "scope": "N=1000 has finite functionality evidence only; S50/S51 security theorem remains N<=256."
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "scope": "No formal performance or network comparison."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN",
+      "scope": "No secure alias created; complete security proof remains open."
+    },
+    "OFF_ALL_TARGET_BUILD": {
+      "status": "OPEN",
+      "scope": "The selected sytorch library target passes; full OFF all-target build fails in unrelated ext/bitpack test link.",
+      "failure": "undefined reference bitpack::mod(unsigned long,int)"
+    },
+    "EXTERNAL_ABI_COMPATIBILITY": {
+      "status": "NOT_VALIDATED",
+      "scope": "No external published ABI/source compatibility contract or consumer was available; no compatibility downgrade was added."
+    },
+    "SERVICE_ABORT_RESPONSE_PATH": {
+      "status": "NOT_RUN",
+      "scope": "Source audit shows A sends ABORT, parser expects COMMITTED, API reports COMMIT_STATUS_UNKNOWN; no dedicated explicit service-abort case was run."
+    }
+  },
+  "runtime_changes": false,
+  "push": "NOT_PERFORMED",
+  "merge": "NOT_PERFORMED",
+  "secure_alias_created": false
+}
