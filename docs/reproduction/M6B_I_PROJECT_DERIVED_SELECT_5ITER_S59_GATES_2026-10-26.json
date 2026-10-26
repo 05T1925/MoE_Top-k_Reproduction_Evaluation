@@ -1,0 +1,150 @@
+{
+  "schema": "m6b-project-derived-select5-s59-gates-v1",
+  "date": "2026-10-26",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "fixed_baseline": {
+    "commit": "4ae16569317f4526699ccb0e55a156eafcd03a1e",
+    "tree": "2f34000e549964c3bfbd1dce9487fd28073d5767",
+    "parent": "79f61f6298e0da65b7c64ea4e748bee1afd1ebb1",
+    "branch": "codex/m6b-i-project-select5-s59",
+    "source_identity": "PASS_WITH_SCOPE"
+  },
+  "gates": [
+    {
+      "id": "S58_SOURCE_RECEIPT",
+      "status": "PASS_WITH_SCOPE",
+      "scope": "S58 fixed source/evidence identity only",
+      "evidence": "S58 manifest rechecked: 7/7 primary sources, 9/9 evidence inputs, 15/15 S55 runtime sources; five-file S58 canonical delivery recomputed."
+    },
+    {
+      "id": "THEOREM_SCOPE_FREEZE",
+      "status": "CONDITIONAL",
+      "scope": "Success-only SuccessFence theorem inherited; abort-aware scope remains a proposal",
+      "evidence": "S59 report §§3-4; three owner decisions remain OPEN_CONFIRMATION."
+    },
+    {
+      "id": "SUCCESS_FENCE_APPLICATION_VIEW_N_LE_256",
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Ideal FTv3 cap-success, ideal A token RNG, honest peer causal deposit, one static semi-honest party, externally guaranteed on-time legal application messages",
+      "evidence": "Inherited S50 Kpre3, S51 Kpost3, S53 SuccessFence scope; no extension to deployment timing or failure-prefix privacy."
+    },
+    {
+      "id": "UNCONDITIONAL_FULL_SINGLE_PARTY_VIEW",
+      "status": "OPEN",
+      "first_gap": "ISSUANCE_ABORT outcome has no same-invocation package-delivery/party-start/notice joint kernel in current F_T/v3 + F_TOPK interface."
+    },
+    {
+      "id": "FTV3_CAP_ABORT_PARTY_ROUTING",
+      "status": "OPEN",
+      "scope": "Ideal F_T/v3 defines issuer-side cap-abort/private burn/no package; party-visible delivery/start/notice projection is undefined."
+    },
+    {
+      "id": "PROTOCOL_REJECT_AND_ABORT_PREFIX_VIEW",
+      "status": "OPEN",
+      "scope": "No complete simulator for validation rejection, prefix-dependent honest endpoint abort, or all approved protocol cut points. Malicious abort is outside static semi-honest model unless separately approved."
+    },
+    {
+      "id": "ESCROW_DB_STATE_AND_PARTY_OBSERVATION_MAP",
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Static source mapping only",
+      "detail": "A DB state PENDING/COMMITTED/ABORTED is separate from party API COMMIT_STATUS_UNKNOWN; local share formation, envelope submission, fetch, and API return are distinct."
+    },
+    {
+      "id": "ESCROW_ABORT_UNKNOWN_RECOVERY_JOINT_SIMULATION",
+      "status": "OPEN",
+      "first_gap": "No full joint kernel for hidden A transaction outcome, response delivery, per-party observations, and recovery fetch across unconditioned branches."
+    },
+    {
+      "id": "F_TOPK_ISSUE_ESCROW_V1_CANDIDATE",
+      "status": "CONDITIONAL",
+      "implementation": "NOT_IMPLEMENTED",
+      "approval": "NOT_APPROVED",
+      "detail": "Proof-only candidate proposes issuance outcome, all-or-none launch gate, explicit abstract cut/state transitions, and separate party observations; requires owner decision and independent formal review."
+    },
+    {
+      "id": "ISSUANCE_ABORT_CAUSE_CLASSIFICATION",
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Static source classification",
+      "detail": "Sampler cap exhaustion, marker EEXIST replay refusal, and marker durability failure can share an ISSUANCE_ABORT prefix but are distinct causes and distributions."
+    },
+    {
+      "id": "T_SIGNER_MARKER_RNG_PUBLICATION_FAILURE_VIEW",
+      "status": "OPEN",
+      "first_source_boundary": "Signer key load/parse at score_to_mask_v3_gmw.cpp:862-870; if assumed available, marker I/O at :472-543."
+    },
+    {
+      "id": "DEPLOYMENT_FAILURE_VIEW",
+      "status": "OPEN",
+      "scope": "Target signer, RAND/provider, file/marker, SQLite/rollback/durability, service restart, TLS/network, machine/storage failures not instantiated."
+    },
+    {
+      "id": "ACTUAL_FINITE_TIMEOUT_WALL_CLOCK_VIEW",
+      "status": "OPEN",
+      "detail": "SuccessFence is an ideal scheduler condition, not a deployment or success-conditioned finite-timeout proof."
+    },
+    {
+      "id": "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE",
+      "status": "OPEN_CONFIRMATION"
+    },
+    {
+      "id": "ISSUER_FAILURE_NOTICE_AND_LAUNCH_CONTRACT",
+      "status": "OPEN_CONFIRMATION"
+    },
+    {
+      "id": "ABORT_AWARE_PRIVACY_SCOPE_OWNER_DECISION",
+      "status": "OPEN_CONFIRMATION"
+    },
+    {
+      "id": "LS29",
+      "status": "NOT_CHANGED"
+    },
+    {
+      "id": "RUNTIME_OR_TEST_CODE_DEFECT",
+      "status": "NOT_REPRODUCED",
+      "detail": "Static review only; no runtime tests run."
+    },
+    {
+      "id": "BUILD_TEST_AND_HISTORICAL_MATRICES",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "N_LE_1000_FUNCTIONAL_RECEIPT",
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Inherited S52 finite cases only; not rerun in S59 and not a security proof."
+    },
+    {
+      "id": "N_GT_256_SECURITY_EXPANSION",
+      "status": "NOT_IN_SCOPE"
+    },
+    {
+      "id": "NATURAL_IO_FAILURE",
+      "status": "NOT_REPRODUCED",
+      "detail": "No natural-I/O experiment in S59."
+    },
+    {
+      "id": "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE",
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    {
+      "id": "SECURE_ALIAS",
+      "status": "NOT_CREATED"
+    },
+    {
+      "id": "PUSH_MERGE_PR",
+      "status": "NOT_PERFORMED"
+    },
+    {
+      "id": "VFSS_BASELINE",
+      "status": "UNCHANGED"
+    }
+  ],
+  "review": {
+    "reviewer": "/root/s59_independent_review",
+    "independent_of_s50_s59": true,
+    "scope": "Read-only source identity, cause classification, state-chain, candidate interface and theorem boundary review",
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "limitations": "Not full cryptographic proof, not functional acceptance, no target deployment kernel."
+  }
+}

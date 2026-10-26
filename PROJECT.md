@@ -1021,3 +1021,11 @@ S58 固定审查 S57 commit `79f61f6298e0da65b7c64ea4e748bee1afd1ebb1`、tree `e
 正常成功消息视图只在理想 IID FTv3 cap-success、理想 A token RNG、静态半诚实一方、T/A 条件受信不合谋、诚实 peer 因果提交、N≤256 以及外生 `SuccessFence` 下继承 `PASS_WITH_SCOPE`。协议中止全视图与部署故障全视图均 `OPEN`；SuccessFence 不关闭真实有限 timeout/wall-clock 视图。S58 提出未批准、未实现的 proof-only `F_TOPK-ISSUE-ESCROW/v1`，需绑定同次调用的发行 outcome、交付/启动、A 隐藏状态、每方 API 结果，并区分 share 已在本地形成与 API 已返回；不扩张 `L_S29` 或授予 party simulator T/A/controller 权限。
 
 独立 reviewer `/root/s58_independent_review` 未参与 S50–S58 推导，复核上述状态机、权限边界与首个联合核缺口；只读、未构建或测试。owner 对低概率 cap abort、非协议发材失败时的双方启动/通知策略、以及隐私声明是否覆盖底层部署故障的三项决定仍 `OPEN_CONFIRMATION`。本轮仅治理文档变更；BUILD/TEST、历史矩阵、自然 I/O、LAN/WAN、RTT、AAV86 与性能均 `NOT_RUN`，性能 `NOT_MEASURED`；不改 `VFSS/` 或 `VFSS-baseline/`，不创建 secure alias，不推送/合并。详见 S58 decision/report/gates/source-evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S59（2026-10-26）
+
+S59 从精确 S58 commit `4ae16569317f4526699ccb0e55a156eafcd03a1e` 隔离开始，复核 parent/tree、S58 7 项 primary source、9 项 evidence input、15 项固定 S55 runtime source 及五文件 canonical delivery。路线、signed Q20.12 稳定排序、原序 Top-K XOR-mask 输出、双方角色和 `L_S29` 均不变。
+
+S50 `Kpre₃` 与 S51 `Kpost₃` 只在理想 FTv3 成功发材、理想 A token RNG、诚实 peer 因果提交、N≤256 和外生 `SuccessFence` 下继承 `PASS_WITH_SCOPE`；完整不按成功事件筛选的单方视图仍 `OPEN`。首个协议级接口断点为 cap-abort 到同一 invocation 的 package delivery/双方 launch/notice 联合规则缺失。真实部署最早可在 signer key read/parse 失败；在 signer 成功前提下 marker 分步持久化是首个持久发行分叉。源码中 sampler cap exhaustion、marker durability failure、marker EEXIST replay refusal 可共用 `ISSUANCE_ABORT` 状态前缀，必须按原因区分。A 的 PENDING/COMMITTED/ABORTED 数据库态与 party `COMMIT_STATUS_UNKNOWN` 观察分开；本地 share 形成不等于提交、fetch 或 API 返回。
+
+S59 提出未批准、未实现的 proof-only `F_TOPK-ISSUE-ESCROW/v1`，显式绑定发材结果、交付/启动、协议中止、A 隐藏状态、各方响应/恢复，以及本地 share 形成与返回阶段；不扩大 `L_S29` 或模拟器权限。协议 abort 定理和部署-inclusive 故障定理均须负责人确定范围后另行证明。低概率 `ISSUANCE_ABORT`、部署失败时双方启动/通知合同、隐私声明是否纳入协议 abort 三项仍 `OPEN_CONFIRMATION`。非作者 `/root/s59_independent_review` 未参与 S50–S59 推导，完成只读来源、状态边界和候选接口复核，未构建或测试。S59 不改 runtime/test，BUILD/TEST=`NOT_RUN`，历史矩阵和正式性能未运行/测量，真实 finite-timeout view、DRBG、签名/存储、TLS、recipient encryption 与完整 party-view 仍 OPEN；自然业务 I/O 沿用 `NOT_REPRODUCED`，`VFSS-baseline/` 未修改，不创建 `secure` alias，不推送/合并。详见 S59 decision/report/gates/source-evidence manifest。

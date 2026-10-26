@@ -1365,3 +1365,11 @@ S58 固定 S57 commit `79f61f6298e0da65b7c64ea4e748bee1afd1ebb1`，核对 7 项 
 只继承 SuccessFence 下的范围性成功应用消息视图：理想 IID FTv3 cap-success、理想 A token RNG、至多一方静态半诚实、A/T 条件受信且不合谋、诚实 peer 因果提交、N≤256、无 I/O/进程故障且外生保证按期处理。真实有限 timeout/wall-clock 仍 OPEN。协议中止全视图、部署故障全视图也仍 OPEN；不得把 API no-share 写成进程从未形成临时 share。`F_TOPK-ISSUE-ESCROW/v1` 仅为未批准、未实现的 proof-only 候选，不能扩大 `L_S29`、角色或模拟器权限。
 
 三项负责人事项均为 `OPEN_CONFIRMATION`：低概率 cap abort 后烧掉 invocation 并用新 invocation 重试是否接受；非协议发材失败是否需双方同获明确失败且都不启动；隐私定理是否限于初始化/发材成功后的正常执行。非作者 `/root/s58_independent_review` 只读复核状态机与首个联合核缺口，未构建、测试或修改文件。S58 不改运行时/测试，BUILD/TEST=`NOT_RUN`，不重跑历史矩阵或自然 I/O；正式 LAN/WAN、RTT、AAV86 与性能未运行/未测量，不改 `VFSS-baseline/`，不创建 `secure` alias，不推送/合并。详见 S58 decision/report/gates/source-evidence manifest。
+
+### S59：发材中止、escrow 状态与单方完整视图模拟（2026-10-26）
+
+固定 S58 commit `4ae16569317f4526699ccb0e55a156eafcd03a1e`，复核 source/evidence manifest 的 7 项 primary source、9 项 evidence input、15 项 S55 runtime source 及五文件 canonical delivery。现有 `F_T/v3 + F_TOPK + escrow` 不足以生成包含全部中止/UNKNOWN/恢复分支的未筛选单方联合视图。首个协议级接口缺口是 ideal `ISSUANCE_ABORT` 到同 invocation 的 package/context 交付、P0/P1 启动与 party notice 的 joint kernel；真实 signer read/parse 是最早部署失败，marker I/O/EEXIST 与 cap exhaustion 也必须按原因拆分，尽管源码可共用 `ISSUANCE_ABORT` 状态前缀。
+
+S59 只继承 ideal FTv3 cap-success、ideal A token RNG、诚实 peer 因果提交、N≤256 和外生 SuccessFence 下的成功消息视图 `PASS_WITH_SCOPE`。协议 abort-aware 组合功能 `F_TOPK-ISSUE-ESCROW/v1` 仅为 proof-only 候选，需负责人确认启动/失败通知/低概率 cap-abort 和安全范围；不扩大 `L_S29`，不授予模拟器 T/A/peer/controller 秘密。A 的 DB 状态 PENDING/COMMITTED/ABORTED 与 party `COMMIT_STATUS_UNKNOWN`、response/fetch/API 状态分开。实际有限 timeout、signer/DRBG/storage/SQLite/TLS/机器故障与完整 party-view 仍 OPEN。
+
+非作者 `/root/s59_independent_review` 未参与 S50–S59 推导，独立只读复核 S58 来源和 S59 状态/权限/候选接口，未编辑、构建或测试；不构成功能接收。S59 无 runtime/test 修改，BUILD/TEST=`NOT_RUN`；不重跑 S35/S40/S52 矩阵、不运行正式 LAN/WAN/RTT/AAV86/性能，性能 `NOT_MEASURED`。自然业务 I/O 沿用 `NOT_REPRODUCED`，`VFSS-baseline/` 不变，不建 secure alias，不推送/合并。详细范围见 S59 decision/report/gates/source-evidence manifest。
