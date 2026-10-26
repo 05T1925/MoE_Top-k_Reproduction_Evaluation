@@ -1029,3 +1029,13 @@ S59 从精确 S58 commit `4ae16569317f4526699ccb0e55a156eafcd03a1e` 隔离开始
 S50 `Kpre₃` 与 S51 `Kpost₃` 只在理想 FTv3 成功发材、理想 A token RNG、诚实 peer 因果提交、N≤256 和外生 `SuccessFence` 下继承 `PASS_WITH_SCOPE`；完整不按成功事件筛选的单方视图仍 `OPEN`。首个协议级接口断点为 cap-abort 到同一 invocation 的 package delivery/双方 launch/notice 联合规则缺失。真实部署最早可在 signer key read/parse 失败；在 signer 成功前提下 marker 分步持久化是首个持久发行分叉。源码中 sampler cap exhaustion、marker durability failure、marker EEXIST replay refusal 可共用 `ISSUANCE_ABORT` 状态前缀，必须按原因区分。A 的 PENDING/COMMITTED/ABORTED 数据库态与 party `COMMIT_STATUS_UNKNOWN` 观察分开；本地 share 形成不等于提交、fetch 或 API 返回。
 
 S59 提出未批准、未实现的 proof-only `F_TOPK-ISSUE-ESCROW/v1`，显式绑定发材结果、交付/启动、协议中止、A 隐藏状态、各方响应/恢复，以及本地 share 形成与返回阶段；不扩大 `L_S29` 或模拟器权限。协议 abort 定理和部署-inclusive 故障定理均须负责人确定范围后另行证明。低概率 `ISSUANCE_ABORT`、部署失败时双方启动/通知合同、隐私声明是否纳入协议 abort 三项仍 `OPEN_CONFIRMATION`。非作者 `/root/s59_independent_review` 未参与 S50–S59 推导，完成只读来源、状态边界和候选接口复核，未构建或测试。S59 不改 runtime/test，BUILD/TEST=`NOT_RUN`，历史矩阵和正式性能未运行/测量，真实 finite-timeout view、DRBG、签名/存储、TLS、recipient encryption 与完整 party-view 仍 OPEN；自然业务 I/O 沿用 `NOT_REPRODUCED`，`VFSS-baseline/` 未修改，不创建 `secure` alias，不推送/合并。详见 S59 decision/report/gates/source-evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S60（2026-10-26）
+
+S60 从 S59 精确提交 `0f67aec45d767c4bf530b12e4d548a82d68b6800` 在新隔离分支复核；父链、tree、S59 五项交付规范摘要和所引用 Git blob 均按 manifest 核验。没有从主工作区替换源码。S50/S51/S53 的成功执行结论只在 ideal FTv3 cap-success、ideal A token RNG、诚实 peer 因果执行、`N≤256`、单方静态半诚实和外生 SuccessFence 下继承 `PASS_WITH_SCOPE`。
+
+本轮未筛选的 A+B 完整单方视图仍 `OPEN`。当前 F_T/v3 对理想 cap-abort 的定义没有和同一 invocation 的 package/context delivery、双方启动/通知相连的 joint kernel；若候选全/无启动门关闭该处，任意在线 GMW/Select cut 仍缺 `Kpre-prefix^{b,j}`。S50 的成功 `Kpre₃` 不能通过截断或给出未来 `z_b` 自动变成 abort-prefix sampler。Escrow 的 A 数据库态 `NO_TX/PENDING/COMMITTED/ABORTED` 与 party 观察 `COMMIT_STATUS_UNKNOWN` 不同；本地 share 形成也不同于 submit、fetch 或 API 返回。
+
+proof-only `F_TOPK-ISSUE-ESCROW/v1` 进一步明确 `τ` burn/replay、issuance/start gate、operation-indexed abstract cuts、A 隐状态与每方通知/恢复、share 本地形成/对外返回的分离；仍为 `CONDITIONAL / NOT_APPROVED / NOT_IMPLEMENTED`。负责人关于 cap-abort 新 invocation 重试、发材/启动失败通知及安全定理是否包括协议中止、当前安全上限是否为 N≤256 的事项均 `OPEN_CONFIRMATION`。部署 signer/RNG/storage/SQLite/TLS/OS 故障和真实有限 timeout 仍是独立 `OPEN`，SuccessFence 不替代它们。
+
+本轮只读审查，无 runtime/test 修改；BUILD/TEST、历史矩阵、自然 I/O 实验和正式 LAN/WAN/RTT/AAV86/性能均 `NOT_RUN`，性能 `NOT_MEASURED`。自然业务 I/O 沿用 `NOT_REPRODUCED`；`VFSS-baseline/` 未修改；无 `secure` alias、push、merge 或 PR。非作者 reviewer `/root/s60_independent_review` 只读复核状态/模拟边界并要求精确化 cap-abort 概率、完整调用绑定和 cut 枚举；修改已纳入交付。Reviewer 未构建或测试，且不批准 `T_AB`、runtime refinement 或部署故障/timeout 范围。详见 S60 report/gates/source-evidence manifest。

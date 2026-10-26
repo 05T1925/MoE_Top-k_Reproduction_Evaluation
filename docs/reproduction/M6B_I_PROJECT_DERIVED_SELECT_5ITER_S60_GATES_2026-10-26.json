@@ -1,0 +1,96 @@
+{
+  "schema": "m6b-i-project-derived-select5-s60-gates-v1",
+  "date": "2026-10-26",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "fixed_object": {
+    "task_start_commit": "0f67aec45d767c4bf530b12e4d548a82d68b6800",
+    "tree": "1a8615481103eb7c50cf2c0c1ecf2556ac6b7c8d",
+    "parent": "4ae16569317f4526699ccb0e55a156eafcd03a1e",
+    "source_receipt": "PASS_WITH_SCOPE",
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-i-project-select5-s60/MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-i-project-select5-s60",
+    "initial_worktree_clean": true
+  },
+  "contract": {
+    "input": "signed Q20.12 score shares",
+    "ordering": "descending score, stable ties by original index",
+    "output": "original-order XOR-shared Top-K bit mask with exactly K ones",
+    "roles_and_L_S29_changed": false,
+    "normal_escrow_contract_changed": false
+  },
+  "theorem_branches": [
+    {
+      "id": "T_A_SUCCESS_ONLY_SUCCESSFENCE",
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Inherited only: ideal FTv3 cap-success, ideal A token RNG, one static semi-honest party, trusted non-colluding T/A, honest peer causal deposit, 1<=K<=N<=256, exogenous SuccessFence for timely legal application messages.",
+      "excludes": ["cap-abort", "online protocol abort prefixes", "escrow abort/unknown/recovery failures", "real finite timeout selection", "deployment faults"],
+      "evidence": ["S50 Kpre_3", "S51 Kpost_3", "S53 SuccessFence"]
+    },
+    {
+      "id": "T_AB_UNFILTERED_PROTOCOL_ABORT_VIEW",
+      "status": "OPEN",
+      "scope": "No complete unfiltered joint simulator for issuance abort, launch/notice, arbitrary protocol cuts, A transaction outcomes, client response observations and recovery.",
+      "first_gap": "F_T/v3 ISSUANCE_ABORT has no same-invocation joint kernel for package/context delivery, P0/P1 start and notice; even under a proposed all-or-none launch gate, Kpre-prefix^{b,j} for online cuts is absent.",
+      "ideal_cap_abort_bound_if_security_scope_N_le_256": "delta_cap <= 255*2^-154 < 2^-146 for m<=256,r=7 under the ideal IID FTv3 sampler; semantic-material projection only, not full package/transcript or deployment RAND error.",
+      "exact_probability_definition": "For independent ideal IID sampling blocks, delta_cap = 1 - product_{i=2..m}(1-rho_i^7), rho_i=(2^32 mod i)/2^32.",
+      "not_attack_or_impossibility": true
+    },
+    {
+      "id": "C_DEPLOYMENT_FAILURE_VIEW",
+      "status": "OPEN",
+      "scope": "Signer/provider/RAND, marker/filesystem, SQLite/rollback, restart, TLS/network, machine/media and real deadline failure distributions are not instantiated by the ideal protocol model."
+    }
+  ],
+  "detailed_gates": [
+    {"id": "S59_FIXED_SOURCE_AND_MANIFEST", "status": "PASS_WITH_SCOPE", "detail": "Exact commit/tree/parent and S59 delivery canonical verified; 7 primary + 9 evidence + 15 fixed runtime blob identities rechecked through S59 manifest."},
+    {"id": "CAP_ABORT_PARTY_ROUTING", "status": "OPEN", "detail": "Issuer-side cap-abort/burn/no package is defined, but party delivery/start/notice projection for the same invocation is not."},
+    {"id": "PRESTART_PUBLIC_LOCAL_REJECTION", "status": "CONDITIONAL", "detail": "A deterministic local sampler is available only if rejection depends solely on this party's own package/public tuple and occurs before any online message; not tested."},
+    {"id": "ONLINE_ABORT_PREFIX_SAMPLER", "status": "OPEN", "detail": "Need Law(V_b^{<=j}, share_formed_b | x_b, public(tau), L_S29, ISSUED, E_cut=j); S50 Kpre_3 conditions on complete successful prefix/output share and does not imply this law. For cuts after local output formation but before API return, an ideal interface must expose staged own z_b only to the corrupted-party simulator at the formation event; no early z_b for earlier cuts. Reviewer independently confirmed this models the corrupted party's own local view, not L_S29, without giving it to the peer."},
+    {"id": "ESCROW_ABORT_UNKNOWN_RECOVERY_KERNEL", "status": "CONDITIONAL", "detail": "Can be specified as an ideal event-index state machine after a valid pre-escrow simulator exists; S51 Kpost_3 covers the successful suffix only and no real service refinement is established."},
+    {"id": "F_TOPK_ISSUE_ESCROW_V1", "status": "CONDITIONAL", "approval": "NOT_APPROVED", "implementation": "NOT_IMPLEMENTED", "detail": "Proof-only candidate skeleton in report binds full tau and preserves permissions; allowed E_cut set is not enumerated and per-cut transition kernels are incomplete. No leakage/role/output change. Requires owner contract choice, prefix kernels and further independent review."},
+    {"id": "SUCCESSFENCE_VS_REAL_TIMEOUT", "status": "OPEN", "detail": "SuccessFence is an exogenous ideal scheduler assumption; no actual wall-clock/finite-timeout conditional view proof."},
+    {"id": "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE", "status": "OPEN_CONFIRMATION", "detail": "Not conflated with the separate deferred numeric algorithm random-failure bound."},
+    {"id": "ISSUANCE_NOTICE_AND_START_POLICY", "status": "OPEN_CONFIRMATION"},
+    {"id": "ABORT_AWARE_THEOREM_SCOPE", "status": "OPEN_CONFIRMATION"},
+    {"id": "CURRENT_SECURITY_N_LIMIT", "status": "OPEN_CONFIRMATION", "detail": "N<=1000 is finite functional evidence, not security expansion; inherited proof scope is N<=256."},
+    {"id": "N_GT_256_SECURITY", "status": "NOT_IN_SCOPE"},
+    {"id": "N_LE_1000_FUNCTIONAL_EVIDENCE", "status": "PASS_WITH_SCOPE", "detail": "Inherited S52 finite functional cases only; not rerun and not a security theorem."},
+    {"id": "NATURAL_IO_FAILURE", "status": "NOT_REPRODUCED", "detail": "No experiment in S60; retain prior evidence state."},
+    {"id": "RUNTIME_DEFECT", "status": "NOT_REPRODUCED", "detail": "Static review only; no runtime test or failure injection was run."},
+    {"id": "RUNTIME_OR_TEST_MODIFICATION", "status": "NOT_RUN"},
+    {"id": "BUILD_TEST_AND_HISTORICAL_MATRICES", "status": "NOT_RUN"},
+    {"id": "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE", "status": "NOT_RUN", "measurement": "NOT_MEASURED"},
+    {"id": "SECURE_ALIAS", "status": "NOT_CREATED"},
+    {"id": "VFSS_BASELINE", "status": "UNCHANGED"},
+    {"id": "PUSH_MERGE_PR", "status": "NOT_PERFORMED"}
+  ],
+  "owner_confirmations": [
+    "Does legal-input FTv3 cap exhaustion burn the invocation and permit retry only under a new invocation?",
+    "Do issuance/start failures require the same explicit failure at both parties and no start, and is UNKNOWN/timeout acceptable when notice is undeliverable?",
+    "Does the security theorem cover only successful initialization/issuance or also protocol-level abort states?",
+    "Is the current security claim explicitly limited to N<=256?"
+  ],
+  "review": {
+    "reviewer": "/root/s60_independent_review",
+    "independent_of_s50_s60": true,
+    "scope": "Read-only review of S59 fixed source, abort-aware law, candidate interface, A state versus party observations, and exact prefix stopping point.",
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "status": "PASS_WITH_SCOPE",
+    "review_result": "Reviewer accepted the exact stopping point and candidate only as a proof-only discussion specification; requested corrections to cap-abort probability notation and invocation binding/cut scope were incorporated.",
+    "limitations": "Review covers source/state mapping and proof-boundary consistency only; it does not close T_AB, enumerate all cut kernels, constitute functional acceptance, or prove deployment refinement. Reviewer separately confirmed the staged-own-z_b simulator-interface note; no build/tests were run."
+  },
+  "execution": {
+    "runtime_changed": false,
+    "tests_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "historical_matrices": "NOT_RUN",
+    "natural_io_experiment": "NOT_RUN",
+    "performance": "NOT_RUN",
+    "measurement": "NOT_MEASURED",
+    "vfss_baseline_modified": false,
+    "secure_alias_created": false,
+    "push_merge_pr": false
+  }
+}

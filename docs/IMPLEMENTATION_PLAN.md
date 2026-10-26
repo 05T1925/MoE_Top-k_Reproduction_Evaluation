@@ -1373,3 +1373,15 @@ S58 固定 S57 commit `79f61f6298e0da65b7c64ea4e748bee1afd1ebb1`，核对 7 项 
 S59 只继承 ideal FTv3 cap-success、ideal A token RNG、诚实 peer 因果提交、N≤256 和外生 SuccessFence 下的成功消息视图 `PASS_WITH_SCOPE`。协议 abort-aware 组合功能 `F_TOPK-ISSUE-ESCROW/v1` 仅为 proof-only 候选，需负责人确认启动/失败通知/低概率 cap-abort 和安全范围；不扩大 `L_S29`，不授予模拟器 T/A/peer/controller 秘密。A 的 DB 状态 PENDING/COMMITTED/ABORTED 与 party `COMMIT_STATUS_UNKNOWN`、response/fetch/API 状态分开。实际有限 timeout、signer/DRBG/storage/SQLite/TLS/机器故障与完整 party-view 仍 OPEN。
 
 非作者 `/root/s59_independent_review` 未参与 S50–S59 推导，独立只读复核 S58 来源和 S59 状态/权限/候选接口，未编辑、构建或测试；不构成功能接收。S59 无 runtime/test 修改，BUILD/TEST=`NOT_RUN`；不重跑 S35/S40/S52 矩阵、不运行正式 LAN/WAN/RTT/AAV86/性能，性能 `NOT_MEASURED`。自然业务 I/O 沿用 `NOT_REPRODUCED`，`VFSS-baseline/` 不变，不建 secure alias，不推送/合并。详细范围见 S59 decision/report/gates/source-evidence manifest。
+
+### S60：协议级中止的未筛选单方完整视图（2026-10-26）
+
+固定 S59 commit `0f67aec45d767c4bf530b12e4d548a82d68b6800`，在独立 worktree 核对 parent/tree、S59 delivery canonical 摘要和所引用 manifest Git blobs。S50 `Kpre₃`、S51 `Kpost₃`、S53 SuccessFence 的成功视图只在 ideal FTv3 cap-success、ideal A token RNG、诚实 peer 因果提交、单方静态半诚实、`N≤256` 及外生 timely-message fence 下为 `PASS_WITH_SCOPE`。这不是包含失败结果的无条件执行模拟。
+
+当前完整 A+B 视图仍 `OPEN`。第一个接口断点是 ideal `ISSUANCE_ABORT` 到同一 invocation 的 package/context delivery、party start 与 notice 没有联合核；若未来合同采用全/无启动门，在线 GMW/Select 中途 cut 仍缺 `Kpre-prefix^{b,j}`。从含未来输出 `z_b` 的成功 `Kpre₃` 截断 transcript，不等于在 cut 条件下的未筛选 prefix law。Escrow 的 `NO_TX/PENDING/COMMITTED/ABORTED` 是 A 隐藏状态，`COMMIT_STATUS_UNKNOWN` 是客户端观察；本地 share 已形成也不同于提交、fetch 或 API 返回。
+
+候选 `F_TOPK-ISSUE-ESCROW/v1` 只作为 proof-only 规格，区分 issuer burn/replay、同次发材与启动门、抽象 operation-indexed cut、诚实 peer 因果 deposit、A 状态及 response loss/recovery、每方 share formation/fetch/API return。候选未获批准或实现；不修改 `L_S29`、角色或 runtime。部署签名/RNG/文件/SQLite/TLS/机器故障与真实 timeout 不纳入理想 cut，继续独立 `OPEN`。
+
+负责人确认项维持 `OPEN_CONFIRMATION`：合法输入下 cap exhaustion 是否烧掉本次 invocation 并允许新 invocation 重试；发行/启动失败通知策略以及通知不可达时是否接受 UNKNOWN/timeout；隐私定理是否包括协议级 abort；当前安全阶段是否固定 `N≤256`。既有对数值算法随机失败上限的暂缓要求不视为 cap-abort 合同决定。
+
+本轮只读审计，无 runtime/test/build 修改或执行；BUILD/TEST 和历史矩阵 `NOT_RUN`，自然业务 I/O `NOT_REPRODUCED`（本轮未测试），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。`VFSS-baseline/` 未改，无 `secure` alias、push、merge 或 PR。非作者 `/root/s60_independent_review` 只读复核状态链和证明边界，建议精确区分 cap-abort 概率与上界、补全调用 tuple 并明确 cut 集合/转移核尚未完成；报告已纳入。Reviewer 未构建或测试，不批准 `T_AB` 或部署范围。详见 S60 decision/report/gates/source-evidence manifest。

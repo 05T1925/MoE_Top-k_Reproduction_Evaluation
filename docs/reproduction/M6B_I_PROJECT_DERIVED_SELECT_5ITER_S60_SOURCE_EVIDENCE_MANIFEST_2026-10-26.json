@@ -1,0 +1,712 @@
+{
+  "schema": "m6b-i-project-derived-select5-s60-source-evidence/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S60",
+  "date": "2026-10-26",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "fixed_baseline": {
+    "commit": "0f67aec45d767c4bf530b12e4d548a82d68b6800",
+    "tree": "1a8615481103eb7c50cf2c0c1ecf2556ac6b7c8d",
+    "parent": "4ae16569317f4526699ccb0e55a156eafcd03a1e",
+    "branch_at_creation": "codex/m6b-i-project-select5-s60",
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-i-project-select5-s60/MoE_Top-k_Reproduction_Evaluation",
+    "initial_worktree_clean": true,
+    "vfss_baseline_modified": false
+  },
+  "s59_manifest_identity": {
+    "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S59_SOURCE_EVIDENCE_MANIFEST_2026-10-26.json",
+    "git_blob_sha1": "5dc1b5f3ca53840502af77b3b1dfd68e5a22e5fe",
+    "git_blob_content_sha256": "1afd51391cd7873a2bc93bb4d7c74a141094b027d92e121f3b83824022f79105",
+    "baseline_semantics": "S59 manifest baseline points to its S58 reviewed source, not to S59 delivery commit."
+  },
+  "s59_delivery_recheck": {
+    "recorded_canonical_sha256": "003b768fd2866dec29367904fbef05521124305d91b49cbd225d5458b653db74",
+    "recomputed_canonical_sha256": "003b768fd2866dec29367904fbef05521124305d91b49cbd225d5458b653db74",
+    "match": true,
+    "files": [
+      {
+        "path": "PROJECT.md",
+        "role": "S59_DELIVERY",
+        "scope": "",
+        "git_blob_sha1": "d2182565cfc7de8a23dd36d7592d9580d7b85a04",
+        "git_blob_content_sha256": "eb385819579e1906f0a4add7e745da37defc95b0dce121da3fb3a34ac7f826b3",
+        "bytes": 86910
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "role": "S59_DELIVERY",
+        "scope": "",
+        "git_blob_sha1": "7f5b42c317b07c7c1ee4c31a742b590c4f59184c",
+        "git_blob_content_sha256": "e45c34cfc4459f89ceffed9b75becbba9358f810b1e42f8fb2725c2fea11aecb",
+        "bytes": 110140
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S59_DECISION_2026-10-26.md",
+        "role": "S59_DELIVERY",
+        "scope": "",
+        "git_blob_sha1": "e716f57033dbe6e4bc3cebad026631d01ec52a95",
+        "git_blob_content_sha256": "e1c8181ca0f1113584ead0e570d64d31c62306b8d08026531b620b5eb1e06a64",
+        "bytes": 7027
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S59_REPORT_2026-10-26.md",
+        "role": "S59_DELIVERY",
+        "scope": "",
+        "git_blob_sha1": "bf764523e68df84c138c6a7bc778040d264fc672",
+        "git_blob_content_sha256": "45916cc02347a16eab8f477297b7e3a33078c1cef59c1134014bb650277aa4f6",
+        "bytes": 36614
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S59_GATES_2026-10-26.json",
+        "role": "S59_DELIVERY",
+        "scope": "",
+        "git_blob_sha1": "873dc52946481f4688f08372a273d5ae021a5d1c",
+        "git_blob_content_sha256": "cfd4073c5b4e4abf1bca905a889172d3ae0f45d55e270af1385fcf93f06a4a73",
+        "bytes": 5998
+      }
+    ]
+  },
+  "s59_source_recheck_groups": [
+    {
+      "group": "S58_PRIMARY_SOURCE",
+      "recorded_count": 7,
+      "matched_count": 7,
+      "files": [
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "FTv3 issuer order, RAND wrapper, signer-key read, burn marker, bounded sampling, signing and sequential publication",
+          "git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+          "git_blob_content_sha256": "0819e11be6d7cef70f94491e40d9ff6bb932826164bf40311bbc10066dbf2c42",
+          "bytes": 70512,
+          "expected_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "FTv3 bounded rejection sampler profile",
+          "git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+          "git_blob_content_sha256": "72aa4dc47d6c7be9b3170cf1de8e47cd976c6b53b284d1617b9109ea44770bc7",
+          "bytes": 2292,
+          "expected_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "A token generation, SQL state transitions, submit, restart/timeout, fetch and error responses",
+          "git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+          "git_blob_content_sha256": "e835c71b2565232f6044b4cdd0439d08bda632732d7a360a71949cf8f896addf",
+          "bytes": 46390,
+          "expected_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "Party local-output timing, submit/fetch/API state and share-release mapping",
+          "git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+          "git_blob_content_sha256": "5cace49daa40d9243c457b521232c7e2305e308276ce23221072d802b33bbce5",
+          "bytes": 44331,
+          "expected_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "Party state/API contract and definite-abort type",
+          "git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+          "git_blob_content_sha256": "cb9d185a474bf11f350e1aa46df47264d11b4a1cbf247fb2a81772a446a2134f",
+          "bytes": 14990,
+          "expected_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "Framed TLS transport integration; source-only reference, not runtime test",
+          "git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+          "git_blob_content_sha256": "ca18f02820ae2270ea3f6c419e8a11de34d7577b24e599668fafef1cea4496e1",
+          "bytes": 23389,
+          "expected_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+          "role": "S58_PRIMARY_SOURCE",
+          "scope": "Test-controller process, file and SQLite visibility; controller is not a simulator input",
+          "git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+          "git_blob_content_sha256": "66017017de8645ffd981218c24902c177112c9b4c25fcfe7e11010a57eb510fe",
+          "bytes": 124832,
+          "expected_git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+          "matches_expected": true
+        }
+      ]
+    },
+    {
+      "group": "S58_EVIDENCE_INPUT",
+      "recorded_count": 9,
+      "matched_count": 9,
+      "files": [
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S32_REPORT_2026-10-20.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "F_TOPK-U/F_TOPK-ATOMIC contract summary; original S31 source is absent from this fixed tree",
+          "git_blob_sha1": "dfdf14391f32da0eeaeae17b1fc604691d456ec0",
+          "git_blob_content_sha256": "630bb6f6835b39677d6e32295f8d720747dc13e1d879991df0566ea1a1057c58",
+          "bytes": 17658,
+          "expected_git_blob_sha1": "dfdf14391f32da0eeaeae17b1fc604691d456ec0",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S49_REPORT_2026-10-23.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "Ideal FTv3 cap-abort and semantic-material scope",
+          "git_blob_sha1": "bb2e3c1ff9fb1cfae77eec533be20ddeeb7b68d9",
+          "git_blob_content_sha256": "e1f2f04ef595a1585dca6907a49edb8143b9d980c9386e2010d9de1b3bef04d6",
+          "bytes": 26835,
+          "expected_git_blob_sha1": "bb2e3c1ff9fb1cfae77eec533be20ddeeb7b68d9",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_REPORT_2026-10-23.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "Kpre3 cap-success conditioned pre-escrow proof range",
+          "git_blob_sha1": "fdb98cb901225959e1c07e6382834f43c59ca0d2",
+          "git_blob_content_sha256": "8c596bd1da95568e5dd25eb144470bb39f55d0a91e2c60beab55908eb7a2c26f",
+          "bytes": 19642,
+          "expected_git_blob_sha1": "fdb98cb901225959e1c07e6382834f43c59ca0d2",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_REPORT_2026-10-24.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "Kpost3 success-path and SuccessFence assumptions",
+          "git_blob_sha1": "f59c9469570998b5d2b37628c1dc66b4b3795c3e",
+          "git_blob_content_sha256": "6ea0bcde7d5b18f688034bc35e0861cd5ccf91e53a81d7d52e1aeab9eef4f589",
+          "bytes": 35041,
+          "expected_git_blob_sha1": "f59c9469570998b5d2b37628c1dc66b4b3795c3e",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_REPORT_2026-10-25.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "SuccessFence versus real finite-timeout distinction",
+          "git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+          "git_blob_content_sha256": "d9093e1ae97e9f060a4beaa73268990893695753ba6ff3d51cd516ca3b7d23f9",
+          "bytes": 21376,
+          "expected_git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S56_DECISION_2026-10-25.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "Inherited S56 token/status bridge conclusion",
+          "git_blob_sha1": "35f5e51a18c6c8741f38bf06ce3937ac095c74d5",
+          "git_blob_content_sha256": "f5cb257aa417c4833a424a947b64b59218995e623e6c216a96c9232f471dcc23",
+          "bytes": 5160,
+          "expected_git_blob_sha1": "35f5e51a18c6c8741f38bf06ce3937ac095c74d5",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S56_REPORT_2026-10-25.md",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "Token/escrow status details and prior independent review",
+          "git_blob_sha1": "d4be4ecfb79381c9d9714f09960b98f0a096b94a",
+          "git_blob_content_sha256": "5b56f7d7c97593817ced399cfedd150e7cc0f484de17dfbd3aea7af62034fd14",
+          "bytes": 26411,
+          "expected_git_blob_sha1": "d4be4ecfb79381c9d9714f09960b98f0a096b94a",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S56_GATES_2026-10-25.json",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "Inherited gate state",
+          "git_blob_sha1": "b6c4983bc8b00005a912f87b8878c85f1885efe3",
+          "git_blob_content_sha256": "b9cf094a207a0d02e90e3702880a7257e90a0acc7586f3b347183051d6188be2",
+          "bytes": 7456,
+          "expected_git_blob_sha1": "b6c4983bc8b00005a912f87b8878c85f1885efe3",
+          "matches_expected": true
+        },
+        {
+          "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S56_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+          "role": "S58_EVIDENCE_INPUT",
+          "scope": "S56 source/evidence identity and S55 source cross-check",
+          "git_blob_sha1": "ac3ffee0d98c8d694263764f0dd572500726f04d",
+          "git_blob_content_sha256": "f2196e1c478c6736733aa453e35acbab58fdb270ebcd867f86a245e05bc411fc",
+          "bytes": 28521,
+          "expected_git_blob_sha1": "ac3ffee0d98c8d694263764f0dd572500726f04d",
+          "matches_expected": true
+        }
+      ]
+    },
+    {
+      "group": "S55_FIXED_RUNTIME_SOURCE",
+      "recorded_count": 15,
+      "matched_count": 15,
+      "files": [
+        {
+          "path": "VFSS/CMakeLists.txt",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "minimum OpenSSL dependency and production/test target inventory",
+          "git_blob_sha1": "16bd97d1ddc6ee8d62644200c1e21fb309a5178e",
+          "git_blob_content_sha256": "c8d6607b19df75beb245435e325117f25c6483b56c75fa34159bd50ffc650fd9",
+          "bytes": 36653,
+          "expected_git_blob_sha1": "16bd97d1ddc6ee8d62644200c1e21fb309a5178e",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "FTv3 Dealer, RAND wrapper, error handling, signing, marker and three-file publication",
+          "git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+          "git_blob_content_sha256": "0819e11be6d7cef70f94491e40d9ff6bb932826164bf40311bbc10066dbf2c42",
+          "bytes": 70512,
+          "expected_git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_bounded_sampler.h",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "bounded rejection sampler and retry profile",
+          "git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+          "git_blob_content_sha256": "72aa4dc47d6c7be9b3170cf1de8e47cd976c6b53b284d1617b9109ea44770bc7",
+          "bytes": 2292,
+          "expected_git_blob_sha1": "04b148691f452f95e0a6cf9bc97ab9c29443b03c",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "FTv3 profile constants and API contract",
+          "git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+          "git_blob_content_sha256": "cb9d185a474bf11f350e1aa46df47264d11b4a1cbf247fb2a81772a446a2134f",
+          "bytes": 14990,
+          "expected_git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "party-side RAND_bytes call-site inventory, excluded by role unless co-process",
+          "git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+          "git_blob_content_sha256": "5cace49daa40d9243c457b521232c7e2305e308276ce23221072d802b33bbce5",
+          "bytes": 44331,
+          "expected_git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "A receipt token RAND_bytes call-site inventory, excluded by role unless co-process",
+          "git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+          "git_blob_content_sha256": "e835c71b2565232f6044b4cdd0439d08bda632732d7a360a71949cf8f896addf",
+          "bytes": 46390,
+          "expected_git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "other direct RAND_bytes caller: two 16-byte DCF roots",
+          "git_blob_sha1": "deeed6904db8868cbe0d7ef5110344ff7a33b672",
+          "git_blob_content_sha256": "b2bc67cbe26bd11b2fded7a3f10002970947694e001cbf16f2bbbd45ae83982f",
+          "bytes": 13819,
+          "expected_git_blob_sha1": "deeed6904db8868cbe0d7ef5110344ff7a33b672",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/include/moe_topk/dcf_bcg21_fig1_aes128_v1.h",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "DCF root size definition",
+          "git_blob_sha1": "ac2693056b65e10dd4150956832e4bfe72c5284b",
+          "git_blob_content_sha256": "8f25128dcebe6497a9e63bbfb2388938b5e16cce658af575e9209c78543c10f0",
+          "bytes": 2306,
+          "expected_git_blob_sha1": "ac2693056b65e10dd4150956832e4bfe72c5284b",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/protocol_i_opv_emp.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "other direct RAND_bytes caller: OPV seed",
+          "git_blob_sha1": "cc013b8b0992d59278af62c18f94e97abfaab2ae",
+          "git_blob_content_sha256": "35280c84a788884d964d35019e9cc45c41ed9f082b4eba3481d6213f042ac1c8",
+          "bytes": 7494,
+          "expected_git_blob_sha1": "cc013b8b0992d59278af62c18f94e97abfaab2ae",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/include/moe_topk/protocol_i_opv.h",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "OPV seed and 24-byte block definitions",
+          "git_blob_sha1": "d0b46103cbf1249f94774a5708c87d06bee6d164",
+          "git_blob_content_sha256": "ddb90c2ee1682129797e9c30d48876dd29fabd8d5aa24eeb2e086879eaf9ef0a",
+          "bytes": 2417,
+          "expected_git_blob_sha1": "d0b46103cbf1249f94774a5708c87d06bee6d164",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/protocol_i_permute_share.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "other direct RAND_bytes caller: 24*n-byte PermuteShare material",
+          "git_blob_sha1": "1e35f3b60e73341938da3ff4bebb8b3fb1ccc4ff",
+          "git_blob_content_sha256": "63d4acc9341b2b3e8b87aab6fcf1f866dd3c1463ac4a06fbda805fd912f0f193",
+          "bytes": 8318,
+          "expected_git_blob_sha1": "1e35f3b60e73341938da3ff4bebb8b3fb1ccc4ff",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "OS getrandom call path, not libcrypto RAND_bytes",
+          "git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+          "git_blob_content_sha256": "7db7e81fa2529523bc58a3cc40a755d2fe8e6fc63446ed5d4fea69e3b6c5ab8c",
+          "bytes": 104792,
+          "expected_git_blob_sha1": "0a02d83b88e43f46d90cbcfbbd0e1547e8d3c941",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/include/moe_topk/project_derived_select5.h",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "32-byte Select5 seed size",
+          "git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+          "git_blob_content_sha256": "4a38df0d7c56a1ffbd3f0836c79ced23a95b1b2193e7c9005ba10432c73156ab",
+          "bytes": 5112,
+          "expected_git_blob_sha1": "b13fecc1324719d63a72a89235760b579e998e5c",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "OS getrandom call path, not libcrypto RAND_bytes",
+          "git_blob_sha1": "9b0e66378ee4cd22e86ff9bca7793be2873a6112",
+          "git_blob_content_sha256": "4e71b49650e788f425e276e066095b3caddf4f8e3e2ab76e574a3f6692195151",
+          "bytes": 27213,
+          "expected_git_blob_sha1": "9b0e66378ee4cd22e86ff9bca7793be2873a6112",
+          "matches_expected": true
+        },
+        {
+          "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+          "role": "S55_FIXED_RUNTIME_SOURCE",
+          "scope": "TLS source-level path; target provider/process use not instantiated",
+          "git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+          "git_blob_content_sha256": "ca18f02820ae2270ea3f6c419e8a11de34d7577b24e599668fafef1cea4496e1",
+          "bytes": 23389,
+          "expected_git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+          "matches_expected": true
+        }
+      ]
+    }
+  ],
+  "s59_inherited_evidence_recheck": {
+    "count": 21,
+    "all_matches": true,
+    "selected_for_s60": [
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_DECISION_2026-10-23.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S50 Kpre3 and ideal FTv3 cap-success report/evidence",
+        "git_blob_sha1": "4257d04fdd3d6c6bb50c3ec0dbf398e5de884007",
+        "git_blob_content_sha256": "749666384e8f4b96cb1a169d7a6cbf358823eba0b3b3ea03d89b7945bcdca660",
+        "bytes": 2862,
+        "expected_git_blob_sha1": "4257d04fdd3d6c6bb50c3ec0dbf398e5de884007",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_GATES_2026-10-23.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S50 Kpre3 and ideal FTv3 cap-success report/evidence",
+        "git_blob_sha1": "553acf21f6198ea86732a03257ade1f38497986f",
+        "git_blob_content_sha256": "2f38658b8b9a448dd02af55f99cdd38c7e5ca0f2bed35c23fc200811ba606f4a",
+        "bytes": 6057,
+        "expected_git_blob_sha1": "553acf21f6198ea86732a03257ade1f38497986f",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_REPORT_2026-10-23.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S50 Kpre3 and ideal FTv3 cap-success report/evidence",
+        "git_blob_sha1": "fdb98cb901225959e1c07e6382834f43c59ca0d2",
+        "git_blob_content_sha256": "8c596bd1da95568e5dd25eb144470bb39f55d0a91e2c60beab55908eb7a2c26f",
+        "bytes": 19642,
+        "expected_git_blob_sha1": "fdb98cb901225959e1c07e6382834f43c59ca0d2",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S50_SOURCE_EVIDENCE_MANIFEST_2026-10-23.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S50 Kpre3 and ideal FTv3 cap-success report/evidence",
+        "git_blob_sha1": "84a57b619615923bb9b301841815479b21926ae2",
+        "git_blob_content_sha256": "d34a48917bbbba6d86f5949d6079d3f9e11d5c4e53c751271b5005527fbab7da",
+        "bytes": 19664,
+        "expected_git_blob_sha1": "84a57b619615923bb9b301841815479b21926ae2",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_DECISION_2026-10-24.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S51 Kpost3 and success escrow suffix report/evidence",
+        "git_blob_sha1": "0f5a9b5f43d860f1a6933a29632d68433781efca",
+        "git_blob_content_sha256": "e6fb74b7d5fd73aef1d9344ca3a54752fb9d38c1f6cb2bf40e64d8b5c2c6af23",
+        "bytes": 5428,
+        "expected_git_blob_sha1": "0f5a9b5f43d860f1a6933a29632d68433781efca",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_CASES_2026-10-24.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S51 Kpost3 and success escrow suffix report/evidence",
+        "git_blob_sha1": "3a6171f3300431498803d748f5d59acac5b2daff",
+        "git_blob_content_sha256": "5440a6d5a820d8c80e07fb2fc7b5e62a1fae91afaa02df2cf25a4355142130f6",
+        "bytes": 10630,
+        "expected_git_blob_sha1": "3a6171f3300431498803d748f5d59acac5b2daff",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_GATES_2026-10-24.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S51 Kpost3 and success escrow suffix report/evidence",
+        "git_blob_sha1": "518e4f077f5457f5388ed76ff8cfe9fb93f11c4f",
+        "git_blob_content_sha256": "39a438fe7c1d59fba0dc21e004fcec2fd5f0fd92c864a46bda265a301bed558d",
+        "bytes": 10615,
+        "expected_git_blob_sha1": "518e4f077f5457f5388ed76ff8cfe9fb93f11c4f",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_REPORT_2026-10-24.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S51 Kpost3 and success escrow suffix report/evidence",
+        "git_blob_sha1": "f59c9469570998b5d2b37628c1dc66b4b3795c3e",
+        "git_blob_content_sha256": "6ea0bcde7d5b18f688034bc35e0861cd5ccf91e53a81d7d52e1aeab9eef4f589",
+        "bytes": 35041,
+        "expected_git_blob_sha1": "f59c9469570998b5d2b37628c1dc66b4b3795c3e",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S51_SOURCE_EVIDENCE_MANIFEST_2026-10-24.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S51 Kpost3 and success escrow suffix report/evidence",
+        "git_blob_sha1": "76b11b4c322b70fe4e55d39b809df1a0e35b14fc",
+        "git_blob_content_sha256": "c12c475416b5095cf6ecbff915adc9ad7c1d005c0dfcf22af9082e4dc365ccbc",
+        "bytes": 15652,
+        "expected_git_blob_sha1": "76b11b4c322b70fe4e55d39b809df1a0e35b14fc",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_DECISION_2026-10-25.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S53 SuccessFence versus actual finite timeout distinction",
+        "git_blob_sha1": "d3f928611febec7e7a262b3afc6e27d1bba9431b",
+        "git_blob_content_sha256": "117b2c87fe4defd8ac56946f672413c4473db0c4e85735850129ee67b0a04401",
+        "bytes": 3219,
+        "expected_git_blob_sha1": "d3f928611febec7e7a262b3afc6e27d1bba9431b",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_GATES_2026-10-25.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S53 SuccessFence versus actual finite timeout distinction",
+        "git_blob_sha1": "9fab59c52dc3821da53f1cbfed1d6845ce22e1d2",
+        "git_blob_content_sha256": "2147a52f5e44628b0ef8d5b97061b25604126314949a5e2d358350f66ca2dd12",
+        "bytes": 6195,
+        "expected_git_blob_sha1": "9fab59c52dc3821da53f1cbfed1d6845ce22e1d2",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_REPORT_2026-10-25.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S53 SuccessFence versus actual finite timeout distinction",
+        "git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+        "git_blob_content_sha256": "d9093e1ae97e9f060a4beaa73268990893695753ba6ff3d51cd516ca3b7d23f9",
+        "bytes": 21376,
+        "expected_git_blob_sha1": "11a9d456fdc49afb8a938f7d0135b281a6222c2d",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S53_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S53 SuccessFence versus actual finite timeout distinction",
+        "git_blob_sha1": "f00a301672d36d133261112ebbe0dbd288615cc2",
+        "git_blob_content_sha256": "53a2aaf273fa812e286d182f185769780bf75d1d4de3e4d3cf4ed2257b9d71f3",
+        "bytes": 15613,
+        "expected_git_blob_sha1": "f00a301672d36d133261112ebbe0dbd288615cc2",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S57_DECISION_2026-10-25.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S57 full-view abort-aware starting point",
+        "git_blob_sha1": "1056f3be7e873660932804d5483aa200210a21e4",
+        "git_blob_content_sha256": "9f3815ec290b5c8997b10db4115fd43e874a8f3684f81076bacc80418538d2a0",
+        "bytes": 4571,
+        "expected_git_blob_sha1": "1056f3be7e873660932804d5483aa200210a21e4",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S57_GATES_2026-10-25.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S57 full-view abort-aware starting point",
+        "git_blob_sha1": "eb0055f6b62ab3c8bf074f05297d29719cdd7e59",
+        "git_blob_content_sha256": "24ff4afe6e1c37b3b283ff1f1c7c573fa5e8b032008a5fdf6bbb18a53485104c",
+        "bytes": 7452,
+        "expected_git_blob_sha1": "eb0055f6b62ab3c8bf074f05297d29719cdd7e59",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S57_REPORT_2026-10-25.md",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S57 full-view abort-aware starting point",
+        "git_blob_sha1": "80b8ce60e82147ee773d1fd83c80f5f8abd5a243",
+        "git_blob_content_sha256": "2151e4a58699a24b0a4deee22c7e68959e8a33ed3eab7b202ecd6c8c55658366",
+        "bytes": 26533,
+        "expected_git_blob_sha1": "80b8ce60e82147ee773d1fd83c80f5f8abd5a243",
+        "matches_expected": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S57_SOURCE_EVIDENCE_MANIFEST_2026-10-25.json",
+        "role": "S59_INHERITED_EVIDENCE",
+        "scope": "S57 full-view abort-aware starting point",
+        "git_blob_sha1": "251a80fa41fe7f38a623966418025cdf52319e64",
+        "git_blob_content_sha256": "8ef075635ce77940b80361a348bfdf9475be28f04fd71079bc7e49f40d2fe88f",
+        "bytes": 21908,
+        "expected_git_blob_sha1": "251a80fa41fe7f38a623966418025cdf52319e64",
+        "matches_expected": true
+      },
+      {
+        "path": "AGENTS.md",
+        "role": "GOVERNANCE_SOURCE",
+        "scope": "repository execution instructions",
+        "git_blob_sha1": "da8e3e455b25b35a4d7d1b45c5996829a1d9753e",
+        "git_blob_content_sha256": "dbe27b304dd0a183f3a183aaa21f38a2ca6d36f903dd1c4a592b29bf8df86e06",
+        "bytes": 2041
+      },
+      {
+        "path": "PROJECT.md",
+        "role": "GOVERNANCE_SOURCE",
+        "scope": "project status and contract",
+        "git_blob_sha1": "d2182565cfc7de8a23dd36d7592d9580d7b85a04",
+        "git_blob_content_sha256": "eb385819579e1906f0a4add7e745da37defc95b0dce121da3fb3a34ac7f826b3",
+        "bytes": 86910
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "role": "GOVERNANCE_SOURCE",
+        "scope": "milestone and proof status",
+        "git_blob_sha1": "7f5b42c317b07c7c1ee4c31a742b590c4f59184c",
+        "git_blob_content_sha256": "e45c34cfc4459f89ceffed9b75becbba9358f810b1e42f8fb2725c2fea11aecb",
+        "bytes": 110140
+      }
+    ]
+  },
+  "s60_fixed_runtime_sources": [
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_gmw.cpp",
+      "role": "FIXED_RUNTIME_SOURCE",
+      "scope": "FTv3 issuer, burn marker, cap abort, package publication",
+      "git_blob_sha1": "848afbe5ddd5a34a54ed06dabce6b806a72835c6",
+      "git_blob_content_sha256": "0819e11be6d7cef70f94491e40d9ff6bb932826164bf40311bbc10066dbf2c42",
+      "bytes": 70512
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_party.cpp",
+      "role": "FIXED_RUNTIME_SOURCE",
+      "scope": "local output, submit outcomes, fetch and API release",
+      "git_blob_sha1": "e5a5def38d7fb66a5423bd1389d8c525d31559ac",
+      "git_blob_content_sha256": "5cace49daa40d9243c457b521232c7e2305e308276ce23221072d802b33bbce5",
+      "bytes": 44331
+    },
+    {
+      "path": "VFSS/src/moe_topk/score_to_mask_v3_escrow.cpp",
+      "role": "FIXED_RUNTIME_SOURCE",
+      "scope": "PENDING/COMMITTED/ABORTED, receipt, submit, recovery, fetch",
+      "git_blob_sha1": "7c2f2fd6725694125eb40f2725fe11d079fd1cd3",
+      "git_blob_content_sha256": "e835c71b2565232f6044b4cdd0439d08bda632732d7a360a71949cf8f896addf",
+      "bytes": 46390
+    },
+    {
+      "path": "VFSS/include/moe_topk/score_to_mask_v3_gmw.h",
+      "role": "FIXED_RUNTIME_SOURCE",
+      "scope": "party API and error/status contract",
+      "git_blob_sha1": "3806eed03dde2231a5be791c65475a0c0f4a54d4",
+      "git_blob_content_sha256": "cb9d185a474bf11f350e1aa46df47264d11b4a1cbf247fb2a81772a446a2134f",
+      "bytes": 14990
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "role": "FIXED_RUNTIME_SOURCE",
+      "scope": "framed transport source mapping",
+      "git_blob_sha1": "05e8a2d6c1782a4f64b9184b6fec2b0a79879597",
+      "git_blob_content_sha256": "ca18f02820ae2270ea3f6c419e8a11de34d7577b24e599668fafef1cea4496e1",
+      "bytes": 23389
+    },
+    {
+      "path": "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp",
+      "role": "FIXED_RUNTIME_SOURCE",
+      "scope": "controller-only DB/file visibility; not simulator input",
+      "git_blob_sha1": "7ad08dafea5e2dbe0d7fbd9ece9479c59e4eca3a",
+      "git_blob_content_sha256": "66017017de8645ffd981218c24902c177112c9b4c25fcfe7e11010a57eb510fe",
+      "bytes": 124832
+    }
+  ],
+  "proof_scope": {
+    "success_only": "Inherited S50/S51/S53 SuccessFence PASS_WITH_SCOPE; ideal FTv3 cap success, ideal A token RNG, N<=256.",
+    "unfiltered_protocol_abort": "OPEN at issuance routing, then online Kpre-prefix law.",
+    "deployment_faults": "OPEN; excluded from ideal protocol cut model."
+  },
+  "reviewer": {
+    "identity": "/root/s60_independent_review",
+    "independent_of_s50_s60": true,
+    "scope": "Read-only review of theorem branch separation, cap-abort routing gap, Kpre-prefix stopping point, A versus party states, source/state mapping, and staged-own-z_b simulator interface.",
+    "result": "PASS_WITH_SCOPE for proof-boundary/source-state consistency only. Reviewer confirmed exact cap-abort equation/bound distinction, complete invocation binding tuple, unenumerated E_cut limitation, and staged own z_b timing/permissions. T_AB remains OPEN.",
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "limitations": "Not functional acceptance or a complete cryptographic proof; no T_AB closure, full cut enumeration, runtime refinement, deployment/timeout conclusion, build, or tests."
+  },
+  "execution": {
+    "runtime_changed": false,
+    "tests_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "performance": "NOT_RUN/NOT_MEASURED",
+    "natural_io": "NOT_RUN; inherited status NOT_REPRODUCED",
+    "push_merge_pr": false
+  },
+  "delivery_files": [
+    {
+      "path": "PROJECT.md",
+      "git_blob_sha1": "659e49d958e08cf055f6a69e242ad208a85193e8",
+      "git_blob_content_sha256": "7c90cba177422f0f6a19d920c92b866aa9bf10743c966e4bb4048da4bc3ac4fa",
+      "bytes": 89154
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "git_blob_sha1": "4c86f752f12016948856efcac61107ff023fbc60",
+      "git_blob_content_sha256": "6204ca61be9c9258d7622b36669bd13ea60b98ff59b4cbe78248a8d3c641aa91",
+      "bytes": 112702
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S60_DECISION_2026-10-26.md",
+      "git_blob_sha1": "c79149b33d2f2cae6a26b4ffdcf5fe7f76dafef7",
+      "git_blob_content_sha256": "df6dd264cea0cc5560e36cbe58efbaeb30bf86b7f05e8fd409ecfc79e7ffa15c",
+      "bytes": 6754
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S60_REPORT_2026-10-26.md",
+      "git_blob_sha1": "060f63011445d949cb364f0077687facb8e4931e",
+      "git_blob_content_sha256": "d017f8fc16973d9dee41890c67f5323edf24fedcc8c7e1cf00de394abccadc24",
+      "bytes": 27816
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S60_GATES_2026-10-26.json",
+      "git_blob_sha1": "efc3f106664cf10a0e3507b83c672b45aa0cc85f",
+      "git_blob_content_sha256": "46047fca89dd62f28989f4c683d8f8fc4132050f61ae52ae6d9f4a24990d7c39",
+      "bytes": 8027
+    }
+  ],
+  "canonical_delivery": {
+    "file_count": 5,
+    "sha256": "9b6b35befdb2138ce15ee8750d154a5881e1f4aa3f6392dbbbe75e5d7efc1024",
+    "definition": "SHA-256 over ordinal path-sorted UTF-8 lines <path><TAB><Git-blob-content-SHA256><LF>; manifest excluded."
+  },
+  "self_reference": "This manifest is excluded from canonical_delivery to avoid a recursive hash."
+}
