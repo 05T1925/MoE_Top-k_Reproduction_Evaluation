@@ -1,0 +1,205 @@
+{
+  "schema": "m6b-i-project-derived-select5-s61-gates-v1",
+  "date": "2026-10-27",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "artifacts": {
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S61_DECISION_2026-10-26.md",
+    "report": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S61_REPORT_2026-10-26.md",
+    "source_evidence_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S61_SOURCE_EVIDENCE_MANIFEST_2026-10-26.json"
+  },
+  "fixed_object": {
+    "task_start_commit": "07325b076dc31f83439d55d7a59ad2239e0d5fcf",
+    "tree": "748a4d86bdfbaffc6d401e8d25f3de7a02ed90f2",
+    "parent": "0f67aec45d767c4bf530b12e4d548a82d68b6800",
+    "branch": "codex/m6b-i-project-select5-s61",
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S60_SOURCE_EVIDENCE_MANIFEST_2026-10-26.json",
+    "s60_canonical_delivery_sha256": "9b6b35befdb2138ce15ee8750d154a5881e1f4aa3f6392dbbbe75e5d7efc1024",
+    "tracked_tree_matches_start_commit": true,
+    "preexisting_untracked_s61_drafts": [
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S61_DECISION_2026-10-26.md",
+        "initial_raw_sha256": "15422e55eb277ae4ec41dc4bff92b754355f82a38a93fbb566b99faf25cfa7cc",
+        "disposition": "read before editing; preserved and revised in place"
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S61_REPORT_2026-10-26.md",
+        "initial_raw_sha256": "dfaccaa671848d62ff733397d35e41b7a5a743cfdd9bf9b24460433826032844",
+        "disposition": "read before editing; preserved and revised in place"
+      }
+    ],
+    "source_receipt": "PASS_WITH_SCOPE"
+  },
+  "theorem_scope": {
+    "n_range": "1<=K<=N<=256",
+    "corruption": "one static semi-honest online party",
+    "preprocessing": "ideal FTv3 material, successful issuance/cap_success",
+    "output": "ideal F_TOPK output refresh; own staged share only after local share-formation event",
+    "escrow": "ideal A token RNG and ideal S51 success-state kernel; causal honest-peer endpoint",
+    "scheduler": "externally fixed source-event sigma and single cut label J=j; nonselective SuccessFence",
+    "leakage": "existing L_S29 only; no added phase/batch/frame/time/cut leakage",
+    "excluded": [
+      "FTv3 cap-abort and same-invocation package/context delivery/start notice",
+      "protocol ABORT/UNKNOWN/fetch failure and arbitrary failure prefixes",
+      "real finite timeout, wall-clock success selection, partial-byte/TLS-record cuts",
+      "deployment signer/RNG/filesystem/SQLite/TLS/machine failures",
+      "N>256 security expansion"
+    ]
+  },
+  "cut_universe": {
+    "starts_after": "successful same-invocation package validation, local preflight/lease checks and ideal private-channel setup",
+    "selector": "exogenous fixed sigma and single event label J=j; neither is party-view leakage",
+    "event_families": [
+      "READY_PHASE_SET / READY_BODY_READY / FRAME_BODY_READY",
+      "complete FRAME_SEND_COMPLETE and FRAME_RECEIVE_COMPLETE",
+      "FRAME_VALIDATED / EXCHANGE_RETURN",
+      "SEED_RNG_RETURN / SEED_FRAME / ACK_FRAME / SEED_ACCEPTED",
+      "AND_BODY_READY(layer,batch) / AND_RESULT_READY(layer)",
+      "COMPARE_BODY_READY(iter,substage) / COMPARE_RESULT_READY",
+      "SELECT_STATE_UPDATED(iter)",
+      "OUTPUT_SHARE_FORMED(b) and output-refresh body/ACK events",
+      "OWN_ENVELOPE_READY / SUBMIT_ENTER",
+      "escrow READY/request/response events for submit and fetch",
+      "FETCH_DECRYPT_CHECKED / API_RETURN_SHARE"
+    ],
+    "finite_bounds_for_n_le_256": {
+      "protocol_i_logical_phases_max": 89,
+      "nonempty_and_batches_per_layer_max": 1,
+      "select5_state_updates_max": 5,
+      "select5_seed_exchanges_max": 4,
+      "select5_compare_waves_max": 9,
+      "output_refresh_count": 1,
+      "own_submit_calls_max": 1,
+      "own_fetch_calls_max": 1
+    },
+    "excluded": ["arbitrary CPU instruction cuts", "partial application-frame bytes", "TLS record/poll/WANT cuts", "failure and timeout cuts", "hidden A DB transition as party-visible label"]
+  },
+  "gates": [
+    {
+      "id": "S60_FIXED_SOURCE_AND_MANIFEST",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "Verified exact S60 commit/tree/parent, canonical delivery and all cited Git blobs. Windows working-tree raw hashes may differ from Git blob bytes due to line endings; manifest identities use Git blobs."
+    },
+    {
+      "id": "E_CUT_FINITE_SOURCE_EVENT_SET",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "Finite event vocabulary includes phase/body-ready, complete application-frame send/receive, decode/state updates, one-batch-per-nonempty-layer, Select5 activity, output-share formation and escrow API events. Starts after successful package/preflight/lease/ideal-channel setup. Excludes arbitrary instruction, partial-byte, TLS-record, failure and real-time cuts. Max 89 logical phases for N<=256."
+    },
+    {
+      "id": "KPRE_PREFIX_PRE_SHARE",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "For every declared party/cut before local output-share formation, uses inherited S36/S50 conditional material kernel plus fixed-z_b conditional-law equality and marginalization. Does not supply future z_b to simulator. Base Beaver/material kernel is inherited, not re-proved by S61 reviewer."
+    },
+    {
+      "id": "OUTPUT_REFRESH_CUTS_P0_P1",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "Correct source order: P0 forms z0 then body u=z0 xor m0; P1 builds fixed ACK, receives/decodes full u, sends ACK, then XORs to form z1. Before z1 formation, P1 simulator samples u uniformly under fresh ideal refresh and receives no z1."
+    },
+    {
+      "id": "KPRE_PREFIX_POST_SHARE",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "At and after own share-formation event only, corrupted party simulator may receive its own staged z_b as local state. This does not imply ciphertext submission, COMMITTED, fetch, or API return."
+    },
+    {
+      "id": "KPOST_PREFIX_IDEAL_SUCCESS_EVENTS",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "Incremental event-prefix extension uses S51 ideal token/Kpost kernel in causal order with honest peer and ideal A; does not truncate a completed transcript. Reviewer affirmed this extension under SuccessFence. S51 base token lemma and real escrow refinement are inherited/open, not independently re-certified."
+    },
+    {
+      "id": "FULL_UNFILTERED_PROTOCOL_ABORT_VIEW",
+      "status": "OPEN",
+      "detail": "First gap: FTv3 cap-abort has no joint kernel connecting the same invocation to package/context delivery, both parties' start permission and party-visible notice. Later ABORT/UNKNOWN/recovery-failure cut laws are not established. This is an unproved interface/model step, not an attack or impossibility result."
+    },
+    {
+      "id": "ISSUANCE_ABORT_RETRY_AND_NOTICE_CONTRACT",
+      "status": "OPEN_CONFIRMATION",
+      "detail": "Owner decision needed on burning invocation and retrying only under a new invocation, paired failure/start notification, and whether abort states enter the theorem. Numeric algorithm random-failure deferral is not acceptance of FTv3 cap-abort."
+    },
+    {
+      "id": "SUCCESSFENCE_VS_REAL_TIMEOUT",
+      "status": "OPEN",
+      "detail": "SuccessFence is an exogenous ideal scheduling condition. No conditional sampler for real finite-timeout/wall-clock success selection is provided."
+    },
+    {
+      "id": "REAL_T_A_DRBG_SIGNATURE_STORAGE_TLS_CRYPTO",
+      "status": "OPEN",
+      "detail": "Actual deployment DRBG, signatures, recipient encryption, TLS/mTLS, SQLite/filesystem durability and runtime refinement are outside this ideal event-prefix proof."
+    },
+    {
+      "id": "L_S29_UNCHANGED",
+      "status": "PASS_WITH_SCOPE",
+      "detail": "No additional leakage fields, roles, inputs or outputs were introduced. Cut label J and scheduler sigma are proof-experiment inputs, not party-view leakage."
+    },
+    {
+      "id": "N_GT_256_SECURITY",
+      "status": "NOT_IN_SCOPE",
+      "detail": "S61 prefix argument is limited to 1<=K<=N<=256."
+    },
+    {
+      "id": "RUNTIME_OR_TEST_CHANGE",
+      "status": "NOT_RUN",
+      "detail": "No runtime or test source changed."
+    },
+    {
+      "id": "BUILD_TEST_HISTORICAL_MATRICES",
+      "status": "NOT_RUN",
+      "detail": "No build/tests and no S35/S40/S52 matrix rerun."
+    },
+    {
+      "id": "NATURAL_IO_FAILURE",
+      "status": "NOT_RUN",
+      "detail": "No natural I/O experiment this round; inherited evidence remains NOT_REPRODUCED."
+    },
+    {
+      "id": "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE",
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    {
+      "id": "SECURE_ALIAS",
+      "status": "NOT_CREATED"
+    },
+    {
+      "id": "VFSS_BASELINE",
+      "status": "UNCHANGED"
+    },
+    {
+      "id": "PUSH_MERGE_PR",
+      "status": "NOT_PERFORMED"
+    }
+  ],
+  "review": {
+    "reviewer": "/root/s61_prefix_review",
+    "independent_of_s50_s61": true,
+    "review_type": "read-only theoretical review; not functional acceptance",
+    "affirmed": [
+      "finite success-only E_cut vocabulary with exogenous sigma and proof-only J",
+      "fixed-z_b pre-share prefix marginalization and P1 uniform-u pre-share cut",
+      "causal ideal event-prefix extension of S51 Kpost under SuccessFence"
+    ],
+    "not_reproved_or_certified": [
+      "S36/S50 Beaver/material conditional kernel",
+      "S51 ideal token lemma",
+      "real escrow source refinement, cryptographic assumptions, TLS or deployment"
+    ],
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "files_edited": false,
+    "status": "PASS_WITH_SCOPE"
+  },
+  "owner_confirmations": [
+    "Does FTv3 cap-abort burn this invocation and permit retry only under a new invocation?",
+    "What paired issuance/start notice is required, and are different timeout/UNKNOWN observations acceptable if notice delivery fails?",
+    "Does the privacy theorem include protocol-level abort states or only successful initialization/issuance and normal execution?"
+  ],
+  "execution": {
+    "runtime_changed": false,
+    "tests_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "performance": "NOT_RUN/NOT_MEASURED",
+    "natural_io": "NOT_RUN; inherited NOT_REPRODUCED",
+    "vfss_baseline_modified": false,
+    "secure_alias_created": false,
+    "push_merge_pr": false
+  }
+}

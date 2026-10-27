@@ -1039,3 +1039,13 @@ S60 从 S59 精确提交 `0f67aec45d767c4bf530b12e4d548a82d68b6800` 在新隔离
 proof-only `F_TOPK-ISSUE-ESCROW/v1` 进一步明确 `τ` burn/replay、issuance/start gate、operation-indexed abstract cuts、A 隐状态与每方通知/恢复、share 本地形成/对外返回的分离；仍为 `CONDITIONAL / NOT_APPROVED / NOT_IMPLEMENTED`。负责人关于 cap-abort 新 invocation 重试、发材/启动失败通知及安全定理是否包括协议中止、当前安全上限是否为 N≤256 的事项均 `OPEN_CONFIRMATION`。部署 signer/RNG/storage/SQLite/TLS/OS 故障和真实有限 timeout 仍是独立 `OPEN`，SuccessFence 不替代它们。
 
 本轮只读审查，无 runtime/test 修改；BUILD/TEST、历史矩阵、自然 I/O 实验和正式 LAN/WAN/RTT/AAV86/性能均 `NOT_RUN`，性能 `NOT_MEASURED`。自然业务 I/O 沿用 `NOT_REPRODUCED`；`VFSS-baseline/` 未修改；无 `secure` alias、push、merge 或 PR。非作者 reviewer `/root/s60_independent_review` 只读复核状态/模拟边界并要求精确化 cap-abort 概率、完整调用绑定和 cut 枚举；修改已纳入交付。Reviewer 未构建或测试，且不批准 `T_AB`、runtime refinement 或部署故障/timeout 范围。详见 S60 report/gates/source-evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S61（2026-10-27）
+
+S61 以 S60 精确 commit `07325b076dc31f83439d55d7a59ad2239e0d5fcf`（tree `748a4d86bdfbaffc6d401e8d25f3de7a02ed90f2`）为来源，逐项核对 S60 delivery 与固定运行时 Git blobs。工作树开始时 tracked 内容与 S60 一致，已有两份未跟踪 S61 草稿；先读取后保留并修订。路线、signed Q20.12 稳定排序、原序恰 K 位 Top-K XOR-mask、角色和 `L_S29` 未改变。
+
+本轮将 cut 固定为有限 source-event 词汇：成功取得并验证同次 package、通过本地 preflight/lease 检查且理想私有通道建立后，覆盖 phase/body-ready、完整应用帧、Beaver layer/batch、Select5 比较/状态更新、output-share formation、submit/fetch/API 边界；不覆盖任意 CPU 指令、partial byte、TLS record、失败或真实 timeout。`N≤256` 下最多 89 个 Protocol-I logical phases，每层最多一个 FTv3 batch。非作者 reviewer `/root/s61_prefix_review` 未参与 S50–S61 推导，独立确认本轮限定 `Kpre-prefix` 的固定 `z_b` 条件边缘化、P1 收到刷新 frame 后 ACK、再 XOR 形成 share 的均匀 `u` sampler，以及沿 S51 ideal A/诚实 peer 状态机逐事件继续的 `Kpost-prefix`；reviewer 未重推 S36/S50 Beaver 材料基础核或 S51 token 基础引理，未构建/测试。
+
+在理想 FTv3 cap-success、理想 `F_TOPK` output refresh、理想 A token RNG、诚实 peer 因果执行、一方静态半诚实、外生 `SuccessFence` 和固定外生 cut 的 **online-prefix 子目标**为 `PASS_WITH_SCOPE`。它不把带最终输出 share 的成功转录直接截断；share 形成前模拟器不获 `z_b`，形成后只获得腐化方自己的 staged share。完整 abort-aware A+B 视图仍 `OPEN`：首个合同断点是 FTv3 cap-abort 与同 invocation package/context delivery、双方 start/notice 的联合核；escrow ABORT/UNKNOWN/recovery failure、真实有限 timeout/部署故障也未闭合。cap-abort 重试、发行/启动通知、是否将协议中止纳入安全定理仍 `OPEN_CONFIRMATION`。N>256 安全扩域 `NOT_IN_SCOPE`；真实部署桥、完整协议组合及性能继续各自独立过门。
+
+本轮仅审查和治理文档更新：BUILD/TEST=`NOT_RUN`，历史矩阵不重跑，自然 I/O 本轮 `NOT_RUN`（既有状态 `NOT_REPRODUCED`），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。`VFSS-baseline/` 未修改，不创建 `secure` alias，不推送/合并。详见 S61 decision、report、gates 与 source/evidence manifest。

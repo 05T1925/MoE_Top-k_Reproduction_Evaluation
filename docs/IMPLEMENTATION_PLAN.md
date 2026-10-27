@@ -1385,3 +1385,13 @@ S59 只继承 ideal FTv3 cap-success、ideal A token RNG、诚实 peer 因果提
 负责人确认项维持 `OPEN_CONFIRMATION`：合法输入下 cap exhaustion 是否烧掉本次 invocation 并允许新 invocation 重试；发行/启动失败通知策略以及通知不可达时是否接受 UNKNOWN/timeout；隐私定理是否包括协议级 abort；当前安全阶段是否固定 `N≤256`。既有对数值算法随机失败上限的暂缓要求不视为 cap-abort 合同决定。
 
 本轮只读审计，无 runtime/test/build 修改或执行；BUILD/TEST 和历史矩阵 `NOT_RUN`，自然业务 I/O `NOT_REPRODUCED`（本轮未测试），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。`VFSS-baseline/` 未改，无 `secure` alias、push、merge 或 PR。非作者 `/root/s60_independent_review` 只读复核状态链和证明边界，建议精确区分 cap-abort 概率与上界、补全调用 tuple 并明确 cut 集合/转移核尚未完成；报告已纳入。Reviewer 未构建或测试，不批准 `T_AB` 或部署范围。详见 S60 decision/report/gates/source-evidence manifest。
+
+### S61：N≤256 在线 source-event 前缀模拟（2026-10-27）
+
+从 S60 精确 commit `07325b076dc31f83439d55d7a59ad2239e0d5fcf` 固定源码；S60 manifest 中引用源码 Git blobs 已复核。有限 `E_cut` 从成功 package/preflight/lease/理想私有通道 setup 后开始，包含 phase、完整 frame send/receive、通用 `FRAME_BODY_READY`、Beaver layer/batch、Select5 active comparison/state update、output-share formation、submit/fetch/API event；排除任意指令、TLS/partial-byte、failure 与 real timeout cuts。`N≤256` 的固定 gate schedule 每个非空 layer 最多一个 batch，logical phase 上界 89。
+
+`Kpre-prefix^{b,j}` 的增量证明经未参与 S50–S61 的只读 reviewer 复核为 `PASS_WITH_SCOPE`：output share 形成前使用 S36/S50 条件核并以固定 `z_b` law 边缘化；P1 在 receive output refresh frame 后、ACK 后、XOR 形成本地 share 前分别按正确源码顺序建模，未提前向 simulator 提供 `z_1`。成功 escrow 前缀从 S51 ideal `Kpost_3` kernel 沿 honest peer/A 因果状态机扩展，`PASS_WITH_SCOPE` 仅继承其理想 token/成功服务引理与外生 SuccessFence；reviewer 未重推 Beaver、token 基础证明或真实服务 refinement。
+
+该结果只覆盖理想 FTv3 cap-success、理想 output refresh/A token RNG、一方静态半诚实、honest peer、固定公开 tuple/既有 `L_S29`、exogenous event cut 的在线成功 prefix。完整 unfiltered abort-aware A+B 仍 `OPEN`，首个缺口是 cap-abort 到同 invocation package/context delivery 与双方 start/notice 的联合核；ABORT/UNKNOWN/fetch failure、部署故障、真实 finite timeout、T/A RNG/signature/TLS/recipient encryption 和全协议组合各自 OPEN。三项 owner 合同决定继续 `OPEN_CONFIRMATION`：新 invocation 重试、发材/启动通知，以及定理是否包含 protocol abort。N>256 security `NOT_IN_SCOPE`。
+
+S61 不改运行时代码/测试/ABI/默认开关/输出/角色/`L_S29`。BUILD/TEST、历史矩阵及故障实验 `NOT_RUN`；自然业务 I/O 本轮 `NOT_RUN`，沿用 `NOT_REPRODUCED`；正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。不得把该有限 prefix 结果升级为完整安全或性能通过。
