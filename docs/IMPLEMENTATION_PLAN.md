@@ -1395,3 +1395,17 @@ S59 只继承 ideal FTv3 cap-success、ideal A token RNG、诚实 peer 因果提
 该结果只覆盖理想 FTv3 cap-success、理想 output refresh/A token RNG、一方静态半诚实、honest peer、固定公开 tuple/既有 `L_S29`、exogenous event cut 的在线成功 prefix。完整 unfiltered abort-aware A+B 仍 `OPEN`，首个缺口是 cap-abort 到同 invocation package/context delivery 与双方 start/notice 的联合核；ABORT/UNKNOWN/fetch failure、部署故障、真实 finite timeout、T/A RNG/signature/TLS/recipient encryption 和全协议组合各自 OPEN。三项 owner 合同决定继续 `OPEN_CONFIRMATION`：新 invocation 重试、发材/启动通知，以及定理是否包含 protocol abort。N>256 security `NOT_IN_SCOPE`。
 
 S61 不改运行时代码/测试/ABI/默认开关/输出/角色/`L_S29`。BUILD/TEST、历史矩阵及故障实验 `NOT_RUN`；自然业务 I/O 本轮 `NOT_RUN`，沿用 `NOT_REPRODUCED`；正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。不得把该有限 prefix 结果升级为完整安全或性能通过。
+
+### S62：正常成功定理与协议级中止联合功能分支（2026-11-02）
+
+S62 以 S61 commit `d843b45f29ab87d75520b28aac12c82608ec9678` 为固定对象，独立 worktree 核对父链、S61 delivery canonical、固定运行时源码 blobs 与引用证据。S61 manifest 的两项治理文档 inherited-evidence hash 对应 S60 父版本；S62 manifest 单列该快照差异及 S61 实际 blob，不改写历史文件。
+
+负责人决定核查未发现 cap-abort 新 invocation retry、发材失败通知/启动规则或 abort-aware theorem scope 的书面新决定，三项继续 `OPEN_CONFIRMATION`。这与历史暂缓“算法随机失败数值界”不同。S62 不重问已确认的正常 escrow/取回和人工 kill 边界。
+
+分支 A 将 S50 `Kpre₃`、S51 `Kpost₃`、S53 `SuccessFence` 和 S61 source-event prefix 仅按既有假设整理为 `PASS_WITH_SCOPE`：理想 FTv3 发材成功、理想 output refresh/A token RNG、一方静态半诚实、honest peer 因果执行、`1≤K≤N≤256`、外生 timely-success 与单个外生 event cut。S62 不重证基础 Beaver、token 或 prefix 引理；该范围不是真实 finite-timeout、任意 crash/abort 或完整 T_AB。
+
+分支 B 仍 `OPEN`。理想 F_T/v3 对 cap exhaustion 的 issuer-local 结果不自动决定同一 `τ` 的 package/context 交付、双方 start、notice 或 party API outcome。实际 repo 有 Dealer issuer 与 party API，但没有生产 all-or-none launch/notice coordinator；TEST_ONLY 控制器只在 Dealer 成功且验证两个 package 后才创建服务和启动两方，不能作为 production route。可以用 proof-only `F_TOPK-ISSUE-ESCROW/v1` 候选分别指定 `NONE_NO_CALL` 或 `PAIRED_GENERIC_ABORT`，但未获批准/未实现；统一 abort 观察只有在负责人确认其已包含于获准 `L_S29` abort 字段后才可采用。若临时假设该理想 cap policy，后续第一个 escrow failure gap 是首份 deposit→PENDING 后第二份 deposit 到达/超时、A 隐藏状态和 submit 响应实际送达的联合条件核；UNKNOWN、ABORT、服务重启、fetch/recovery 失败继续 OPEN。A 数据库态不交给 party simulator，`L_S29` 不扩张，share formed 与 API returned 分开。
+
+cap-abort 的理想 IID 界仅适用于语义材料投影；marker EEXIST replay、signer/marker/RAND/signature/文件发布错误、SQLite/TLS/机器故障和实际 finite timeout 是不同状态，不计入该界。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`。S62 不改运行时代码/测试、`VFSS-baseline/`、材料 ABI、默认开关、输出、角色或 leakage；BUILD/TEST 与旧矩阵 `NOT_RUN`，自然业务 I/O 本轮 `NOT_RUN`（沿用 `NOT_REPRODUCED`），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。N>256 安全扩域 `NOT_IN_SCOPE`。逐状态来源映射、A/B 定理表、首个缺口和负责人问题见 S62 report/gates/source-evidence manifest。
+
+非作者 `/root/s62_readonly_review` 未参与 S50–S62 推导，已只读复核成功分支继承范围、cap-abort 的发行/交付/启动边界、错误类型及首个 escrow 失败核；未编辑、构建或测试。`PAIRED_GENERIC_ABORT` 只有在负责人确认其观察已包含于获准 `L_S29` abort 字段时才可作为候选输出，当前仍未获批准。

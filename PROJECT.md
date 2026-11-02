@@ -1049,3 +1049,19 @@ S61 以 S60 精确 commit `07325b076dc31f83439d55d7a59ad2239e0d5fcf`（tree `748
 在理想 FTv3 cap-success、理想 `F_TOPK` output refresh、理想 A token RNG、诚实 peer 因果执行、一方静态半诚实、外生 `SuccessFence` 和固定外生 cut 的 **online-prefix 子目标**为 `PASS_WITH_SCOPE`。它不把带最终输出 share 的成功转录直接截断；share 形成前模拟器不获 `z_b`，形成后只获得腐化方自己的 staged share。完整 abort-aware A+B 视图仍 `OPEN`：首个合同断点是 FTv3 cap-abort 与同 invocation package/context delivery、双方 start/notice 的联合核；escrow ABORT/UNKNOWN/recovery failure、真实有限 timeout/部署故障也未闭合。cap-abort 重试、发行/启动通知、是否将协议中止纳入安全定理仍 `OPEN_CONFIRMATION`。N>256 安全扩域 `NOT_IN_SCOPE`；真实部署桥、完整协议组合及性能继续各自独立过门。
 
 本轮仅审查和治理文档更新：BUILD/TEST=`NOT_RUN`，历史矩阵不重跑，自然 I/O 本轮 `NOT_RUN`（既有状态 `NOT_REPRODUCED`），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。`VFSS-baseline/` 未修改，不创建 `secure` alias，不推送/合并。详见 S61 decision、report、gates 与 source/evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S62（2026-11-02）
+
+S62 从 S61 精确提交 `d843b45f29ab87d75520b28aac12c82608ec9678`（tree `d7dbc1f107ded4fe0527e55a40c24965b7b01a60`）的新隔离 worktree 开始，S61 父提交为 `07325b076dc31f83439d55d7a59ad2239e0d5fcf`。S61 delivery canonical 与固定运行时源 Git blobs 已复核。其 manifest 的 `inherited_evidence` 中 `PROJECT.md` 与 `docs/IMPLEMENTATION_PLAN.md` 两条指向 S60 父版本；S62 manifest 记录原值和 S61 实际对象，不改写 S61 历史文件。signed Q20.12、稳定同分、原序恰 K 个 1 的 Top-K XOR-mask 输出、角色及 `L_S29` 不变。
+
+负责人决定核查未发现三项合同的书面更新：FTv3 cap-abort 烧掉 invocation 后是否允许以新 invocation 重试；失败通知/双端启动门以及通知不可达时是否允许不同 timeout/UNKNOWN；安全定理是否包括协议级 abort。既有“算法随机失败数值界暂缓”不等于接受 FTv3 cap-abort。已确认的正常托管与人工 kill 含义不重开。
+
+**A：正常成功定理保持 `PASS_WITH_SCOPE`（继承整理）。**范围为 `1≤K≤N≤256`、一方静态半诚实、理想 FTv3 成功发材、理想输出刷新与 A token RNG、诚实对端因果执行、外生 `SuccessFence` 和 S61 固定 event-cut。S50 `Kpre₃`、S51 `Kpost₃`、S53 fence 与 S61 每个 source-event prefix 按既有前提组合；S62 不重证这些基础引理。该范围不覆盖真实 wall-clock/timeout 筛选成功样本、任意 failure cut 或完整协议安全。
+
+**B：协议级 abort-aware 联合视图仍 `OPEN`。**理想 FTv3 局部定义 cap exhaustion→issuer `ISSUANCE_ABORT`/私有 burn/无 package，但没有同一 invocation 的 package/context delivery、双方 start 和 notice joint kernel。固定运行时是独立 Dealer issuer 与独立 party API；测试控制器会先等待 Dealer 成功并验证两个 package 后才启动 parties，但这不是生产 launcher/屏障。可以在未批准的 proof-only `F_TOPK-ISSUE-ESCROW/v1` 下分别分析“不通知不调用”或“两方先收到统一 ABORT 再不启动”；后一策略只有在负责人确认该观察已包含于获准 `L_S29` abort 字段后才可采用，不能代负责人选择，也不能描述为已实现。
+
+若暂按 cap-abort 启动门，escrow abort-aware 证明的首个条件分布缺口是：第一份有效 deposit 进入 `PENDING` 后，第二份 deposit 是否在 A wait-expiry 前到达、A 的隐藏状态如何转移、以及提交方是否实际收到 ABORT/COMMITTED 响应的联合核。`COMMIT_STATUS_UNKNOWN` 是 party 观察，不是数据库状态；share 已在本地形成也不同于提交、fetch 或 API 返回。现有 Kpost 只覆盖 SuccessFence 成功后缀；未知响应、ABORT、服务重启、重复提交和 fetch/recovery failure 均未闭合。signer、marker EEXIST/I/O、RAND、签名/顺序文件发布、SQLite、TLS/机器及真实有限 timeout 分别留在部署/可用性 OPEN，不并入 `δ_cap`。
+
+S62 未改 runtime/test、`VFSS-baseline/`、默认开关、输出、角色或泄露；BUILD/TEST=`NOT_RUN`，历史功能矩阵与故障注入未运行，自然业务 I/O 本轮 `NOT_RUN`（既有 `NOT_REPRODUCED`），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。N≤1000 仍仅为历史有限功能收据，N>256 安全扩域 `NOT_IN_SCOPE`。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`；真实 T/A RNG、签名/文件持久性、TLS/加密、有限 timeout 和完整 GMW/Select/shuffle/output/escrow composition 继续分别过门。详见 S62 report、decision、gates 与 source/evidence manifest。
+
+非作者 `/root/s62_readonly_review` 未参与 S50–S62 推导，已只读复核 A 分支继承范围、S61 来源差异说明、cap-abort 通知/启动分支、错误分类和首个 escrow 失败核，未编辑、构建或测试；reviewer 要求将 `PAIRED_GENERIC_ABORT` 对 `L_S29` 的归类保留为负责人待确认条件。该复核不是功能接收或部署签核。

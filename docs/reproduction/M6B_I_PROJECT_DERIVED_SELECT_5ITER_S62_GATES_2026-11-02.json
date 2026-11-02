@@ -1,0 +1,127 @@
+{
+  "schema": "m6b-i-project-derived-select5-s62-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S62",
+  "date": "2026-11-02",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "fixed_baseline": {
+    "commit": "d843b45f29ab87d75520b28aac12c82608ec9678",
+    "tree": "d7dbc1f107ded4fe0527e55a40c24965b7b01a60",
+    "parent": "07325b076dc31f83439d55d7a59ad2239e0d5fcf",
+    "source_identity": "PASS_WITH_SCOPE",
+    "notes": "S61 manifest canonical delivery and eight fixed source mappings were checked. Two inherited_evidence rows (PROJECT.md and docs/IMPLEMENTATION_PLAN.md) refer to S60 parent blobs; S62 records both the original rows and actual S61 blobs."
+  },
+  "owner_contracts": {
+    "cap_abort_new_invocation_retry": "OPEN_CONFIRMATION",
+    "issuance_notice_and_both_start_policy": "OPEN_CONFIRMATION",
+    "abort_aware_privacy_theorem_scope": "OPEN_CONFIRMATION",
+    "normal_escrow_contract": "INHERITED_CONFIRMED",
+    "manual_kill_meaning": "INHERITED_CONFIRMED_AS_ENGINEERING_INJECTION"
+  },
+  "claims": {
+    "A_NORMAL_SUCCESS_THEOREM": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": [
+        "S50 Kpre3",
+        "S51 Kpost3",
+        "S53 SuccessFence",
+        "S61 Kpre-prefix per fixed source-event cut"
+      ],
+      "scope": "Inherited composition only: 1<=K<=N<=256; at most one static semi-honest party; ideal FTv3 issuance success/cap_success; ideal F_TOPK output refresh; ideal A token RNG; honest peer causal execution; T/A trusted and non-colluding with corrupted party; exogenous nonselective SuccessFence; one externally specified source-event cut j in S61 E_cut. Not real wall-clock/timeout success conditioning, arbitrary abort-prefix privacy, deployment security, or complete protocol security.",
+      "reproved_in_s62": false
+    },
+    "S61_EVENT_CUTS": {
+      "status": "INHERITED_PASS_WITH_SCOPE",
+      "scope": "Only fixed source-event boundaries after successful package validation, preflight/lease and ideal channel setup. Share z_b is withheld before local share formation and available only as that party's staged local state after formation. No partial-byte, TLS-record, arbitrary instruction, or failure cuts."
+    },
+    "FTV3_IDEAL_CAP_ABORT_LOCAL_OUTCOME": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Ideal IID bounded sampler local outcome: cap exhaustion burns invocation and returns ISSUANCE_ABORT to the issuer; no party package/context or online lease. Does not define same-invocation party delivery/start/notice. S60 conservative semantic-material bound only; not deployment error probability or full transcript distance."
+    },
+    "CAP_ABORT_TO_PARTY_DELIVERY_START_NOTICE": {
+      "status": "OPEN",
+      "first_gap": "No current joint kernel maps one invocation's ideal cap-abort to package/context delivery, start_0/start_1, party-visible notice_0/notice_1, and party API state. Fixed runtime has separate issuer and party APIs; TEST_ONLY E2E controller's success-gated launch is not production routing.",
+      "candidate": "CONDITIONAL proof-only F_TOPK-ISSUE-ESCROW/v1 branches NONE_NO_CALL, PAIRED_GENERIC_ABORT, or an explicitly modeled per-party notice kernel; no branch is owner-approved or implemented. PAIRED_GENERIC_ABORT may expose a uniform abort to parties only if the owner confirms that observation is already within the approved L_S29 abort field; otherwise its leakage mapping remains unapproved."
+    },
+    "ISSUANCE_ERROR_CLASS_SEPARATION": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Source mapping separates sampler cap exhaustion from marker EEXIST replay refusal, signer/key errors, marker I/O, RAND_bytes errors, signing/serialization failures and sequential file publication failures. This classification does not model their party-view probabilities."
+    },
+    "ESCROW_ABORT_UNKNOWN_RECOVERY_FAILURE_SIMULATION": {
+      "status": "OPEN_WITH_EXACT_GAP",
+      "first_gap": "After first valid deposit creates A PENDING, no ideal conditional kernel specifies whether the honest second deposit arrives before A wait expiry, A's hidden state transition, and the corrupted party's actual response-delivery/parse observation. Kpost/S61 cover success only.",
+      "later_gaps": [
+        "ABORT response versus response loss and COMMIT_STATUS_UNKNOWN",
+        "server restart PENDING-to-ABORTED and party observation",
+        "duplicate submit under ABORTED/PENDING/COMMITTED states",
+        "fetch/recovery success or failure and exact API result",
+        "share formed versus ciphertext submitted, fetched, or API returned"
+      ],
+      "notes": "A DB state is never an input to the party simulator. COMMIT_STATUS_UNKNOWN is a client observation, not A database state."
+    },
+    "PROOF_ONLY_F_TOPK_ISSUE_ESCROW_V1": {
+      "status": "CONDITIONAL",
+      "approval": "NOT_APPROVED",
+      "implementation": "NOT_IMPLEMENTED",
+      "scope": "Candidate transition specification only; requires owner choice of issue/start/notice contract, confirmation that any paired abort observation is within approved L_S29, an explicit non-secret-adaptive event/response kernel, per-party view projection, then a separate runtime refinement."
+    },
+    "REAL_FINITE_TIMEOUT_SUCCESS_VIEW": {
+      "status": "OPEN",
+      "scope": "SuccessFence is an ideal exogenous scheduling condition; no deployment scheduler/network/duration law or success-selection sampler was established."
+    },
+    "DEPLOYMENT_DRBG_SIGNATURE_STORAGE_TLS_ENCRYPTION_BRIDGES": {
+      "status": "OPEN",
+      "scope": "T/A DRBG, signer, package publication/registry, SQLite persistence, TLS/mTLS, recipient encryption/hash binding and machine/storage failures remain separate bridges."
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "evidence": "No new owner decision found in the fixed S61 repository snapshot. Numeric algorithm random-failure deferral is not acceptance of FTv3 cap-abort."
+    },
+    "SECURITY_DOMAIN_GT_256": {
+      "status": "NOT_IN_SCOPE",
+      "notes": "N<=1000 records are finite inherited functional evidence only."
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN"
+    },
+    "HISTORICAL_FUNCTION_MATRICES": {
+      "status": "NOT_RUN"
+    },
+    "NATURAL_BUSINESS_IO": {
+      "status": "NOT_RUN",
+      "inherited_status": "NOT_REPRODUCED"
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS": {
+      "status": "NOT_CREATED"
+    }
+  },
+  "review": {
+    "status": "PASS_WITH_SCOPE",
+    "reviewer": "/root/s62_readonly_review",
+    "independent_of_s50_s62": true,
+    "review_type": "read-only theoretical/source-mapping review; not functional acceptance or deployment security signoff",
+    "reviewer_scope": [
+      "A theorem inheritance scope and limitations",
+      "S61 provenance mismatch statement",
+      "cap-abort issuer outcome vs package/context delivery, party start and notice",
+      "production API vs TEST_ONLY success-gated launcher distinction",
+      "separation of cap exhaustion, EEXIST, RAND/signer/publication failures",
+      "first escrow PENDING-to-ABORTED / response-delivery conditional kernel",
+      "P0/P1 and A hidden-state permissions"
+    ],
+    "review_result": "No material issue found; reviewer required explicit owner confirmation before treating PAIRED_GENERIC_ABORT as covered by L_S29.",
+    "reviewer_edited_files": false,
+    "build_or_tests": "NOT_RUN"
+  },
+  "execution": {
+    "runtime_or_test_code_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "performance": "NOT_RUN/NOT_MEASURED",
+    "vfss_baseline_changed": false,
+    "push_merge_pr": false
+  }
+}
