@@ -1,0 +1,231 @@
+{
+  "schema": "m6b-i-project-derived-select5-s63-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S63",
+  "date": "2026-11-03",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "fixed_baseline": {
+    "commit": "c9c87799b0f27931249d5b82edce37a5f0f1814c",
+    "tree": "79bec327f312ed199e2ae4406781d52f5971436b",
+    "parent": "d843b45f29ab87d75520b28aac12c82608ec9678",
+    "s62_manifest_blob_sha1": "20baae7b34cce4efa2960c19e4d89498881905cc",
+    "s62_manifest_blob_sha256": "f8c79634e2bb1159ed61fb86b56420f30a126ab02a7118095c0b0410c218351c",
+    "s62_delivery_canonical_sha256_recomputed": "9ce84f044a1483b6a412a7f518fb64c8abc30ef616e5f9bdf2b12ffb8686e56c",
+    "s62_delivery_canonical_matches_manifest": true,
+    "initial_worktree_clean": true,
+    "fixed_source_blobs_verified": true
+  },
+  "proof_scope": {
+    "corruption": "at most one static semi-honest computing party",
+    "input_domain": "1<=K<=N<=1000; FTv3 padded m<=1024",
+    "functionality": "signed Q20.12 descending score, stable original-index ascending ties, original-order Top-K XOR mask shares with exactly K ones",
+    "setup": "ideal FTv3 joint material law conditioned on successful issuance; ideal output-refresh share functionality; ideal A independent 32-byte token RNG",
+    "roles": "T and A trusted and non-colluding with corrupted party; honest peer causally executes using only its own input, output share, package and credentials",
+    "schedule": "external non-selective SuccessFence plus one fixed complete source-event cut in E_cut^FTv3(N)",
+    "leakage": "existing L_S29 unchanged; batch/frame metadata are deterministic functions of public invocation tuple and existing L_S29",
+    "excluded": [
+      "F_T issuance cap-abort and other protocol abort views",
+      "actual wall-clock or finite-timeout success conditioning",
+      "partial-byte, TLS-record and arbitrary instruction cuts",
+      "deployment DRBG, signing, file publication, SQLite, TLS/mTLS, recipient-encryption and machine-failure bridges",
+      "A-only corruption",
+      "N>1000",
+      "formal performance or RTT conclusions"
+    ]
+  },
+  "advantage_decomposition": {
+    "ideal_model_batch_replacements": 0,
+    "ideal_model_select5_and_event_cut_composition": 0,
+    "ideal_model_kpost_success_suffix": 0,
+    "real_deployment_terms": {
+      "dealer_rng": "Adv_DRBG_T(Qmax,Cmax;E_T,P)",
+      "escrow_token_rng": "Adv_DRBG_A(Q_A,C_A;E_A,P)",
+      "party_local_rng_for_active_seed_and_output_refresh": "Adv_DRBG_P(Q_P,C_P;E_P,P)",
+      "signature_and_binding": "Adv_SIG + Adv_hash_binding",
+      "recipient_encryption": "Adv_RSA_OAEP + Adv_AES_GCM",
+      "private_channel": "Adv_TLS_mTLS",
+      "actual_timeout_success_selection": "OPEN; no deployment scheduler law or conditional sampler",
+      "interpretation": "The zero terms are exact equalities only in the listed ideal success-path model; they do not bound or instantiate any deployment advantage."
+    }
+  },
+  "source_derived_schedule": {
+    "batch_gate_cap": 4193824,
+    "max_payload_bytes": 1048576,
+    "max_batch_body_bytes": 1048468,
+    "max_batch_inner_payload_bytes": 1048572,
+    "material_bound_header_bytes_outside_payload_cap": 56,
+    "n_257_to_512": {
+      "padded_m": 512,
+      "width_w": 41,
+      "gate_count": 21638400,
+      "and_batch_exchanges": 78,
+      "logical_and_layer_calls": 75,
+      "max_success_phases": 93
+    },
+    "n_513_to_1000": {
+      "padded_m": 1024,
+      "width_w": 42,
+      "pair_count": 523776,
+      "gate_count": 88626688,
+      "package_bytes_per_party_formula_result": 33366516,
+      "package_bytes_both_parties_formula_result": 66733032,
+      "and_layer_batch_counts": {
+        "input_generate": 1,
+        "carry": 31,
+        "forward_route": 11,
+        "compare_generate": 6,
+        "compare_borrow": 41,
+        "inverse_route": 1
+      },
+      "and_batch_exchanges": 91,
+      "logical_and_layer_calls": 76,
+      "ready_phase": 1,
+      "max_sample_seed_exchanges": 4,
+      "max_active_comparison_waves": 9,
+      "max_inverse_phase": 105,
+      "max_output_refresh_phase": 106,
+      "max_success_application_phases": 106,
+      "max_sequence_number_each_direction": 105,
+      "max_frame_counts_and_length_depend_on": "public tuple P and existing L_S29; no new leakage field is introduced",
+      "output_refresh_inner_payload_bytes": {
+        "p0_to_p1": 1109,
+        "p1_to_p0": 105
+      }
+    }
+  },
+  "claims": {
+    "S62_SOURCE_RECEIPT": {
+      "status": "PASS",
+      "evidence": "S62 commit/tree/parent, manifest Git blob and canonical delivery recomputed; fixed runtime Git blobs agree"
+    },
+    "KPRE3_BATCHED_N_LE_1000": {
+      "status": "PASS_WITH_SCOPE",
+      "conditions": [
+        "ideal FTv3 joint material law conditioned on cap_success",
+        "full H4 joint conditional kernel applied sequentially to disjoint gate-ID batches",
+        "fixed party package and prior local history",
+        "at most one static semi-honest party"
+      ],
+      "ideal_conditional_distance": 0,
+      "first_unclosed_step_in_scope": null
+    },
+    "BATCH_PHASE_SEQUENCE_FRAME_LEAKAGE_MAP": {
+      "status": "PASS_WITH_SCOPE",
+      "mapping": "layer,batch,count,phase,sequence,frame size and success-path counters are deterministic from public invocation tuple and existing L_S29",
+      "leakage_expansion": false,
+      "condition": "H(batch_metadata | public_tuple,L_S29)=0"
+    },
+    "S61_EVENT_CUT_EXPANSION_N_LE_1000": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "finite source-event boundaries, including complete per-batch message/body/opening transitions and output-share formation; one fixed external cut; no partial bytes, TLS records, arbitrary instruction, abort or timeout cuts",
+      "party_share_rule": "future z_b withheld until that party's local share-formation event; P1 pre-formation refresh receive uses uniform u sampler"
+    },
+    "KPOST3_IDEAL_SUCCESS_SUFFIX_N_LE_1000": {
+      "status": "PASS_WITH_SCOPE",
+      "conditions": [
+        "ideal A token RNG",
+        "honest peer deposits causally using only its own state",
+        "both valid deposits commit under external SuccessFence",
+        "party simulator sees only its own submit/receipt/fetch/API projection"
+      ],
+      "deployment_envelope_crypto": "OPEN"
+    },
+    "IDEAL_SUCCESS_APPLICATION_API_VIEW_N_LE_1000": {
+      "status": "PASS_WITH_SCOPE",
+      "composition": "Kpre_3 batched conditional kernel; Select5/L_S29 adaptive replay; S61 cut/refresh rules; S51 Kpost_3 success suffix",
+      "wall_clock_success_conditioning": "not covered"
+    },
+    "N1000_FUNCTIONAL_CASES": {
+      "status": "INHERITED_PASS_WITH_SCOPE",
+      "source": "S48/S52 finite oracle cases only",
+      "rerun_in_s63": false,
+      "security_evidence": false
+    },
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {
+      "status": "OPEN_CONFIRMATION",
+      "owner_decisions_found": false,
+      "questions": [
+        "whether cap exhaustion burns the invocation and permits retry only under a new invocation",
+        "issuance failure notice/start rule and what parties may observe if notice is undelivered",
+        "whether the security theorem includes protocol-level aborts"
+      ],
+      "paired_generic_abort": "not permitted unless the owner confirms this observation is within existing L_S29"
+    },
+    "CAP_ABORT_TO_PACKAGE_START_NOTICE": {
+      "status": "OPEN",
+      "first_gap": "no owner-approved same-invocation joint package/context delivery, both-party start and party-notice kernel",
+      "production_joint_launcher_or_barrier": "not found",
+      "test_controller_barrier_is_production_guarantee": false
+    },
+    "ESCROW_ABORT_UNKNOWN_RECOVERY_FAILURE_VIEW": {
+      "status": "OPEN_WITH_EXACT_GAP",
+      "first_gap": "after first valid deposit enters PENDING, the conditional joint kernel for honest second deposit before expiry, hidden A state transition, response delivery/parse and party observation is unspecified",
+      "later_open_states": [
+        "ABORT response versus response loss and COMMIT_STATUS_UNKNOWN",
+        "restart PENDING-to-ABORTED and party observation",
+        "duplicate submit under hidden states",
+        "fetch/recovery success or failure and final API result"
+      ]
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW": {
+      "status": "OPEN",
+      "reason": "no deployment scheduler/network delay law or permission-correct conditional sampler; SuccessFence is not real-time evidence"
+    },
+    "T_A_P_DRBG_SIGNATURE_PUBLICATION_STORAGE_TLS_RECIPIENT_ENCRYPTION_BRIDGES": {
+      "status": "OPEN",
+      "numeric_advantage": "not instantiated"
+    },
+    "FULL_DEPLOYED_PARTY_VIEW_SECURITY": {
+      "status": "OPEN"
+    },
+    "N_GT_1000_SECURITY": {
+      "status": "NOT_IN_SCOPE"
+    },
+    "BUILD_TEST": {
+      "status": "NOT_RUN"
+    },
+    "HISTORICAL_FUNCTION_MATRICES": {
+      "status": "NOT_RUN"
+    },
+    "NATURAL_BUSINESS_IO": {
+      "status": "NOT_RUN",
+      "inherited_status": "NOT_REPRODUCED"
+    },
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "measurement": "NOT_MEASURED"
+    },
+    "SECURE_ALIAS": {
+      "status": "NOT_CREATED"
+    }
+  },
+  "review": {
+    "reviewer": "/root/s63_independent_review",
+    "independent_of_s50_s63": true,
+    "review_type": "read-only independent theoretical/source-map review",
+    "review_scope": [
+      "S62 source identity and fixed runtime blob alignment",
+      "N=257..1000 and padded m=1024 layer/batch arithmetic",
+      "full H4 conditional-kernel extension across disjoint batches",
+      "batch, phase, sequence, frame length and L_S29 mapping",
+      "P0/P1 order and output-share formation timing",
+      "S51 ideal Kpost success-suffix size/causal mapping",
+      "S62 abort decision state and TEST_ONLY versus production launch boundary"
+    ],
+    "result": "no inherent obstacle found for the stated ideal success-path model; supports PASS_WITH_SCOPE only under listed assumptions",
+    "edited_files": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "deployment_security_signoff": false
+  },
+  "execution": {
+    "runtime_or_test_code_changed": false,
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "targeted_trace_or_conformance": "NOT_RUN; source-derived arithmetic and independent source review were sufficient for this proof-only milestone",
+    "S48_S52_function_matrices": "NOT_RUN",
+    "natural_business_io": "NOT_RUN; inherited NOT_REPRODUCED",
+    "performance": "NOT_RUN/NOT_MEASURED",
+    "vfss_baseline_changed": false,
+    "push_merge_pr": false
+  }
+}

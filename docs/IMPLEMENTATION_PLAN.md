@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-26
+更新日期：2026-11-03
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -1409,3 +1409,11 @@ S62 以 S61 commit `d843b45f29ab87d75520b28aac12c82608ec9678` 为固定对象，
 cap-abort 的理想 IID 界仅适用于语义材料投影；marker EEXIST replay、signer/marker/RAND/signature/文件发布错误、SQLite/TLS/机器故障和实际 finite timeout 是不同状态，不计入该界。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`。S62 不改运行时代码/测试、`VFSS-baseline/`、材料 ABI、默认开关、输出、角色或 leakage；BUILD/TEST 与旧矩阵 `NOT_RUN`，自然业务 I/O 本轮 `NOT_RUN`（沿用 `NOT_REPRODUCED`），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。N>256 安全扩域 `NOT_IN_SCOPE`。逐状态来源映射、A/B 定理表、首个缺口和负责人问题见 S62 report/gates/source-evidence manifest。
 
 非作者 `/root/s62_readonly_review` 未参与 S50–S62 推导，已只读复核成功分支继承范围、cap-abort 的发行/交付/启动边界、错误类型及首个 escrow 失败核；未编辑、构建或测试。`PAIRED_GENERIC_ABORT` 只有在负责人确认其观察已包含于获准 `L_S29` abort 字段时才可作为候选输出，当前仍未获批准。
+
+### S63：N≤1000 ideal success-view 条件模拟扩域（2026-11-03）
+
+从固定 S62 commit `c9c87799b0f27931249d5b82edce37a5f0f1814c` 开始。按固定源码 gate 预算、batch/frame/phase 编码与 `L_S29` 确定字段映射，非作者理论/源码只读复核后，FTv3 `Kpre_3` + S51 `Kpost_3` + S61 完整 source-event cut 的理想**正常成功**应用/API view 可在 `1≤K≤N≤1000`、padded `m≤1024` 下标 `PASS_WITH_SCOPE`：理想 FTv3 发材成功、理想输出刷新与 A token RNG、至多一方静态半诚实、honest peer 因果执行、T/A 不合谋、固定既有 `L_S29`、SuccessFence 外生保证成功、cut 固定在完整源码 event 边界。最大 `m=1024` profile 为 `G=88,626,688`、91 个 AND batch exchange、最多 106 个 application phase。五个算法迭代、最多九个 active comparison wave、phase 数和网络 RTT 单独记账。
+
+每个 AND layer 先按 gate-id 顺序构造，其 gate inputs 不依赖同一层前一 batch output；固定本方 package 和既往 history 后，对未消费 disjoint gate IDs 逐 batch 使用 S36/S50 H4 **联合条件核**采样 openings、peer partial 和本地输出。`layer/batch/count/phase/sequence/length` 固定于公开 tuple 和既有 `L_S29`，故无新增泄露。cut 在本地 share formation 之前不提供未来 `z_b`；P1 收到 output refresh frame 但尚未 XOR 形成 share 时抽均匀 `u`。本扩域没有重跑 S48/S52 功能矩阵或做实际 schedule trace 测试；历史 N=1000 功能案例只作为功能证据继承。
+
+S63 仅扩展理想成功模型。S62 的 cap-abort retry、发行错误通知/启动门和安全声明是否涵盖 protocol abort 均无新的 owner 决定，继续 `OPEN_CONFIRMATION`；`PAIRED_GENERIC_ABORT` 未获批准，测试 controller 启动屏障不等于生产接口。cap-abort delivery/start、A PENDING 后 ABORT/UNKNOWN/recovery failure、真实有限 timeout、T/A DRBG、签名/文件发布、SQLite、TLS/mTLS、recipient encryption、真实完整 party-view/部署优势均 OPEN。`N>1000` 未准入。BUILD/TEST、历史矩阵、正式 LAN/WAN/RTT/AAV86/性能=`NOT_RUN/NOT_MEASURED`；自然 I/O 本轮未测，既有 `NOT_REPRODUCED` 不变。runtime、tests、ABI、角色、输出、`L_S29`、默认开关及 `VFSS-baseline/` 均未改变。详见 S63 decision/report/gates/source/evidence manifest。

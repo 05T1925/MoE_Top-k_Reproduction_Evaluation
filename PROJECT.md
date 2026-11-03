@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-26
+更新日期：2026-11-03
 
 ## 1. 项目目标与当前边界
 
@@ -1065,3 +1065,11 @@ S62 从 S61 精确提交 `d843b45f29ab87d75520b28aac12c82608ec9678`（tree `d7db
 S62 未改 runtime/test、`VFSS-baseline/`、默认开关、输出、角色或泄露；BUILD/TEST=`NOT_RUN`，历史功能矩阵与故障注入未运行，自然业务 I/O 本轮 `NOT_RUN`（既有 `NOT_REPRODUCED`），正式 LAN/WAN/RTT/AAV86/性能 `NOT_RUN/NOT_MEASURED`。N≤1000 仍仅为历史有限功能收据，N>256 安全扩域 `NOT_IN_SCOPE`。`LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE=OPEN_CONFIRMATION`；真实 T/A RNG、签名/文件持久性、TLS/加密、有限 timeout 和完整 GMW/Select/shuffle/output/escrow composition 继续分别过门。详见 S62 report、decision、gates 与 source/evidence manifest。
 
 非作者 `/root/s62_readonly_review` 未参与 S50–S62 推导，已只读复核 A 分支继承范围、S61 来源差异说明、cap-abort 通知/启动分支、错误分类和首个 escrow 失败核，未编辑、构建或测试；reviewer 要求将 `PAIRED_GENERIC_ABORT` 对 `L_S29` 的归类保留为负责人待确认条件。该复核不是功能接收或部署签核。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S63（2026-11-03）
+
+S63 固定 S62 commit `c9c87799b0f27931249d5b82edce37a5f0f1814c`，重新核验 tree、parent、S62 manifest、canonical delivery 和 FTv3 源码 Git blobs。经非作者只读复核，理想成功应用/API view 的 FTv3 batching 条件核及 S50/S51/S53/S61 条件组合扩展到 `1≤K≤N≤1000`，包含 N=1000→padded 1024。该 `PASS_WITH_SCOPE` 仅适用于理想发材成功、理想输出刷新/A token RNG、单方静态半诚实、honest peer、固定既有 `L_S29`、外生 SuccessFence 与固定完整 source-event cut。N=1000 的 gate 数 88,626,688、AND 批次帧 91、最大成功 phase 106 均由源码公式/调用顺序推导，属于 schedule 诊断，不是性能或 RTT 测量。
+
+新增 `(layer,batch,count,phase,sequence,frame-length)` 在固定公开 tuple 与获准 `L_S29` 下是确定性后处理，未扩大泄露。逐批 Beaver openings 使用完整 H4 条件联合 kernel 归纳；每个 source-event cut 按其所在 batch/协议阶段采样。输出 share 形成前不提供 future `z_b`；P1 output-refresh receive-pre-share cut 使用均匀 refresh-frame kernel，形成后仅提供本方 staged share。S51 Kpost 仅在相同理想 A、诚实 endpoint、独立 token RNG 和 SuccessFence 下扩域；真实部署桥未关闭。
+
+S62 的 cap-abort 重试、发材失败通知/启动门、协议 abort 定理范围仍 `OPEN_CONFIRMATION`。生产 issuer/party API 没有共同的 all-or-none startup/notice 接口；TEST_ONLY 控制器不构成生产保证。`PAIRED_GENERIC_ABORT` 仅在负责人确认已属批准 `L_S29` 时才能采用。A PENDING 后的 ABORT/UNKNOWN/fetch-recovery 联合核仍 `OPEN`；真实有限 timeout、T/A DRBG、签名/发布/存储、SQLite、TLS/mTLS、recipient encryption 与完整实际 party-view 分别保持 OPEN。S48/S52 的 N=1000 是有限功能证据，不是安全证明。N>1000 未覆盖；BUILD/TEST、旧矩阵及正式 LAN/WAN/RTT/AAV86/性能本轮未运行/测量；不改 runtime/test/`VFSS-baseline/`，无 `secure` alias，不推送/合并。详细裁决见 S63 decision/report/gates/source-evidence manifest。
