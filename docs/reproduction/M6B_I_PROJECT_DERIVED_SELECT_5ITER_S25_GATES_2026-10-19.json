@@ -1,0 +1,119 @@
+{
+  "schema": "m6b-project-derived-select5-s25-gates/v1",
+  "date": "2026-10-19",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "s24_candidate_canonical_sha256": "585d4fd60f8cc04ad4b14bf02730882084cfbb2bd7045d9b2ca36c956fc51438",
+  "s25_candidate_canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d",
+  "independent_receipt": "NOT_SATISFIED",
+  "independent_crypto_review": "NOT_SATISFIED",
+  "gates": {
+    "S24_SOURCE_IDENTITY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Rehashed all 74 paths from the S24 candidate manifest; recomputed canonical digest matches 585d4fd60f8cc04ad4b14bf02730882084cfbb2bd7045d9b2ca36c956fc51438. S25 current set differs in three test-only files; current digest is recorded in the S25 manifest.",
+      "scope": "Manifest identity and file integrity only; not an independent human receipt."
+    },
+    "INDEPENDENT_RECEIPT": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Current executor participated in S19-S24 design/proof derivations. Fresh isolated worktree builds/replays are technical replay, not an inter-session independent receipt."
+    },
+    "V1_SHARE_AND_RECORD_SEMANTICS": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Source reconstruction plus DCF correctness yields Q0+Q1=kappa in R_c. v1 low residues i/0 make local q recomposition valid; downstream runtime consumes complete key records.",
+      "assumptions": ["Actual DCF correctness for the selected score conversion call."],
+      "scope": "Algebra/function mapping; no privacy claim."
+    },
+    "V2_FULL_KEY_ZERO_SUM_REFRESH": {
+      "status": "PASS",
+      "evidence": "rho0+rho1=0 and Qprime_b=Q_b+rho_b modulo 2^c preserve reconstructed full priority keys for every random tape, including wraparound. Targeted conformance and E2E passed.",
+      "scope": "Full c-bit key shares only; not local q-prime shares."
+    },
+    "V2_LOCAL_Q_RECOMPOSITION": {
+      "status": "OPEN/NO_GO",
+      "evidence": "For h=1,c=34,Q0=Q1=0,rho0=1,rho1=2^34-1, full sum remains zero but shifted local shares sum to 2^33-1. Runtime uses full Qprime records and does not consume q-prime."
+    },
+    "V2_REFRESH_PACKAGE_AND_ONE_SHOT_BINDING": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "M6B5/v4 monolithic and M6S2/v3 streamed paths passed tested header, party/session, missing/corrupt slot, replay/lease and E2E checks.",
+      "scope": "Tested local schemas and failure cases; not a complete correlated-pool privacy proof or production storage certification."
+    },
+    "FEATURE_OFF_API_BOUNDARY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "ON external API probe compiled; OFF probe failed as expected because API declaration is hidden; OFF static library lacked v2 helper symbol and OFF target help lacked v2 test target."
+    },
+    "FUNCTIONAL_ORACLE_E2E": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "16 recorded successes including one v1 control and 15 v2 runs; TEST_ONLY supervisor reconstructed XOR masks and checked frozen stable oracle, original order, length, bits and weight K. Six fault cases produced uniform abort/no-mask. Six v2 crash prefixes produced no complete mask; steps 5-6 left a P1 8-byte local XOR share.",
+      "scope": "Finite fixtures only; does not prove correctness for all inputs/tapes or a probability bound."
+    },
+    "V2_OUTPUT_CONDITIONAL_SIMULATION": {
+      "status": "CONDITIONAL/UNQUANTIFIED",
+      "evidence": "Uniform-refresh equation is valid only for V_pre excluding rho, if rho remains uniform independent conditioned on the complete V_pre and scoped L_prefix. The full-view sampler must include party package/material/lease variables and is not supplied.",
+      "unquantified": ["epsilon_RNG_joint^(v2)", "AES PRP reduction time/advantage T-prime", "TLS channel advantage"],
+      "scope": "Restricted score-conversion prefix law; not full party view."
+    },
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL/UNQUANTIFIED",
+      "evidence": "The actual M2B1/v1 conformance path is exercised, but this S25 review does not independently re-prove that serialized key distribution and auxiliary-input conditions satisfy BCG21 Theorem 2. The inherited bridge is conditional on AES-128 PRP and the stated key-generation/randomness mapping.",
+      "unquantified": ["AES reduction time T-prime and concrete advantage", "epsilon_RNG_joint across getrandom/RAND_bytes and party-visible auxiliary state"],
+      "scope": "Single-key candidate bridge only; does not imply two-Eval UCMP or pool privacy."
+    },
+    "M6B5_V4_SCHEMA_FUNCTIONAL": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "N=128 monolithic package refresh count/header, party/session decoding and tested one-shot/replay paths passed; package layout and v2 E2E recorded separately from streamed schema."
+    },
+    "M6S2_V3_SCHEMA_FUNCTIONAL": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "N=256 streamed purpose-5 slots, manifest binding/one-shot behavior, staged E2E layout and wrong-party/session rejection passed in the tested local configuration."
+    },
+    "FORWARD_SHUFFLE_WIRE_PROJECTION": {
+      "status": "CONDITIONAL/UNQUANTIFIED",
+      "evidence": "Only the masked forward wire projection follows under ideal independent shuffle pads. Local permutation/mask states and complete package view are not jointly simulated."
+    },
+    "ADAPTIVE_DCF_POOL": {
+      "status": "OPEN/NO_GO",
+      "evidence": "No simulator for same-key two Eval view, opened comparison bits, unused/used correlated slots, bit-dependent future addresses, abort/crash access across either schema."
+    },
+    "INVERSE_MEMBERSHIP_OUTPUT_CRASH_COMPOSITION": {
+      "status": "OPEN/NO_GO",
+      "evidence": "No full P0/P1 simulator for inverse shuffle, membership, output share and restart/crash state. Tests establish only no-complete-mask for the listed fault prefixes; local orphan share may remain."
+    },
+    "ATTACK_OR_RUNTIME_DEFECT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "No exploitable distinguisher or reproducible runtime defect found in this review. Proof gaps remain; absence of a found attack is not a security pass. No runtime files changed."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Independent receipt and full party-view proofs are absent; keep EXPERIMENTAL and do not create secure alias."
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "NO_GO",
+      "evidence": "N=257 streamed resource preflight rejected; no N>256 evidence."
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "status": "NOT_RUN",
+      "authorized": false,
+      "evidence": "M6A V3 remains OPEN; V4 not authorized. Formal LAN/WAN matrix was not run. Local functional counters and package bytes are not performance results."
+    }
+  },
+  "functional_counts": {
+    "success_records": 16,
+    "v1_control_successes": 1,
+    "v2_successes": 15,
+    "uniform_fault_abort_cases": 6,
+    "v2_crash_prefix_cases": 6,
+    "fresh_release_on_ctest": "7/7 PASS",
+    "fresh_release_off_legacy_ctest": "3/3 PASS",
+    "standalone_streamed_store": "PASS",
+    "standalone_tls13_mtls": "PASS",
+    "full_on_build": "FAILED at unrelated ext/bitpack bitpack::mod(unsigned long,int) link reference"
+  },
+  "performance": {
+    "formal_matrix": "NOT_ALLOWED/NOT_RUN",
+    "V3": "OPEN",
+    "V4": "NOT_AUTHORIZED"
+  },
+  "report": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_REPORT_2026-10-19.md",
+  "decision": "../decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_DECISION_2026-10-19.md",
+  "case_summary": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_E2E_CASES_2026-10-19.json",
+  "source_build_evidence_manifest": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json"
+}
