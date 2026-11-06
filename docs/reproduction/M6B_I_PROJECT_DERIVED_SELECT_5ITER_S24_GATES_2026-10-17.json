@@ -1,0 +1,134 @@
+{
+  "schema": "m6b-project-derived-select5-s24-gates/v1",
+  "date": "2026-10-17",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "worktree": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s24/MoE_Top-k_Reproduction_Evaluation",
+  "branch": "codex/m6b-project-select5-s24",
+  "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+  "s18_s15_source_canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+  "independent_review": "NOT_SATISFIED",
+  "gates": {
+    "S18_LOCKED_SOURCE_IDENTITY": {
+      "status": "PASS",
+      "evidence": "S18 manifest external source root rehashed: 72/72 files match; canonical digest recomputed to the declared value.",
+      "scope": "S15 base snapshot only; S24 modifications are a new candidate revision."
+    },
+    "INDEPENDENT_CRYPTO_REVIEW": {
+      "status": "OPEN/NO_GO",
+      "evidence": "The S24 executor participated in S19-S23 proof derivation; no non-author S24 crypto review was performed."
+    },
+    "F_SCORECONV_V1_SHARE_CONTRACT": {
+      "status": "PASS",
+      "evidence": "Source reconstruction plus DCF-correctness algebra: Q0+Q1 equals stable κ in R_(2^(33+h)).",
+      "scope": "Does not claim Q_b is uniform; v1 share distribution is implementation-induced."
+    },
+    "V1_LOCAL_Q_MAPPING": {
+      "status": "PASS",
+      "evidence": "Q0 mod 2^h=i and Q1 mod 2^h=0, so no low-part carry and high parts recompose.",
+      "scope": "Algebraic mapping; current downstream consumer uses complete Q_b."
+    },
+    "V2_ZERO_SUM_FULL_KEY_RECONSTRUCTION": {
+      "status": "PASS",
+      "evidence": "R_c share sum preserved for all rho values; conformance covers h=1..8, boundary rho, wraparound and stable-key oracle."
+    },
+    "V2_LOCAL_Q_MAPPING": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Counterexample h=1,c=34,Q0=Q1=0,rho0=1,rho1=2^34-1 preserves full sum 0 but local shifted shares sum to 2^33-1.",
+      "mitigation": "Do not derive or expose q'_b; v2 runtime passes complete Q'_b."
+    },
+    "V2_F_SCORECONV_OUTPUT_CONDITIONAL_SIMULATION": {
+      "status": "CONDITIONAL",
+      "evidence": "Under an ideal joint independent tape, rho_b is uniform independent of local carry/sign pre-view; Pr[V=v,Q'=q'|x,L]=Pr[V=v|x,L]/2^(cN). Simulator samples the S22 local pre-output view and sets rho_b=q'-Q_b.",
+      "assumptions": [
+        "S22 carry/sign local pre-output sampler applies to the exact S15 conversion prefix.",
+        "The v2 refresh tape is independent of all local score-conversion material and prior view in the ideal model.",
+        "Concrete getrandom/RAND_bytes joint distinguishing advantage is included in a new epsilon_RNG_joint^(v2) and is not quantified.",
+        "The S22 AES-PRP bridge remains conditional with unquantified T' and actual advantage."
+      ],
+      "review": "No independent cryptographic reviewer for S24; author participated in S19-S23."
+    },
+    "FORWARD_SHUFFLE_LOCAL_VIEW": {
+      "status": "CONDITIONAL",
+      "evidence": "Given ideal Q'_b, q'_b and full-key record are deterministic. The inherited S23 fixed-Q forward-only sampler composes for Q'_b under ideal independent shuffle tape and approved L containing its masked frame and aggregate Y.",
+      "scope": "Forward-only local view; not full package pool, inverse shuffle, membership, output or crash composition."
+    },
+    "FIRST_ADAPTIVE_SELECT_DCF_QUERY": {
+      "status": "OPEN/NO_GO",
+      "evidence": "No S24 simulator for the first sample-selected DCF comparison, its opened bit, the correlated key pool and the bit-dependent future slot address."
+    },
+    "V2_PACKAGE_AND_SLOT_ABI": {
+      "status": "PASS",
+      "evidence": "M6B5/v4 monolithic and M6S2/v3 streamed formats bind score-share ABI; N=256 adds 256 one-shot purpose-5 rho slots per party.",
+      "scope": "Package format/conformance and tested E2E only; not a cryptographic pool proof."
+    },
+    "PUBLIC_BINDING_LEAKAGE": {
+      "status": "PASS",
+      "evidence": "The existing phase-3 binding uses fixed version 5 and existing ABI/reserved bytes 2,0 for v2. Frame length is unchanged; marker is public configuration independent of scores, shares, rho and transcript values, and creates no new message phase."
+    },
+    "FEATURE_DEFAULT_OFF_BOUNDARY": {
+      "status": "PASS",
+      "evidence": "Release OFF static library has no protocol_i_refresh_full_priority_key_shares_v2 symbol; OFF target help has no v2 test target. ON static library contains the symbol and ON E2E links/runs."
+    },
+    "V2_TARGETED_CONFORMANCE": {
+      "status": "PASS",
+      "evidence": "7/7 selected CTest targets passed, including refresh, DCF, Select5, material store, uCMP, score-input and shuffle; streamed store test passed."
+    },
+    "V2_T_P0_P1_FROZEN_ORACLE_E2E": {
+      "status": "PASS",
+      "evidence": "7 successful cases: v1 N7/K3; v2 N7/K3 twice, N7/K1, N7/K7, N128/K64, N256/K128. TEST_ONLY supervisor reconstructs XOR mask and checks exact frozen stable oracle, original order, bits and weight K.",
+      "not_run": ["v2 dedicated N=1 case", "v2 dedicated wrong-session/wrong-party E2E", "v2 crash-prefix matrix"]
+    },
+    "N_LE_256_FUNCTIONAL_ADMISSION": {
+      "status": "PASS",
+      "evidence": "S24 v2 oracle E2E for N=128/K=64 and N=256/K=128 plus N=7/K boundaries; not an independent receipt of S24."
+    },
+    "MATERIAL_RESOURCE_LAYOUT": {
+      "status": "CONDITIONAL",
+      "evidence": "Exact format deltas are derived; N256 E2E observed staged store and manifest sizes.",
+      "unmeasured": ["production peak RSS", "filesystem block/inode overhead", "cross-host delivery", "formal capacity envelope"]
+    },
+    "DCF_SINGLE_KEY_AND_CORRELATED_POOL": {
+      "status": "NOT_RUN",
+      "evidence": "S24 did not independently re-prove the actual serialized key distribution or two-Eval view. The separate S22 fixed-parameter bridge remains historical CONDITIONAL evidence only."
+    },
+    "ADAPTIVE_DCF_POOL": {
+      "status": "OPEN",
+      "evidence": "No S24 simulator for used/unused slots, opened comparison bits, adaptive addresses, abort/crash access or per-schema full-pool view."
+    },
+    "SHUFFLE_INVERSE_MEMBERSHIP_OUTPUT_COMPOSITION": {
+      "status": "OPEN",
+      "evidence": "The output-share refresh argument stops at score-conversion local carry/sign view; no joint M2CM shuffle/inverse, membership or output-share simulator."
+    },
+    "CRASH_ABORT_CONTRACT": {
+      "status": "CONDITIONAL",
+      "evidence": "Only prior specified no-complete-mask tests; a local 8-byte XOR share may remain. Not atomic no-output or all-or-nothing; S24 crash matrix NOT_RUN."
+    },
+    "ATTACK_OR_RUNTIME_DEFECT": {
+      "status": "PASS",
+      "evidence": "No attack found. One reproducible integration issue: ready publisher rejected new v4 header; fixed by version-pair validation and v2 E2E passed after fix."
+    },
+    "WHOLE_PROTOCOL_SECURITY_OR_SECURE_ALIAS": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Full adaptive pool and shuffle/output/crash party-view proofs remain open; no secure alias created."
+    },
+    "FORMAL_LAN_WAN_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "authorized": false,
+      "evidence": "M6A V3 remains OPEN and V4 not authorized. Local functional counters/bytes are not formal performance results."
+    }
+  },
+  "failure_record": {
+    "ninja_generator": "FAILED_UNAVAILABLE; Unix Makefiles used",
+    "first_ctest_before_all_targets_built": "NOT_RUN for unbuilt executables; rebuilt and final selected run passed 7/7",
+    "first_v2_ready_publish": "FAILED because publisher accepted only old package headers; fixed and rerun passed",
+    "wrong_e2e_executable_name": "FAILED exit 127; actual CMake target rebuilt and smoke suite passed"
+  },
+  "performance_status": {
+    "V3": "OPEN",
+    "V4": "NOT_AUTHORIZED",
+    "formal_matrix": "NOT_RUN"
+  },
+  "evidence_manifest": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-17.json",
+  "report": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_REPORT_2026-10-17.md",
+  "case_summary": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_E2E_CASES_2026-10-17.json"
+}

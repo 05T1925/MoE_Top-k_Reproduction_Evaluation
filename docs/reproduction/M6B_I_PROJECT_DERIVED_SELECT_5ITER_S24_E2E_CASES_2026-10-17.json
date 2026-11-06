@@ -1,0 +1,32 @@
+{
+  "schema": "m6b-project-derived-select5-s24-e2e-cases/v1",
+  "date": "2026-10-17",
+  "source_candidate": "S24 worktree after versioned F_scoreconv/v2 implementation; not independently received",
+  "oracle": "frozen C++ stable Top-K oracle in TEST_ONLY supervisor",
+  "checks_per_success_case": [
+    "XOR-combine P0/P1 shares only in TEST_ONLY supervisor",
+    "original input order",
+    "mask length equals logical n",
+    "each bit is 0 or 1",
+    "weight equals K",
+    "bitwise equality with frozen oracle"
+  ],
+  "cases": [
+    {"case_id":500,"score_share_abi":"S15InducedV1","schema":"M6B5/v3","n":7,"padded_n":8,"k":3,"result":"ORACLE_PASS","comparison_calls":18,"compare_layers":4,"active_sample_rounds":2,"observed_online_exchanges":20,"material_replay_rejected":true},
+    {"case_id":501,"score_share_abi":"FullKeyZeroSumRefreshV2","schema":"M6B5/v4","n":7,"padded_n":8,"k":3,"result":"ORACLE_PASS","comparison_calls":16,"compare_layers":4,"active_sample_rounds":2,"observed_online_exchanges":20,"material_replay_rejected":true},
+    {"case_id":502,"score_share_abi":"FullKeyZeroSumRefreshV2","schema":"M6B5/v4","n":7,"padded_n":8,"k":3,"result":"ORACLE_PASS","comparison_calls":14,"compare_layers":3,"active_sample_rounds":2,"observed_online_exchanges":18,"material_replay_rejected":true},
+    {"case_id":504,"score_share_abi":"FullKeyZeroSumRefreshV2","schema":"M6B5/v4","n":7,"padded_n":8,"k":1,"result":"ORACLE_PASS","comparison_calls":13,"compare_layers":2,"active_sample_rounds":1,"observed_online_exchanges":15,"material_replay_rejected":true},
+    {"case_id":505,"score_share_abi":"FullKeyZeroSumRefreshV2","schema":"M6B5/v4","n":7,"padded_n":8,"k":7,"result":"ORACLE_PASS","comparison_calls":22,"compare_layers":4,"active_sample_rounds":2,"observed_online_exchanges":20,"material_replay_rejected":true},
+    {"case_id":507,"score_share_abi":"FullKeyZeroSumRefreshV2","schema":"M6B5/v4","n":128,"padded_n":128,"k":64,"result":"ORACLE_PASS","comparison_calls":2133,"compare_layers":9,"active_sample_rounds":4,"observed_online_exchanges":32,"package_bytes_per_party":44986628,"material_replay_rejected":true},
+    {"case_id":503,"score_share_abi":"FullKeyZeroSumRefreshV2","schema":"M6S2/v3","n":256,"padded_n":256,"k":128,"streamed":true,"result":"ORACLE_PASS","comparison_calls":16818,"compare_layers":9,"active_sample_rounds":4,"observed_online_exchanges":32,"staged_store_bytes":385331840,"store_bytes_per_party":192665920,"manifest_bytes_per_party":12675648,"segments_per_party":11,"material_replay_rejected":true}
+  ],
+  "not_run": [
+    "v2 dedicated N=1 E2E",
+    "v2 E2E with explicit wrong-session/wrong-party package",
+    "v2 crash-prefix matrix",
+    "production storage/peak RSS",
+    "formal LAN/WAN performance matrix"
+  ],
+  "interpretation": "Comparison counts, exchange counts and byte counts above are functional-run diagnostics for these exact cases; they are not formal performance results, worst-case bounds or general protocol-round formulas. Algorithm iterations, comparison dependency layers and observed end-to-end exchange counts are separate quantities.",
+  "raw_evidence_external": "C:/Users/28641/.codex/evidence/M6B_I_S24_20261017_02/final_targeted_tests.log"
+}
