@@ -1,0 +1,111 @@
+{
+  "schema": "m6b-project-derived-select5-s6-source-manifest/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S6",
+  "created_date": "2026-10-14",
+  "route": "PROJECT_DERIVED_SELECT_5ITER",
+  "composition": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / EXPERIMENTAL",
+  "repository": {
+    "s6_worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-derived-5iter-s6",
+    "branch": "codex/m6b-project-derived-5iter-s6",
+    "head_and_base": "c3926c68fd14f270faa8b55234311071947fa080",
+    "task_changes_committed": false,
+    "main_at_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "origin_main_at_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "s5_worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-derived-5iter-s5",
+    "s5_branch_and_head": "codex/m6b-project-derived-5iter-s5 @ c3926c68fd14f270faa8b55234311071947fa080",
+    "desktop_main_checkout_modified_by_s6": false
+  },
+  "s5_receipt": {
+    "receipt_type": "nonparticipant independent receipt of S5 baseline only",
+    "reviewer_prior_involvement": "S1/S2 source review; no S4/S5 implementation or review participation",
+    "source_manifest_entries": 36,
+    "matching_entries": 35,
+    "exception": {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "manifest_sha256": "3023056355c55df5992facd457e256dabc7d6ca2196c1a795c7ec557b7246d6e",
+      "observed_sha256": "6b9bd2e1cc6fcd6212ca8159cd12cc08c29419125c3003ad85d21c78d1876b99",
+      "reason": "post-manifest S5 documentation append; no runtime source mismatch"
+    },
+    "all_18_s5_reported_source_hashes_match": true,
+    "fresh_release_tests": "7 targets exit 0; 10 frozen-oracle success and 5 uniform-abort/no-mask cases exit 0",
+    "evidence_directory": "C:\\Users\\28641\\.codex\\evidence\\S6_S5_RECEIPT_2026-10-14",
+    "evidence_hashes": {
+      "receipt_summary.json": "46e9225981d820ec5f18a388ad314b0d0f112a2df396a7c4b8d3b7e940d63b10",
+      "run2_console.txt": "9ac3c10a608126cb40360259de91c19c94c048c37e884bb15c536ab786e001f0",
+      "binary_sha256.txt": "d9ccab345b2240a203693f13b96c1853eb2155c774a66c765f80581284656220"
+    },
+    "scope_limit": "Receipt covers the frozen S5 baseline, not the S6 delta."
+  },
+  "s6_delta_files_vs_s5": [
+    {"path":"VFSS/include/moe_topk/project_derived_select5.h","s5_sha256":"19177983f603beddd2cc237d7ca9ee10cea8c49e7b8bed87f71afbaf2a90fe75","s6_sha256":"a54de6c2c94a58bfc03e0afac660718820119dc49c59a5cb5d5f62a7d35ed891"},
+    {"path":"VFSS/include/moe_topk/protocol_i_material_slot_store.h","s5_sha256":"18cce441cf4f719d720ddab39f603e2c76b5b82621994d3248c78c91a8564690","s6_sha256":"0b4424378f3833685a5f0c79cdf5f40156f6bcd4aa52dd6409570294c220cca0"},
+    {"path":"VFSS/include/moe_topk/protocol_i_parallel_shuffle.h","s5_sha256":"0843c6717885f12421b37fed1285d6216c800fb590a97ca0984aa1287254d476","s6_sha256":"e51af2733de14c8b06cb04f33152b379db3dc72459a400af0943a8430e4f3cd9"},
+    {"path":"VFSS/include/moe_topk/protocol_i_project_derived_select5.h","s5_sha256":"698f0c0d27d4c4a1fd5b4c7aac1b5ef37d829963bbd4b29942dc4dda0378e862","s6_sha256":"665a92a356358bc1ab2be3b6cdfab5c5d49ad651d33b618d3fd93027dafd273a"},
+    {"path":"VFSS/src/moe_topk/project_derived_select5.cpp","s5_sha256":"ecfa56c3d12f8a8183db680d9197bcaf75a18761ba1a4e078a300ca273f2651e","s6_sha256":"b5d18cf1d74af01170447ff15007bd120618894a04df9705ac06081302e34da3"},
+    {"path":"VFSS/src/moe_topk/protocol_i_material_slot_store.cpp","s5_sha256":"d84c14d93ed58e1baf8a18737a6387074d288dd0d1fcefc96a3f8dd096d66792","s6_sha256":"0c43a90b8d0615855bb90600bdf10f4d761f44da13f454cc044c5d29f5434949"},
+    {"path":"VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp","s5_sha256":"f5b767130bf6d93fde58151629ef6f209257b7a53daf30cd4843c20cfdc01010","s6_sha256":"08a43369efded4b760d4d5e6e32b16420031c1d1c571ecf1a070aadd26276cb1"},
+    {"path":"VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp","s5_sha256":"a4a5f1c63afd4bc9b621b4a46a203df62fcc924c0a7fa222b6595395f478f325","s6_sha256":"aa0663e35bb6879b03d724f4ee8e8e8aee2e21982f0f86d912574a35a306e0ab"},
+    {"path":"VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp","s5_sha256":"51ad8c34c5b1170585b7cadceb9e3a158d7ece3f7e5106e8177083d8cbaa365d","s6_sha256":"d0c8bfcfdc8bdabec30c0f95fa9cd2c2a082b173dc2d7e595c16ab48dc8b25b3"}
+  ],
+  "s6_governance_delta_vs_s5": [
+    {"path":"PROJECT.md","s5_sha256":"0241202bb636ad973205b66d99bd918198320caef139e31f597d702b01c420d8","s6_sha256":"5e39327033027e33a3ffa394faa1b5583cce10a3221471d90208b24539172c47"},
+    {"path":"docs/IMPLEMENTATION_PLAN.md","s5_sha256":"c0c1a6e08ab61cf8909b86be2a21390b44be0f5e35fd0b923374ad8726d2ab69","s6_sha256":"108e3db65b466910d5641a8cb40ed18be69ee2e1deece4ec967a9030b9af9c4e"},
+    {"path":"docs/REFERENCE_MANIFEST.md","s5_sha256":"6b9bd2e1cc6fcd6212ca8159cd12cc08c29419125c3003ad85d21c78d1876b99","s6_sha256":"88cec20435fad7049e389e715db5accbbe47667e9cdd3296cbd8965c96044186"}
+  ],
+  "s6_deliverables": [
+    {"path":"docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_DECISION_2026-10-14.md","sha256":"c561c941f560f9500138b23a7a188e3b19f024e3e3b8d0d3439d64d774a7e09a"},
+    {"path":"docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_REPORT_2026-10-14.md","sha256":"82e370835cdf0873e5f88cc8d748520cc8a8b7186904b3f5fb4e7496ae28dabe"},
+    {"path":"docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_E2E_CASES_2026-10-14.json","sha256":"90d6850bda111ccef3ab16bb6ec73ac8b70d4c97d0bf77c4ff3ae55e71fac879"},
+    {"path":"docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_INPUT_FREEZE_2026-10-14.json","sha256":"4c6a8c3dee3085e23fe1ebb432f52d3764731813c594cca4a6e8e1e174447724"}
+  ],
+  "build_and_test": {
+    "environment": "Ubuntu 24.04 WSL2 x86_64; CMake 3.28.3; GCC 13.3.0; OpenSSL 3.0.13; Release; BUILD_TESTING=ON; EMP OT=OFF; Select5 experimental=ON",
+    "build_directory": "/tmp/m6b-select5-s6-build (outside repository)",
+    "configure_command": "cmake -S /mnt/c/Users/28641/.codex/worktrees/m6b-project-derived-5iter-s6/VFSS -B /tmp/m6b-select5-s6-build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_EMP_OT=OFF -DMOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL=ON",
+    "built_and_run_targets_exit_0": [
+      "moe_topk_project_derived_select5_conformance_test",
+      "moe_topk_project_derived_select5_material_store_test",
+      "moe_topk_streamed_material_slot_store_test",
+      "moe_topk_tls13_transport_conformance_test",
+      "moe_topk_project_derived_select5_process_e2e_test",
+      "moe_topk_m2_ucmp_conformance_test",
+      "moe_topk_m2_parallel_shuffle_conformance_test"
+    ],
+    "final_e2e": {"cases":23,"oracle_pass":18,"uniform_abort_no_mask":5,"exit_code":0,"case_json_sha256":"90d6850bda111ccef3ab16bb6ec73ac8b70d4c97d0bf77c4ff3ae55e71fac879"},
+    "default_feature_off": "Separate Release configure with Select5 option OFF; new Select5/streamed-store/TLS targets absent from default target list.",
+    "final_binary_sha256": {
+      "moe_topk_project_derived_select5_conformance_test":"de5e38a10ed39a0e9daa73cea81dd44e6b245c2f4e9968aedb0d55606980092b",
+      "moe_topk_project_derived_select5_material_store_test":"19d6e294485a8bb75fe71b768a473dabbe3267e5bbf55118fec0ce47115d6a50",
+      "moe_topk_streamed_material_slot_store_test":"19e4fb9a975cffa95812426ab27ea4cb03fc5622d7502c41ad5fb53d95303129",
+      "moe_topk_tls13_transport_conformance_test":"069b9ffd089fb04c38d133d4634e1d0962fb6a5ac119563ec0d5e203c9d8cdc4",
+      "moe_topk_project_derived_select5_process_e2e_test":"1bd54f7f29f25b0b0b3bf40e0935a79e87817af50ac5000757e053c20b3d4d3c",
+      "moe_topk_m2_ucmp_conformance_test":"d7b8ebcdfd05dace299cede2040e4e5f58534f7828302e695785568f1d08f56d",
+      "moe_topk_m2_parallel_shuffle_conformance_test":"6af7cc27f09a19451453e1a0689efc8dd15f32a13bd214217e26f18222747e1d"
+    },
+    "external_evidence_directory":"C:\\Users\\28641\\.codex\\evidence\\M6B_I_PROJECT_SELECT_5ITER_S6_2026-10-14",
+    "final_logs_sha256": {
+      "final-conformance.log":"6b2de88521308ecd367f315abf4636fbcf55a99bfc821ea6ba698daf1c146425",
+      "full-e2e-final.log":"0a8adae16a489f13738526d29520ac504a5ddfdd5c88fa58bf6807c135f50243"
+    },
+    "preserved_failed_or_intermediate_logs_sha256": {
+      "full-e2e.log":"1f72501945e3b65c06a56a2ed9d689f81426be76e2ad533fd8850ea37a54aa9d",
+      "n256-e2e.log":"8c4a6e64485237ade9367d57399826cf3df227920ec399bbe63043672ef1f66c",
+      "full-e2e-v2.log":"becad6f8f1b3dc7ff2e96e155514079da1daae143af771aa60b8091b0405b163",
+      "full-e2e-v3.log":"d908bdf8dc8f08701c23a290e39a44193206c2c662177bbe9d2a0ea490e9558c",
+      "full-e2e-v4.log":"2254e95b2db70dbc8efba559d49312af7747bfe96d05acccc047af295ec0a640",
+      "n256-k128-output.log":"cd3a42a524b4801712b6b0afa1b152a0287bc95b043c1d9ff189764b9b4052f8",
+      "n256-k128-time.txt":"67b48d9742479a3c9a22e5f730e43d3b3c319009f47b89eb43f02b7c804e611f"
+    }
+  },
+  "scope_and_exclusions": {
+    "S6_source_delta_file_count": 9,
+    "S6_governance_delta_file_count": 3,
+    "S1_S5_source_and_historical_reports_in_checkout": "Selective inherited inputs, not S6 modifications; hashes/path scope recorded in the input-freeze record.",
+    "inherited_S5_changes_not_relabelled_as_S6": ["VFSS/CMakeLists.txt","VFSS/include/moe_topk/protocol_i_score_input.h","VFSS/include/moe_topk/protocol_i_transport.h","VFSS/src/moe_topk/protocol_i_score_input.cpp","VFSS/src/moe_topk/protocol_i_transport.cpp","VFSS/tests/moe_topk/project_derived_select5_control_test.cpp","VFSS/tests/moe_topk/protocol_i_material_slot_store_test.cpp","VFSS/tests/moe_topk/protocol_i_project_derived_select5_material_store_test.cpp","VFSS/tests/moe_topk/protocol_i_tls13_transport_conformance_test.cpp"],
+    "excluded_from_S6_copy_or_edit": ["VFSS-baseline/","Papers/","docs/PAPERS.sha256 (existing S4 user difference)","keys/certificates/packages/sidecars/build artifacts/raw logs in repository","online Dealer","formal LAN/WAN performance matrix"],
+    "security_status":"JOINT_VIEW_SECURITY=OPEN; no secure alias",
+    "performance_status":"M6A V3=OPEN; V4 and formal LAN/WAN=NOT_ALLOWED/NOT_RUN",
+    "bb90_status":"S1 BB90_SOURCE=NO_GO_FOR_IMPLEMENTATION; PROJECT_DERIVED route remains separate",
+    "self_hash":"Omitted by design; hash this manifest after publication if an external immutable digest is needed."
+  }
+}
