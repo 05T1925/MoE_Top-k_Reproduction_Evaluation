@@ -1,0 +1,100 @@
+{
+  "schema": "m6b-project-derived-select5-s26-gates/v1",
+  "date": "2026-10-19",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "source_snapshot": {
+    "s25_manifest_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "file_count": 74,
+    "s24_canonical_sha256": "585d4fd60f8cc04ad4b14bf02730882084cfbb2bd7045d9b2ca36c956fc51438",
+    "s25_canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d",
+    "manifest_file_hashes_match": true,
+    "s25_runtime_changed_vs_s24": false,
+    "s25_changed_test_sources": 3
+  },
+  "independent_receipt": "NOT_SATISFIED",
+  "independent_crypto_review": "NOT_SATISFIED",
+  "gates": {
+    "S25_SOURCE_IDENTITY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Copied only the 74 S25 manifest paths into a fresh S26 worktree; rehashed 74/74 and recomputed canonical SHA-256 64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d. Also rehashed S24 tree and recomputed 585d4fd60f8cc04ad4b14bf02730882084cfbb2bd7045d9b2ca36c956fc51438.",
+      "scope": "File integrity and identity only; does not establish independent human receipt."
+    },
+    "INDEPENDENT_RECEIPT": {
+      "status": "NOT_SATISFIED",
+      "evidence": "Executor participated in S19-S25 implementation, design, tests, or proof derivation. Fresh replay is technical replay only."
+    },
+    "S24_TO_S25_RUNTIME_DELTA": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Independent comparison of the 74 paths confirmed exactly three changed test sources and no runtime source change."
+    },
+    "F_SCORECONV_V2_RING_CORRECTNESS": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "In R_c=Z/(2^c), rho_0+rho_1=0 and Q'_b=Q_b+rho_b preserve Q'_0+Q'_1=kappa for all tapes, including wraparound; bound to the inspected S25 source snapshot."
+    },
+    "F_SCORECONV_V2_ALL_CONSUMERS_USE_FULL_KEY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Runtime adds full rho to keys and builds records {keys[i],0,0}; no Q'_b>>h/truncate/narrow consumer found in the inspected route."
+    },
+    "P0_FULL_OUTPUT_CONDITIONAL_SAMPLER": {
+      "status": "OPEN/NO_GO",
+      "evidence": "The restricted V_pre equation excludes rho and assumes a base sampler. No SimBase_0 for the complete local score-conversion prefix, non-rho material package, used/unused preprocessing state and lease view is provided."
+    },
+    "P1_FULL_OUTPUT_CONDITIONAL_SAMPLER": {
+      "status": "OPEN/NO_GO",
+      "evidence": "rho_1=-rho_0 has a uniform single-party marginal, but the same missing complete base sampler and conditional distribution apply to P1."
+    },
+    "M6B5_V4_N128_LAYOUT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Source-recomputed 40,640 Select + 1,280 shuffle + 256 carry/sign + 128 membership + 128 refresh logical entries = 42,432. E2E observed monolithic package 44,986,628 bytes per party. Functional/layout only, not pool privacy proof."
+    },
+    "M6S2_V3_N256_LAYOUT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Source-recomputed 163,200 Select + 2,560 shuffle + 512 carry/sign + 256 membership + 256 refresh = 166,784 slots. E2E observed 192,665,920 bytes per party, 12,675,648 manifest bytes, 11 segments. No full-pool simulator."
+    },
+    "N_LE_256_FUNCTIONAL_E2E": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fresh ON/OFF build, 7 ON CTests, 3 OFF CTests and v2 acceptance E2E: 9 oracle successes, 6 uniform abort/no-mask faults, 6 no-complete-mask crash prefixes. N=256 K=128 tested; not all K."
+    },
+    "MATERIAL_REPLAY_AND_STORE": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fresh streamed-store test passed durable one-shot, crash, race and integrity; material-store CTest passed package/session/party/slot validation."
+    },
+    "DEFAULT_OFF_API_BOUNDARY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Fresh OFF API probe rejected, static library lacked v2 helper, and OFF CMake target help lacked v2 test target; ON API probe and symbol present."
+    },
+    "ADAPTIVE_DCF_POOL": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Stopped before adaptive pool proof because the P0/P1 complete score-conversion output sampler is not closed. Static slot counts do not establish an adaptive hybrid."
+    },
+    "SHUFFLE_INVERSE_MEMBERSHIP_OUTPUT_CRASH_VIEW": {
+      "status": "OPEN/NO_GO",
+      "evidence": "No P0/P1 joint simulator for package, local permutation/mask states, adaptive transcript, inverse/membership/output shares and crash/restart state."
+    },
+    "NO_COMPLETE_MASK_CRASH_PREFIX": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Six tested prefixes left no complete mask; prefixes 5-6 left a P1 8-byte local XOR share. Does not prove atomic no-output/all-or-nothing."
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "NO_GO",
+      "evidence": "Acceptance preflight rejected N=257 streamed; N>256 has no function or security admission."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Independent receipt and full output/pool/shuffle joint-view proofs are absent; keep EXPERIMENTAL."
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "status": "NOT_ALLOWED/NOT_RUN",
+      "authorized": false,
+      "evidence": "M6A V3 remains OPEN and V4 is not authorized. No formal LAN/WAN matrix was run."
+    }
+  },
+  "unquantified": ["epsilon_RNG_joint", "AES reduction T_prime/advantage", "TLS channel advantage", "peak RSS", "production storage overhead"],
+  "attack_or_bug": "No exploitable attack or reproducible runtime defect found; absence of attack is not a security pass. No runtime changes.",
+  "reports": {
+    "decision": "../decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_DECISION_2026-10-19.md",
+    "report": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_REPORT_2026-10-19.md",
+    "cases": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_E2E_CASES_2026-10-19.json",
+    "manifest": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json"
+  }
+}
