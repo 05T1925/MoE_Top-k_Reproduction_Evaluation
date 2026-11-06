@@ -1,0 +1,82 @@
+{
+  "schema": "m6b-project-derived-select5-s16-gates/v1",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "snapshot": {
+    "receipt_target": "S15 72-file selected source snapshot plus default-OFF patch",
+    "S15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "S15_source_canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "merged": false,
+    "receiver_independence": "NOT_INDEPENDENT: S16 author participated in S15 default-OFF repair and proof drafting"
+  },
+  "gates": {
+    "S15_INDEPENDENT_RECEIPT": {
+      "status": "NOT_INDEPENDENT",
+      "scope": "72/72 S15 source hashes and source canonical recomputed in a clean isolated tree; same-session technical rerun only",
+      "evidence": "S16 report §§1-3; S16 source/build manifest"
+    },
+    "DEFAULT_OFF_API_BOUNDARY": {
+      "status": "PASS_TECHNICAL_RERUN",
+      "scope": "OFF archive has zero BCG symbols; public header probe rejected; no Select5/BCG target; ON external API probe linked and ran; old M2 uCMP/shuffle 2/2",
+      "evidence": "S16 report §3; off-symbols.txt, probe logs, CTest log"
+    },
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL",
+      "scope": "BCG+21 Figure 1/Theorem 2 key-only, fixed alpha,beta; M2B1/v1 canonical serialized party key; assumes AES-128 PRP and unquantified epsilon_RNG_joint",
+      "bound": "delta_w <= w*epsilon_G + epsilon_RNG_joint(A,t;X_slot); epsilon_G <= Adv_AES128^PRP(A,t,q=5)+10/2^128",
+      "independent_review": "NOT_RUN in S16; reviewer is S15 proof author",
+      "evidence": "S14 DCF bridge, source VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp; S16 report §4"
+    },
+    "UCMP_SINGLE_CALL_VIEW": {
+      "status": "CONDITIONAL",
+      "scope": "Single invocation only: corrupted invocation shares, masked operand L, opened comparator bit, own key, two Eval results and outgoing result share; no shuffle composition",
+      "evidence": "S16 report §4; VFSS/src/moe_topk/protocol_i_ucmp.cpp"
+    },
+    "POOL_AND_ADAPTIVE_ACCESS": {
+      "status": "CONDITIONAL",
+      "scope": "DCF key/Eval projection only; per-schema fixed pool and slot counts; full RNG context must include dealer package randomness and online public sample-seed draws for adaptive addresses",
+      "N128": "41024 DCF slots; sum widths 1639424; capacity 44985596 B/party",
+      "N256": "163968 DCF slots; sum widths 6719104; store 192644416 B/party, manifest 12656192 B/party, 11 segments",
+      "evidence": "S16 report §4; S14 DCF bridge; S16 E2E JSON"
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION": {
+      "status": "OPEN",
+      "first_unclosed_hybrid": "Actual M2CM/v1 forward shuffle party view: correlated (sigma_b,tau_b,a_b,e_b,r_b), received masked record frames, local shuffle share and public masked aggregate, jointly with later adaptive comparison leakage. No P0/P1 simulator from own input share, ideal output share and approved L is provided.",
+      "attack": "NONE_FOUND; proof_not_closed",
+      "evidence": "S16 report §5"
+    },
+    "CRASH_ABORT_OUTPUT_VIEW": {
+      "status": "CONDITIONAL_FUNCTIONAL_NO_COMPLETE_MASK; OPEN_PRIVACY_SIMULATION",
+      "scope": "six crash-prefix runs: no complete mask; steps 5/6 leave P1 8-byte local orphan share while P0 publishes 0 bytes; not atomic all-or-nothing",
+      "evidence": "S16 crash-step-1..6 logs and S16 report §§3,5"
+    },
+    "N<=256_FUNCTIONAL_E2E": {
+      "status": "PASS_SAME_SESSION_TECHNICAL_RERUN",
+      "scope": "13 frozen-oracle success rows; 6 uniform abort/no-mask; 6 crash prefixes; N=128 monolithic and N=128/256 streamed rows; N=256 monolithic and N=257 reject",
+      "evidence": "S16 E2E cases JSON and source/build manifest"
+    },
+    "N>256_ADMISSION": {
+      "status": "NO_GO",
+      "scope": "N=257 streamed preflight reject; no larger range admitted",
+      "evidence": "S16 E2E JSON"
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NO_GO",
+      "scope": "full shuffle/inverse/membership/output-share/abort/restart simulator remains open",
+      "evidence": "S16 report §5"
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "status": "V3_OPEN_V4_NOT_ALLOWED_NOT_RUN",
+      "scope": "follow existing M6A V3->V4 gate; no formal LAN/WAN matrix run",
+      "evidence": "PROJECT.md and existing performance validation plan"
+    }
+  },
+  "limits": [
+    "S16 is not an independent S15 receipt because the reviewer authored the S15 patch.",
+    "No runtime changes were made in S16.",
+    "Functional/capacity diagnostics are not formal performance evidence.",
+    "No new peer-visible field outside approved L was found; field audit is not a simulator proof.",
+    "PROJECT_DERIVED_SELECT_5ITER is not BB90 or BMW16 and remains EXPERIMENTAL."
+  ]
+}
