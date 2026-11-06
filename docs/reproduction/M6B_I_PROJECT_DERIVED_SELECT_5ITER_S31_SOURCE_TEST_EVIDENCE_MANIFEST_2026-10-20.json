@@ -1,0 +1,186 @@
+{
+  "schema": "m6b-project-derived-select5-s31-source-test-evidence/v1",
+  "date": "2026-10-20",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S31",
+  "route": "PROJECT_DERIVED_SELECT_5ITER",
+  "evidence_kind": "source identity, TEST_ONLY build/run, architecture report; not a cryptographic proof",
+  "reviewed_object": {
+    "path": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s25/MoE_Top-k_Reproduction_Evaluation",
+    "s25_source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "s25_source_manifest_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+    "manifest_entries": 74,
+    "entry_hashes_recomputed": 74,
+    "entry_hash_mismatches": 0,
+    "canonicalization": "UTF-8; ordinal ascending relative paths; each path<TAB>lowercase SHA-256<LF>",
+    "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d",
+    "canonical_sha256_matches_requested": true,
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "candidate_committed": false,
+    "verification_command": "PowerShell: parse the S25 source manifest; for each manifest.files entry Get-FileHash the corresponding path; ordinal-sort path<TAB>actual-lowercase-SHA256<LF> lines; SHA-256 the UTF-8-no-BOM canonical byte string.",
+    "result": "PASS"
+  },
+  "read_context_hashes": [
+    {
+      "path": "PROJECT.md",
+      "sha256": "dd8e0087e007fe2c55d5b2a0d1e12764d14c99cff35223b331efc5447317ba10"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "sha256": "f5c2d1dcd6587d763efbd8dbf3d6cf8f9a7014edb93145a7678adf6876dd49e8"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_DECISION_2026-10-20.md",
+      "sha256": "e486f80f968f8eeb353823fb26be904c35fa63339c79a31a7a79c13fd43044e7"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_REPORT_2026-10-20.md",
+      "sha256": "aa8dde4bde549c59bffa4ce2f2d2343e52d53912f734d7cc2134c6e15cccf717"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_DECISION_2026-10-20.md",
+      "sha256": "c2c5c059770274ff5ce539aad37168ee6edcd157a0899877b82acf2e255d76ea"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_REPORT_2026-10-20.md",
+      "sha256": "8545bdcc1d335c303af95116cb61629d4dd9b4151281f958cd51ecd0add662ac"
+    }
+  ],
+  "s25_dependencies": [
+    {
+      "path": "VFSS/include/moe_topk/topk_oracle.h",
+      "sha256": "270ed8e3c3c8eef3fb143641d376d4fae7726e14621cc1274c717c2620a12e22",
+      "role": "frozen stable score-order oracle included by TEST_ONLY build"
+    },
+    {
+      "path": "VFSS/include/moe_topk/score_semantics.h",
+      "sha256": "df9e2400429432fc0be998fe6adca3bb774d98be44eae97535e0b463da6c9801",
+      "role": "signed Q20.12 semantics"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_priority_key.h",
+      "sha256": "8c345675877fdd101e0b5918250ff7e7b6879031161cd38b7fe141ce96d0e338",
+      "role": "project priority-key behavior"
+    },
+    {
+      "path": "VFSS/include/moe_topk/project_derived_select5.h",
+      "sha256": "c9826888dc89d5091dbb01c88a9060bf53487f38066801b0d251004b49ff837e",
+      "role": "S25 Select5 control interface and disclosure state"
+    },
+    {
+      "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+      "sha256": "e7b1059df34d1474e8e96de954275cf764b698a9ac7f04e6535ff8eb7b7f4809",
+      "role": "five-iteration control graph"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "sha256": "7db7e81fa2529523bc58a3cc40a755d2fe8e6fc63446ed5d4fea69e3b6c5ab8c",
+      "role": "score-conversion, material, Select, membership, shuffle/output and publish behavior"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+      "sha256": "28933632cf04d2f76699047c51c9190e321ae00536602554dd33fa2b31869939",
+      "role": "Q20.12 input-share conversion behavior"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+      "role": "shuffle pad and additive-share output behavior"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp",
+      "sha256": "00822853dd462be6fd06d4d8ea1c00f746e278b109e1fb41078f9ac3bd02583c",
+      "role": "crash-prefix result length-header probe"
+    }
+  ],
+  "test_run": {
+    "source": "VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp",
+    "source_sha256": "ab8bb143e31b30bd7588c7e7f4a0a4a586e28b90e2602b12ef8574e977976144",
+    "binary_path": "C:/Users/28641/AppData/Local/Temp/s31_score_to_mask_v3_gmw_test_only.exe",
+    "binary_sha256": "557d74cdb023a9e59f248817c8a110ab3e01c7497871844e992c4015f94e8450",
+    "command": "PowerShell: $s25='C:\\Users\\28641\\.codex\\worktrees\\m6b-project-select5-s25\\MoE_Top-k_Reproduction_Evaluation'; $out=Join-Path $env:TEMP 's31_score_to_mask_v3_gmw_test_only.exe'; g++ -std=c++17 -O2 -Wall -Wextra -Werror -DMOE_TOPK_ENABLE_S31_TEST_ONLY=1 -I \"$s25/VFSS/include\" VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp -o $out; & $out",
+    "exit_code": 0,
+    "result": "PASS_TEST_ONLY_F_TOPK_ATOMIC_LOGICAL_ESCROW_MODEL",
+    "stdout_result": {
+      "comparator_pairs": 65536,
+      "select_total_orders": 362879,
+      "full_pipeline_cases": 5936,
+      "all_beaver_gates_one_shot": true,
+      "material_fault_cases": 7,
+      "abort_prefix_cases": 12,
+      "output_share_cases": 87380,
+      "budget_cases": 2,
+      "diagnostic_elapsed_ms": 3952,
+      "status": "S31 TEST_ONLY GMW/Beaver functional prototype PASS"
+    },
+    "environment": {
+      "os": "Windows 10 Home China",
+      "os_build": "26200",
+      "powershell": "7.6.5",
+      "compiler": "MinGW-w64 g++ 8.1.0 (x86_64-win32-seh-rev0)",
+      "language_standard": "C++17",
+      "flags": [
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+      ],
+      "binary_outside_workspace": true
+    },
+    "limits": [
+      "single-process TEST_ONLY controller holds both party shares and reconstructs only for correctness checks",
+      "std::mt19937_64 and FNV-1a are not production cryptographic primitives",
+      "escrow prefix checks are a logical state model, not a distributed atomicity/crash-recovery implementation",
+      "not runtime conformance, independent-process E2E, cryptographic proof, or performance evidence",
+      "full 32-bit score domain not exhaustively enumerated"
+    ]
+  },
+  "s31_artifact_hashes": [
+    {
+      "path": "VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp",
+      "sha256": "ab8bb143e31b30bd7588c7e7f4a0a4a586e28b90e2602b12ef8574e977976144"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_REPORT_2026-10-20.md",
+      "sha256": "567ecea1353631d139eecf40a4c477a1ad5c2f3e5c17aae84570577af9ed84cd"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_DECISION_2026-10-20.md",
+      "sha256": "7cc455e2c4e7a73206a569ff21e6fe16b7c6502cf57f1230145187d8e6e0fa15"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_GATES_2026-10-20.json",
+      "sha256": "e77c178f35b40d8b448f24bd39170729c0477bcca5971db57361bbc12fe4a65b"
+    }
+  ],
+  "independent_review": {
+    "reviewer": "s31_independent_technical_reviewer",
+    "eligible_for_S31": "Reviewer confirmed no S19-S30 participation and no prototype implementation.",
+    "technical_review": "PASS_TECHNICAL_REVIEW_ONLY; reviewer confirmed eligibility and verified the applied corrections; no cryptographic proof performed.",
+    "cryptographic_proof": "NOT_PROVIDED",
+    "functional_acceptance": "S27 historical PASS_WITH_SCOPE, separate",
+    "review_scope": "Read-only output law, S25 crash evidence, GMW/Beaver budgets, leakage mapping, TEST_ONLY boundary, escrow, L_A, single commit DAG stage, fixed-shape READY; reviewer did not run tests. Reviewer recommends security acceptance remain NO_GO pending proof and crash/recovery."
+  },
+  "not_run": [
+    "S25/S27 functional matrix rerun",
+    "runtime build/conformance/oracle differential/independent-process E2E",
+    "N=128 or N=256 full GMW runtime",
+    "N=128/N=256 party-view simulation composition",
+    "formal LAN/WAN performance matrix",
+    "M6A V3/V4 work"
+  ],
+  "status": {
+    "runtime_source_changed": false,
+    "test_only_source_added": true,
+    "VFSS_baseline_modified": false,
+    "papers_or_reference_projects_modified": false,
+    "secure_alias_created": false,
+    "formal_performance": "NOT_MEASURED",
+    "runtime_admission": "ADMITTED_NEXT_PHASE_OPT_IN; IMPLEMENTATION_NOT_STARTED",
+    "v3_abort_contract": "OWNER_SELECTED_F_TOPK_ATOMIC",
+    "S25_historical_abort_semantics": "UNRESOLVED_BY_EVIDENCE",
+    "new_escrow_metadata_observer": "A observes L_A; P0/P1 approved L_S29 unchanged",
+    "global_metadata_boundary_changed": "YES: escrow A observes L_A; P0/P1 L_S29 unchanged",
+    "runtime_security_admission": "NO_GO_PENDING_P0_P1_A_PROOFS_AND_CRASH_RECOVERY"
+  },
+  "self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE"
+}

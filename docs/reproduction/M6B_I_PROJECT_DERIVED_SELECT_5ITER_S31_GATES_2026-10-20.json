@@ -1,0 +1,232 @@
+{
+  "schema": "m6b-project-derived-select5-s31-gates/v1",
+  "date": "2026-10-20",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S31",
+  "route": "PROJECT_DERIVED_SELECT_5ITER",
+  "protocol": "Protocol I project-derived five-iteration stable Select; not BB90/BMW16 reproduction",
+  "source_identity": {
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s25/MoE_Top-k_Reproduction_Evaluation",
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "source_manifest_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+    "file_count": 74,
+    "verified_file_hashes": 74,
+    "mismatches": 0,
+    "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d",
+    "canonical_matches_requested": true,
+    "candidate_committed": false,
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "status": "PASS"
+  },
+  "s25_functional_receipt": {
+    "status": "PASS_WITH_SCOPE",
+    "source": "S27 receipt for the identical S25 manifest snapshot",
+    "s31_s25_matrix_rerun": "NOT_RUN",
+    "scope": "Historical functional acceptance only; not an S31 run or cryptographic security proof."
+  },
+  "success_output_contract": {
+    "name": "F_TOPK-U",
+    "share_law": "Under ideal independent random tape, inverse-shuffle h.word1 low bit makes z0 uniform and z1=z0 XOR M_runtime; each party receives only its local 0/1 share. For word1 arithmetic is modulo 2^64 (word0 alone is masked to comparison_bits); the LSB identity is exact.",
+    "status": "CONDITIONAL_IMPLEMENTATION_DERIVATION",
+    "basis": [
+      "S25 inverse-shuffle e0/e1 include opposite signs of the independently sampled h vector; the returned shuffled_share is formed from input share plus e, before r_share is used for the public-masked lane.",
+      "Output uses word1 LSB; uint64_t addition modulo 2^64 followed by LSB is XOR share reconstruction.",
+      "S25 runtime does not return the complete mask to either party."
+    ],
+    "stable_topk_reconstruction_all_inputs": "NOT_PROVEN_BY_S31; S27 receipt remains scoped",
+    "production_rng_joint_advantage": "NOT_QUANTIFIED",
+    "F_TOPK_C_allowed": false
+  },
+  "abort_crash_contract": {
+    "status": "OWNER_SELECTED_FOR_V3; S25_HISTORICAL_UNRESOLVED",
+    "S25_runtime_facts": {
+      "local_output_share_formed_before_prepare_commit_publish": true,
+      "API_returns_party_local_share_after_published_marker": true,
+      "step_5_6_probe_observed_bytes": 8,
+      "observed_bytes_kind": "length header declaring payload length n=7; payload was not read",
+      "P0_probe_bytes": 0,
+      "conclusion": "NO_COMPLETE_MASK for tested prefixes only; not atomic no-output or all-or-nothing"
+    },
+    "options": [
+      {
+        "name": "F_TOPK-PREFIX",
+        "contract": "A party receives z_b iff its API returns; the other party may already have returned; local unreturned shares remain in that party's view.",
+        "status": "NOT_SELECTED_FOR_V3"
+      },
+      {
+        "name": "F_TOPK-ATOMIC",
+        "contract": "Atomic durable escrow transaction makes both recipient shares available in one ideal transition; pre-commit both outputs are bottom; post-commit crash cannot roll back and shares remain recoverable.",
+        "status": "SELECTED_FOR_V3_ONLY",
+        "required_architecture": "Additional atomic coordination/escrow trust boundary; current markers do not prove this."
+      }
+    ],
+    "S25_historical_status": "UNRESOLVED_BY_EVIDENCE",
+    "v3_status": "OWNER_SELECTED_F_TOPK_ATOMIC",
+    "v3_contract": {
+      "name": "F_TOPK-ATOMIC",
+      "linearization_point": "durable linearizable escrow A transaction commits both recipient-encrypted share records",
+      "before_commit": "both ideal outputs are bottom; abort/timeout burns consumed material",
+      "at_commit": "both recipient shares become durably available in the same ideal transition",
+      "after_commit_crash": "no rollback; each recipient may recover its own encrypted record later",
+      "physical_fetch": "asynchronous recovery; not the ideal output event",
+      "new_trust_boundary": "A provides durable atomicity/availability; recipient encryption keys remain outside A",
+      "new_metadata_observer": "L_A includes fixed ciphertext lengths, deposit/commit status, order and timing",
+      "client_fetch_semantics": "Physical fetch may complete later; durable atomic commit is the ideal output transition and post-commit recovery does not change output to bottom.",
+      "preflight_sync": "Each party preflights locally before lease consumption; the READY handshake carries only fixed-shape READY or the existing uniform ABORT outcome, with no local resource detail. Either preflight failure causes uniform pre-commit abort."
+    },
+    "historical_semantics_inferred_from_s25": false
+  },
+  "simulator_interface": {
+    "P0": "Sim_0(x0, z0, public_params, L_S29, escrow_commit_or_abort) -> complete P0 view, A deposit/receipt and crash prefix",
+    "P1": "Sim_1(x1, z1, public_params, L_S29, escrow_commit_or_abort) -> complete P1 view, A deposit/receipt and crash prefix",
+    "forbidden_simulator_inputs": [
+      "peer input share",
+      "complete mask",
+      "Q/Q_prime/rho",
+      "carry/sign local shares",
+      "DCF/uCMP keys",
+      "Dealer full tape",
+      "peer package plaintext",
+      "real transcript"
+    ],
+    "approved_L_extended": false,
+    "approved_L_fields": [
+      "public parameters and protocol bindings",
+      "approved shuffle endpoints/positions",
+      "approved pivots and active comparison result bits",
+      "active sample seed only after forward shuffle completion",
+      "already approved masked values",
+      "comparison count",
+      "communication lengths",
+      "uniform ABORT"
+    ],
+    "escrow_A": "Sim_A(public_params, L_A) -> ciphertext/metadata/commit view only; no plaintext share",
+    "approved_L_extended_for_P0_P1": false,
+    "new_L_A_required": true
+  },
+  "security_gates": {
+    "P0": {
+      "END_TO_END_SIM": "OPEN/NO_GO",
+      "MODULAR_COMPOSITION_VALID": "OPEN/NO_GO",
+      "CURRENT_INTERFACE_SECURITY": "OPEN/NO_GO",
+      "VERSIONED_REDESIGN_REQUIRED": "CONDITIONAL"
+    },
+    "P1": {
+      "END_TO_END_SIM": "OPEN/NO_GO",
+      "MODULAR_COMPOSITION_VALID": "OPEN/NO_GO",
+      "CURRENT_INTERFACE_SECURITY": "OPEN/NO_GO",
+      "VERSIONED_REDESIGN_REQUIRED": "CONDITIONAL"
+    },
+    "classification": {
+      "proof_gap": true,
+      "dependencies_unquantified": true,
+      "reproducible_distinguisher_found": false,
+      "v2_impossibility_proven": false,
+      "GMW_generic_theorem_instantiated": false
+    }
+  },
+  "v2_v3_route": {
+    "v2_outer_functionality_or_L_changed": false,
+    "v2_full_sampler_status": "OPEN/NO_GO; no S31 retry; S30 stop condition stands",
+    "v2_Q_prime_as_corrupt_party_subfunction_output": false,
+    "selected_followup": "score-to-mask-v3 design plus isolated TEST_ONLY functional model",
+    "v3_outer_functionality": "F_TOPK-U stable Top-K shares wrapped by F_TOPK-ATOMIC; P0/P1 retain L_S29, new escrow A observes L_A",
+    "v3_preprocessing": "Trusted offline T; one-time XOR-shared Boolean Beaver triples over GF(2); no online Dealer; no OT in this direct-triple design",
+    "v3_security": "NOT_PROVEN; architecture can cover v2 conditional-distribution gap only if concrete full-view simulator/hybrids are proved",
+    "v3_independent_spec_review": "PASS_TECHNICAL_REVIEW_ONLY",
+    "v3_runtime_admission": "ADMITTED_NEXT_PHASE_OPT_IN; IMPLEMENTATION_NOT_STARTED; SECURITY_OPEN",
+    "selected_abort_contract": "F_TOPK-ATOMIC for v3 only",
+    "S25_historical_abort_contract": "UNRESOLVED_BY_EVIDENCE",
+    "P0_P1_approved_L_changed": false,
+    "new_participant_or_metadata_observer_added": true,
+    "new_escrow_metadata_leakage": "L_A: public protocol/session bindings, fixed ciphertext lengths, deposit/commit/abort state, arrival order and timing; no plaintext shares",
+    "global_participant_and_metadata_boundary_changed": true
+  },
+  "test_only": {
+    "source": "VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp",
+    "runtime_target_linked": false,
+    "centralized_test_controller": true,
+    "result": "PASS_TEST_ONLY",
+    "counts": {
+      "comparator_pairs": 65536,
+      "select_total_orders": 362879,
+      "full_pipeline_cases": 5936,
+      "material_fault_cases": 7,
+      "abort_prefix_cases": 12,
+      "output_share_cases": 87380,
+      "budget_cases": 2,
+      "all_beaver_gates_one_shot": true
+    },
+    "coverage_limit": "n<=8; all 32-bit score inputs not exhaustively enumerated; no network/dual-process/proof coverage",
+    "diagnostic_elapsed_ms": 3952,
+    "elapsed_is_performance_result": false
+  },
+  "circuit_budget": {
+    "formula": "G=63N + N^2*W + C(N,2)*(2W-1) + N^2; W=32+log2(N)",
+    "N128": {
+      "W": 39,
+      "G": 1289280,
+      "packed_triple_bytes_per_party": 483480,
+      "permutation_share_bytes_per_party": 2048,
+      "packed_payload_bytes_per_party_excluding_metadata": 485528,
+      "max_RTT_upper_bound_from_DAG": 90
+    },
+    "N256": {
+      "W": 40,
+      "G": 5281664,
+      "packed_triple_bytes_per_party": 1980624,
+      "permutation_share_bytes_per_party": 8192,
+      "packed_payload_bytes_per_party_excluding_metadata": 1988816,
+      "max_RTT_upper_bound_from_DAG": 91
+    },
+    "resource_preflight_policy": {
+      "max_N": 256,
+      "max_G": 5281664,
+      "max_package_bytes_including_metadata": 2097152,
+      "metadata_cap_bytes": 65536,
+      "max_single_online_batch_frame_bytes": 1048576,
+      "checked_memory_estimate_exceeds_admin_cap": "preflight is local; READY carries no resource result or estimate, only fixed-shape READY or existing uniform ABORT; any failure yields uniform pre-online ABORT before lease consumption",
+      "fallback": "none"
+    },
+    "budget_status": "THEORETICAL_NOT_MEASURED"
+  },
+  "N_scope": {
+    "N128_full_runtime_simulation": "NOT_RUN",
+    "N256_full_runtime_simulation": "NOT_RUN",
+    "N_gt_256": "OUT_OF_SCOPE_NOT_RUN"
+  },
+  "independent_review": {
+    "reviewer": "s31_independent_technical_reviewer",
+    "eligibility_requirement": "Must not have participated in S19-S30 proof writing, decisions, or implementation.",
+    "technical_spec_review": "PASS_TECHNICAL_REVIEW_ONLY",
+    "functional_receipt": "S27 historical PASS_WITH_SCOPE; separate",
+    "cryptographic_proof": "NOT_PROVIDED; separate",
+    "eligibility": "REVIEWER_CONFIRMED_NO_S19_S30_PARTICIPATION_AND_NO_PROTOTYPE_IMPLEMENTATION",
+    "reviewed_scope": "Read-only output law, S25 crash evidence, GMW/Beaver budgets, leakage mapping, TEST_ONLY boundary, escrow and L_A; conditional findings on normal-return/recovery, single commit stage, pre-commit local view and fixed-shape READY leakage were applied and verified in final read-only review. No cryptographic proof was performed."
+  },
+  "build_and_performance": {
+    "direct_TEST_ONLY_compile": "PASS",
+    "S25_function_matrix": "NOT_RUN",
+    "runtime_build": "NOT_RUN",
+    "runtime_conformance": "NOT_RUN",
+    "oracle_differential_runtime": "NOT_RUN",
+    "independent_process_E2E": "NOT_RUN",
+    "formal_LAN_WAN_matrix": "NOT_RUN",
+    "performance": "NOT_MEASURED",
+    "secure_alias_created": false,
+    "VFSS_runtime_modified": false,
+    "VFSS_baseline_modified": false,
+    "runtime_admission": "ADMITTED_NEXT_PHASE_OPT_IN; IMPLEMENTATION_NOT_STARTED",
+    "runtime_security_admission": "NO_GO_PENDING_P0_P1_A_PROOFS_AND_CRASH_RECOVERY"
+  },
+  "M6A_V3_V4_status": {
+    "changed_by_S31": false,
+    "recorded_status": "V3 OPEN; V4 NOT_ALLOWED/NOT_RUN; formal LAN/WAN NOT_RUN"
+  },
+  "modified_files": [
+    "VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_REPORT_2026-10-20.md",
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_DECISION_2026-10-20.md",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_GATES_2026-10-20.json",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_SOURCE_TEST_EVIDENCE_MANIFEST_2026-10-20.json"
+  ]
+}
