@@ -1,0 +1,73 @@
+{
+  "schema": "m6b-project-derived-select5-s11-gates/v1",
+  "date": "2026-10-15",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / EXPERIMENTAL",
+  "source_snapshot": {
+    "s8_manifest_sha256": "c5d29679aeaf1be3cc71da1ffc8053b33d589fd15313031137b5b79655e1dffb",
+    "s11_canonical_58_file_sha256": "17f1827077bc3f9dbf6038688bbda466162c4fe53e6436d34abb09703725f957",
+    "base_revision": "c3926c68fd14f270faa8b55234311071947fa080",
+    "merged_to_main": false
+  },
+  "receipt": {
+    "S8_FUNCTIONAL_RECEIPT": "PASS_INHERITED_FROM_S10",
+    "receiver": "/root/s8_independent_receipt",
+    "receiver_uninvolved_in_s4_s8": true,
+    "s11_is_new_independent_receipt": false,
+    "s10_fresh_release_targets": 7,
+    "s10_three_process_cases": 24,
+    "s10_oracle_success_cases": 18,
+    "s10_abort_no_mask_cases": 6,
+    "s11_build_or_tests_run": false,
+    "s11_runtime_changes": false,
+    "s10_counter_erratum_is_authoritative": true
+  },
+  "security_gates": {
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL_BRIDGE_ESTABLISHED",
+      "basis": "BCG+21 optimized DCF theorem mapped to the implementation, conditional on the restricted-key fixed-counter AES expansion being a PRG, AES-CTR dealer PRNG, OS CSPRNG, authenticated private channels, and independent review of the randomized complementary initial-control-bit extension"
+    },
+    "CORRELATED_POOL_SIMULATION": {
+      "status": "CONDITIONAL_PASS_DCF_KEY_LAYER",
+      "schemas_separate": ["N128_M6B5_v2_monolithic", "N256_M6S2_streamed"],
+      "includes_used_and_unused_dcf_keys": true,
+      "excludes_full_package_delivery_and_shuffle_output_proof": true
+    },
+    "ADAPTIVE_QUERY_SIMULATION": {
+      "status": "CONDITIONAL_PASS_DCF_KEY_LAYER",
+      "conditions": ["current-round seed is disclosed only after shuffle and activation", "addresses derive deterministically from approved transcript", "one-shot slots", "no rollback of durable lease state"]
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION": {
+      "status": "OPEN",
+      "blockers": ["approved leakage L does not enumerate every observed shuffle record array and material/lease metadata", "N=128 same-directory package interface does not enforce P0/P1 filesystem isolation", "two-party output-share publication is not crash-atomic"]
+    },
+    "JOINT_PARTY_VIEW": {
+      "status": "OPEN_NO_GO_FOR_SECURE_CLAIM",
+      "concrete_dcf_distinguisher_found": false,
+      "full_simulator_closed": false
+    },
+    "SECURE_ALIAS_READY": "NO",
+    "ALTERNATIVE_DCF_REQUIRED": false
+  },
+  "functional_and_project_gates": {
+    "FUNCTIONAL_E2E_N_LE_256": "PASS_INHERITED_S10_ORACLE_RECEIPT",
+    "N_GT_256_ADMISSION": "NO_GO",
+    "PROJECT_ROUTE_IDENTITY": "PROJECT_DERIVED_SELECT_5ITER",
+    "BB90_EQUIVALENCE": "NOT_CLAIMED",
+    "BMW16_EQUIVALENCE": "NOT_CLAIMED",
+    "M6A_V3": "OPEN",
+    "M6A_V4": "NOT_ALLOWED_NOT_RUN",
+    "FORMAL_LAN_WAN_PERFORMANCE": "NOT_ALLOWED_NOT_RUN"
+  },
+  "s11_execution": {
+    "runtime_modified": false,
+    "builds_run": 0,
+    "tests_run": 0,
+    "formal_performance_runs": 0,
+    "new_binary_sha256": null
+  },
+  "reports": {
+    "decision": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_DECISION_2026-10-15.md",
+    "review": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_REPORT_2026-10-15.md",
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_SOURCE_MANIFEST_2026-10-15.json"
+  }
+}
