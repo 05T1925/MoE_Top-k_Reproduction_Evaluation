@@ -1,0 +1,146 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S21",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "reviewer": {
+    "identity": "/root/s12_receipt",
+    "independence_from_proof_authorship": "SATISFIED",
+    "new_independent_second_review": "NOT_SATISFIED",
+    "prior_s20_read_only_review": true,
+    "disclosure": "Did not author or derive S19/S20 proofs or write the S20 report; previously reviewed the S20 final bridge/report read-only, so this S21 review is a continuation rather than a new second opinion.",
+    "scope": "Read-only carry-to-sign conditional-view review and score-ring width correction; no build/tests."
+  },
+  "source_object": {
+    "s15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "s18_manifest_sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+    "file_count": 72,
+    "reverified": 72,
+    "mismatches": 0,
+    "canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "s20_current_report_sha256": "9668c67d37ecaed9558638f7a59300f7a3c27da99b088c8ddd38d156a48aac89"
+  },
+  "gates": {
+    "S15_SOURCE_IDENTITY": {
+      "status": "PASS",
+      "evidence": "72/72 per-file hashes and canonical source digest reverified against S18 receipt manifest."
+    },
+    "INDEPENDENT_CRYPTO_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Non-author review independent of proof authorship, but the reviewer previously read the S20 final bridge/report; not a new second reviewer. Scope is carry-to-sign conclusion only."
+    },
+    "S20_FIXED_ALPHA_PRE_EVAL_SINGLE_KEY": {
+      "status": "CONDITIONAL",
+      "conditions": [
+        "fixed alpha, beta and party",
+        "target roots conditionally independent of complete pre-Eval auxiliary state given alpha",
+        "same-key repeated Eval treated as deterministic postprocessing",
+        "opened bit c only when correctness-determined and actually opened",
+        "AES-128 PRP assumption",
+        "ideal joint random tape replacement"
+      ],
+      "limitations": [
+        "does not cover a key-dependent continuation",
+        "epsilon_RNG_joint is unquantified",
+        "no concrete security level claimed"
+      ]
+    },
+    "CARRY_TO_SIGN_P0_CONDITIONAL_SIMULATION": {
+      "status": "OPEN/NO_GO",
+      "first_gap": "Carry local DCF share c_0 is not opened; its low two bits determine lift_0, which enters the phase-5 sign right-operand frame. No sampler proves the joint conditional distribution after replacing the carry key."
+    },
+    "CARRY_TO_SIGN_P1_CONDITIONAL_SIMULATION": {
+      "status": "OPEN/NO_GO",
+      "first_gap": "Carry local DCF share c_1 is not opened; its low two bits determine lift_1, which enters the phase-5 sign right-operand frame. No sampler proves the joint conditional distribution after replacing the carry key."
+    },
+    "CARRY_TO_SIGN_ATTACK": {
+      "status": "NOT_FOUND_NOT_A_PASS",
+      "evidence": "The phase-5 relation is a proof obligation; no distinguisher or exploitable attack was established."
+    },
+    "SCORE_RING_WIDTH": {
+      "status": "PASS",
+      "evidence": "Actual protocol_i_score_input.cpp uses kScoreBits=34 and mask 2^34-1. Reviewer draft corrected from 2^53 to R34; 40/41 bits are Select widths."
+    },
+    "SINGLE_CALL_UCMP": {
+      "status": "CONDITIONAL",
+      "scope": "Inherited scoped S20 result: fixed-call projection only; not carry continuation or full protocol transcript."
+    },
+    "POOL_KEY_ONLY_PROJECTION_N128_M6B5_V3_M2CM_V1_M6P2_V1": {
+      "status": "CONDITIONAL",
+      "slots": 41024,
+      "sum_widths": 1639424,
+      "candidate_bound": "1639424 * epsilon_G + epsilon_RNG_joint(schema,T)",
+      "limitations": "Key-only projection only; requires ideal fresh conditionally independent roots; adaptive transcript and failure slot ledger excluded/NOT_MEASURED."
+    },
+    "POOL_KEY_ONLY_PROJECTION_N256_M6S2_V2": {
+      "status": "CONDITIONAL",
+      "slots": 163968,
+      "sum_widths": 6719104,
+      "candidate_bound": "6719104 * epsilon_G + epsilon_RNG_joint(schema,T)",
+      "limitations": "Key-only projection only; requires ideal fresh conditionally independent roots; adaptive transcript and failure slot ledger excluded/NOT_MEASURED."
+    },
+    "ADAPTIVE_FULL_POOL_N128": {
+      "status": "OPEN/NO_GO",
+      "reason": "Carry-to-sign continuation prerequisite is not established; abort/crash used/unused/rejected slot ledger NOT_MEASURED."
+    },
+    "ADAPTIVE_FULL_POOL_N256": {
+      "status": "OPEN/NO_GO",
+      "reason": "Carry-to-sign continuation prerequisite is not established; abort/crash used/unused/rejected slot ledger NOT_MEASURED."
+    },
+    "SHUFFLE_INVERSE_MEMBERSHIP_OUTPUT_CRASH_P0": {
+      "status": "OPEN/NO_GO",
+      "reason": "No full conditional simulator for common Pi/Pi^-1, frames, membership carrier, local output share, lease/restart and crash transcript."
+    },
+    "SHUFFLE_INVERSE_MEMBERSHIP_OUTPUT_CRASH_P1": {
+      "status": "OPEN/NO_GO",
+      "reason": "No full conditional simulator for common Pi/Pi^-1, frames, membership carrier, local output share, lease/restart and crash transcript; scoped crash evidence may leave an 8-byte local XOR share."
+    },
+    "CRASH_OUTPUT_CONTRACT": {
+      "status": "CONDITIONAL",
+      "scope": "Inherited S18 specified no-complete-mask cases only; not atomic no-output or all-or-nothing."
+    },
+    "REPRODUCIBLE_RUNTIME_DEFECT": {
+      "status": "NOT_FOUND",
+      "evidence": "Read-only review; no runtime change. This is not a security pass."
+    },
+    "BUILD_TEST_E2E": {
+      "status": "NOT_RUN",
+      "reason": "No runtime code changed; S18 functional matrix not repeated."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN/NO_GO",
+      "evidence": "Carry continuation and subsequent full view proofs remain open."
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "OPEN/NO_GO",
+      "evidence": "No scope expansion."
+    },
+    "V3_V4_FORMAL_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "v3": "OPEN",
+      "v4": "NOT_ALLOWED",
+      "lan_wan": "NOT_RUN"
+    },
+    "PROTOCOL_EXCHANGE_COUNT": {
+      "status": "NOT_CLOSED",
+      "algorithm_iterations": 5,
+      "plaintext_comparison_dependency_layers_max": 9,
+      "raw_score_to_mask_online_exchange_count": "NOT_CLOSED"
+    },
+    "NEW_INDEPENDENT_SECOND_REVIEW": {
+      "status": "NOT_SATISFIED",
+      "reason": "The reviewer is independent of S19/S20 proof authorship but had already read-only reviewed S20; this is a continuation, not a new second opinion."
+    },
+    "BCG21_FIG1_IMPLEMENTATION_BRIDGE": {
+      "status": "CONDITIONAL/UNQUANTIFIED",
+      "evidence": "Author mapped lambda=128, 514-bit G output and 64-bit Convert_G to S15 code; AES PRP switching term checked, but T-prime not rederived and RNG/channel terms remain unquantified; new mapping paragraph not separately reviewed."
+    }
+  },
+  "runtime_changed": false,
+  "source_review_executed": true,
+  "build": "NOT_RUN",
+  "tests": "NOT_RUN",
+  "formal_performance": "NOT_RUN",
+  "diff_check": "PASS",
+  "untracked_s21_whitespace_scan": "PASS",
+  "gates_json_parse": "PASS"
+}
