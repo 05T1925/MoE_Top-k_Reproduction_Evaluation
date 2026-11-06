@@ -1,0 +1,713 @@
+{
+  "schema": "m6b-project-derived-select5-s18-source-build-evidence/v1",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "checkout": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-select5-s18\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-project-select5-s18",
+    "head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "task_commit": null,
+    "main_at_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "origin_main_at_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "desktop_checkout_modified": false
+  },
+  "receipt_object": {
+    "original_worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-select5-s15\\MoE_Top-k_Reproduction_Evaluation",
+    "s15_branch": "codex/m6b-project-select5-s15",
+    "s15_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "s15_task_commit": null,
+    "s15_merged": false,
+    "source_manifest_original_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S15_SOURCE_MANIFEST_2026-10-15.json",
+    "source_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "source_file_count": 72,
+    "declared_canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "s18_snapshot_canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "hash_matches": true,
+    "verified_files": [
+      {
+        "path": "docs/decisions/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_DECISION_2026-10-12.md",
+        "expected_sha256": "8d9f52ea5f81a26bb5f53ef9bd50105a8c57dbf68c7ca59e7aaf483c29b49692",
+        "snapshot_sha256": "8d9f52ea5f81a26bb5f53ef9bd50105a8c57dbf68c7ca59e7aaf483c29b49692",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_DECISION_2026-10-12.md",
+        "expected_sha256": "56119c4b8caf403d6e4f10eafdfaacdf64f31f40e3f00cef4c684baebf40c171",
+        "snapshot_sha256": "56119c4b8caf403d6e4f10eafdfaacdf64f31f40e3f00cef4c684baebf40c171",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_DECISION_2026-10-15.md",
+        "expected_sha256": "d2fd674f7dc4efb83e9844f5ca66c8566b93e6621b88b76f1fdf792fb2c1bd86",
+        "snapshot_sha256": "d2fd674f7dc4efb83e9844f5ca66c8566b93e6621b88b76f1fdf792fb2c1bd86",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_DECISION_2026-10-12.md",
+        "expected_sha256": "8e34cc20eba3028f61a8d14c05e81814ab16df2ddc94e39a1d9412397ee6814c",
+        "snapshot_sha256": "8e34cc20eba3028f61a8d14c05e81814ab16df2ddc94e39a1d9412397ee6814c",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_DECISION_2026-10-12.md",
+        "expected_sha256": "a59da81ad6e375f1d47bd2758003c6aa1be3ce089dd444a44c253b108f498381",
+        "snapshot_sha256": "a59da81ad6e375f1d47bd2758003c6aa1be3ce089dd444a44c253b108f498381",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_DECISION_2026-10-12.md",
+        "expected_sha256": "ab873eef1c05befcdf89a555156ba9c21c0c1988c87f6e4d718f38a5a2e64cb3",
+        "snapshot_sha256": "ab873eef1c05befcdf89a555156ba9c21c0c1988c87f6e4d718f38a5a2e64cb3",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_DECISION_2026-10-13.md",
+        "expected_sha256": "7eae3cac642397859e020430f2490685f7854d9d94f5aeefcba7607031d0d3c5",
+        "snapshot_sha256": "7eae3cac642397859e020430f2490685f7854d9d94f5aeefcba7607031d0d3c5",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_DECISION_2026-10-14.md",
+        "expected_sha256": "c561c941f560f9500138b23a7a188e3b19f024e3e3b8d0d3439d64d774a7e09a",
+        "snapshot_sha256": "c561c941f560f9500138b23a7a188e3b19f024e3e3b8d0d3439d64d774a7e09a",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_DECISION_2026-10-14.md",
+        "expected_sha256": "0a581b476edf56bb49ae01d2492bce7df8dce74dce903cfe5daa7b901ed38ffa",
+        "snapshot_sha256": "0a581b476edf56bb49ae01d2492bce7df8dce74dce903cfe5daa7b901ed38ffa",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_DECISION_2026-10-15.md",
+        "expected_sha256": "42ea88641fd67333124a477852f1110a49fbb21cb9998e0ba0abc043fb56f4c0",
+        "snapshot_sha256": "42ea88641fd67333124a477852f1110a49fbb21cb9998e0ba0abc043fb56f4c0",
+        "matches": true
+      },
+      {
+        "path": "docs/IMPLEMENTATION_PLAN.md",
+        "expected_sha256": "f510da247f9113a6ea07aff5c8e0b57181eaf9dc15692dfb52e24bdacb66ab9e",
+        "snapshot_sha256": "f510da247f9113a6ea07aff5c8e0b57181eaf9dc15692dfb52e24bdacb66ab9e",
+        "matches": true
+      },
+      {
+        "path": "docs/REFERENCE_MANIFEST.md",
+        "expected_sha256": "ea31b0a5a8cfc0e5b900dc553fbc7e849bd5cd666f7f8eae24550d9279bc592b",
+        "snapshot_sha256": "ea31b0a5a8cfc0e5b900dc553fbc7e849bd5cd666f7f8eae24550d9279bc592b",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_REPORT_2026-10-12.md",
+        "expected_sha256": "b98ce668897631276740e04fe334412f1578b66ab25b0993f7608c4a819fdab0",
+        "snapshot_sha256": "b98ce668897631276740e04fe334412f1578b66ab25b0993f7608c4a819fdab0",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_REPORT_2026-10-12.md",
+        "expected_sha256": "09e751bd96f514a3c067dcbd7de503b9005945d359769fa08334f5bc5d47ae43",
+        "snapshot_sha256": "09e751bd96f514a3c067dcbd7de503b9005945d359769fa08334f5bc5d47ae43",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_DCF_BRIDGE_2026-10-15.md",
+        "expected_sha256": "fa3aff87e35d7dc8d3d38404ae9371c708f09fc4a178a242086f0153dac46573",
+        "snapshot_sha256": "fa3aff87e35d7dc8d3d38404ae9371c708f09fc4a178a242086f0153dac46573",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_E2E_CASES_2026-10-15.json",
+        "expected_sha256": "0593937aaa95cd077f34e1307ddab67177dfce4abdde8165bbf07724c344c70e",
+        "snapshot_sha256": "0593937aaa95cd077f34e1307ddab67177dfce4abdde8165bbf07724c344c70e",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_GATES_2026-10-15.json",
+        "expected_sha256": "a6fb5f00aba7896e575bbe3ee748ff915b356340131beb866e27d88acb5df5d8",
+        "snapshot_sha256": "a6fb5f00aba7896e575bbe3ee748ff915b356340131beb866e27d88acb5df5d8",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_REPORT_2026-10-15.md",
+        "expected_sha256": "26274817adfa075a55780089f22e2ceb2d767c1409bc38d981a1f879adb62608",
+        "snapshot_sha256": "26274817adfa075a55780089f22e2ceb2d767c1409bc38d981a1f879adb62608",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_REPORT_2026-10-12.md",
+        "expected_sha256": "ac4fb63cdbeabaa861e89e036b6fe1e1b389b46e5012a69f80458a183cfe3653",
+        "snapshot_sha256": "ac4fb63cdbeabaa861e89e036b6fe1e1b389b46e5012a69f80458a183cfe3653",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_REPORT_2026-10-12.md",
+        "expected_sha256": "98f23eeef73f4255e58ca5834fbf560eaecdba394fb5d1616198b6a9e13bbc4c",
+        "snapshot_sha256": "98f23eeef73f4255e58ca5834fbf560eaecdba394fb5d1616198b6a9e13bbc4c",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_REPORT_2026-10-12.md",
+        "expected_sha256": "0a09f8eb5b9e0bb25239e2079358889c4942f3ca7fe37095a6490b7549475a80",
+        "snapshot_sha256": "0a09f8eb5b9e0bb25239e2079358889c4942f3ca7fe37095a6490b7549475a80",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_E2E_CASES_2026-10-13.json",
+        "expected_sha256": "56142221b7acfe35f784109fea763864489b71237659e299cef42708ede5207d",
+        "snapshot_sha256": "56142221b7acfe35f784109fea763864489b71237659e299cef42708ede5207d",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_REPORT_2026-10-13.md",
+        "expected_sha256": "215ef7fe3b077df0b0dc36da6ea356fcce3a7abda7b8abc4ad599a4201c7bb61",
+        "snapshot_sha256": "215ef7fe3b077df0b0dc36da6ea356fcce3a7abda7b8abc4ad599a4201c7bb61",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_SOURCE_MANIFEST_2026-10-13.json",
+        "expected_sha256": "feb5001cb89e334eaea85f765f05920645ac4762d0e510198a527fe2be7cb079",
+        "snapshot_sha256": "feb5001cb89e334eaea85f765f05920645ac4762d0e510198a527fe2be7cb079",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_E2E_CASES_2026-10-14.json",
+        "expected_sha256": "90d6850bda111ccef3ab16bb6ec73ac8b70d4c97d0bf77c4ff3ae55e71fac879",
+        "snapshot_sha256": "90d6850bda111ccef3ab16bb6ec73ac8b70d4c97d0bf77c4ff3ae55e71fac879",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_INPUT_FREEZE_2026-10-14.json",
+        "expected_sha256": "4c6a8c3dee3085e23fe1ebb432f52d3764731813c594cca4a6e8e1e174447724",
+        "snapshot_sha256": "4c6a8c3dee3085e23fe1ebb432f52d3764731813c594cca4a6e8e1e174447724",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_REPORT_2026-10-14.md",
+        "expected_sha256": "82e370835cdf0873e5f88cc8d748520cc8a8b7186904b3f5fb4e7496ae28dabe",
+        "snapshot_sha256": "82e370835cdf0873e5f88cc8d748520cc8a8b7186904b3f5fb4e7496ae28dabe",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_REPORT_2026-10-14.md",
+        "expected_sha256": "4d289b4b4dc27964a505a6cc68e7a62407e233a410b1e41f2ebc6b78f2421156",
+        "snapshot_sha256": "4d289b4b4dc27964a505a6cc68e7a62407e233a410b1e41f2ebc6b78f2421156",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_SOURCE_MANIFEST_2026-10-14.json",
+        "expected_sha256": "0b1118c038cca4b1deadb4f522ff22d8358aed43d3b9f6b8367b72b21096e907",
+        "snapshot_sha256": "0b1118c038cca4b1deadb4f522ff22d8358aed43d3b9f6b8367b72b21096e907",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_E2E_CASES_2026-10-15.json",
+        "expected_sha256": "82f89ea34821a96f8653f4f80449162d0cdb8b5dfb10f8e69c6fee1f5b8d1b53",
+        "snapshot_sha256": "82f89ea34821a96f8653f4f80449162d0cdb8b5dfb10f8e69c6fee1f5b8d1b53",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_REPORT_2026-10-15.md",
+        "expected_sha256": "0345c7b8aa1a97800b4b27aa1d009454ba4a2e6f09f6ea2715f16d1fddfff197",
+        "snapshot_sha256": "0345c7b8aa1a97800b4b27aa1d009454ba4a2e6f09f6ea2715f16d1fddfff197",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/comparison_cost_bounds.py",
+        "expected_sha256": "3810a095f7552ef233da17d15458ef4f24d976b3f024b94acb975f9942e6b40e",
+        "snapshot_sha256": "3810a095f7552ef233da17d15458ef4f24d976b3f024b94acb975f9942e6b40e",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/independent_accept.py",
+        "expected_sha256": "6dbd5b14a01e6de2796afde4624a953e5456b75c42e11a00ebe6de1f76490883",
+        "snapshot_sha256": "6dbd5b14a01e6de2796afde4624a953e5456b75c42e11a00ebe6de1f76490883",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/material_access_prototype.py",
+        "expected_sha256": "3444405e0b1a782619bb4f9c9338e7d0b095f006eb2e6105f9aba06b6bf56a2d",
+        "snapshot_sha256": "3444405e0b1a782619bb4f9c9338e7d0b095f006eb2e6105f9aba06b6bf56a2d",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/README.md",
+        "expected_sha256": "9f50b68bda2e5dc3564122171e4c6dfeecfbd3ab4aafa53f48e33c26fede6d53",
+        "snapshot_sha256": "9f50b68bda2e5dc3564122171e4c6dfeecfbd3ab4aafa53f48e33c26fede6d53",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/material_budget.py",
+        "expected_sha256": "e14c52f389fc426637e2d54a41f561c7cccb46b59128c17677a012e20b6f6218",
+        "snapshot_sha256": "e14c52f389fc426637e2d54a41f561c7cccb46b59128c17677a012e20b6f6218",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/membership_direction_probe.py",
+        "expected_sha256": "76a27dd56fb7f3e7fdf42914ee7cfc9f4727de427e41e59db2c5571a79d1c912",
+        "snapshot_sha256": "76a27dd56fb7f3e7fdf42914ee7cfc9f4727de427e41e59db2c5571a79d1c912",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/public_view_probe.py",
+        "expected_sha256": "37d06d0367fcc484492e44218c4d0507cbe88e36860188fa53038939ffe48e18",
+        "snapshot_sha256": "37d06d0367fcc484492e44218c4d0507cbe88e36860188fa53038939ffe48e18",
+        "matches": true
+      },
+      {
+        "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/README.md",
+        "expected_sha256": "ee6a26592ef64eb2ec1feeeb2ff6615326f645a3769d8d9dcf93fe96f89e070b",
+        "snapshot_sha256": "ee6a26592ef64eb2ec1feeeb2ff6615326f645a3769d8d9dcf93fe96f89e070b",
+        "matches": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/audit_edges.py",
+        "expected_sha256": "b84591c49ec9f67484258011b0685ce9f6cbcebb56685457a80a571bfbcf2fc0",
+        "snapshot_sha256": "b84591c49ec9f67484258011b0685ce9f6cbcebb56685457a80a571bfbcf2fc0",
+        "matches": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/frozen_oracle.cpp",
+        "expected_sha256": "a30fe76ab09552ea532ca0e732a19eb925e3d35db0eb99e1728a087f5e48a457",
+        "snapshot_sha256": "a30fe76ab09552ea532ca0e732a19eb925e3d35db0eb99e1728a087f5e48a457",
+        "matches": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/README.md",
+        "expected_sha256": "44eca9ccfdfaed63c96b675ecb345b0aa86e2d247a7feb91c54c4c7abe7ead41",
+        "snapshot_sha256": "44eca9ccfdfaed63c96b675ecb345b0aa86e2d247a7feb91c54c4c7abe7ead41",
+        "matches": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/select5iter.py",
+        "expected_sha256": "8b8d3dbd087d601a4962fe61c7b35546aa834cebd0ed4736b4e6d5dca204606b",
+        "snapshot_sha256": "8b8d3dbd087d601a4962fe61c7b35546aa834cebd0ed4736b4e6d5dca204606b",
+        "matches": true
+      },
+      {
+        "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/test_select5iter.py",
+        "expected_sha256": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
+        "snapshot_sha256": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
+        "matches": true
+      },
+      {
+        "path": "PROJECT.md",
+        "expected_sha256": "1593ad4dd23aed7ea72292dc9a6c5140ef12f2bb565322542e68eb793dc876db",
+        "snapshot_sha256": "1593ad4dd23aed7ea72292dc9a6c5140ef12f2bb565322542e68eb793dc876db",
+        "matches": true
+      },
+      {
+        "path": "VFSS/CMakeLists.txt",
+        "expected_sha256": "03bb2817ce8fac4fd183ef33a3a00189a1d6922fd5505f805a5fe893bdec745a",
+        "snapshot_sha256": "03bb2817ce8fac4fd183ef33a3a00189a1d6922fd5505f805a5fe893bdec745a",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/dcf_bcg21_fig1_aes128_v1.h",
+        "expected_sha256": "8f25128dcebe6497a9e63bbfb2388938b5e16cce658af575e9209c78543c10f0",
+        "snapshot_sha256": "8f25128dcebe6497a9e63bbfb2388938b5e16cce658af575e9209c78543c10f0",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/project_derived_select5.h",
+        "expected_sha256": "c9826888dc89d5091dbb01c88a9060bf53487f38066801b0d251004b49ff837e",
+        "snapshot_sha256": "c9826888dc89d5091dbb01c88a9060bf53487f38066801b0d251004b49ff837e",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_material_slot_store.h",
+        "expected_sha256": "87a3d323f9e7689185d42a21068dd23efad39269b14345ad21c6a6d2733b94d1",
+        "snapshot_sha256": "87a3d323f9e7689185d42a21068dd23efad39269b14345ad21c6a6d2733b94d1",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_parallel_shuffle.h",
+        "expected_sha256": "b187e84ac56fd5f861a61652160198a886dbef57f7d4cff8a381ab443cc0760d",
+        "snapshot_sha256": "b187e84ac56fd5f861a61652160198a886dbef57f7d4cff8a381ab443cc0760d",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+        "expected_sha256": "d84528507559b15454084dba8b36e9d05197e6124da6d437ab41aef7a6184d8f",
+        "snapshot_sha256": "d84528507559b15454084dba8b36e9d05197e6124da6d437ab41aef7a6184d8f",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_score_input.h",
+        "expected_sha256": "61eca4c20e21a86c76593c2ee2bc22d887d78d33df28e44c7b879a171c2d09af",
+        "snapshot_sha256": "61eca4c20e21a86c76593c2ee2bc22d887d78d33df28e44c7b879a171c2d09af",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_transport.h",
+        "expected_sha256": "756d090b1a974bca57031c89c54a5ae16ac54e115c12fb87944854f4a1a8394c",
+        "snapshot_sha256": "756d090b1a974bca57031c89c54a5ae16ac54e115c12fb87944854f4a1a8394c",
+        "matches": true
+      },
+      {
+        "path": "VFSS/include/moe_topk/protocol_i_ucmp.h",
+        "expected_sha256": "973a46df5cf4ac49df47d0b7f345e39de6ec6c0c13d03cc6fc13a47465bdb51d",
+        "snapshot_sha256": "973a46df5cf4ac49df47d0b7f345e39de6ec6c0c13d03cc6fc13a47465bdb51d",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp",
+        "expected_sha256": "b2bc67cbe26bd11b2fded7a3f10002970947694e001cbf16f2bbbd45ae83982f",
+        "snapshot_sha256": "b2bc67cbe26bd11b2fded7a3f10002970947694e001cbf16f2bbbd45ae83982f",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+        "expected_sha256": "e7b1059df34d1474e8e96de954275cf764b698a9ac7f04e6535ff8eb7b7f4809",
+        "snapshot_sha256": "e7b1059df34d1474e8e96de954275cf764b698a9ac7f04e6535ff8eb7b7f4809",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_material_slot_store.cpp",
+        "expected_sha256": "82cc87d8483ddaa85008fd14b0d685da5ad50460da4f27e041c12617d9938e28",
+        "snapshot_sha256": "82cc87d8483ddaa85008fd14b0d685da5ad50460da4f27e041c12617d9938e28",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+        "expected_sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+        "snapshot_sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+        "expected_sha256": "d339c326efd4ab5dd3415f985a5c93b342c5c94cd0f79be86117084ef9a6f31a",
+        "snapshot_sha256": "d339c326efd4ab5dd3415f985a5c93b342c5c94cd0f79be86117084ef9a6f31a",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+        "expected_sha256": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+        "snapshot_sha256": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+        "expected_sha256": "f077a3d22b06df69698ec4d213920e83996ffa81fff7c3f99eaf5862065d8367",
+        "snapshot_sha256": "f077a3d22b06df69698ec4d213920e83996ffa81fff7c3f99eaf5862065d8367",
+        "matches": true
+      },
+      {
+        "path": "VFSS/src/moe_topk/protocol_i_ucmp.cpp",
+        "expected_sha256": "8b2c68123db86e4ebfa976131895fdd6b383485a01f4d4bd64863a08e6d0aa64",
+        "snapshot_sha256": "8b2c68123db86e4ebfa976131895fdd6b383485a01f4d4bd64863a08e6d0aa64",
+        "matches": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/dcf_bcg21_fig1_aes128_v1_conformance_test.cpp",
+        "expected_sha256": "cccc923653a23503e77d3dcb24a84fa9872e765462ad1eedad6dcefe04ec104b",
+        "snapshot_sha256": "cccc923653a23503e77d3dcb24a84fa9872e765462ad1eedad6dcefe04ec104b",
+        "matches": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/project_derived_select5_control_test.cpp",
+        "expected_sha256": "aaff515c396cc0ea6ef78a9a655ce92d9842a8def97d4acc887c831e9c6ee63e",
+        "snapshot_sha256": "aaff515c396cc0ea6ef78a9a655ce92d9842a8def97d4acc887c831e9c6ee63e",
+        "matches": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/protocol_i_material_slot_store_test.cpp",
+        "expected_sha256": "cab907ad2aab13b40ecfd0c077daa217405e5c16fb1a92d760838894b8cdd510",
+        "snapshot_sha256": "cab907ad2aab13b40ecfd0c077daa217405e5c16fb1a92d760838894b8cdd510",
+        "matches": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_material_store_test.cpp",
+        "expected_sha256": "32bb24c273a41de47cecbfa9665b78285d36aef292be352a0590ec92f169a2c3",
+        "snapshot_sha256": "32bb24c273a41de47cecbfa9665b78285d36aef292be352a0590ec92f169a2c3",
+        "matches": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp",
+        "expected_sha256": "a256ba597f7b29b0eb7dab2c3be1d0ad5dcf45fa2c785f1190e04101cc628e14",
+        "snapshot_sha256": "a256ba597f7b29b0eb7dab2c3be1d0ad5dcf45fa2c785f1190e04101cc628e14",
+        "matches": true
+      },
+      {
+        "path": "VFSS/tests/moe_topk/protocol_i_tls13_transport_conformance_test.cpp",
+        "expected_sha256": "c8adb49eac16967f48d24ec5358bc11d6f60ae2425feb69c6290aa05409dac63",
+        "snapshot_sha256": "c8adb49eac16967f48d24ec5358bc11d6f60ae2425feb69c6290aa05409dac63",
+        "matches": true
+      },
+      {
+        "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S15_DECISION_2026-10-15.md",
+        "expected_sha256": "21f45cc9f84ce9400727a5a6f49c45ba1e1281f05a54d20f2f0c19f716b5d37b",
+        "snapshot_sha256": "21f45cc9f84ce9400727a5a6f49c45ba1e1281f05a54d20f2f0c19f716b5d37b",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S15_REPORT_2026-10-15.md",
+        "expected_sha256": "7330fe64f14eb79a88830a93cb93cadfb815340f25ecc04611c3ffba8bbb6775",
+        "snapshot_sha256": "7330fe64f14eb79a88830a93cb93cadfb815340f25ecc04611c3ffba8bbb6775",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S15_GATES_2026-10-15.json",
+        "expected_sha256": "fab1836338e69573024e48410f87c633fe89236d7fe98d8780c6d9942a4a77d4",
+        "snapshot_sha256": "fab1836338e69573024e48410f87c633fe89236d7fe98d8780c6d9942a4a77d4",
+        "matches": true
+      },
+      {
+        "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S15_E2E_CASES_2026-10-15.json",
+        "expected_sha256": "dc0a524b32fef803e35c9ea78cd18756d4cabae51f0a7d39466640c9171951a4",
+        "snapshot_sha256": "dc0a524b32fef803e35c9ea78cd18756d4cabae51f0a7d39466640c9171951a4",
+        "matches": true
+      }
+    ],
+    "receiver": {
+      "identity": "separate isolated receiver agent context /root/s18_independent_receipt",
+      "declaration": "No participation in S4-S17 implementation, proof, or decisions",
+      "independent_for_s15_s16": true,
+      "independent_security_proof_review": false,
+      "scope": "S15 exact runtime snapshot only; not S16/S17 docs and not full S17 25-case replay"
+    },
+    "inherited_status": {
+      "s16_manifest_sha256": "9378fddd4f6a0c7ab339a263cd69a152cc25796717f1e26a85789977fb1675d0",
+      "s16_files": 76,
+      "s16_declared_canonical": "63208f02ba8f8b014df41be668d6435aaab29673adbd611f7fbfc1fecb738fbc",
+      "s17_manifest_sha256": "3f0df46fede0c5b9ca3e5142948c8350fcd13f9b2a30578a527dfc99eb6d7fa7",
+      "s17_receiver_status": "NOT_INDEPENDENT",
+      "s14_historical_canonical_erratum": {
+        "old_declared": "a8bd42361ee0c6c717e624abdf351bd7f1c6a26284df09b68b06bbfd7cfeb422",
+        "recomputed": "3d41295e9cd0f3adf4a0e0f0f652493996d9cd77bb4a4062eaf557c675aa79bf",
+        "status": "retained as historical correction"
+      },
+      "s17_e2e_case_json_sha256": "29566a9f1e459a5826a1910411a420c2d455e99bde7766af389a91b45e26c252"
+    },
+    "snapshot_root": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\source"
+  },
+  "build_environment": {
+    "os": "WSL Ubuntu 20.04.6",
+    "compiler": "GCC/G++ 9.4.0",
+    "openssl": "1.1.1f",
+    "cmake": "bundled CMake/CTest 3.31.6",
+    "build_type": "Release",
+    "BUILD_TESTING": true,
+    "MOE_TOPK_ENABLE_EMP_OT": false,
+    "feature_option": "MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL",
+    "output_directories": [
+      "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\on",
+      "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\off"
+    ],
+    "config_and_build_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "commands": {
+    "on_configure": "wsl.exe -d Ubuntu-20.04 -- bash -lc <CMake 3.31.6> -S <S15>/VFSS -B <Temp>/on -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_EMP_OT=OFF -DMOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL=ON",
+    "on_build_targets": "moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test moe_topk_project_derived_select5_conformance_test moe_topk_project_derived_select5_material_store_test moe_topk_project_derived_select5_process_e2e_test moe_topk_streamed_material_slot_store_test moe_topk_m2_ucmp_conformance_test moe_topk_m2_parallel_shuffle_conformance_test -j2; exit 0",
+    "off_configure": "same configure; build directory off; MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL=OFF; exit 0",
+    "off_build_targets": "sytorch moe_topk_m2_ucmp_conformance_test moe_topk_m2_parallel_shuffle_conformance_test -j2; exit 0",
+    "on_ctest": "ctest --test-dir <Temp>/on -R exact regex for DCF BCG21, Select5 control, Select5 material-store, M2 uCMP, M2 parallel-shuffle --output-on-failure; exit 0",
+    "off_ctest": "ctest --test-dir <Temp>/off -R exact regex for M2 uCMP and M2 parallel-shuffle --output-on-failure; exit 0",
+    "e2e": [
+      "moe_topk_project_derived_select5_process_e2e_test --bcg21-monolithic-n128; exit 0",
+      "moe_topk_project_derived_select5_process_e2e_test --bcg21-smoke; exit 0",
+      "moe_topk_project_derived_select5_process_e2e_test --bcg21-faults; exit 0",
+      "moe_topk_project_derived_select5_process_e2e_test --crash-step 5; exit 0 (legacy M2UCv1)"
+    ],
+    "off_checks": [
+      "nm -C OFF libsytorch.a piped to grep for BCG symbols; no matches, grep exit 1 expected",
+      "OFF target help piped to grep for BCG21/Select5; no matches, grep exit 1 expected",
+      "C++ header probe without opt-in; expected compile failure from #error"
+    ]
+  },
+  "tests": {
+    "on_ctest": {
+      "passed": 5,
+      "failed": 0,
+      "exit_code": 0,
+      "targets": [
+        "DCF BCG21 conformance",
+        "Select5 control conformance",
+        "Select5 material store",
+        "M2 uCMP legacy",
+        "M2 parallel shuffle legacy"
+      ]
+    },
+    "off_ctest": {
+      "passed": 2,
+      "failed": 0,
+      "exit_code": 0,
+      "targets": [
+        "M2 uCMP legacy",
+        "M2 parallel shuffle legacy"
+      ]
+    },
+    "e2e_success": {
+      "n128_monolithic": {
+        "count": 1,
+        "case": 301,
+        "K": 64,
+        "oracle": "PASS",
+        "select_comparison_calls": 2148,
+        "schema": "M6B5/v3+M2CM/v1+M6P2/v1"
+      },
+      "bcg21_smoke": {
+        "count": 12,
+        "passed": 12,
+        "oracle": "PASS",
+        "schema": "N128 monolithic and N256 streamed BCG21; includes N256 K=1,2,8,128,255,256; N128 K=1,64,128 and N=1/2 boundaries"
+      },
+      "n256_streamed_sample": {
+        "case": 110,
+        "K": 128,
+        "oracle": "PASS",
+        "select_comparison_calls": 17207,
+        "schema": "M6S2/v2"
+      },
+      "verification": "TEST_ONLY supervisor merged two shares and checked frozen C++ stable oracle, original order, mask length, Boolean bits, and weight K"
+    },
+    "abort_cases": {
+      "count": 6,
+      "case_ids": [
+        201,
+        202,
+        203,
+        204,
+        205,
+        206
+      ],
+      "result": "UNIFORM_ABORT_NO_MASK",
+      "exit_code": 0,
+      "faults": [
+        "package tamper",
+        "disconnect",
+        "wrong K binding",
+        "wrong TLS identity",
+        "dealer exit before ready",
+        "malformed sample seed magic"
+      ]
+    },
+    "crash_case": {
+      "count": 1,
+      "case": 55,
+      "step": 5,
+      "result": "NO_COMPLETE_MASK",
+      "P0_bytes": 0,
+      "P1_orphan_share_bytes": 8,
+      "ABI": "legacy M2UCv1",
+      "exit_code": 0
+    },
+    "attempts": [
+      {
+        "command": "--n256-k 128",
+        "outcome": "excluded from BCG21 receipt because this entry used legacy M2UCv1",
+        "followup": "--bcg21-smoke completed N256 BCG21 path"
+      }
+    ],
+    "not_run": [
+      "full S17 25-case matrix",
+      "all BCG21 crash prefixes",
+      "dedicated TLS conformance",
+      "standalone streamed-store CTest",
+      "production OS/store failure modes",
+      "wall-clock side-channel audit",
+      "failed-path consumed-slot counts",
+      "separate ON external API probe"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\on\\libsytorch.a",
+      "bytes": 2606006,
+      "sha256": "8c8bd88124e23faec7f392f6816504684e544554ff7ac2c4c44d14e564a49ff8"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\off\\libsytorch.a",
+      "bytes": 2122218,
+      "sha256": "d95e70a34c238a4e2b1f2d67dc66fefbb4573e3331ef2211cdab05113acd57bd"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\on\\moe_topk_dcf_bcg21_fig1_aes128_v1_conformance_test",
+      "bytes": 211920,
+      "sha256": "65cc80e3e5100632f148f4a6339185031fe638e64f0feb3bf5215c2feddc2303"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\on\\moe_topk_project_derived_select5_process_e2e_test",
+      "bytes": 652416,
+      "sha256": "6d521461bac45ddbdaf2fab1fa0ed6a2bbfd6960330895834af0fe26e050aa73"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\on\\moe_topk_project_derived_select5_conformance_test",
+      "bytes": 312616,
+      "sha256": "754a9550dcc7b22b1e2816ce7772b915f77bf2fb06eb76bf48bc8d477e94385b"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\on\\moe_topk_project_derived_select5_material_store_test",
+      "bytes": 571088,
+      "sha256": "6d9ef511ba2ba067abab77791a5e5cce52f60fbbd823890e170b0669970776e3"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\off\\moe_topk_m2_ucmp_conformance_test",
+      "bytes": 187544,
+      "sha256": "5cfb02d0f52f96d370657ff8cd7afc270b84026a6598b52ae7d25bbb85925599"
+    },
+    {
+      "path": "C:\\Users\\28641\\AppData\\Local\\Temp\\codex-s18-m6b-s15-receipt\\off\\moe_topk_m2_parallel_shuffle_conformance_test",
+      "bytes": 309760,
+      "sha256": "963da34acc59ee8457bf90c5cdd165f629d65bedf93f30ccd5a1cfa4f048ad18"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\receipt\\ON_LastTest.log",
+      "bytes": 4222,
+      "sha256": "955e89d4ee3005b19439bf3fbf6791d80d4ebbf2b54da2693a1a4e1d63340ed5"
+    },
+    {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\receipt\\OFF_LastTest.log",
+      "bytes": 1617,
+      "sha256": "67cc2f4d629a195d2a041d2c95b7e5de12606dd4def316371f52abb0092cd618"
+    },
+    {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\S15_REPORT.md",
+      "bytes": 21996,
+      "sha256": "7330fe64f14eb79a88830a93cb93cadfb815340f25ecc04611c3ffba8bbb6775"
+    },
+    {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\S15_GATES.json",
+      "bytes": 3768,
+      "sha256": "fab1836338e69573024e48410f87c633fe89236d7fe98d8780c6d9942a4a77d4"
+    },
+    {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\S15_E2E_CASES.json",
+      "bytes": 24186,
+      "sha256": "dc0a524b32fef803e35c9ea78cd18756d4cabae51f0a7d39466640c9171951a4"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_GATES_2026-10-16.json",
+      "bytes": 6847,
+      "sha256": "f687962f25076c3b237e3237d759878560cc4e8534ae14cfda563beff152acc5"
+    },
+    {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\S15_SOURCE_MANIFEST.json",
+      "bytes": 50345,
+      "sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816"
+    }
+  ],
+  "security": {
+    "dcf_single_key": "CONDITIONAL key-only bridge; Figure 1/Theorem 2 mapping; epsilon_rng_joint unquantified",
+    "ucmp_single_call": "OPEN for conditional transcript simulator; same key performs two Eval calls",
+    "adaptive_pool": "OPEN; key-only static projections do not cover adaptive transcript",
+    "shuffle_output": "OPEN; joint conditional distribution over shared Pi/Pi-inverse, Y/Q, membership carrier, output share, and crash/lease state unproved",
+    "attack": "No reproducible attack found; proof not closed"
+  },
+  "code_changes": "none",
+  "formal_performance": "NOT_RUN",
+  "final_digest_exclusion": "Manifest excludes its own digest and S18 report digest to avoid a circular hash; final manifest digest is recorded in S18 report.",
+  "s18_document_hashes_except_report": {
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_DECISION_2026-10-16.md": "4290e5527ac4957d3f48d0ddbcaef58a66a9793ca893bc1c947556d239f85ea0",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_GATES_2026-10-16.json": "f687962f25076c3b237e3237d759878560cc4e8534ae14cfda563beff152acc5",
+    "PROJECT.md": "581e3ef4ad0bfd5188c1c4b1e97da0aef539c156a8fcbae33a947479dbfbd0af",
+    "docs/IMPLEMENTATION_PLAN.md": "13d653d7975887c9347c788a4d7f196cac94d0d3e709b3a0a9a5e288fd5ba420",
+    "docs/REFERENCE_MANIFEST.md": "75ba0abb53cf89c76cf450bdabf59d0ad956212f8e2bb3ff315fe73e635a42f5"
+  },
+  "raw_e2e_stdout_preservation": "NOT_SAVED as standalone raw log; scoped results and commands are recorded from the independent receiver report; CTest LastTest.log files are preserved and hashed"
+}

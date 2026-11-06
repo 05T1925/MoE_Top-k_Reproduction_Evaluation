@@ -1,0 +1,133 @@
+{
+  "schema": "m6b-project-derived-select5-s18-gates/v1",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "receipt_object": {
+    "runtime_snapshot": "S15 default-OFF repair",
+    "receiver_relation": "Separate isolated receiver context; declared no participation in S4-S17 implementation, proof, or decisions",
+    "source_files": 72,
+    "source_sha256_canonical": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "scope": "Fresh ON/OFF builds, 5 ON CTests, 2 OFF CTests, 12 BCG21 smoke successes, N128 monolithic success, 6 BCG21 abort cases, one legacy-ABI crash-step-5 check",
+    "not_scope": "Not all 25 S17 cases; not S16/S17 document changes; not a full independent security proof"
+  },
+  "gates": {
+    "S15_INDEPENDENT_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": "Independent receiver checked 72/72 S15 source hashes, recomputed canonical digest, built the exact S15 VFSS source in fresh ON/OFF Release directories, and replayed the scoped matrix.",
+      "limitations": [
+        "Does not receive S16/S17 documentation changes",
+        "Does not rerun all 25 S17 cases",
+        "Does not certify cryptographic security"
+      ]
+    },
+    "DEFAULT_OFF_API_BOUNDARY": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": [
+        "OFF static library BCG symbol scan had no matches (grep exit 1 expected)",
+        "OFF target-help BCG/Select5 scan had no matches (grep exit 1 expected)",
+        "OFF public-header API probe failed on the expected opt-in compile guard",
+        "OFF legacy M2 uCMP and shuffle CTests passed 2/2"
+      ],
+      "not_run": "Separate ON external API probe"
+    },
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL",
+      "basis": "BCG+21 Figure 1/Theorem 2 key-only bridge mapped to M2B1/v1",
+      "assumptions": [
+        "AES-128 PRP; 5 distinct AES input blocks per G",
+        "epsilon_RNG_joint for the ordered OS/OpenSSL random-source schedule remains unquantified",
+        "Fixed ABI, parameter range, fresh roots, and one-shot material"
+      ],
+      "bound": "epsilon_G <= Adv_AES128^PRP(T_prime,5)+10/2^128; delta_w <= w*epsilon_G+epsilon_RNG_joint",
+      "limitation": "Key-only result; no full UCMP transcript proof or numeric security level"
+    },
+    "UCMP_SINGLE_CALL_VIEW": {
+      "status": "OPEN",
+      "first_gap": "No proof that key-only replacement remains valid conditioned on party input share, correlated mask/material auxiliaries, opened z operands, the same key's two Eval inputs, and opened comparison bit."
+    },
+    "POOL_AND_ADAPTIVE_ACCESS": {
+      "status": "OPEN",
+      "N128": {
+        "schema": "M6B5/v3 + M2CM/v1 + M6P2/v1",
+        "DCF_slots": 41024,
+        "widths": "40768 x 40-bit; 256 x 34-bit",
+        "static_key_only_hybrid": "1639424*epsilon_G + epsilon_RNG_joint(schema)",
+        "metadata_slots": 1280,
+        "fresh_case": {
+          "case": 301,
+          "K": 64,
+          "select_comparison_calls": 2148,
+          "source": "S18 independent run"
+        }
+      },
+      "N256": {
+        "schema": "M6S2/v2",
+        "DCF_slots": 163968,
+        "widths": "163456 x 41-bit; 512 x 34-bit",
+        "static_key_only_hybrid": "6719104*epsilon_G + epsilon_RNG_joint(schema)",
+        "metadata_slots": 2560,
+        "fresh_case": {
+          "case": 110,
+          "K": 128,
+          "select_comparison_calls": 17207,
+          "source": "S18 independent run"
+        }
+      },
+      "limitation": "Static key-only projection is not the adaptive party-view hybrid; used/unused/rejected/restart slot transcript is not proven."
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION": {
+      "status": "OPEN",
+      "first_gap": "Joint conditional distribution across common forward/inverse Pi, public Y/Q arrays, adaptive Select bits/addresses, membership carrier, local output share, and crash/lease state is not established.",
+      "attack": "No reproducible attack found; proof not closed."
+    },
+    "CRASH_ABORT_OUTPUT_VIEW": {
+      "status": "CONDITIONAL_FUNCTION_OPEN_PRIVACY",
+      "evidence": [
+        "BCG21 fault cases 201-206: 6/6 UNIFORM_ABORT_NO_MASK",
+        "Case 55 crash-step 5: NO_COMPLETE_MASK; P0 output 0 bytes, P1 may retain 8-byte local XOR share"
+      ],
+      "limitation": "Crash-step 5 check used legacy M2UCv1; no atomic publication or all-or-nothing claim."
+    },
+    "N_LE_256_FUNCTIONAL_E2E": {
+      "status": "PASS_WITH_SCOPE",
+      "evidence": [
+        "N128 BCG21 monolithic case 301, K=64, ORACLE_PASS",
+        "BCG21 smoke 12/12 ORACLE_PASS, including N256 K=1,2,8,128,255,256 and N128/N1/N2 cases",
+        "Each successful result checked by TEST_ONLY supervisor against frozen C++ oracle, order, length, bits, and weight K"
+      ],
+      "not_run": "Full S17 25-case matrix; all BCG21-specific crash prefixes; independent TLS conformance; streamed-store standalone CTest"
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "NO_GO",
+      "evidence": "S18 did not increase the range; N=257 rejection remains inherited S17 evidence and was not independently rerun in this scoped receipt."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "NO_GO",
+      "reason": "UCMP conditional view, adaptive full-pool simulation, and shuffle/output joint party view are not proved and independently reviewed."
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "status": "V3_OPEN_V4_NOT_ALLOWED_NOT_RUN",
+      "formal_LAN_WAN": "NOT_RUN",
+      "reason": "Existing V3-to-V4 prerequisite remains unchanged."
+    },
+    "LEAKAGE_L_MAPPING": {
+      "status": "MAPPED_NO_NEW_EXPLICIT_PEER_FIELD_FOUND",
+      "evidence": "Binding, masked operands, Y/Q arrays, per-active-iteration seed, endpoint/bit transcript, per-channel sequence, material slot/phase, PREPARE/COMMIT/ABORT mapped from S15 source",
+      "limitation": "Local package/ready digests are not peer payloads; wall-clock timing NOT_MEASURED; mapping is not a simulator proof"
+    },
+    "JOINT_PARTY_VIEW": {
+      "status": "OPEN",
+      "scope": [
+        "P0",
+        "P1",
+        "N128 M6B5/v3+M2CM/v1+M6P2/v1",
+        "N256 M6S2/v2"
+      ],
+      "first_gap": "The fixed-function DCF key-only replacement is not proved conditioned on actual per-party input share, correlated masks/material state, opened z operands, same-key two Eval inputs, and opened comparison bit; later common Pi/Pi-inverse shuffle, membership carrier, output, lease and crash conditionals are also unproved",
+      "attack": "No reproducible attack found; proof not closed"
+    }
+  },
+  "runtime_changes": "NONE",
+  "formal_performance": "NOT_RUN",
+  "bb90_identity": "NOT_BB90; S1 source gap unchanged"
+}
