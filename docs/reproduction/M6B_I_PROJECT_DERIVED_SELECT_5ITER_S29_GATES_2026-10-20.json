@@ -1,0 +1,98 @@
+{
+  "schema": "m6b-project-derived-select5-s29-gates/v1",
+  "date": "2026-10-20",
+  "route": "PROJECT_DERIVED_SELECT_5ITER",
+  "reviewed_object": {
+    "source_manifest": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s25/MoE_Top-k_Reproduction_Evaluation/docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "candidate_committed": false,
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "file_count": 74,
+    "all_file_hashes_match": true,
+    "manifest_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+    "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d"
+  },
+  "s25_functional_receipt": {
+    "status": "PASS_WITH_SCOPE",
+    "source": "S27 independent receipt for the identical S25 manifest snapshot",
+    "s29_rerun": "NOT_RUN",
+    "scope": "Inherited functional evidence only; N<=256 recorded cases; not a complete privacy proof or performance matrix."
+  },
+  "ideal_functionality": {
+    "output_share_law_status": "NOT_FROZEN_IN_PROJECT_CONTRACT",
+    "candidate_success_output_laws": [
+      {
+        "name": "F_TOPK-U",
+        "law": "stable Top-K mask M; sample z0 uniformly; z1=z0 XOR M; party b receives only z_b.",
+        "security_implication": "Uniform single-party share marginals; proof-target candidate only, not asserted as the proven S25 adapter law."
+      },
+      {
+        "name": "F_TOPK-C",
+        "law": "z0=0^n; z1=M; party b receives only z_b.",
+        "security_implication": "P1 learns M; this changes visible information and cannot silently replace the original contract."
+      }
+    ],
+    "pre_admission_gate": "Confirm the actual S25 adapter/approved contract share law; define another exact candidate if neither U nor C matches.",
+    "simulator_inputs_per_corrupted_party": ["x_b", "z_b", "public_params", "approved_L"],
+    "intermediate_values_granted": false,
+    "not_granted": ["Q_b", "Q'_b", "rho_b", "carry/sign shares", "DCF/uCMP key", "peer input", "Dealer tape", "party-local package/manifest/lease", "shuffle-local state"],
+    "abort_contract": {
+      "status": "AMBIGUOUS_NOT_SELECTED",
+      "candidates": ["F_TOPK-ATOMIC", "F_TOPK-PREFIX"],
+      "simulator_abort_status_input": "Only if specified as that party's ideal output under a frozen contract; no arbitrary transcript prefix or internal stage is granted.",
+      "inherited_crash_claim": "NO_COMPLETE_MASK only; do not infer atomic no-output or all-or-nothing."
+    }
+  },
+  "approved_leakage": {
+    "changed": false,
+    "fields": ["public parameters and bindings", "approved post-shuffle endpoints/positions", "pivot", "comparison bit", "per-active-iteration sample seed after forward shuffle", "approved masked values", "comparison count", "communication length", "uniform ABORT"],
+    "future_seed_pre_disclosure": false,
+    "Q_prime_added": false
+  },
+  "end_to_end_simulation": {
+    "P0": "OPEN/NO_GO",
+    "P1": "OPEN/NO_GO",
+    "first_outer_gap": "No sampler for Law(Q'_b, complete score-prefix/package view | x_b,z_b,public_params,L); module candidate takes Q'_b but outer F_TOPK does not provide it.",
+    "distinguisher_found": false,
+    "interpretation": "Missing proof/conditional distribution, not an attack or impossibility result."
+  },
+  "modular_composition": {
+    "P0": "OPEN/NO_GO",
+    "P1": "OPEN/NO_GO",
+    "reason": "F_scoreconv/v2 gives Q'_b to the corrupted party; exposing it expands the composed functionality/leakage, while hiding it requires the missing final-output-conditioned bridge."
+  },
+  "current_interface_security": {
+    "P0": "OPEN/NO_GO",
+    "P1": "OPEN/NO_GO",
+    "reason": "No full party-view simulator from final mask share and approved leakage."
+  },
+  "versioned_redesign_required": {
+    "status": "CONDITIONAL",
+    "trigger": "If a proof-only final-output-conditioned simulator cannot be closed for v2, use a new score-to-mask-v3 runtime/material schema.",
+    "claim_limit": "No proof that v2 is mathematically impossible to secure; versioned redesign is a conditional admission route."
+  },
+  "N_scope": {
+    "functional_inherited": "N<=256 PASS_WITH_SCOPE",
+    "privacy_N_le_256": "OPEN/NO_GO",
+    "N_gt_256": "NOT_RUN/OUT_OF_SCOPE"
+  },
+  "secure_alias": "NOT_CREATED",
+  "performance": {
+    "formal_LAN_WAN": "NOT_RUN",
+    "metrics": "NOT_MEASURED",
+    "reason": "Explicitly post-gated."
+  },
+  "independent_receiver": {
+    "status": "REVIEWED",
+    "not_involved_in_S19_S28": true,
+    "reviewed": ["S25 object identity", "ideal functionality", "A/B/C route conclusions", "party-view failure point", "crash probe interpretation"],
+    "tests_rerun": false,
+    "scope_limit": "Independent review opinion; not organizational signoff or a complete cryptographic proof."
+  },
+  "runtime_changes": 0,
+  "builds": "NOT_RUN",
+  "tests": "NOT_RUN",
+  "oracle_differential": "NOT_RUN",
+  "independent_process_e2e": "NOT_RUN",
+  "formal_matrix": "NOT_RUN",
+  "binary_hashes": "NOT_BUILT_THIS_TURN"
+}
