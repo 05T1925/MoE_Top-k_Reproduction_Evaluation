@@ -1,0 +1,227 @@
+{
+  "schema": "m6b-i-project-select5-s33-gates/v1",
+  "date": "2026-10-20",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S33",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "source_and_build": {
+    "s25_74_file_hash_reconstruction": {
+      "status": "PASS",
+      "count": 74,
+      "matched": 74,
+      "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d"
+    },
+    "s32_15_increment_reconstruction": {
+      "status": "PASS",
+      "count": 15,
+      "matched": 15
+    },
+    "s32_union_exact_source": {
+      "status": "PASS",
+      "unique_files": 84,
+      "matched_before_s33_delta": 84,
+      "canonical_sha256": "fbb4b2474b5c4594d8f10a91cdbc669cd1a1efcc8865bf565fa2fbd8552dd38e"
+    },
+    "s33_final_source": {
+      "status": "PASS",
+      "unique_files": 84,
+      "unchanged_from_s32": 80,
+      "intentional_s33_delta_files": [
+        "PROJECT.md",
+        "docs/IMPLEMENTATION_PLAN.md",
+        "VFSS/src/moe_topk/protocol_i_transport.cpp",
+        "VFSS/tests/moe_topk/score_to_mask_v3_process_e2e_test.cpp"
+      ],
+      "canonical_sha256": "7e0f2ab6ae03ae402a739e2f5e97a09aa44a4fb3a373294f860ebb6f441c3df9"
+    },
+    "default_off_boundary": {
+      "status": "PASS",
+      "fresh_release_build": "PASS",
+      "v3_symbols": "ABSENT",
+      "v3_targets": "ABSENT",
+      "header_without_optin": "EXPECTED_REJECTION"
+    },
+    "explicit_v3_on_boundary": {
+      "status": "PASS",
+      "fresh_release_v2_off_v3_on": "PASS",
+      "v2_dcf_fallback": "ABSENT"
+    }
+  },
+  "functional": {
+    "runtime_conformance": {
+      "status": "PASS",
+      "ctest": "PASS 1/1"
+    },
+    "independent_process_e2e": {
+      "status": "PASS",
+      "ctest": "PASS 1/1",
+      "cases": 195,
+      "oracle_pass": 195,
+      "failed": 0,
+      "timed_out": 0,
+      "retries": 0
+    },
+    "stable_semantics": {
+      "status": "PASS",
+      "tested": "signed Q20.12 descending; ties by original index ascending; output returned in original order; exactly K ones"
+    },
+    "n128_n256_observed_resource_cases": {
+      "status": "PASS",
+      "formal_performance": false,
+      "values_in_case_manifest": true
+    },
+    "normal_multi_process_communication": {
+      "status": "PASS",
+      "natural_io_fault": "NOT_REPRODUCED",
+      "per_message_logger": "SUPPLEMENTAL_TEST_ONLY_PROXY_TRACE_AVAILABLE; production runtime reports aggregate phase/frame counters",
+      "worker_stdio": "captured separately in supplementary no-injection trace"
+    },
+    "normal_path_frame_observer": {
+      "status": "PASS",
+      "fault_injected": false,
+      "p0_exit": 0,
+      "p1_exit": 0,
+      "party_api": "both COMMITTED",
+      "a_transactions": 1,
+      "a_share_rows": 2,
+      "phase_frames_each_direction": 76,
+      "per_frame_phase_sequence_tag": "retained"
+    }
+  },
+  "communication_and_material": {
+    "generic_framed_transport_regression": {
+      "status": "PASS",
+      "ctest": "PASS 1/1"
+    },
+    "tls13_dedicated_transport_target": {
+      "status": "NOT_RUN",
+      "reason": "target is registered only under v2 experimental CMake branch; S33 ON-only config kept v2 off. v3 TLS channel was exercised by 195 E2E and three fault cases."
+    },
+    "ready_parameter_content_mismatch": {
+      "status": "PASS",
+      "cases": 1,
+      "post_repair_api": "both ABORTED/no-share"
+    },
+    "old_phase_frame_duplicate": {
+      "status": "PASS",
+      "cases": 1,
+      "post_repair_api": "both ABORTED/no-share"
+    },
+    "one_party_exit_during_first_beaver_exchange": {
+      "status": "PASS",
+      "cases": 1,
+      "p0_api": "ABORTED/no-share",
+      "p1_process": "SIGKILL before API return"
+    },
+    "partial_read_write_eof_truncation_phase_sequence_timeout": {
+      "status": "PASS",
+      "evidence": "generic transport conformance plus source review and fault proxy trace"
+    },
+    "one_shot_package_lease": {
+      "status": "PASS",
+      "note": "both leases burned for every communication fault"
+    },
+    "gate_consumption_after_fault": {
+      "status": "CONDITIONAL",
+      "note": "READY mismatch consumes 0 gate triples; stale duplicate marks the first 128 gate ids per party; P1 kill has at least 128 per party and possible additional prefix not instrumented"
+    }
+  },
+  "escrow": {
+    "two_ciphertext_single_transaction_commit_function": {
+      "status": "PASS",
+      "evidence": "195 E2E including normal restart/fetch, precommit A crash/timeout, postcommit lost receipt recovery"
+    },
+    "recipient_identity_bound_fetch_and_no_A_decrypt_key": {
+      "status": "PASS",
+      "source_review": "server accepts/fetches recipient ciphertext; recipient private keys are not held by A"
+    },
+    "logical_commit_vs_client_return_timing": {
+      "status": "PASS",
+      "note": "commit linearizes in SQLite; service receipt and client API returns are later and may occur at different times"
+    },
+    "power_loss_storage_hardware_durability": {
+      "status": "NOT_RUN"
+    },
+    "A_view_commit_recovery_simulator": {
+      "status": "OPEN",
+      "first_gap": "No output-conditioned simulator for ciphertext/metadata order, commit receipt, restart/fetch, crash prefix, and timing view under L_A"
+    }
+  },
+  "security": {
+    "P0_full_view_simulator": {
+      "status": "OPEN"
+    },
+    "P1_full_view_simulator": {
+      "status": "OPEN"
+    },
+    "A_view_and_crash_recovery_simulator": {
+      "status": "OPEN"
+    },
+    "dealer_triple_and_permutation_joint_distribution": {
+      "status": "OPEN"
+    },
+    "approved_comparison_leakage_composition": {
+      "status": "OPEN"
+    },
+    "GMW_Beaver_theorem_instantiation": {
+      "status": "OPEN"
+    },
+    "CSPRNG_DRBG_advantage": {
+      "status": "NOT_MEASURED"
+    },
+    "signature_recipient_encryption_TLS_advantage": {
+      "status": "NOT_MEASURED"
+    },
+    "reproducible_distinguisher_found": {
+      "status": "NOT_REPRODUCED"
+    },
+    "functional_test_is_security_proof": {
+      "status": "OPEN",
+      "claim": false
+    }
+  },
+  "performance": {
+    "formal_LAN_WAN_matrix": {
+      "status": "NOT_RUN"
+    },
+    "RTT_measurement": {
+      "status": "NOT_MEASURED"
+    },
+    "diagnostic_process_elapsed": {
+      "status": "NOT_MEASURED",
+      "note": "raw diagnostic times exist but are not formal performance results"
+    },
+    "s32_m6a_v3_to_v4_gate": {
+      "status": "OPEN",
+      "unchanged_by_s33": true
+    }
+  },
+  "repair": {
+    "pre_repair_sigpipe": {
+      "status": "PASS",
+      "meaning": "defect reproduced",
+      "p0_exit": 141,
+      "p1_exit": 141,
+      "pre_repair_library_sha256": "c207203f6c5e6325024ae525e50e7d88bf4111f3794473d5a9938fe58406ceae",
+      "pre_repair_process_binary_sha256": "57668ef37ecbc6d4bd612ce53b8d6e9b004ee2a9e081e07647257b9490170a58"
+    },
+    "post_repair_fault_matrix": {
+      "status": "PASS",
+      "cases": 3,
+      "process_binary_sha256": "1f5223b5aa0e7fd27a7ea026692cf72a344732cd2687f2caf5bc095ebc01bc16",
+      "library_sha256": "53acd750a1c3d0f0ec10f4f96fe9641f86470510de1acbcb41ef89c3dc9a7500",
+      "test_source_sha256": "42a3de0e4e6d2b5ca1b8f6647e1c2f2f9bbf96de9881e41b38be6c841da2a997",
+      "audited_targeted_ctest_log_sha256": "0dd12e44b0b935683f90aad03e9c92ec55ef7d232a11d19f9096d3d40306f5a2"
+    },
+    "natural_io_failure": {
+      "status": "NOT_REPRODUCED"
+    }
+  },
+  "status_summary": {
+    "PASS": "source rebuild, OFF/ON build boundary, targeted functional tests, 195-case oracle matrix, listed communication faults and app-level escrow cases",
+    "CONDITIONAL": "fault-path exact additional gate prefix and SQLite/app-process durability claims",
+    "OPEN": "all proof/simulation/leakage/composition gates",
+    "NOT_RUN": "dedicated v2-only TLS target, power-loss durability, formal LAN/WAN",
+    "NOT_MEASURED": "formal RTT and concrete cryptographic advantages",
+    "NOT_REPRODUCED": "natural I/O error"
+  }
+}
