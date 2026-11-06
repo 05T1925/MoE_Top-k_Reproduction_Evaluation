@@ -1,0 +1,60 @@
+{
+  "case_count": 24,
+  "groups": {
+    "128": {
+      "comparison_calls_sorted": [
+        298,
+        299,
+        303,
+        368,
+        747,
+        2094,
+        2479
+      ],
+      "k_multiplicity": {
+        "1": 1,
+        "128": 1,
+        "2": 1,
+        "64": 2,
+        "65": 1,
+        "8": 1
+      },
+      "max": 2479,
+      "median": 368,
+      "min": 298,
+      "success_rows": 7
+    },
+    "256": {
+      "comparison_calls_sorted": [
+        600,
+        605,
+        607,
+        626,
+        765,
+        10967,
+        12271,
+        14723
+      ],
+      "k_multiplicity": {
+        "1": 1,
+        "128": 2,
+        "2": 1,
+        "255": 1,
+        "256": 1,
+        "64": 1,
+        "8": 1
+      },
+      "max": 14723,
+      "median": 695.5,
+      "min": 600,
+      "success_rows": 8
+    }
+  },
+  "input": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_E2E_CASES_2026-10-15.json",
+  "input_sha256": "82f89ea34821a96f8653f4f80449162d0cdb8b5dfb10f8e69c6fee1f5b8d1b53",
+  "outcomes": {
+    "ORACLE_PASS": 18,
+    "UNIFORM_ABORT_NO_MASK": 6
+  },
+  "scope": "finite S8 functional diagnostic only; not an expected-cost theorem or performance result"
+}

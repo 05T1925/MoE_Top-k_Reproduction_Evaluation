@@ -1,0 +1,100 @@
+{
+  "binary_path_normalization_evidence": {
+    "full_comparison": {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\S10_RECONSTRUCTION_VERIFY_2026-10-15\\S10_S8_S9_BINARY_COMPARE_FULL.txt",
+      "sha256": "b7e739c3343dbc52d41c908500d952b6bd5d4997ca570ff3b6b054b8a908d289"
+    },
+    "normalization": "replace equal-length embedded path component m6b-project-derived-5iter-s8 with m6b-project-derived-5iter-s9",
+    "normalization_output": {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\S10_RECONSTRUCTION_VERIFY_2026-10-15\\S10_S8_S9_BINARY_PATH_NORMALIZATION.txt",
+      "sha256": "db9e2fc9b7b792c8ed1cf353987ea04db58d8001d9601f3ef0e75a32b33a5a7b"
+    },
+    "normalized_diff_ranges": {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\S10_RECONSTRUCTION_VERIFY_2026-10-15\\S10_S8_S9_BINARY_NORMALIZED_DIFFS.txt",
+      "sha256": "a83d7cc645201a89a1cfa95e66daf0afbae0968c4a88e9eefed13526b366eeba"
+    },
+    "result": "five differing executables then differ only in 20-byte .note.gnu.build-id at ELF offsets 888..907; two executables already match byte-for-byte; original binaries and original hashes are not interchangeable"
+  },
+  "build_configuration": {
+    "BUILD_TESTING": "ON",
+    "MOE_TOPK_ENABLE_EMP_OT": "OFF",
+    "MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL": "ON",
+    "build_type": "Release",
+    "cmake": "3.28.3",
+    "gcc": "13.3.0",
+    "link_inputs": "same recorded libraries and system dependencies",
+    "openssl": "3.0.13",
+    "os": "Ubuntu 24.04.4 WSL2",
+    "release_flags": "-O3 -DNDEBUG -std=gnu++17 -fopenmp plus identical project flags",
+    "s8_build": "/tmp/m6b-project-derived-5iter-s8-release",
+    "s9_build": "/tmp/m6b-project-derived-5iter-s9-release"
+  },
+  "comparison_scope": "S8 and S9 historical Release directories only; not the S10 independent replay build",
+  "date": "2026-10-15",
+  "historical_incomplete_s8_e2e_identity": "UNRESOLVED; stale pre-correction attempt lacked a binary hash and complete output",
+  "s8_source_base": "c3926c68fd14f270faa8b55234311071947fa080",
+  "s9_role": "same-implementer regression, not independent receipt",
+  "s9_source_base": "c3926c68fd14f270faa8b55234311071947fa080",
+  "schema": "m6b-project-derived-select5-s10-build-provenance/v1",
+  "source_tree_comparison": {
+    "checked_union": 356,
+    "evidence": {
+      "path": "C:\\Users\\28641\\.codex\\evidence\\S10_RECONSTRUCTION_VERIFY_2026-10-15\\S10_S8_S9_SOURCE_TREE_COMPARE.txt",
+      "sha256": "665f2044a69062e5af285b9ed2c1da9eb6786032a3d5b6c3d64e9bddc77fb0f3"
+    },
+    "note": "includes active, baseline and experiment source paths; active VFSS C/C++/header subset contains 234 paths",
+    "sha256": "665f2044a69062e5af285b9ed2c1da9eb6786032a3d5b6c3d64e9bddc77fb0f3",
+    "source_hash_mismatches": 0
+  },
+  "targets": [
+    {
+      "bytes": 321760,
+      "name": "moe_topk_project_derived_select5_conformance_test",
+      "normalized": "path strings removed; only build-id differs",
+      "s8_sha256": "db90b8aa40b2b871771cd775587d62ef10d4d9b4e5539eacfe84f0b612784921",
+      "s9_sha256": "57d1dbe03ad224a5759e2d61ac364095aea9a2fab748a5d346c7eefef8e7f7bf"
+    },
+    {
+      "bytes": 558792,
+      "name": "moe_topk_project_derived_select5_material_store_test",
+      "normalized": "path strings removed; only build-id differs",
+      "s8_sha256": "2c0f27c254e1058a37629dd1daf63cd55fd4e889d4264962ef8c0c70e4ed0af6",
+      "s9_sha256": "a5f08ee2e7942a95d1216da5e100f3f0b98aa2ae56c0a2b96a2ec999149db648"
+    },
+    {
+      "bytes": 93240,
+      "name": "moe_topk_streamed_material_slot_store_test",
+      "normalized": "identical",
+      "s8_sha256": "19e4fb9a975cffa95812426ab27ea4cb03fc5622d7502c41ad5fb53d95303129",
+      "s9_sha256": "19e4fb9a975cffa95812426ab27ea4cb03fc5622d7502c41ad5fb53d95303129"
+    },
+    {
+      "bytes": 63144,
+      "name": "moe_topk_tls13_transport_conformance_test",
+      "normalized": "identical",
+      "s8_sha256": "069b9ffd089fb04c38d133d4634e1d0962fb6a5ac119563ec0d5e203c9d8cdc4",
+      "s9_sha256": "069b9ffd089fb04c38d133d4634e1d0962fb6a5ac119563ec0d5e203c9d8cdc4"
+    },
+    {
+      "bytes": 608792,
+      "name": "moe_topk_project_derived_select5_process_e2e_test",
+      "normalized": "path strings removed; only build-id differs",
+      "s8_sha256": "b72bc6a9df4e389abfe4d67d450ac40ecdc77a0dfe36d7a22f3e60957af8c1d6",
+      "s9_sha256": "92a4483c61c9861017e6d5f90e402fb5172f91dc0488695d26ad07087efcaa1e"
+    },
+    {
+      "bytes": 202752,
+      "name": "moe_topk_m2_ucmp_conformance_test",
+      "normalized": "path strings removed; only build-id differs",
+      "s8_sha256": "73574e88208cea2e93d30de72468b7f3ad3c47ef12cf07e15fafd03b7b74cdf6",
+      "s9_sha256": "ef805eeef41fc2eba6c69240070626b3719de5dcb6d636f83160d3c2c78e0f11"
+    },
+    {
+      "bytes": 333048,
+      "name": "moe_topk_m2_parallel_shuffle_conformance_test",
+      "normalized": "path strings removed; only build-id differs",
+      "s8_sha256": "059b7272cb752ec147411105c2764830dc1b4c5bbf9fbee9cc4067ab0aac0192",
+      "s9_sha256": "944886f71ebd901b4e2bb7243ae187a9a1ecfd2957b9e7dbda15106426e4560a"
+    }
+  ]
+}
