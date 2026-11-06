@@ -1,0 +1,143 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S22",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "runtime_object": {
+    "stage": "S15 default-OFF repair snapshot locked by S18",
+    "canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "files_verified": 72,
+    "mismatches": 0
+  },
+  "reviewer": {
+    "required": "not involved in S19-S21 proof writing, derivation, or decisions",
+    "candidate": "/root/independent_dcf_review",
+    "participation_disclosure": "SATISFIED: reviewer states no participation in S19-S21 proof writing, derivation, or decisions",
+    "independent_crypto_review": "CONDITIONAL",
+    "scope": "Read-only review of the S15-locked R34 carry-to-sign pre-output local-view continuation only; excludes fixed ideal-output-share simulation, adaptive pool, and shuffle/output/crash composition.",
+    "evidence_file": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_INDEPENDENT_REVIEW_2026-10-16.md"
+  },
+  "gates": {
+    "S15_SOURCE_IDENTITY": {
+      "status": "PASS",
+      "evidence": "S18 receipt manifest; 72/72 per-file SHA-256 matched; canonical digest recomputed using UTF-8 ordinal path sort and path<TAB>lowercase-sha256<LF>."
+    },
+    "R34_CARRY_SIGN_SOURCE_RECONSTRUCTION": {
+      "status": "PASS",
+      "evidence": "Frozen protocol_i_score_input.cpp: kScoreBits=34; phase 4/5 frames; lift formula at line 109; frames big-endian; carry_open is declared but unused."
+    },
+    "DCF_FIXED_ALPHA_KEY_ONLY_BRIDGE": {
+      "status": "CONDITIONAL",
+      "scope": "Single party key for fixed alpha,beta=1,party, followed by deterministic Eval postprocessing; actual RNG replacement remains unquantified."
+    },
+    "CARRY_TO_SIGN_P0_PREOUTPUT_LOCAL_VIEW": {
+      "status": "CONDITIONAL",
+      "scope": "Non-author reviewer conditionally accepts the local pre-output sampler under ideal joint tape, per-fixed-alpha key-only theorem, and approved masked-frame L; epsilon_RNG_joint remains unquantified. Not conditioned on a fixed ideal output share."
+    },
+    "CARRY_TO_SIGN_P1_PREOUTPUT_LOCAL_VIEW": {
+      "status": "CONDITIONAL",
+      "scope": "Non-author reviewer conditionally accepts the symmetric local pre-output sampler under ideal joint tape, per-fixed-alpha key-only theorem, and approved masked-frame L; epsilon_RNG_joint remains unquantified. Not conditioned on a fixed ideal output share."
+    },
+    "CARRY_TO_SIGN_P0_GIVEN_IDEAL_OUTPUT_SHARE": {
+      "status": "OPEN/NO_GO",
+      "first_gap": "No formal score-conversion ideal functionality/share-output distribution and no Sim_b(x_b,Q_b,L) conditional sampler."
+    },
+    "CARRY_TO_SIGN_P1_GIVEN_IDEAL_OUTPUT_SHARE": {
+      "status": "OPEN/NO_GO",
+      "first_gap": "No formal score-conversion ideal functionality/share-output distribution and no Sim_b(x_b,Q_b,L) conditional sampler."
+    },
+    "REVIEWER_INDEPENDENCE": {
+      "status": "PASS",
+      "evidence": "Reviewer /root/independent_dcf_review explicitly disclosed no participation in S19-S21 proof writing, derivation, or decisions."
+    },
+    "INDEPENDENT_CRYPTO_REVIEW": {
+      "status": "CONDITIONAL",
+      "evidence": "The reviewer conditionally accepts only the local carry-to-sign pre-output sampler. The output-conditioned and composed security gates remain open."
+    },
+    "CARRY_TO_SIGN_ATTACK": {
+      "status": "NOT_FOUND_NOT_A_PASS",
+      "evidence": "No exploitable distinguisher or reproducible attack was derived; phase-5 relation is a simulation obligation only."
+    },
+    "ADAPTIVE_STATE_CHAIN": {
+      "status": "OPEN/NO_GO",
+      "first_gap": "q_b from protocol_i_score_input.cpp:129-141 becomes key_records[i].word0 and enters run_two_round_shuffle at protocol_i_project_derived_select5.cpp:1901-1906; no sampler is proved for this state conditioned on the ideal final output share.",
+      "later_adaptive_select_slots": "NOT_RUN"
+    },
+    "Q_TO_FORWARD_SHUFFLE_CONDITIONAL_VIEW": {
+      "status": "OPEN/NO_GO",
+      "first_gap": "Missing F_scoreconv share-output semantics and Sim_b(x_b,Q_b,L) for q_b/key_records plus M2CM forward-shuffle local view. This is a missing proof step, not an attack."
+    },
+    "POOL_AND_ADAPTIVE_ACCESS_N128": {
+      "status": "OPEN/NO_GO",
+      "schema": "M6B5/v3 + M2CM/v1 + M6P2/v1",
+      "scope": "No S22 full-pool recomputation; inherited S21 key-only projection remains conditional only."
+    },
+    "POOL_AND_ADAPTIVE_ACCESS_N256": {
+      "status": "OPEN/NO_GO",
+      "schema": "M6S2/v2",
+      "scope": "No S22 full-pool recomputation; inherited S21 key-only projection remains conditional only."
+    },
+    "SHUFFLE_OUTPUT_CRASH_COMPOSITION_P0": {
+      "status": "OPEN/NO_GO",
+      "reason": "Not analyzed in S22 beyond identifying q_b -> key_records -> forward shuffle as the first unproved composition state."
+    },
+    "SHUFFLE_OUTPUT_CRASH_COMPOSITION_P1": {
+      "status": "OPEN/NO_GO",
+      "reason": "Not analyzed in S22 beyond the first unproved composition state; inherited tests only support scoped no-complete-mask and may leave an 8-byte local XOR share."
+    },
+    "RUNTIME_DEFECT": {
+      "status": "NOT_FOUND",
+      "scope": "Read-only source review; no runtime defect reproduced."
+    },
+    "BUILD_TEST_E2E": {
+      "status": "NOT_RUN",
+      "reason": "No runtime change; S18 full feature matrix not repeated."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN/NO_GO"
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "OPEN/NO_GO"
+    },
+    "PROTOCOL_EXCHANGE_COUNT": {
+      "status": "NOT_RUN",
+      "algorithm_iterations": 5,
+      "max_plaintext_comparison_dependency_layers": 9,
+      "raw_score_to_mask_online_exchange_count": "NOT_CLOSED",
+      "reason": "Full message DAG was not reconstructed after the first q_b-to-forward-shuffle proof break."
+    },
+    "V3_V4_FORMAL_PERFORMANCE": {
+      "status": "NOT_ALLOWED/NOT_RUN",
+      "v3": "OPEN",
+      "v4": "NOT_ALLOWED",
+      "lan_wan": "NOT_RUN"
+    }
+  },
+  "leakage_basis": {
+    "current_task_approved_fields": [
+      "shuffled-coordinate endpoints and positions",
+      "pivot positions",
+      "opened comparison bits",
+      "sample seed for each active iteration, generated after forward shuffle and disclosed at iteration activation",
+      "masked values",
+      "comparison count",
+      "communication length",
+      "uniform joint ABORT"
+    ],
+    "historical_audit_note": "A prior repository leakage audit still records exact approval as pending; S22 follows the user's explicit approved-field statement in this task and does not treat approval as proof."
+  },
+  "security_assumptions_and_unquantified_terms": {
+    "trust_model": "T is fully trusted, generates material offline, exits, and does not collude; at most one online party is semi-honest corrupt; P0/P1 communicate over private authenticated channels.",
+    "epsilon_G_candidate": "Adv_AES128^PRP(T_prime,q=5)+10/2^128",
+    "candidate_carry_sign_bound": "68*epsilon_G + epsilon_RNG_joint",
+    "unquantified": [
+      "epsilon_RNG_joint for the joint getrandom/RAND_bytes prefix and party-visible auxiliary state",
+      "AES reduction running time T_prime and concrete PRP advantage",
+      "actual TLS/private-authenticated-channel advantage and composition"
+    ],
+    "interpretation": "The bound is conditional and scoped to the local pre-output continuation. It is not an implementation-level security estimate."
+  },
+  "runtime_changed": false,
+  "formal_performance": "NOT_RUN",
+  "evidence_scope": "Source-level author analysis and S18/S21 inherited evidence only; no new functional/security experiment."
+}
