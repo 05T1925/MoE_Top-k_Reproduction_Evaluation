@@ -1,0 +1,108 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S19",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "runtime_object": {
+    "origin": "S18 independently received S15 runtime snapshot",
+    "file_count": 72,
+    "s15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "canonical_source_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "s19_source_recheck": "PASS",
+    "s19_runtime_changed": false
+  },
+  "gates": {
+    "S18_SOURCE_IDENTITY": {
+      "status": "PASS",
+      "scope": "72/72 S15 files and canonical digest revalidated; this is source identity, not a fresh function receipt."
+    },
+    "S18_FUNCTIONAL_RECEIPT": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Inherited from S18 report only; S19 did not rerun S18 build, CTest, E2E, TLS, or crash-prefix evidence."
+    },
+    "DCF_SINGLE_KEY_PRIVACY": {
+      "status": "CONDITIONAL",
+      "scope": "M2B1/v1 key-only replacement maps to BCG+21 Figure 1/Theorem 2/Appendix F.1 under AES-128 PRP and ideal joint random tape. epsilon_RNG_joint is unquantified; concrete channel assumptions are separate."
+    },
+    "UCMP_CORRELATED_CONDITIONAL_VIEW_P0": {
+      "status": "CONDITIONAL",
+      "scope": "Same P0 key handles both x and y Eval calls; operands, local/peer operand-share frames, and opened comparison bit are conditioned on. Correctness makes the opened bit root-tape independent."
+    },
+    "UCMP_CORRELATED_CONDITIONAL_VIEW_P1": {
+      "status": "CONDITIONAL",
+      "scope": "Same P1 key handles both x and y Eval calls; party-specific initial control and output-share corrections are included."
+    },
+    "POOL_AND_ADAPTIVE_ACCESS_N128_M6B5_V3_M2CM_V1_M6P2_V1": {
+      "status": "CONDITIONAL",
+      "slots": 41024,
+      "sum_input_widths": 1639424,
+      "advantage": "1639424 * epsilon_G + epsilon_RNG_joint(M6B5/v3)",
+      "scope": "Includes used, unused, rejected slots and monolithic package/claim postprocessing; relies on fresh ideal roots and transcript-determined access."
+    },
+    "POOL_AND_ADAPTIVE_ACCESS_N256_M6S2_V2": {
+      "status": "CONDITIONAL",
+      "slots": 163968,
+      "sum_input_widths": 6719104,
+      "advantage": "6719104 * epsilon_G + epsilon_RNG_joint(M6S2/v2)",
+      "scope": "Includes used, unused, rejected streamed slots, segment bytes, leases/restart prefix and transcript-determined access."
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION_P0": {
+      "status": "CONDITIONAL",
+      "scope": "M2CM/v1 forward/inverse local permutation and fresh pad simulation under approved wire-level masked-frame L and ideal private authenticated channels."
+    },
+    "SHUFFLE_OUTPUT_COMPOSITION_P1": {
+      "status": "CONDITIONAL",
+      "scope": "Separate P1 simulation, including P1 output-share direction and crash-prefix local artifact."
+    },
+    "JOINT_PARTY_VIEW": {
+      "status": "CONDITIONAL",
+      "advantage": "(sum_j w_j) * epsilon_G + epsilon_RNG_joint(schema,T) + epsilon_channel(schema,T)",
+      "scope": "Conditional simulator/hybrid is documented for each party; ideal private authenticated channel has epsilon_channel=0. It is not yet reviewed by a separate non-author cryptographic reviewer. Concrete TLS channel advantage and epsilon_RNG_joint are unquantified; wall-clock timing is not measured."
+    },
+    "NON_AUTHOR_CRYPTO_REVIEW": {
+      "status": "OPEN",
+      "scope": "A reviewer who did not write this conditional-view argument must check theorem quantifiers, conditioning, pool hybrids, shared-Pi shuffle simulation, and orphan-share crash handling."
+    },
+    "CRASH_ABORT_OUTPUT_VIEW": {
+      "status": "CONDITIONAL",
+      "scope": "Only S18 tested no-complete-mask prefixes are inherited. A late prefix can leave one party an 8-byte local XOR share. No atomic/all-or-nothing publication claim."
+    },
+    "REPRODUCIBLE_ATTACK": {
+      "status": "NOT_FOUND_NOT_A_PASS",
+      "scope": "No reproducible distinguisher or exploit was identified in this review; absence of an attack is not a proof."
+    },
+    "RUNTIME_DEFECT": {
+      "status": "NOT_FOUND",
+      "scope": "No reproducible code/contract defect found; runtime unchanged and no regression run required by this review."
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "OPEN_NO_GO",
+      "scope": "No admission beyond N=256."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN_NO_GO",
+      "scope": "Keep EXPERIMENTAL; conditional assumptions unquantified and a non-author review is outstanding."
+    },
+    "V3_V4_PERFORMANCE_STATUS": {
+      "status": "NOT_RUN",
+      "scope": "M6A V3 remains OPEN; V4 remains NOT_ALLOWED; formal LAN/WAN matrix not run."
+    }
+  },
+  "security_assumptions": [
+    "AES-128 is a secure PRP for the five distinct fixed AES inputs used by the G expander.",
+    "epsilon_RNG_joint(schema,T) bounds the whole adaptive getrandom/RAND_bytes tape and all approved party-visible auxiliary information against an independent uniform ideal tape; it is currently unquantified.",
+    "Trusted offline T does not collude with either online party; at most one online party is semi-honest corrupted.",
+    "Private authenticated channels are ideal in the proof statement. A concrete TLS 1.3 instantiation requires a separate unquantified channel term; external timing is outside the measured scope.",
+    "The leakage L includes each transmitted masked operand-share frame and its derived masked ring value, as well as the already approved seed, endpoint, pivot, opened-bit, length, count, and uniform ABORT fields."
+  ],
+  "validation": {
+    "S19_build": "NOT_RUN",
+    "S19_tests": "NOT_RUN",
+    "S18_tests": "INHERITED_ONLY_NOT_RERUN",
+    "formal_performance": "NOT_RUN"
+  },
+  "artifacts": {
+    "report": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_REPORT_2026-10-16.md",
+    "decision": "../decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_DECISION_2026-10-16.md",
+    "manifest": "M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json"
+  }
+}

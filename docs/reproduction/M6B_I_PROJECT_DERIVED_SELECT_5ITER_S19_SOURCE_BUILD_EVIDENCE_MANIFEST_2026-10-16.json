@@ -1,0 +1,139 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S19",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "repository": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-select5-s19\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-project-select5-s19",
+    "base_revision": "c3926c68fd14f270faa8b55234311071947fa080",
+    "runtime_changes_in_s19": false,
+    "self_hash_excluded": true
+  },
+  "runtime_snapshot": {
+    "receipt_source": "S18 independent receipt of S15 default-OFF repair snapshot",
+    "external_source_root": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\source",
+    "s15_source_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "file_count": 72,
+    "verified_files": 72,
+    "mismatched_files": 0,
+    "canonicalization": "UTF-8, slash-normalized relative path + TAB + lowercase SHA-256, paths sorted with ordinal comparison, newline after every row",
+    "canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "runtime_scope": "S15 source snapshot only; S18/S19 documentation is not part of the 72-file runtime snapshot"
+  },
+  "review_environment": {
+    "os": "Microsoft Windows NT 10.0.26200.0",
+    "powershell": "7.6.5",
+    "git": "2.55.0.windows.1",
+    "compiler_build": "NOT_RUN",
+    "binary_hash": "NOT_MEASURED"
+  },
+  "inherited_s18_evidence_copies": [
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_DECISION_2026-10-16.md",
+      "sha256": "4290e5527ac4957d3f48d0ddbcaef58a66a9793ca893bc1c947556d239f85ea0",
+      "copy_status": "byte-identical to S18 worktree; original not modified"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_REPORT_2026-10-16.md",
+      "sha256": "a8fd265ed7ed5d7c9c0866ca3033ec1a9fa07e063890c0c299ea21e02f778c0f",
+      "copy_status": "byte-identical to S18 worktree; original not modified"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_GATES_2026-10-16.json",
+      "sha256": "f687962f25076c3b237e3237d759878560cc4e8534ae14cfda563beff152acc5",
+      "copy_status": "byte-identical to S18 worktree; original not modified"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json",
+      "sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+      "copy_status": "byte-identical to S18 worktree; original not modified"
+    }
+  ],
+  "reviewed_runtime_files": [
+    {
+      "path": "VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp",
+      "sha256": "b2bc67cbe26bd11b2fded7a3f10002970947694e001cbf16f2bbbd45ae83982f",
+      "reviewed_symbols": "expand, expand_children, convert_group, eval, generate, keygen, serialize"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_ucmp.cpp",
+      "sha256": "8b2c68123db86e4ebfa976131895fdd6b383485a01f4d4bd64863a08e6d0aa64",
+      "reviewed_symbols": "ProtocolIUcmpMaterial::eval_strict_lt; ProtocolIUcmpPartyMaterial::eval_strict_lt/serialize/deserialize"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+      "sha256": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+      "reviewed_symbols": "protocol_i_raw_score_input_party; carry and sign masked operand exchanges"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "sha256": "d339c326efd4ab5dd3415f985a5c93b342c5c94cd0f79be86117084ef9a6f31a",
+      "reviewed_symbols": "Select5 compare-wave frames, sample seed phases, membership, inverse output and final status"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+      "reviewed_symbols": "dealer permutation and sigma/tau/a/e/r generation; party material serializer"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_material_slot_store.cpp",
+      "sha256": "82cc87d8483ddaa85008fd14b0d685da5ad50460da4f27e041c12617d9938e28",
+      "reviewed_symbols": "party-scoped slot reads, lease/replay state and streamed-store handling"
+    },
+    {
+      "path": "VFSS/include/moe_topk/dcf_bcg21_fig1_aes128_v1.h",
+      "sha256": "8f25128dcebe6497a9e63bbfb2388938b5e16cce658af575e9209c78543c10f0"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_ucmp.h",
+      "sha256": "973a46df5cf4ac49df47d0b7f345e39de6ec6c0c13d03cc6fc13a47465bdb51d"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_score_input.h",
+      "sha256": "61eca4c20e21a86c76593c2ee2bc22d887d78d33df28e44c7b879a171c2d09af"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "sha256": "d84528507559b15454084dba8b36e9d05197e6124da6d437ab41aef7a6184d8f"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_parallel_shuffle.h",
+      "sha256": "b187e84ac56fd5f861a61652160198a886dbef57f7d4cff8a381ab443cc0760d"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_material_slot_store.h",
+      "sha256": "87a3d323f9e7689185d42a21068dd23efad39269b14345ad21c6a6d2733b94d1"
+    }
+  ],
+  "paper_source": {
+    "title": "Function Secret Sharing for Mixed-Mode and Fixed-Point Secure Computation",
+    "authors": "Boyle et al.",
+    "official_author_pdf": "https://www.microsoft.com/en-us/research/wp-content/uploads/2021/01/FSS.pdf",
+    "reviewed_locations": "Figure 1 at 0-based PDF viewer index 12 (1-based PDF page 13); Theorem 2 at viewer index 13 (PDF page 14); Appendix F.1 at viewer indices 41-45 (PDF pages 42-46)",
+    "sha256_local_copy": "NOT_AVAILABLE; no local paper copy was added or modified"
+  },
+  "evidence_and_build": {
+    "s19_build": "NOT_RUN; documentation/proof review only; no binary hash",
+    "s19_ctest_e2e_tls_crash_prefix": "NOT_RUN; S18 scoped results remain inherited and are not relabeled as S19 runs",
+    "s19_rng_platform_quantification": "NOT_MEASURED; epsilon_RNG_joint remains an external unquantified condition",
+    "s19_external_timing": "NOT_MEASURED",
+    "s19_new_raw_logs": "NONE",
+    "reproducible_attack": "NOT_FOUND_NOT_A_PASS",
+    "runtime_defect": "NOT_FOUND; no runtime changes and no runtime regression run",
+    "performance_matrix": "NOT_RUN; M6A V3 OPEN and V4 NOT_ALLOWED"
+  },
+  "repository_checks": {
+    "git_diff_check": "PASS; run after the final source/document edits",
+    "vfss_baseline_tracked_diff": "NONE",
+    "runtime_source_paths_in_diff": "NONE",
+    "keys_certificates_material_packages_build_products_raw_large_logs_in_diff": "NONE"
+  },
+  "s19_artifact_hashes": {
+    "PROJECT.md": "f578a6f1cb6a3b534ac30b201245d62455ef9ae4d032d1e4c3c9fa2d13682186",
+    "docs/IMPLEMENTATION_PLAN.md": "a4388a8da3d242a5c76a26bc4e70149b118134cba14be3fe9397da3013e05f7b",
+    "docs/REFERENCE_MANIFEST.md": "a36247e26963aa15d4df37a00d927fdb6a32f045f04033018da2aba7949f9e80",
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_DECISION_2026-10-16.md": "f133629b7e0233c8f5ccd04baabadf1b7d9e2f7fb3ed366b6fae1542171baf6f",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_REPORT_2026-10-16.md": "27380f69ac4fdd71a6d7c0f98be097e8a74a89367d3ece054473bdfe17441f8c",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_GATES_2026-10-16.json": "ea2c9664d285eed59c361fb71750055d7ba271827d2391ca492fb8ea4e51f0fc"
+  }
+}
