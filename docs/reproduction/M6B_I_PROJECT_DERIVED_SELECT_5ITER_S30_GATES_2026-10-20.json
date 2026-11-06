@@ -1,0 +1,213 @@
+{
+  "schema": "m6b-project-derived-select5-s30-gates/v1",
+  "date": "2026-10-20",
+  "route": "PROJECT_DERIVED_SELECT_5ITER",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S30",
+  "reviewed_object": {
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s25/MoE_Top-k_Reproduction_Evaluation",
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "manifest_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+    "candidate_committed": false,
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "file_count": 74,
+    "all_file_hashes_match": true,
+    "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d",
+    "identity_status": "PASS"
+  },
+  "s25_functional_receipt": {
+    "status": "PASS_WITH_SCOPE",
+    "source": "S27 independent receipt for the identical S25 manifest snapshot",
+    "s30_rerun": "NOT_RUN",
+    "scope": "Historical recorded builds/tests/E2E only; inherited evidence is not a S30 test run or a complete security proof."
+  },
+  "ideal_functionality": {
+    "success_output_law": {
+      "shares_of_runtime_mask_status": "PASS_WITH_SCOPE",
+      "runtime_mask_equals_stable_topk_status": "NOT_PROVEN/INHERITED_FUNCTIONAL_ONLY",
+      "status": "PASS_WITH_SCOPE",
+      "name": "F_TOPK-U",
+      "runtime_share_law": "For M_runtime: sample z0 uniformly from {0,1}^n; set z1=z0 XOR M_runtime; party b receives only z_b.",
+      "basis": "S25 inverse shuffle e0/e1 include -h/+h; output is word1 LSB; ideal independent random tape yields uniform per-party shares whose XOR is M_runtime.",
+      "ideal_target": "F_TOPK-U for stable Top-K mask M; functional equivalence requires M_runtime=M.",
+      "runtime_rng_assumption": "OS getrandom/OpenSSL RAND_bytes joint computational distribution and epsilon_rng_joint are NOT_QUANTIFIED.",
+      "runtime_mask_equals_stable_topk": "NOT_PROVEN/INHERITED_FUNCTIONAL_ONLY",
+      "correctness_scope": "S27 finite functional receipt does not prove equality for all allowed inputs and random tapes."
+    },
+    "simulator_interface": {
+      "P0": ["x_0", "z_0", "public_params", "approved_L"],
+      "P1": ["x_1", "z_1", "public_params", "approved_L"],
+      "excluded": ["peer input", "M", "Q_b", "Q_prime_b", "rho_b", "carry/sign local shares", "DCF/uCMP keys", "Dealer tape", "party-local package plaintext as simulator input", "manifest/lease as simulator input"]
+    },
+    "approved_L": [
+      "public parameters and protocol bindings",
+      "approved post-shuffle endpoints/positions",
+      "pivot and comparison result bit",
+      "sample seed for each active iteration only after forward shuffle",
+      "approved masked values",
+      "comparison count",
+      "communication length",
+      "uniform ABORT"
+    ],
+    "leakage_changed": false,
+    "scope": "S30 does not add fields to the approved L; v3 preservation of exact declassification/length semantics remains conditional and unproven.",
+    "Q_prime_added_to_L": false
+  },
+  "abort_output_contract": {
+    "status": "NEEDS_OWNER_DECISION",
+    "evidence_limit": "S25 crash tests establish NO_COMPLETE_MASK for tested prefixes only; they do not establish atomic no-output or all-or-nothing.",
+    "observed": [
+      "local output_share is formed before PREPARE/COMMIT/PUBLISH",
+      "P0 crash steps 2-6 occur after local share formation",
+      "crash steps 5-6 recorded P1 exit 0 and an 8-byte length prefix whose encoded payload length is n=7",
+      "crash probe reads only the 8-byte length prefix (encoding payload length n=7) and does not read payload"
+    ],
+    "options": [
+      {
+        "name": "F_TOPK-PREFIX",
+        "contract": "A party gets its local share iff its API returns; otherwise its ideal output is bottom. The other party may already have returned.",
+        "status": "NOT_SELECTED"
+      },
+      {
+        "name": "F_TOPK-ATOMIC",
+        "contract": "Both parties receive shares iff both atomically publish; otherwise both outputs are bottom.",
+        "status": "NOT_SELECTED",
+        "code_evidence": "Not implied by local durable markers or NO_COMPLETE_MASK."
+      }
+    ]
+  },
+  "end_to_end_simulation": {
+    "P0": "OPEN/NO_GO",
+    "P1": "OPEN/NO_GO",
+    "complete_score_conversion_party_view": "OPEN/NO_GO",
+    "simulator_interface": "Sim_b(x_b,z_b,public_params,approved_L)",
+    "first_stop": "The package generator can sample the unconditional package law. The first missing step is a conditional joint sampler linking Pkg_b and the online carry/sign DCF key+mask, frames and Eval outputs under fixed (x_b,z_b,pp,L); this boundary is protocol_i_score_input.cpp:90-139. rho is pre-ready material; Q_b/Q_prime_b/frames are local view, not ideal outputs.",
+    "classification": {
+      "proof_gap": true,
+      "conditional_distributions_unquantified": true,
+      "reproducible_distinguisher_found": false,
+      "impossibility_result": false
+    },
+    "restricted_scoreconv_prefix": "CONDITIONAL/UNQUANTIFIED; does not cover the full package or final output-conditioned view.",
+    "final_inverse_pad_step": "If the complete prefix and hidden base were already simulatable, condition the corresponding low bit of h and jointly sample e_b/package; candidate only, not a complete conditional sampler."
+  },
+  "modular_composition": {
+    "P0": "OPEN/NO_GO",
+    "P1": "OPEN/NO_GO",
+    "reason": "F_scoreconv/v2 returns Q_prime_b to the corrupted party, expanding the composed functionality. Hiding Q_prime_b requires the missing final-output-conditioned joint sampler.",
+    "Q_prime_publication_accepted": false
+  },
+  "current_interface_security": {
+    "P0": "OPEN/NO_GO",
+    "P1": "OPEN/NO_GO",
+    "reason": "No full view sampler from the frozen output share and L."
+  },
+  "v2_candidate": {
+    "runtime_modified": false,
+    "functionality_or_leakage_changed": false,
+    "proof_admission": "OPEN/NO_GO",
+    "N128_full_pool_and_shuffle_output_crash_composition": "NOT_ATTEMPTED_AFTER_STOP_CONDITION",
+    "N256_full_pool_and_shuffle_output_crash_composition": "NOT_ATTEMPTED_AFTER_STOP_CONDITION"
+  },
+  "party_route_gates": {
+    "P0": {
+      "END_TO_END_SIM": "OPEN/NO_GO",
+      "MODULAR_COMPOSITION_VALID": "OPEN/NO_GO",
+      "CURRENT_INTERFACE_SECURITY": "OPEN/NO_GO",
+      "VERSIONED_REDESIGN_REQUIRED": "CONDITIONAL"
+    },
+    "P1": {
+      "END_TO_END_SIM": "OPEN/NO_GO",
+      "MODULAR_COMPOSITION_VALID": "OPEN/NO_GO",
+      "CURRENT_INTERFACE_SECURITY": "OPEN/NO_GO",
+      "VERSIONED_REDESIGN_REQUIRED": "CONDITIONAL"
+    },
+    "redesign_condition": "A full v2 sampler is not established; v3 is the selected design route, but v2 impossibility is not proven."
+  },  "versioned_redesign": {
+    "name": "score-to-mask-v3",
+    "route_name_preserved": "PROJECT_DERIVED_SELECT_5ITER",
+    "spec_status": "DESIGN_SPEC_ONLY",
+    "candidate_backend": "Two-party semi-honest GMW Boolean circuit with one-time XOR-shared Beaver triples generated by trusted offline T.",
+    "intended_outer_functionality": "Same stable Top-K mask and F_TOPK-U output share law, conditional on proving all-input/all-random-tape runtime correctness.",
+    "intended_leakage_fields": "Same S29 L fields; every declassification output and timing requires proof.",
+    "leakage_semantics_status": "CONDITIONAL/UNPROVEN; v3 communication-length values and declassification schedule must be shown to reveal no additional secret-dependent information.",
+    "break_removal_status": "CONDITIONAL/NOT_PROVEN",
+    "proposed_break_removal": "CONDITIONAL: if a concrete GMW variant is fixed and its transcript, per-gate triple/package, declassification, used/unused material and crash-prefix simulators are proven from (x_b,z_b,public_params,L), the new proof can cover the old Q_prime conditional-law gap. S30 has not instantiated that theorem.",
+    "formal_security_proven": false,
+    "runtime_implemented": false,
+    "implementability_admission": "NO_GO_PENDING_OWNER_AND_PROOF",
+    "owner_decisions_needed": [
+      "Select F_TOPK-PREFIX or F_TOPK-ATOMIC abort/output contract.",
+      "Confirm that the v3 communication-length and declassification schedule preserves the exact approved leakage semantics."
+    ],
+    "proof_obligations": [
+      "Circuit correctness for Q20.12 signed scores, stable ties, five Select iterations, membership, inverse routing and Top-K mask.",
+      "P0 and P1 GMW semi-honest simulators from only x_b,z_b,public_params,L.",
+      "Full preprocessing share, manifest, digest, ready, lease, used/unused slot and abort-prefix simulation.",
+      "Exact declassification ordering and no future-seed disclosure.",
+      "One-time material consumption and no cross-version v2 package reuse.",
+      "Trusted T directly generates Beaver triples in the current design, so OT is not applicable; prove triple correctness/package law and quantify preprocessing, PRG/DRBG, joint RNG, TLS and hybrid advantages. Add OT only if a selected implementation uses it."
+    ],
+    "N_range": {
+      "N128": "Design target; no v3 code/proof/measurement.",
+      "N256": "Design target; no v3 code/proof/measurement.",
+      "N_gt_256": "NOT_RUN/OUT_OF_SCOPE"
+    }
+  },
+  "pool_inventory": {
+    "N128_schema": "M6B5/v4 monolithic",
+    "N128": {
+      "select_dcf": 40640,
+      "shuffle_metadata": 1280,
+      "carry_sign_dcf": 256,
+      "membership_dcf": 128,
+      "rho_fields": 128,
+      "logical_items_total": 42432,
+      "privacy_composition": "NOT_ATTEMPTED_AFTER_STOP_CONDITION"
+    },
+    "N256_schema": "M6S2/v3 streamed",
+    "N256": {
+      "select_dcf": 163200,
+      "shuffle_metadata": 2560,
+      "carry_sign_dcf": 512,
+      "membership_dcf": 256,
+      "rho_slots": 256,
+      "logical_items_total": 166784,
+      "privacy_composition": "NOT_ATTEMPTED_AFTER_STOP_CONDITION"
+    }
+  },
+  "independent_receiver": {
+    "identity": "/root/s30_independent_receiver",
+    "independent_of_S19_S29": true,
+    "initial_read_only_review": "COMPLETE",
+    "S30_draft_review": "COMPLETE_WITH_CORRECTIONS_APPLIED",
+    "S30_final_read_only_review": "COMPLETE",
+    "reviewed_scope": [
+      "S25 74-file identity",
+      "output share law derivation",
+      "crash probe interpretation",
+      "v3 requirement not to hide/rename Q_prime"
+    ],
+    "cryptographic_proof_completed": false,
+    "corrections_applied": ["Separate runtime mask share law from all-input stable Top-K correctness.", "Clarify unconditional package generation versus first online conditional-sampler failure.", "Condition h and jointly generate e/package; do not claim e LSB alone sets output.", "Mark v3 gap removal conditional on future proof.", "Remove epsilon_OT from the trusted-T Beaver-triple design."],
+    "tests_rerun": false
+  },
+  "modified_files": [
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_REPORT_2026-10-20.md",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_GATES_2026-10-20.json",
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_DECISION_2026-10-20.md"
+  ],
+  "reruns": {
+    "S25_manifest_hash_recheck": "PASS; 74/74 matched; canonical SHA-256 matched.",
+    "source_read_only_inspection": "DONE",
+    "build": "NOT_RUN",
+    "conformance": "NOT_RUN",
+    "oracle_differential": "NOT_RUN",
+    "independent_process_e2e": "NOT_RUN",
+    "S25_S27_functional_matrix": "NOT_RUN",
+    "N128_N256_full_simulator": "NOT_RUN",
+    "formal_LAN_WAN_matrix": "NOT_RUN",
+    "performance_metrics": "NOT_MEASURED",
+    "secure_alias": "NOT_CREATED",
+    "runtime_source_changes": 0
+  }
+}
