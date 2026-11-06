@@ -1,0 +1,163 @@
+{
+  "schema": "m6b-project-derived-select5-s23-source-evidence-manifest/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S23",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "checkout": {
+    "worktree": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s23/MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-project-select5-s23",
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "main_origin_main_at_start": "c3926c68fd14f270faa8b55234311071947fa080",
+    "runtime_modified": false
+  },
+  "review_target": {
+    "label": "S15 default-OFF repair snapshot independently functionally received by S18",
+    "source_root": "C:/Users/28641/.codex/evidence/M6B_I_S18_20261016_02/source",
+    "s15_manifest_path": "C:/Users/28641/.codex/evidence/M6B_I_S18_20261016_02/S15_SOURCE_MANIFEST.json",
+    "s15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "s18_receipt_manifest_sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+    "selected_file_count": 72,
+    "per_file_rehash": "72_MATCH_0_MISMATCH",
+    "canonicalization": "UTF-8 ordinal path ordering; each line path<TAB>lowercase_sha256<LF>; manifest excluded",
+    "canonical_source_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "canonical_recomputation": "PASS"
+  },
+  "source_files_reviewed": [
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+      "sha256": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_score_input.h",
+      "sha256": "61eca4c20e21a86c76593c2ee2bc22d887d78d33df28e44c7b879a171c2d09af",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_ucmp.cpp",
+      "sha256": "8b2c68123db86e4ebfa976131895fdd6b383485a01f4d4bd64863a08e6d0aa64",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "sha256": "d339c326efd4ab5dd3415f985a5c93b342c5c94cd0f79be86117084ef9a6f31a",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "sha256": "d84528507559b15454084dba8b36e9d05197e6124da6d437ab41aef7a6184d8f",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_parallel_shuffle.h",
+      "sha256": "b187e84ac56fd5f861a61652160198a886dbef57f7d4cff8a381ab443cc0760d",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_material_slot_store.cpp",
+      "sha256": "82cc87d8483ddaa85008fd14b0d685da5ad50460da4f27e041c12617d9938e28",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp",
+      "sha256": "b2bc67cbe26bd11b2fded7a3f10002970947694e001cbf16f2bbbd45ae83982f",
+      "source": "S18_S15_SOURCE"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_party_package.h",
+      "sha256": "9258f0f141e8d7f0346559458d2b280255633ae5becba41a00bcfe0d83867aa9",
+      "source": "MAIN_BASE_DEPENDENCY"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_permutation.h",
+      "sha256": "de94dc9dc6fecb1c1d0e62ef09469462564d7fc8be62c993bbab62d8bd5d3e2f",
+      "source": "MAIN_BASE_DEPENDENCY"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_permutation.cpp",
+      "sha256": "c92ca4f70c25f88c8d23f2311a72cd9b63d36b28c84cf894efae2c9ee8169df1",
+      "source": "MAIN_BASE_DEPENDENCY"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_opv.h",
+      "sha256": "ca96669d2128fa0bb0e358073b0908c7f120d8d34177df80bd2b7a621febcfa1",
+      "source": "MAIN_BASE_DEPENDENCY"
+    }
+  ],
+  "prior_evidence": [
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_REPORT_2026-10-16.md",
+      "sha256": "72bf84ceeafa431a039e38553e7a53a88bc992cd5ca57dfb902ebbfd6fc0e80f"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_GATES_2026-10-16.json",
+      "sha256": "f327df1901669daefbf47b3845d69cd1a71967312db59cd0967d061ccf042409"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_INDEPENDENT_REVIEW_2026-10-16.md",
+      "sha256": "f472dce11f7f530d315c03661aeb510761958143207b28a39b8077c8b7c69e18"
+    },
+    {
+      "kind": "external_manifest_hash",
+      "name": "S22 source/evidence manifest",
+      "sha256": "fac360ae6ef18c602ce4cc050c81eeb68ebf362d47979a962b0ea423fe7b39a1"
+    }
+  ],
+  "s23_artifacts": [
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_DECISION_2026-10-16.md",
+      "sha256": "a482cec9ea831c1ebad85ed304cb46e7eaa653bdb0ef7f1956b5bf8b172810f2"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_REPORT_2026-10-16.md",
+      "sha256": "d1cc81731dfb3fb944d31e0fdca55b5eb75ca978daa1620538ae7092ba3519a8"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_GATES_2026-10-16.json",
+      "sha256": "6466d624d8ef545ecb253c812c9b13953c08d4d48478aa44d32baf0e7145e703"
+    },
+    {
+      "path": "PROJECT.md",
+      "sha256": "66a31f6e222fdda3a8850912a093906fe4e7b02ee5b848abd4f0df1aac0d5b4d"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "sha256": "7dcccf8a027cc96dc76f19e98f7898a25ef325032f59f588c59212beff2ff042"
+    },
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "sha256": "5a1d35a3a79b1e0d32cfe9a81bef66fed6061a508f3135be8f39a19fb0baf488"
+    }
+  ],
+  "reviewer": {
+    "independent_crypto_review": "NOT_SATISFIED",
+    "disclosure": "Executor participated in S19-S22 proof derivation/reporting. S22 independent reviewer scope did not include output-conditioned F_scoreconv."
+  },
+  "execution": {
+    "source_hash_check": "PASS_72_OF_72",
+    "source_read_only_algebra_review": "DONE",
+    "cmake_build": "NOT_RUN",
+    "ctest": "NOT_RUN",
+    "frozen_oracle": "NOT_RUN",
+    "three_party_e2e": "NOT_RUN",
+    "packet_trace": "NOT_RUN",
+    "material_pool_recomputation_n128": "NOT_RUN",
+    "material_pool_recomputation_n256": "NOT_RUN",
+    "formal_lan_wan": "NOT_RUN",
+    "runtime_defect": "NONE_REPRODUCED",
+    "runtime_files_changed": false,
+    "git_diff_check": "PASS_WITH_LINE_ENDING_WARNINGS_ONLY"
+  },
+  "scope_boundaries": {
+    "n128_schema": "M6B5/v3 + M2CM/v1 + M6P2/v1; no S23 full-pool analysis",
+    "n256_schema": "M6S2/v2; no S23 full-pool analysis",
+    "crash_contract": "Only historical scoped no-complete-mask evidence; some crash prefixes may leave P1 8-byte local XOR share; no atomic/no-output claim",
+    "performance": "V3 OPEN; V4 NOT_AUTHORIZED; formal matrix NOT_RUN"
+  },
+  "canonical_source_rehash_command": "PowerShell Get-Content S15_SOURCE_MANIFEST.json; rehash final_source_set.files; UTF-8 no-BOM lines path<TAB>sha256<LF>, ordinal sort, SHA256"
+}

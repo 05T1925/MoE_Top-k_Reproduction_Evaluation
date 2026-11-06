@@ -1,0 +1,113 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S23",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "runtime_object": {
+    "revision": "S15 default-OFF repair snapshot locked by S18",
+    "file_count": 72,
+    "s15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "s18_receipt_manifest_sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+    "canonical_source_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "source_root": "C:/Users/28641/.codex/evidence/M6B_I_S18_20261016_02/source",
+    "manifest_verification": "PASS_72_OF_72"
+  },
+  "reviewer": {
+    "independent_crypto_review": "NOT_SATISFIED",
+    "reason": "Current executor participated in S19-S22 proof derivation/reporting. No new non-author reviewer was engaged.",
+    "s22_review_scope": "carry-to-sign local pre-output view only; not output-conditioned F_scoreconv"
+  },
+  "gates": {
+    "S15_SOURCE_IDENTITY": {
+      "status": "PASS",
+      "evidence": "S18 S15 manifest rehashed 72/72; canonical SHA-256 matches."
+    },
+    "F_SCORECONV_NORMATIVE_OUTPUT_SHARE_LAW": {
+      "status": "OPEN",
+      "evidence": "Source exposes a returned priority-key additive share vector, but no ideal functionality/API specifying its randomized share law."
+    },
+    "F_SCORECONV_CORRECTNESS_RELATION": {
+      "status": "CONDITIONAL",
+      "assumption": "Carry and sign DCF correctness; x0+x1 interpreted modulo 2^32.",
+      "claim": "Q0+Q1 equals ((0x7fffffff-signed_score)<<h)+index modulo 2^(33+h).",
+      "new_test_run": "NOT_RUN"
+    },
+    "OUTPUT_SHARE_UNIFORMITY": {
+      "status": "OPEN/NO_GO",
+      "witness": "For each party/slot, low h index bits and low 32 q bits are fixed by party and x_b; event probability 1 in implementation and 2^-(h+32) for a uniform R_(2^(33+h)) share.",
+      "interpretation": "Mismatch against a uniform-share ideal law only; not an attack on the current functionality."
+    },
+    "Q_B_TO_Q_AND_KEY_RECORDS": {
+      "status": "PASS",
+      "claim": "Given Q_b, q_b=Q_b>>h mod 2^33 and key_records[i]=(Q_b[i],0,0) are deterministic."
+    },
+    "P0_FIXED_Q_FORWARD_M2CM_LOCAL_VIEW": {
+      "status": "CONDITIONAL",
+      "assumption": "Ideal independent uniform dealer permutations/vectors; masked phase frames and aggregate Y are included in approved leakage L.",
+      "scope": "Forward two-round shuffle local view only; does not include scoreconv prehistory."
+    },
+    "P1_FIXED_Q_FORWARD_M2CM_LOCAL_VIEW": {
+      "status": "CONDITIONAL",
+      "assumption": "Ideal independent uniform dealer permutations/vectors; masked phase frames and aggregate Y are included in approved leakage L.",
+      "scope": "Forward two-round shuffle local view only; does not include scoreconv prehistory."
+    },
+    "P0_OUTPUT_CONDITIONED_SCORECONV_VIEW": {
+      "status": "OPEN/NO_GO",
+      "first_break": "S22 pre-output sampler generates Q_b from V_pre; it does not sample V_pre conditioned on given (x_b,Q_b,L_score)."
+    },
+    "P1_OUTPUT_CONDITIONED_SCORECONV_VIEW": {
+      "status": "OPEN/NO_GO",
+      "first_break": "S22 pre-output sampler generates Q_b from V_pre; it does not sample V_pre conditioned on given (x_b,Q_b,L_score)."
+    },
+    "FULL_F_SCORECONV_PLUS_FORWARD_SHUFFLE": {
+      "status": "OPEN/NO_GO",
+      "reason": "The prior scoreconv view cannot yet be conditioned on ideal Q_b; forward-only simulator cannot repair that gap."
+    },
+    "N128_MATERIAL_POOL_AND_ADAPTIVE_VIEW": {
+      "status": "NOT_RUN",
+      "schema": "M6B5/v3 + M2CM/v1 + M6P2/v1",
+      "reason": "No slot/pool/restart recomputation in S23."
+    },
+    "N256_MATERIAL_POOL_AND_ADAPTIVE_VIEW": {
+      "status": "NOT_RUN",
+      "schema": "M6S2/v2",
+      "reason": "No streamed segment/slot/restart recomputation in S23."
+    },
+    "INVERSE_MEMBERSHIP_OUTPUT_CRASH_COMPOSITION": {
+      "status": "NOT_RUN",
+      "reason": "Stopped at first output-conditioned scoreconv gap; historical S18 evidence remains scoped to tested no-complete-mask cases."
+    },
+    "NEW_PEER_VISIBLE_FIELD_OUTSIDE_APPROVED_L": {
+      "status": "CONDITIONAL",
+      "reason": "Scoreconv peer frames are masked operands; Q_b, q_b and DCF keys are not sent directly. No packet-level trace run."
+    },
+    "RUNTIME_DEFECT": {
+      "status": "PASS",
+      "scope": "Read-only S15 source review; no runtime regression tests were run.",
+      "runtime_changed": false
+    },
+    "F_SCORECONV_V2_REFRESH_DESIGN": {
+      "status": "NOT_RUN",
+      "design": "Fresh rho0 uniform in R_c^n, rho1=-rho0, output Q'_b=Q_b+rho_b. Requires new versioned material/schema and proof."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN/NO_GO"
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "OPEN/NO_GO"
+    },
+    "V3_V4_FORMAL_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "v3": "OPEN",
+      "v4": "NOT_AUTHORIZED"
+    }
+  },
+  "execution": {
+    "build": "NOT_RUN",
+    "ctest": "NOT_RUN",
+    "e2e": "NOT_RUN",
+    "packet_trace": "NOT_RUN",
+    "formal_lan_wan": "NOT_RUN",
+    "git_diff_check": "PASS_WITH_LINE_ENDING_WARNINGS_ONLY"
+  },
+  "next_minimum_task": "Freeze the F_scoreconv interface and output-share law, then have a reviewer uninvolved in S19-S23 prove or refute the P0/P1 distribution of V_pre conditioned on (x_b,Q_b,L_score). Do not advance to adaptive pools or output composition before this gate closes."
+}
