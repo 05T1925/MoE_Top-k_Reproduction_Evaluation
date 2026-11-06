@@ -3,13 +3,15 @@
   "import_date": "2026-11-06",
   "parent_commit": "29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb",
   "status": "archived_from_previously_uncommitted_worktree_files",
-  "note": "These commits record byte-identical imports on 2026-11-06; they are not original stage commits or new test runs.",
-  "file_count": 91,
+  "note": "Source SHA-256 records original raw bytes. Git may normalize line endings; git_blob_oid_sha1 identifies the committed content. All 92 source files matched their committed Git blobs after repository filters. These are archival commits, not original stage commits or new test runs.",
+  "git_filter_verified_count": 92,
+  "file_count": 92,
   "files": [
     {
       "stage": 6,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_SOURCE_MANIFEST_2026-10-14.json",
-      "sha256": "fbf9c6adb7aa4caf543c86a4db317c5abaf3e09f0aa8a523cbb1f42e25902812",
+      "source_sha256": "fbf9c6adb7aa4caf543c86a4db317c5abaf3e09f0aa8a523cbb1f42e25902812",
+      "git_blob_oid_sha1": "b4a05322193e5cd29776fe303f1aba5b135b9b45",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s6",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -17,7 +19,8 @@
     {
       "stage": 8,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "c5d29679aeaf1be3cc71da1ffc8053b33d589fd15313031137b5b79655e1dffb",
+      "source_sha256": "c5d29679aeaf1be3cc71da1ffc8053b33d589fd15313031137b5b79655e1dffb",
+      "git_blob_oid_sha1": "70f74b15371275c4ff21df3ca4ca61e6261e5576",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -25,7 +28,8 @@
     {
       "stage": 9,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S9_DECISION_2026-10-15.md",
-      "sha256": "203d0dd43d0bec3caf313e4f76b7fb9fe3ebf57dd97bd9df2a92cb754a8a3fae",
+      "source_sha256": "203d0dd43d0bec3caf313e4f76b7fb9fe3ebf57dd97bd9df2a92cb754a8a3fae",
+      "git_blob_oid_sha1": "87fa4309a37cfe6bf23993b13b230758a8136b62",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s9",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -33,7 +37,8 @@
     {
       "stage": 9,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S9_E2E_CASES_2026-10-15.json",
-      "sha256": "3b37f0517efee932b0871dbb89e449ee3647fe71ec0b84ab5270b1fc679796b8",
+      "source_sha256": "3b37f0517efee932b0871dbb89e449ee3647fe71ec0b84ab5270b1fc679796b8",
+      "git_blob_oid_sha1": "a02507adad39c38aebf94217de8d51e31e451205",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s9",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -41,7 +46,8 @@
     {
       "stage": 9,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S9_REPORT_2026-10-15.md",
-      "sha256": "f4d2bf079da4f5aa3fd4fb0cdb7ad0e75bd54df20a76054f3ab2849cbcc3de76",
+      "source_sha256": "f4d2bf079da4f5aa3fd4fb0cdb7ad0e75bd54df20a76054f3ab2849cbcc3de76",
+      "git_blob_oid_sha1": "9c2747e29544dd0604c2d0fcf8cccea92a25d083",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s9",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -49,7 +55,8 @@
     {
       "stage": 9,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S9_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "16dd2aacfa7a3505cb3a73ab596d14554cce88fbcab75943431b4a880efe0028",
+      "source_sha256": "16dd2aacfa7a3505cb3a73ab596d14554cce88fbcab75943431b4a880efe0028",
+      "git_blob_oid_sha1": "26967baf72b49f0dd9c871335200376324c0dc10",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s9",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -57,7 +64,8 @@
     {
       "stage": 10,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_DECISION_2026-10-15.md",
-      "sha256": "12c89938aa01fabd3ea0628c172bdc6fb0fa40976bbc7063d951aa29f56e8a77",
+      "source_sha256": "12c89938aa01fabd3ea0628c172bdc6fb0fa40976bbc7063d951aa29f56e8a77",
+      "git_blob_oid_sha1": "2cdd46250c3cfda93c5369bc957d16562af4d48c",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -65,7 +73,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_BUILD_PROVENANCE_2026-10-15.json",
-      "sha256": "bf88cd7e69e304cf89927823863f762a551445696739e772bc9594351a8a6d4e",
+      "source_sha256": "bf88cd7e69e304cf89927823863f762a551445696739e772bc9594351a8a6d4e",
+      "git_blob_oid_sha1": "a023ab95e14b2a1250770a47b5c07bbf60fd6c8b",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -73,7 +82,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_COUNTER_ERRATUM_2026-10-15.json",
-      "sha256": "cedc4b7d5dddc050809e3b4fe3a9a52c3b06b7e9e84271cb46c2ff92dcfd8216",
+      "source_sha256": "cedc4b7d5dddc050809e3b4fe3a9a52c3b06b7e9e84271cb46c2ff92dcfd8216",
+      "git_blob_oid_sha1": "53ea6ea7b966951d5b9918aeb0c4c807b8022de2",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -81,7 +91,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_COUNTER_ERRATUM_2026-10-15.md",
-      "sha256": "7eacf33483ba83bd6bc7ad64c911201e55cf079a537bc44d549ad368d476a37d",
+      "source_sha256": "7eacf33483ba83bd6bc7ad64c911201e55cf079a537bc44d549ad368d476a37d",
+      "git_blob_oid_sha1": "cfe0528c992db083e32d82a6b8cdbf81e73e37f9",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -89,7 +100,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_GATES_2026-10-15.json",
-      "sha256": "08af4ac94f1e110b0f59f688cf45f980e0e5d7cd0f13ef8fbad67bc3412945b3",
+      "source_sha256": "08af4ac94f1e110b0f59f688cf45f980e0e5d7cd0f13ef8fbad67bc3412945b3",
+      "git_blob_oid_sha1": "72a1e8b3fefc2da3e07c56d986f50341730eef0a",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -97,7 +109,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_RECEIPT_CASES_2026-10-15.json",
-      "sha256": "61ef6b6b8bd98fb9ec5a097c717220df7472e54175ade912bc369875091e315c",
+      "source_sha256": "61ef6b6b8bd98fb9ec5a097c717220df7472e54175ade912bc369875091e315c",
+      "git_blob_oid_sha1": "040a8d8e8d0efe0af618d4a63b764c196c7cc138",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -105,7 +118,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_REPORT_2026-10-15.md",
-      "sha256": "669e9aa397c370ef419eb60ca3b592845e584206a09b6c2cbd28856a9e9064ac",
+      "source_sha256": "669e9aa397c370ef419eb60ca3b592845e584206a09b6c2cbd28856a9e9064ac",
+      "git_blob_oid_sha1": "8750fbaf6e83ecc9212a8ad091c3b8d2d553e297",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -113,7 +127,8 @@
     {
       "stage": 10,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S10_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "ec101fd640f46f5ea4d6322757e6a4420a8b526e7f306f9e7f8b6b760de23a2b",
+      "source_sha256": "ec101fd640f46f5ea4d6322757e6a4420a8b526e7f306f9e7f8b6b760de23a2b",
+      "git_blob_oid_sha1": "cdf8444557c3da70685f2e8ee9fdb9e3c40808bd",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s10",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -121,7 +136,8 @@
     {
       "stage": 11,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_DECISION_2026-10-15.md",
-      "sha256": "79fe2484233b0a1b5cba33594362f78e91bcdfbd8699b969d494309fd7651d1a",
+      "source_sha256": "79fe2484233b0a1b5cba33594362f78e91bcdfbd8699b969d494309fd7651d1a",
+      "git_blob_oid_sha1": "853382c29fdfaca019822e55d65b613ca1059bae",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s11",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -129,7 +145,8 @@
     {
       "stage": 11,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_GATES_2026-10-15.json",
-      "sha256": "7055ef255fab6c9e9409d15c4ccdf4ad235acdabb83f6961e9b4007a96e267f4",
+      "source_sha256": "7055ef255fab6c9e9409d15c4ccdf4ad235acdabb83f6961e9b4007a96e267f4",
+      "git_blob_oid_sha1": "5e041b7d2aa2f171727433e9b97af04a0a8d146e",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s11",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -137,7 +154,8 @@
     {
       "stage": 11,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_REPORT_2026-10-15.md",
-      "sha256": "bf7a69ebacbc47ac4d7ade5544a32e24fb2afbbf50b55b0b1f9e98385dc02b0b",
+      "source_sha256": "bf7a69ebacbc47ac4d7ade5544a32e24fb2afbbf50b55b0b1f9e98385dc02b0b",
+      "git_blob_oid_sha1": "d26e6a74f1a149801570bdab6dfc5ef013df9b61",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s11",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -145,7 +163,8 @@
     {
       "stage": 11,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S11_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "d3246f11a1cc19c7c43ec8b6807f7e2503beba9820ae11491f9117ee705b0ca3",
+      "source_sha256": "d3246f11a1cc19c7c43ec8b6807f7e2503beba9820ae11491f9117ee705b0ca3",
+      "git_blob_oid_sha1": "f904abb3361c4c16a8a2f37850c1bd96952085a8",
       "source_snapshot": "worktree:m6b-project-derived-5iter-s11",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -153,7 +172,8 @@
     {
       "stage": 12,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S12_DECISION_2026-10-15.md",
-      "sha256": "af35ee4a729e1e1849ff1732cf424ac3bcbe9306af3ce29705e3f97f91c63a46",
+      "source_sha256": "af35ee4a729e1e1849ff1732cf424ac3bcbe9306af3ce29705e3f97f91c63a46",
+      "git_blob_oid_sha1": "f57be233e69418d8167352b176db2a064379c951",
       "source_snapshot": "worktree:m6b-project-select5-s12",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -161,7 +181,8 @@
     {
       "stage": 12,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S12_E2E_CASES_2026-10-15.json",
-      "sha256": "4de48c9e59e30167934ded9f4b2e6103d3d5d1fcd8be3515a866612e5d8687da",
+      "source_sha256": "4de48c9e59e30167934ded9f4b2e6103d3d5d1fcd8be3515a866612e5d8687da",
+      "git_blob_oid_sha1": "c690a514940c0a94f5bf053e2d621090861c418d",
       "source_snapshot": "worktree:m6b-project-select5-s12",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -169,7 +190,8 @@
     {
       "stage": 12,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S12_GATES_2026-10-15.json",
-      "sha256": "a72bce219b207f385298d3867cb3fa7a47477edc4db1b207f268a2bc68730256",
+      "source_sha256": "a72bce219b207f385298d3867cb3fa7a47477edc4db1b207f268a2bc68730256",
+      "git_blob_oid_sha1": "54510260ca10ee6ff33b630d2aa8082731042857",
       "source_snapshot": "worktree:m6b-project-select5-s12",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -177,7 +199,8 @@
     {
       "stage": 12,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S12_REPORT_2026-10-15.md",
-      "sha256": "1c81564228161a2c262f190994bfdeb0da7eca454769d3e6bd9a19d1a3ddb3b9",
+      "source_sha256": "1c81564228161a2c262f190994bfdeb0da7eca454769d3e6bd9a19d1a3ddb3b9",
+      "git_blob_oid_sha1": "b543ef9689f6b99382b38f5127077758aa01f9cd",
       "source_snapshot": "worktree:m6b-project-select5-s12",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -185,7 +208,8 @@
     {
       "stage": 12,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S12_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "e333b5a7bda6b067ca3a626946c8bfa34c53fdade64f8bd4cb61bb626d3a78e2",
+      "source_sha256": "e333b5a7bda6b067ca3a626946c8bfa34c53fdade64f8bd4cb61bb626d3a78e2",
+      "git_blob_oid_sha1": "2f82a9c05a2973832a7e33de3920599778ac8a39",
       "source_snapshot": "worktree:m6b-project-select5-s12",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -193,7 +217,8 @@
     {
       "stage": 13,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S13_DECISION_2026-10-15.md",
-      "sha256": "fa5e460f90e40bef87e07c9f673e0387efa994e53d004f9d6dfb3140eaf40d17",
+      "source_sha256": "fa5e460f90e40bef87e07c9f673e0387efa994e53d004f9d6dfb3140eaf40d17",
+      "git_blob_oid_sha1": "fd43c4b6b4a012187cd1ac296edd705b8058a1bd",
       "source_snapshot": "worktree:m6b-project-select5-s13",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -201,7 +226,8 @@
     {
       "stage": 13,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S13_GATES_2026-10-15.json",
-      "sha256": "e8be220c1799004604c31aa5a5bd744ff66bc7cf8a37a09c884897d2de5f98bb",
+      "source_sha256": "e8be220c1799004604c31aa5a5bd744ff66bc7cf8a37a09c884897d2de5f98bb",
+      "git_blob_oid_sha1": "bc50d80ed40ba7acdf10be5d7ae60ab845b4d47d",
       "source_snapshot": "worktree:m6b-project-select5-s13",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -209,7 +235,8 @@
     {
       "stage": 13,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S13_REPLAY_CASES_2026-10-15.json",
-      "sha256": "e1afd5e91374bf8fbada5ff06b5adb54d550c4f63a9b154e45a2db3fa0de6339",
+      "source_sha256": "e1afd5e91374bf8fbada5ff06b5adb54d550c4f63a9b154e45a2db3fa0de6339",
+      "git_blob_oid_sha1": "00c398bb92e535790459549086c2d095a0dfd470",
       "source_snapshot": "worktree:m6b-project-select5-s13",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -217,7 +244,8 @@
     {
       "stage": 13,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S13_REPORT_2026-10-15.md",
-      "sha256": "1f2f1511c5b8143ea95e21206b30b34929b89c6daacab365308f186fd2af964b",
+      "source_sha256": "1f2f1511c5b8143ea95e21206b30b34929b89c6daacab365308f186fd2af964b",
+      "git_blob_oid_sha1": "0b58b4fcecfde3f13a8c0404cf709868ca24d19d",
       "source_snapshot": "worktree:m6b-project-select5-s13",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -225,7 +253,8 @@
     {
       "stage": 13,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S13_SOURCE_BUILD_MANIFEST_2026-10-15.json",
-      "sha256": "393615f686786244cd9e87172e9b824b39bdc2a33369ca6b40e50e909dbd166c",
+      "source_sha256": "393615f686786244cd9e87172e9b824b39bdc2a33369ca6b40e50e909dbd166c",
+      "git_blob_oid_sha1": "696433c0004d2b532e9ad7ce75928b8762da8beb",
       "source_snapshot": "worktree:m6b-project-select5-s13",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -233,7 +262,8 @@
     {
       "stage": 14,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S14_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "033c3799bff9b957f829a85c50d73e4d56c9529a52c02e94993dcac009674c1d",
+      "source_sha256": "033c3799bff9b957f829a85c50d73e4d56c9529a52c02e94993dcac009674c1d",
+      "git_blob_oid_sha1": "15fb8cf1f3350d66fc0c43338b8f2edec5374b08",
       "source_snapshot": "worktree:m6b-project-select5-s14",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -241,7 +271,8 @@
     {
       "stage": 15,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S15_SOURCE_MANIFEST_2026-10-15.json",
-      "sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+      "source_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+      "git_blob_oid_sha1": "26394aad144a9fa6e9b4af23bf11dee208b0acbd",
       "source_snapshot": "worktree:m6b-project-select5-s15",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -249,7 +280,8 @@
     {
       "stage": 16,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S16_DECISION_2026-10-16.md",
-      "sha256": "f503bd8227784c46f2356893312bc902022a52b6c9ef7a7853f95e8fb0626b30",
+      "source_sha256": "f503bd8227784c46f2356893312bc902022a52b6c9ef7a7853f95e8fb0626b30",
+      "git_blob_oid_sha1": "3a9b72d901abfe5c1c32523a91670593ac8db8ef",
       "source_snapshot": "worktree:m6b-project-select5-s16",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -257,7 +289,8 @@
     {
       "stage": 16,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S16_E2E_CASES_2026-10-16.json",
-      "sha256": "bfcc8b444ce8a74836383ca42005245f3242228bf2336ce54fc9aa7e535db037",
+      "source_sha256": "bfcc8b444ce8a74836383ca42005245f3242228bf2336ce54fc9aa7e535db037",
+      "git_blob_oid_sha1": "6e35d2da560928f0f2dc02a49c086399d48343a1",
       "source_snapshot": "worktree:m6b-project-select5-s16",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -265,7 +298,8 @@
     {
       "stage": 16,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S16_GATES_2026-10-16.json",
-      "sha256": "4881cd195fd1e56cc058bccd3e2d8fe671d2aa78b494a39594d08452ed22911c",
+      "source_sha256": "4881cd195fd1e56cc058bccd3e2d8fe671d2aa78b494a39594d08452ed22911c",
+      "git_blob_oid_sha1": "542bad4d4510818213d6062675de95f77799d3d2",
       "source_snapshot": "worktree:m6b-project-select5-s16",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -273,7 +307,8 @@
     {
       "stage": 16,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S16_REPORT_2026-10-16.md",
-      "sha256": "a9e2c05ed089f7b861e6a130dccd0ab4a192e1d2795b8aff6e6b61913e3981af",
+      "source_sha256": "a9e2c05ed089f7b861e6a130dccd0ab4a192e1d2795b8aff6e6b61913e3981af",
+      "git_blob_oid_sha1": "41ca9f912be54d8922fa49fb38f66a0018d14da0",
       "source_snapshot": "worktree:m6b-project-select5-s16",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -281,7 +316,8 @@
     {
       "stage": 16,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S16_SOURCE_MANIFEST_2026-10-16.json",
-      "sha256": "9378fddd4f6a0c7ab339a263cd69a152cc25796717f1e26a85789977fb1675d0",
+      "source_sha256": "9378fddd4f6a0c7ab339a263cd69a152cc25796717f1e26a85789977fb1675d0",
+      "git_blob_oid_sha1": "809d824b11dafee9437bc36fc2ece8dea946bda9",
       "source_snapshot": "worktree:m6b-project-select5-s16",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -289,7 +325,8 @@
     {
       "stage": 18,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_DECISION_2026-10-16.md",
-      "sha256": "4290e5527ac4957d3f48d0ddbcaef58a66a9793ca893bc1c947556d239f85ea0",
+      "source_sha256": "4290e5527ac4957d3f48d0ddbcaef58a66a9793ca893bc1c947556d239f85ea0",
+      "git_blob_oid_sha1": "71e7aba1b9f9c34b85418b261f162527ec3d18be",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -297,7 +334,8 @@
     {
       "stage": 18,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_GATES_2026-10-16.json",
-      "sha256": "f687962f25076c3b237e3237d759878560cc4e8534ae14cfda563beff152acc5",
+      "source_sha256": "f687962f25076c3b237e3237d759878560cc4e8534ae14cfda563beff152acc5",
+      "git_blob_oid_sha1": "ea40fd967a9614cd4d8e9fd959de53b34b9498a5",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -305,7 +343,8 @@
     {
       "stage": 18,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_REPORT_2026-10-16.md",
-      "sha256": "a8fd265ed7ed5d7c9c0866ca3033ec1a9fa07e063890c0c299ea21e02f778c0f",
+      "source_sha256": "a8fd265ed7ed5d7c9c0866ca3033ec1a9fa07e063890c0c299ea21e02f778c0f",
+      "git_blob_oid_sha1": "924e6f6fed9d20380d3970127cbb53c18a3b5d54",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -313,7 +352,8 @@
     {
       "stage": 18,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json",
-      "sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+      "source_sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+      "git_blob_oid_sha1": "9be52395f304a98fa94fafb94b634ae856825d71",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -321,7 +361,8 @@
     {
       "stage": 19,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_DECISION_2026-10-16.md",
-      "sha256": "f133629b7e0233c8f5ccd04baabadf1b7d9e2f7fb3ed366b6fae1542171baf6f",
+      "source_sha256": "f133629b7e0233c8f5ccd04baabadf1b7d9e2f7fb3ed366b6fae1542171baf6f",
+      "git_blob_oid_sha1": "c1c8ac218bd630e7e9d4219ddae98b74c0b4bd66",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -329,7 +370,8 @@
     {
       "stage": 19,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_GATES_2026-10-16.json",
-      "sha256": "ea2c9664d285eed59c361fb71750055d7ba271827d2391ca492fb8ea4e51f0fc",
+      "source_sha256": "ea2c9664d285eed59c361fb71750055d7ba271827d2391ca492fb8ea4e51f0fc",
+      "git_blob_oid_sha1": "45de7b4a87e5512888d235791998c637e67ef93c",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -337,7 +379,8 @@
     {
       "stage": 19,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_REPORT_2026-10-16.md",
-      "sha256": "27380f69ac4fdd71a6d7c0f98be097e8a74a89367d3ece054473bdfe17441f8c",
+      "source_sha256": "27380f69ac4fdd71a6d7c0f98be097e8a74a89367d3ece054473bdfe17441f8c",
+      "git_blob_oid_sha1": "43049fd6d0cf13b1a2ca2c46d77ab862f3ea0d2d",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -345,7 +388,8 @@
     {
       "stage": 19,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json",
-      "sha256": "cdc320708ae2f86a621fb8108d2df5eebbe8b9bbc6d36977bcdaf290d202c973",
+      "source_sha256": "cdc320708ae2f86a621fb8108d2df5eebbe8b9bbc6d36977bcdaf290d202c973",
+      "git_blob_oid_sha1": "ae10c08806a30031eba971f42c59e1a39798705d",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -353,7 +397,8 @@
     {
       "stage": 20,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_DECISION_2026-10-16.md",
-      "sha256": "62f6a1c451460bdec6b187dade41f9ce50043001362048e50a6952aa6c684b40",
+      "source_sha256": "62f6a1c451460bdec6b187dade41f9ce50043001362048e50a6952aa6c684b40",
+      "git_blob_oid_sha1": "cc0d724eb7209230a85400e65b6fc8c186b7b0f5",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -361,7 +406,8 @@
     {
       "stage": 20,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_GATES_2026-10-16.json",
-      "sha256": "28b743824ca83beef911f111de8c46807e47955539dd9d7085b15759a7101b5e",
+      "source_sha256": "28b743824ca83beef911f111de8c46807e47955539dd9d7085b15759a7101b5e",
+      "git_blob_oid_sha1": "4bfa960bc1b4c454eac2d5040f3123225c61fe9b",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -369,7 +415,8 @@
     {
       "stage": 20,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_REPORT_2026-10-16.md",
-      "sha256": "9668c67d37ecaed9558638f7a59300f7a3c27da99b088c8ddd38d156a48aac89",
+      "source_sha256": "9668c67d37ecaed9558638f7a59300f7a3c27da99b088c8ddd38d156a48aac89",
+      "git_blob_oid_sha1": "14cb4d9f660ef2fb1adbb8ad5a17583f0d32d695",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -377,7 +424,8 @@
     {
       "stage": 20,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_SOURCE_EVIDENCE_MANIFEST_2026-10-16.json",
-      "sha256": "87ae7f4eec9456403ada3e269a4711dee1870efff2936e35b97c7b1238b542ad",
+      "source_sha256": "87ae7f4eec9456403ada3e269a4711dee1870efff2936e35b97c7b1238b542ad",
+      "git_blob_oid_sha1": "2ca847dd0a382afeb2aa0bd6ed0070bc0d736ebe",
       "source_snapshot": "worktree:m6b-project-select5-s20",
       "source_copies": 4,
       "identical_copy_variants": 1
@@ -385,7 +433,8 @@
     {
       "stage": 21,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S21_DECISION_2026-10-16.md",
-      "sha256": "98a6714df9099d16f0c0d5ceed7a6f9c95dd663be28feee3f1b91c036a409634",
+      "source_sha256": "98a6714df9099d16f0c0d5ceed7a6f9c95dd663be28feee3f1b91c036a409634",
+      "git_blob_oid_sha1": "74ebc5fae1da36ae9f5ddb4a45094110b6494e0d",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -393,7 +442,8 @@
     {
       "stage": 21,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S21_GATES_2026-10-16.json",
-      "sha256": "d96a3a503872d6a60674510b3fe0c7d9d57930aa5f784dc16753320098fc5e3b",
+      "source_sha256": "d96a3a503872d6a60674510b3fe0c7d9d57930aa5f784dc16753320098fc5e3b",
+      "git_blob_oid_sha1": "8dd3dc46c455348fde81478e5a445260258fd254",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -401,7 +451,8 @@
     {
       "stage": 21,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S21_REPORT_2026-10-16.md",
-      "sha256": "fe8696ce8b87ffb77286f44abe9bf91e8d304daccf5c223138106889fc6c9214",
+      "source_sha256": "fe8696ce8b87ffb77286f44abe9bf91e8d304daccf5c223138106889fc6c9214",
+      "git_blob_oid_sha1": "30b0f962ef0772b5a841d61a9dce3c11b847029d",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -409,7 +460,8 @@
     {
       "stage": 21,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S21_SOURCE_EVIDENCE_MANIFEST_2026-10-16.json",
-      "sha256": "bba23d7b901121df782242fd0f6ce1e35ce455ffb206d5a4b239835b01243424",
+      "source_sha256": "bba23d7b901121df782242fd0f6ce1e35ce455ffb206d5a4b239835b01243424",
+      "git_blob_oid_sha1": "e28a98082af615fb1a141b91fde199f469558859",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -417,7 +469,8 @@
     {
       "stage": 22,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_DECISION_2026-10-16.md",
-      "sha256": "b82ae9e75af1f6af7e6c85c55325109406af4bddded944646b0a092d02eae70d",
+      "source_sha256": "b82ae9e75af1f6af7e6c85c55325109406af4bddded944646b0a092d02eae70d",
+      "git_blob_oid_sha1": "ba594289f980523571733b5c9e26a002282b3d7e",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -425,7 +478,8 @@
     {
       "stage": 22,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_GATES_2026-10-16.json",
-      "sha256": "f327df1901669daefbf47b3845d69cd1a71967312db59cd0967d061ccf042409",
+      "source_sha256": "f327df1901669daefbf47b3845d69cd1a71967312db59cd0967d061ccf042409",
+      "git_blob_oid_sha1": "1d537c60d2ae66aa6d3445f152eeb4c4e96c895b",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -433,7 +487,8 @@
     {
       "stage": 22,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_INDEPENDENT_REVIEW_2026-10-16.md",
-      "sha256": "f472dce11f7f530d315c03661aeb510761958143207b28a39b8077c8b7c69e18",
+      "source_sha256": "f472dce11f7f530d315c03661aeb510761958143207b28a39b8077c8b7c69e18",
+      "git_blob_oid_sha1": "b43211ef2eea5a2a6ce2def3eed3a186fb505d72",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -441,7 +496,8 @@
     {
       "stage": 22,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_REPORT_2026-10-16.md",
-      "sha256": "72bf84ceeafa431a039e38553e7a53a88bc992cd5ca57dfb902ebbfd6fc0e80f",
+      "source_sha256": "72bf84ceeafa431a039e38553e7a53a88bc992cd5ca57dfb902ebbfd6fc0e80f",
+      "git_blob_oid_sha1": "8906a96ff1775af064efccf02534610c1000cc21",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 3,
       "identical_copy_variants": 1
@@ -449,7 +505,8 @@
     {
       "stage": 22,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S22_SOURCE_EVIDENCE_MANIFEST_2026-10-16.json",
-      "sha256": "fac360ae6ef18c602ce4cc050c81eeb68ebf362d47979a962b0ea423fe7b39a1",
+      "source_sha256": "fac360ae6ef18c602ce4cc050c81eeb68ebf362d47979a962b0ea423fe7b39a1",
+      "git_blob_oid_sha1": "50c5643d6cdcb1c487b3f372adb56248c0b0c673",
       "source_snapshot": "worktree:m6b-project-select5-s22",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -457,7 +514,8 @@
     {
       "stage": 23,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_DECISION_2026-10-16.md",
-      "sha256": "a482cec9ea831c1ebad85ed304cb46e7eaa653bdb0ef7f1956b5bf8b172810f2",
+      "source_sha256": "a482cec9ea831c1ebad85ed304cb46e7eaa653bdb0ef7f1956b5bf8b172810f2",
+      "git_blob_oid_sha1": "e605280a69f4c9b878c5432a67b8acee0f3478fb",
       "source_snapshot": "worktree:m6b-project-select5-s23",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -465,7 +523,8 @@
     {
       "stage": 23,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_GATES_2026-10-16.json",
-      "sha256": "6466d624d8ef545ecb253c812c9b13953c08d4d48478aa44d32baf0e7145e703",
+      "source_sha256": "6466d624d8ef545ecb253c812c9b13953c08d4d48478aa44d32baf0e7145e703",
+      "git_blob_oid_sha1": "77392a83b1f2b6d09e47caf0e42e8901964c28c5",
       "source_snapshot": "worktree:m6b-project-select5-s23",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -473,7 +532,8 @@
     {
       "stage": 23,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_REPORT_2026-10-16.md",
-      "sha256": "d1cc81731dfb3fb944d31e0fdca55b5eb75ca978daa1620538ae7092ba3519a8",
+      "source_sha256": "d1cc81731dfb3fb944d31e0fdca55b5eb75ca978daa1620538ae7092ba3519a8",
+      "git_blob_oid_sha1": "bba6ad8b8c68c7f1c5c0c34f16ff2ad75664b2d3",
       "source_snapshot": "worktree:m6b-project-select5-s23",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -481,7 +541,8 @@
     {
       "stage": 23,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S23_SOURCE_EVIDENCE_MANIFEST_2026-10-16.json",
-      "sha256": "5aa0d9e6c23c9d2c862fd154da75648d4a2cabd73d69d34e3250459d6d51be72",
+      "source_sha256": "5aa0d9e6c23c9d2c862fd154da75648d4a2cabd73d69d34e3250459d6d51be72",
+      "git_blob_oid_sha1": "de184785848d935758ad0bf41125f04a336f9cd3",
       "source_snapshot": "worktree:m6b-project-select5-s23",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -489,7 +550,8 @@
     {
       "stage": 24,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_DECISION_2026-10-17.md",
-      "sha256": "3d2f4310284fb17edc13718c43ea09c3922c5c2993d0aaf31b1fb50014ca73a2",
+      "source_sha256": "3d2f4310284fb17edc13718c43ea09c3922c5c2993d0aaf31b1fb50014ca73a2",
+      "git_blob_oid_sha1": "0938d1f905435df70ad7eb4e0808d65e699ec674",
       "source_snapshot": "worktree:m6b-project-select5-s24",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -497,7 +559,8 @@
     {
       "stage": 24,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_E2E_CASES_2026-10-17.json",
-      "sha256": "6c74f440d4c809cb7b4dfb012a667457fa6d6a1028f7a112de29f968fccd6d45",
+      "source_sha256": "6c74f440d4c809cb7b4dfb012a667457fa6d6a1028f7a112de29f968fccd6d45",
+      "git_blob_oid_sha1": "336dc19708caec85bb73f0970a33dc1eca9a713a",
       "source_snapshot": "worktree:m6b-project-select5-s24",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -505,7 +568,8 @@
     {
       "stage": 24,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_GATES_2026-10-17.json",
-      "sha256": "c49b0f8290ce64571eeb8b0faec7183dada3713c1703ecce8a0d8c3acf43490e",
+      "source_sha256": "c49b0f8290ce64571eeb8b0faec7183dada3713c1703ecce8a0d8c3acf43490e",
+      "git_blob_oid_sha1": "a237331fc2b2e1ff67d4457bca486d9469426b52",
       "source_snapshot": "worktree:m6b-project-select5-s24",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -513,7 +577,8 @@
     {
       "stage": 24,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_REPORT_2026-10-17.md",
-      "sha256": "136ffcc52c9b38b5a29f28e76c0b532a48d838cb23b0e0131e3276a4fa724c99",
+      "source_sha256": "136ffcc52c9b38b5a29f28e76c0b532a48d838cb23b0e0131e3276a4fa724c99",
+      "git_blob_oid_sha1": "64f97dab0629a84dd71cfc80ab0fa6d644b14a6e",
       "source_snapshot": "worktree:m6b-project-select5-s24",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -521,7 +586,8 @@
     {
       "stage": 24,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S24_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-17.json",
-      "sha256": "b56faf2a3320d8fd53343cb014ad23cd2c7810a40e1f4e0bcacba9edc6b2ecb0",
+      "source_sha256": "b56faf2a3320d8fd53343cb014ad23cd2c7810a40e1f4e0bcacba9edc6b2ecb0",
+      "git_blob_oid_sha1": "c5c886ff0de1275d6583ee44ed2d5f560ead2716",
       "source_snapshot": "worktree:m6b-project-select5-s24",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -529,7 +595,8 @@
     {
       "stage": 25,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_DECISION_2026-10-19.md",
-      "sha256": "b5e720821c463f4f578be8e5c94418ac4c5f22ec0f5a2562d530366d179a216c",
+      "source_sha256": "b5e720821c463f4f578be8e5c94418ac4c5f22ec0f5a2562d530366d179a216c",
+      "git_blob_oid_sha1": "99704142818b04880c2e8882a01c8261e1099c97",
       "source_snapshot": "worktree:m6b-project-select5-s25",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -537,7 +604,8 @@
     {
       "stage": 25,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_E2E_CASES_2026-10-19.json",
-      "sha256": "36360bcecf656c8cdc7ae0a78c2bcf4112bf7c8501fbabc039c9b67f46bbf7d7",
+      "source_sha256": "36360bcecf656c8cdc7ae0a78c2bcf4112bf7c8501fbabc039c9b67f46bbf7d7",
+      "git_blob_oid_sha1": "114f622e20efcbacbc7961f212673ae8e750afc6",
       "source_snapshot": "worktree:m6b-project-select5-s25",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -545,7 +613,8 @@
     {
       "stage": 25,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_GATES_2026-10-19.json",
-      "sha256": "1267089ed5b38b74e55fc57b935f85f7b0b6d6c2f037db85a9582b2374e3cb38",
+      "source_sha256": "1267089ed5b38b74e55fc57b935f85f7b0b6d6c2f037db85a9582b2374e3cb38",
+      "git_blob_oid_sha1": "4a7878cce1fd3b10f15c3209dd6d851a5efb5a6b",
       "source_snapshot": "worktree:m6b-project-select5-s25",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -553,7 +622,8 @@
     {
       "stage": 25,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_REPORT_2026-10-19.md",
-      "sha256": "ecad2f6f03bae3fc7b24d4e450f0486fec99970f4dbd929a4dbff7a15822a09b",
+      "source_sha256": "ecad2f6f03bae3fc7b24d4e450f0486fec99970f4dbd929a4dbff7a15822a09b",
+      "git_blob_oid_sha1": "4bfe5e3f8248aad05294a536fde96f6d20d90e74",
       "source_snapshot": "worktree:m6b-project-select5-s25",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -561,7 +631,8 @@
     {
       "stage": 25,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
-      "sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+      "source_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+      "git_blob_oid_sha1": "9976d161dd1185767329545f0313bfc7c119625b",
       "source_snapshot": "worktree:m6b-project-select5-s25",
       "source_copies": 2,
       "identical_copy_variants": 1
@@ -569,7 +640,8 @@
     {
       "stage": 26,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_DECISION_2026-10-19.md",
-      "sha256": "5d63156ef386fe17b29b40fe42866f6c33e33d50d0f935913bb17b7b16cd9f8d",
+      "source_sha256": "5d63156ef386fe17b29b40fe42866f6c33e33d50d0f935913bb17b7b16cd9f8d",
+      "git_blob_oid_sha1": "acb313cf0c31b71972e85ef412e90c44474cf496",
       "source_snapshot": "worktree:m6b-project-select5-s26",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -577,7 +649,8 @@
     {
       "stage": 26,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_E2E_CASES_2026-10-19.json",
-      "sha256": "45984727ca18b8590fa76d4916b9606eb81404505f0975b7e179123bf99317fa",
+      "source_sha256": "45984727ca18b8590fa76d4916b9606eb81404505f0975b7e179123bf99317fa",
+      "git_blob_oid_sha1": "6344adbfc89def60b84a5db2d73ee11177152267",
       "source_snapshot": "worktree:m6b-project-select5-s26",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -585,7 +658,8 @@
     {
       "stage": 26,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_GATES_2026-10-19.json",
-      "sha256": "4f618de4daa5238220d02ea8027bc6a2683b06f2f8da4d3c3371ac588ca71b5f",
+      "source_sha256": "4f618de4daa5238220d02ea8027bc6a2683b06f2f8da4d3c3371ac588ca71b5f",
+      "git_blob_oid_sha1": "92a226f7fd9d9dafbd5af26c1e750b22ebdf83d6",
       "source_snapshot": "worktree:m6b-project-select5-s26",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -593,7 +667,8 @@
     {
       "stage": 26,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_REPORT_2026-10-19.md",
-      "sha256": "252eda1d39acd6f08e42b8c8a52b15964ba941545dc6e1df544393f5a1b982a0",
+      "source_sha256": "252eda1d39acd6f08e42b8c8a52b15964ba941545dc6e1df544393f5a1b982a0",
+      "git_blob_oid_sha1": "95b6818634a934c14046d7afff2d4c00aae10726",
       "source_snapshot": "worktree:m6b-project-select5-s26",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -601,7 +676,8 @@
     {
       "stage": 26,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S26_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
-      "sha256": "10e0537a8e5065fa38d0593d54b4423763c7292129dcf1b427ce8a408bdcedee",
+      "source_sha256": "10e0537a8e5065fa38d0593d54b4423763c7292129dcf1b427ce8a408bdcedee",
+      "git_blob_oid_sha1": "f295fa54d5efee9623e1129368ce31a89750f144",
       "source_snapshot": "worktree:m6b-project-select5-s26",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -609,7 +685,8 @@
     {
       "stage": 29,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_DECISION_2026-10-20.md",
-      "sha256": "e486f80f968f8eeb353823fb26be904c35fa63339c79a31a7a79c13fd43044e7",
+      "source_sha256": "e486f80f968f8eeb353823fb26be904c35fa63339c79a31a7a79c13fd43044e7",
+      "git_blob_oid_sha1": "cad08e7a7250af10528c38658c1add41fb34567d",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -617,7 +694,8 @@
     {
       "stage": 29,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_GATES_2026-10-20.json",
-      "sha256": "e47543b477121304ccaa279a31ce35436b533800706a050513c47aaf761173ba",
+      "source_sha256": "e47543b477121304ccaa279a31ce35436b533800706a050513c47aaf761173ba",
+      "git_blob_oid_sha1": "cd464918bdd75f3dc3d991b9693fe507d02ed5e7",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -625,7 +703,8 @@
     {
       "stage": 29,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_REPORT_2026-10-20.md",
-      "sha256": "aa8dde4bde549c59bffa4ce2f2d2343e52d53912f734d7cc2134c6e15cccf717",
+      "source_sha256": "aa8dde4bde549c59bffa4ce2f2d2343e52d53912f734d7cc2134c6e15cccf717",
+      "git_blob_oid_sha1": "760962e1cdaba1f8459d415da5e3f7b1f6cbe934",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -633,7 +712,8 @@
     {
       "stage": 29,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-20.json",
-      "sha256": "77837af589f9ad1dca9f4e6ad261b6fd19382e13d5e60fd4f791e407a979b9b4",
+      "source_sha256": "77837af589f9ad1dca9f4e6ad261b6fd19382e13d5e60fd4f791e407a979b9b4",
+      "git_blob_oid_sha1": "ee4a701a7b52623d5d8954bb4ea2ba79174e6e42",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -641,7 +721,8 @@
     {
       "stage": 30,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_DECISION_2026-10-20.md",
-      "sha256": "c2c5c059770274ff5ce539aad37168ee6edcd157a0899877b82acf2e255d76ea",
+      "source_sha256": "c2c5c059770274ff5ce539aad37168ee6edcd157a0899877b82acf2e255d76ea",
+      "git_blob_oid_sha1": "6df15ef3f9f8eb44881056c503d9fb02047f72f0",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -649,7 +730,8 @@
     {
       "stage": 30,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_GATES_2026-10-20.json",
-      "sha256": "894e0f0a9a5ea2bc18cd1485682559a59e07a78d76f04a72c6bcbe3f1464daeb",
+      "source_sha256": "894e0f0a9a5ea2bc18cd1485682559a59e07a78d76f04a72c6bcbe3f1464daeb",
+      "git_blob_oid_sha1": "7fb328e71d96676a31075b293ffe5885d4ce2c28",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -657,7 +739,8 @@
     {
       "stage": 30,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S30_REPORT_2026-10-20.md",
-      "sha256": "8545bdcc1d335c303af95116cb61629d4dd9b4151281f958cd51ecd0add662ac",
+      "source_sha256": "8545bdcc1d335c303af95116cb61629d4dd9b4151281f958cd51ecd0add662ac",
+      "git_blob_oid_sha1": "c6af7fe627edd2334a39c55f57f98ad473659f3d",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -665,7 +748,8 @@
     {
       "stage": 31,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_DECISION_2026-10-20.md",
-      "sha256": "7cc455e2c4e7a73206a569ff21e6fe16b7c6502cf57f1230145187d8e6e0fa15",
+      "source_sha256": "7cc455e2c4e7a73206a569ff21e6fe16b7c6502cf57f1230145187d8e6e0fa15",
+      "git_blob_oid_sha1": "a05b27f01654dc7d18b9f3d293d446c4b9d5edac",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -673,7 +757,8 @@
     {
       "stage": 31,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_GATES_2026-10-20.json",
-      "sha256": "e77c178f35b40d8b448f24bd39170729c0477bcca5971db57361bbc12fe4a65b",
+      "source_sha256": "e77c178f35b40d8b448f24bd39170729c0477bcca5971db57361bbc12fe4a65b",
+      "git_blob_oid_sha1": "65184b9834140954cd78961383c4ed9ccd34ec20",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -681,7 +766,8 @@
     {
       "stage": 31,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_REPORT_2026-10-20.md",
-      "sha256": "567ecea1353631d139eecf40a4c477a1ad5c2f3e5c17aae84570577af9ed84cd",
+      "source_sha256": "567ecea1353631d139eecf40a4c477a1ad5c2f3e5c17aae84570577af9ed84cd",
+      "git_blob_oid_sha1": "45345f312747454d0e33948d597541728be8631a",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -689,7 +775,8 @@
     {
       "stage": 31,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S31_SOURCE_TEST_EVIDENCE_MANIFEST_2026-10-20.json",
-      "sha256": "c878f64bbd527e85dbd183a8ebe91b7ecf56cecbbf82455d9b66e5df097fd1c0",
+      "source_sha256": "c878f64bbd527e85dbd183a8ebe91b7ecf56cecbbf82455d9b66e5df097fd1c0",
+      "git_blob_oid_sha1": "0f8d2c3899b05d6b648ce7333fbf792ba93c4536",
       "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -697,7 +784,8 @@
     {
       "stage": 33,
       "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S33_DECISION_2026-10-20.md",
-      "sha256": "e33a54a4d3cc9173cea89c53c1a292d05bd31bf322408c9f12f29e9cc91f67e4",
+      "source_sha256": "e33a54a4d3cc9173cea89c53c1a292d05bd31bf322408c9f12f29e9cc91f67e4",
+      "git_blob_oid_sha1": "3637eae4be399dd5182561f0b68756aa6fea931b",
       "source_snapshot": "worktree:m6b-i-project-select5-s33-review",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -705,7 +793,8 @@
     {
       "stage": 33,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S33_E2E_CASES_2026-10-20.json",
-      "sha256": "4abc5afb5e9b4afe8fb019b63d1c4d355bb14ae2743f77a0cedc6235db5c9acd",
+      "source_sha256": "4abc5afb5e9b4afe8fb019b63d1c4d355bb14ae2743f77a0cedc6235db5c9acd",
+      "git_blob_oid_sha1": "a4e7600f8fefa50770d3fd40629837e7d2f618da",
       "source_snapshot": "worktree:m6b-i-project-select5-s33-review",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -713,7 +802,8 @@
     {
       "stage": 33,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S33_GATES_2026-10-20.json",
-      "sha256": "e49c5f4d0266e14f0b108e52540e0a67e0a9015024d1199e8eb2ee48b89a04dc",
+      "source_sha256": "e49c5f4d0266e14f0b108e52540e0a67e0a9015024d1199e8eb2ee48b89a04dc",
+      "git_blob_oid_sha1": "adcead6238d2876640e89119020a7e9bf70481cd",
       "source_snapshot": "worktree:m6b-i-project-select5-s33-review",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -721,7 +811,8 @@
     {
       "stage": 33,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S33_REPORT_2026-10-20.md",
-      "sha256": "ada19123be54ae6d3f1eb98e87bc3586394a2e08fa899e3023cb89864a53f0ae",
+      "source_sha256": "ada19123be54ae6d3f1eb98e87bc3586394a2e08fa899e3023cb89864a53f0ae",
+      "git_blob_oid_sha1": "28d436a14b7b407869579f3beb5e52f067691470",
       "source_snapshot": "worktree:m6b-i-project-select5-s33-review",
       "source_copies": 1,
       "identical_copy_variants": 1
@@ -729,8 +820,18 @@
     {
       "stage": 33,
       "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S33_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-20.json",
-      "sha256": "0f965e878032ac661adf541f513a364ff4d73cd2c3b0212902e3cd9957ac0574",
+      "source_sha256": "0f965e878032ac661adf541f513a364ff4d73cd2c3b0212902e3cd9957ac0574",
+      "git_blob_oid_sha1": "f9be01ab6cdaae456d0489e44b6f2b22611d4bf5",
       "source_snapshot": "worktree:m6b-i-project-select5-s33-review",
+      "source_copies": 1,
+      "identical_copy_variants": 1
+    },
+    {
+      "stage": 31,
+      "path": "VFSS/tests/moe_topk/score_to_mask_v3_gmw_test_only.cpp",
+      "source_sha256": "ab8bb143e31b30bd7588c7e7f4a0a4a586e28b90e2602b12ef8574e977976144",
+      "git_blob_oid_sha1": "e92ae5f0a98142fd27c8b2fc5ef72e8d227bc230",
+      "source_snapshot": "desktop-main",
       "source_copies": 1,
       "identical_copy_variants": 1
     }
