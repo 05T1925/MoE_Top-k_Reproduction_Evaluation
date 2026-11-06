@@ -1,0 +1,68 @@
+{
+  "schema": "m6b-project-derived-select5-s13-gates/v1",
+  "date": "2026-10-15",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / EXPERIMENTAL",
+  "tested_source_snapshot_sha256": "dcfd9bccda57edb0cfbc4c953ae5fbd640535cd67dfba59756c2aae6949e4188",
+  "tested_revision": "c3926c68fd14f270faa8b55234311071947fa080",
+  "reviewer_independence": {
+    "S12_implementation_participation": true,
+    "S4_through_S12_participation": true,
+    "independent_receipt": "NOT_SATISFIED",
+    "result_classification": "SAME_SESSION_TECHNICAL_REPLAY"
+  },
+  "gates": {
+    "S12_SOURCE_RECEIPT": "HASH_RECONSTRUCTED",
+    "INDEPENDENT_RECEIPT": "NOT_SATISFIED",
+    "FUNCTIONAL_E2E_N256": "PASS_SAME_SESSION_REPLAY_8_N256_CASES",
+    "FUNCTIONAL_CASES": "18_ORACLE_PASS_6_UNIFORM_ABORT_NO_MASK",
+    "CRASH_PREFIX_OUTPUT": "PASS_NO_COMPLETE_MASK_6_CASES; TWO_PREFIXES_LEAVE_ONE_ORPHAN_SHARE",
+    "DEFAULT_OFF": "PASS_ZERO_SELECT5_TESTS_REGISTERED",
+    "DCF_SINGLE_KEY_PRIVACY": "OPEN_CONVERT_G_OUTPUT_LIES_IN_2_POW_62_ELEMENT_SUBSET_OF_2_POW_64; PARTY_KEY_DISTINGUISHER_NOT_SHOWN",
+    "CORRELATED_POOL_SIMULATION": "OPEN",
+    "ADAPTIVE_QUERY_SIMULATION": "OPEN",
+    "SHUFFLE_OUTPUT_COMPOSITION": "OPEN",
+    "JOINT_PARTY_VIEW": "OPEN_NO_CONDITIONAL_SECURITY_ACCEPTANCE",
+    "VERSIONED_DCF_CANDIDATE": "DCF_BCG21_FIG1_AES128_V1_DESIGN_ONLY_NOT_IMPLEMENTED",
+    "SECURE_ALIAS_READY": "NO",
+    "N_GT_256_ADMISSION": "NO_GO_N257_PREFLIGHT_REJECTED",
+    "V3_V4_PERFORMANCE_STATUS": "V3_OPEN_V4_NOT_ALLOWED_NOT_RUN_FORMAL_LAN_WAN_NOT_ALLOWED_NOT_RUN"
+  },
+  "functional_counter_diagnostics": {
+    "n128_success_case_comparison_calls_min_median_max": [
+      309,
+      383,
+      3978
+    ],
+    "n256_success_case_comparison_calls_min_median_max": [
+      603,
+      628,
+      14709
+    ],
+    "classification": "SINGLE_RUN_LOGICAL_COMPARISON_DIAGNOSTIC_NOT_PERFORMANCE_OR_EXPECTATION"
+  },
+  "full_build": "FAILED_UNRELATED_BITPACK_TEST_LINK",
+  "selected_targets": "PASS_8_OF_8",
+  "directed_ctest": "PASS_6_OF_6",
+  "formal_performance": "NOT_ALLOWED_NOT_RUN",
+  "runtime_changes_in_s13": false,
+  "candidate_key_record": {
+    "status": "DESIGN_ONLY_NOT_SERIALIZED",
+    "assumption": "Retain the current 33-byte M2UC header/count envelope; one control-byte packs the two CW control bits",
+    "current_v1_bytes_per_key": "57+24*b",
+    "candidate_v2_bytes_per_key": "57+25*b",
+    "active_slot_key_only_delta_bytes_per_party": {
+      "N128": {
+        "slot_count": 41024,
+        "sum_width_bits": 1639424,
+        "delta_bytes": 1639424
+      },
+      "N256": {
+        "slot_count": 163968,
+        "sum_width_bits": 6719104,
+        "delta_bytes": 6719104
+      }
+    },
+    "whole_package_delta": "NOT_MEASURED; excludes N128 unused M2CP pool and changed package/manifest/segment framing",
+    "capacity_certified": false
+  }
+}
