@@ -1,0 +1,567 @@
+{
+  "schema": "m6b-project-derived-select5-s8-source-manifest/v1",
+  "date": "2026-10-15",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / EXPERIMENTAL",
+  "head": "c3926c68fd14f270faa8b55234311071947fa080",
+  "branch": "codex/m6b-project-derived-5iter-s8",
+  "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-derived-5iter-s8",
+  "source_status": "dirty selective reconstruction; no task commit; not main",
+  "s7_manifest": {
+    "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_SOURCE_MANIFEST_2026-10-14.json",
+    "sha256": "0b1118c038cca4b1deadb4f522ff22d8358aed43d3b9f6b8367b72b21096e907"
+  },
+  "selected_inherited_file_count": 55,
+  "selected_inherited_files": [
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_DECISION_2026-10-13.md",
+      "sha256_at_S7_receipt": "7eae3cac642397859e020430f2490685f7854d9d94f5aeefcba7607031d0d3c5",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_SOURCE_MANIFEST_2026-10-14.json",
+      "sha256_at_S7_receipt": "0b1118c038cca4b1deadb4f522ff22d8358aed43d3b9f6b8367b72b21096e907",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/select5iter.py",
+      "sha256_at_S7_receipt": "8b8d3dbd087d601a4962fe61c7b35546aa834cebd0ed4736b4e6d5dca204606b",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/audit_edges.py",
+      "sha256_at_S7_receipt": "b84591c49ec9f67484258011b0685ce9f6cbcebb56685457a80a571bfbcf2fc0",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/membership_direction_probe.py",
+      "sha256_at_S7_receipt": "76a27dd56fb7f3e7fdf42914ee7cfc9f4727de427e41e59db2c5571a79d1c912",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_REPORT_2026-10-12.md",
+      "sha256_at_S7_receipt": "09e751bd96f514a3c067dcbd7de503b9005945d359769fa08334f5bc5d47ae43",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_REPORT_2026-10-12.md",
+      "sha256_at_S7_receipt": "98f23eeef73f4255e58ca5834fbf560eaecdba394fb5d1616198b6a9e13bbc4c",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_material_slot_store_test.cpp",
+      "sha256_at_S7_receipt": "4c2ce29ef13ab5d1614283aaabe5b176e6c6133b5f069233b5541a9c633715ff",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_material_slot_store.cpp",
+      "sha256_at_S7_receipt": "0c43a90b8d0615855bb90600bdf10f4d761f44da13f454cc044c5d29f5434949",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_REPORT_2026-10-14.md",
+      "sha256_at_S7_receipt": "4d289b4b4dc27964a505a6cc68e7a62407e233a410b1e41f2ebc6b78f2421156",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/material_budget.py",
+      "sha256_at_S7_receipt": "e14c52f389fc426637e2d54a41f561c7cccb46b59128c17677a012e20b6f6218",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+      "sha256_at_S7_receipt": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/test_select5iter.py",
+      "sha256_at_S7_receipt": "fe933e6d1d3e298e8b9144e8764468693b000cd6b1c12d3a1eb643e179c4cf56",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_INPUT_FREEZE_2026-10-14.json",
+      "sha256_at_S7_receipt": "4c6a8c3dee3085e23fe1ebb432f52d3764731813c594cca4a6e8e1e174447724",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S3_DECISION_2026-10-12.md",
+      "sha256_at_S7_receipt": "a59da81ad6e375f1d47bd2758003c6aa1be3ce089dd444a44c253b108f498381",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp",
+      "sha256_at_S7_receipt": "d0c8bfcfdc8bdabec30c0f95fa9cd2c2a082b173dc2d7e595c16ab48dc8b25b3",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/comparison_cost_bounds.py",
+      "sha256_at_S7_receipt": "3810a095f7552ef233da17d15458ef4f24d976b3f024b94acb975f9942e6b40e",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_DECISION_2026-10-12.md",
+      "sha256_at_S7_receipt": "ab873eef1c05befcdf89a555156ba9c21c0c1988c87f6e4d718f38a5a2e64cb3",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/include/moe_topk/project_derived_select5.h",
+      "sha256_at_S7_receipt": "a54de6c2c94a58bfc03e0afac660718820119dc49c59a5cb5d5f62a7d35ed891",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/README.md",
+      "sha256_at_S7_receipt": "9f50b68bda2e5dc3564122171e4c6dfeecfbd3ab4aafa53f48e33c26fede6d53",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_E2E_CASES_2026-10-14.json",
+      "sha256_at_S7_receipt": "90d6850bda111ccef3ab16bb6ec73ac8b70d4c97d0bf77c4ff3ae55e71fac879",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/frozen_oracle.cpp",
+      "sha256_at_S7_receipt": "a30fe76ab09552ea532ca0e732a19eb925e3d35db0eb99e1728a087f5e48a457",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_REPORT_2026-10-13.md",
+      "sha256_at_S7_receipt": "215ef7fe3b077df0b0dc36da6ea356fcce3a7abda7b8abc4ad599a4201c7bb61",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "sha256_at_S7_receipt": "bb0c95af88bf3f27d060f9a999b9c8e1649287652484502ec7ce2b2291c29b9b",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/CMakeLists.txt",
+      "sha256_at_S7_receipt": "22aa598c4a16ccce30691e6e9a6883801c180af1ee752c8eda017bf31c621026",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "sha256_at_S7_receipt": "665a92a356358bc1ab2be3b6cdfab5c5d49ad651d33b618d3fd93027dafd273a",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_REPORT_2026-10-12.md",
+      "sha256_at_S7_receipt": "b98ce668897631276740e04fe334412f1578b66ab25b0993f7608c4a819fdab0",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_REPORT_2026-10-14.md",
+      "sha256_at_S7_receipt": "82e370835cdf0873e5f88cc8d748520cc8a8b7186904b3f5fb4e7496ae28dabe",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+      "sha256_at_S7_receipt": "b5d18cf1d74af01170447ff15007bd120618894a04df9705ac06081302e34da3",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S7_DECISION_2026-10-14.md",
+      "sha256_at_S7_receipt": "0a581b476edf56bb49ae01d2492bce7df8dce74dce903cfe5daa7b901ed38ffa",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_DECISION_2026-10-12.md",
+      "sha256_at_S7_receipt": "8e34cc20eba3028f61a8d14c05e81814ab16df2ddc94e39a1d9412397ee6814c",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/README.md",
+      "sha256_at_S7_receipt": "ee6a26592ef64eb2ec1feeeb2ff6615326f645a3769d8d9dcf93fe96f89e070b",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_material_store_test.cpp",
+      "sha256_at_S7_receipt": "574cfa48f06b52aa7a2cf141465a72f51236ce0aa243d9a1b523e8b693bf294a",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_DECISION_2026-10-12.md",
+      "sha256_at_S7_receipt": "56119c4b8caf403d6e4f10eafdfaacdf64f31f40e3f00cef4c684baebf40c171",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_BB90_5ITER_SOURCE_CLOSURE_S1_DECISION_2026-10-12.md",
+      "sha256_at_S7_receipt": "8d9f52ea5f81a26bb5f53ef9bd50105a8c57dbf68c7ca59e7aaf483c29b49692",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/tests/moe_topk/project_derived_select5_control_test.cpp",
+      "sha256_at_S7_receipt": "56291adf3904670f26f53766c42d7353c0430a41cf618222c58af2aa0fcfa695",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_tls13_transport_conformance_test.cpp",
+      "sha256_at_S7_receipt": "c8adb49eac16967f48d24ec5358bc11d6f60ae2425feb69c6290aa05409dac63",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "sha256_at_S7_receipt": "aa0663e35bb6879b03d724f4ee8e8e8aee2e21982f0f86d912574a35a306e0ab",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_score_input.h",
+      "sha256_at_S7_receipt": "61eca4c20e21a86c76593c2ee2bc22d887d78d33df28e44c7b879a171c2d09af",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S4_REPORT_2026-10-12.md",
+      "sha256_at_S7_receipt": "0a09f8eb5b9e0bb25239e2079358889c4942f3ca7fe37095a6490b7549475a80",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_material_slot_store.h",
+      "sha256_at_S7_receipt": "0b4424378f3833685a5f0c79cdf5f40156f6bcd4aa52dd6409570294c220cca0",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S3/public_view_probe.py",
+      "sha256_at_S7_receipt": "37d06d0367fcc484492e44218c4d0507cbe88e36860188fa53038939ffe48e18",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/TEST_ONLY_PROJECT_DERIVED_SELECT_5ITER/README.md",
+      "sha256_at_S7_receipt": "44eca9ccfdfaed63c96b675ecb345b0aa86e2d247a7feb91c54c4c7abe7ead41",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S2_REPORT_2026-10-12.md",
+      "sha256_at_S7_receipt": "ac4fb63cdbeabaa861e89e036b6fe1e1b389b46e5012a69f80458a183cfe3653",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "sha256_at_S7_receipt": "7e9120213ffda21e7ae092e4a8ac58a7d99a8b8a572531fcb6dbbdaccab726c1",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_transport.h",
+      "sha256_at_S7_receipt": "87d479df29e06ea635c6fd8ead7b9295620fe869aa8a7e1d4195ddcfd4d5fd0e",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/independent_accept.py",
+      "sha256_at_S7_receipt": "6dbd5b14a01e6de2796afde4624a953e5456b75c42e11a00ebe6de1f76490883",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_transport.cpp",
+      "sha256_at_S7_receipt": "54c2c7f5a803bc4f7ce44774e83ff79b674ca1fc05a748efeaa788a191a93dfd",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "sha256_at_S7_receipt": "08a43369efded4b760d4d5e6e32b16420031c1d1c571ecf1a070aadd26276cb1",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S6_DECISION_2026-10-14.md",
+      "sha256_at_S7_receipt": "c561c941f560f9500138b23a7a188e3b19f024e3e3b8d0d3439d64d774a7e09a",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "PROJECT.md",
+      "sha256_at_S7_receipt": "0ca8c0156cfd78ef9bfc7ded6d730e81b5690e9ddffb902974b9ccf0c8c5518e",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_SOURCE_MANIFEST_2026-10-13.json",
+      "sha256_at_S7_receipt": "feb5001cb89e334eaea85f765f05920645ac4762d0e510198a527fe2be7cb079",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S5_E2E_CASES_2026-10-13.json",
+      "sha256_at_S7_receipt": "56142221b7acfe35f784109fea763864489b71237659e299cef42708ede5207d",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "experiments/PROJECT_DERIVED_SELECT_5ITER_S2/material_access_prototype.py",
+      "sha256_at_S7_receipt": "3444405e0b1a782619bb4f9c9338e7d0b095f006eb2e6105f9aba06b6bf56a2d",
+      "match_at_initial_S8_reconstruction": true
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_parallel_shuffle.h",
+      "sha256_at_S7_receipt": "e51af2733de14c8b06cb04f33152b379db3dc72459a400af0943a8430e4f3cd9",
+      "match_at_initial_S8_reconstruction": true
+    }
+  ],
+  "s8_delta_files": [
+    {
+      "path": "VFSS/tests/moe_topk/protocol_i_project_derived_select5_three_process_e2e_test.cpp",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "d0c8bfcfdc8bdabec30c0f95fa9cd2c2a082b173dc2d7e595c16ab48dc8b25b3",
+      "sha256": "862c0ca04c251c1d286bc63e3de60d420fa72120f220734e30a3334803c13407"
+    },
+    {
+      "path": "VFSS/include/moe_topk/project_derived_select5.h",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "a54de6c2c94a58bfc03e0afac660718820119dc49c59a5cb5d5f62a7d35ed891",
+      "sha256": "c9826888dc89d5091dbb01c88a9060bf53487f38066801b0d251004b49ff837e"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_PLAN.md",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "bb0c95af88bf3f27d060f9a999b9c8e1649287652484502ec7ce2b2291c29b9b",
+      "sha256": "4ce23fa799792f23d4dfcd54fbb775a61f490d3acbf987000329c4c430f5a1f8"
+    },
+    {
+      "path": "VFSS/include/moe_topk/protocol_i_project_derived_select5.h",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "665a92a356358bc1ab2be3b6cdfab5c5d49ad651d33b618d3fd93027dafd273a",
+      "sha256": "821e6f1fa2a546adffaf80c6d0b9736efe4a5709ad72705ff56f6eda7ee539fb"
+    },
+    {
+      "path": "VFSS/src/moe_topk/project_derived_select5.cpp",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "b5d18cf1d74af01170447ff15007bd120618894a04df9705ac06081302e34da3",
+      "sha256": "e7b1059df34d1474e8e96de954275cf764b698a9ac7f04e6535ff8eb7b7f4809"
+    },
+    {
+      "path": "VFSS/tests/moe_topk/project_derived_select5_control_test.cpp",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "56291adf3904670f26f53766c42d7353c0430a41cf618222c58af2aa0fcfa695",
+      "sha256": "aaff515c396cc0ea6ef78a9a655ce92d9842a8def97d4acc887c831e9c6ee63e"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "aa0663e35bb6879b03d724f4ee8e8e8aee2e21982f0f86d912574a35a306e0ab",
+      "sha256": "d1de533af6c421dc7b501a81df1d72fd16f9575b24a61f11fde3a1b28e8f7f52"
+    },
+    {
+      "path": "docs/REFERENCE_MANIFEST.md",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "7e9120213ffda21e7ae092e4a8ac58a7d99a8b8a572531fcb6dbbdaccab726c1",
+      "sha256": "4839334147806f62648ecc4047c4ece071268473d728ca488b2eb88537045dc2"
+    },
+    {
+      "path": "PROJECT.md",
+      "role": "modified_from_S7_receipt",
+      "previous_sha256": "0ca8c0156cfd78ef9bfc7ded6d730e81b5690e9ddffb902974b9ccf0c8c5518e",
+      "sha256": "9058cc80f8fb3ff3670a3f00441266244884214ba6951f961d69fb38cb31a8db"
+    },
+    {
+      "path": "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_DECISION_2026-10-15.md",
+      "role": "new_S8_file",
+      "previous_sha256": null,
+      "sha256": "42ea88641fd67333124a477852f1110a49fbb21cb9998e0ba0abc043fb56f4c0"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_E2E_CASES_2026-10-15.json",
+      "role": "new_S8_file",
+      "previous_sha256": null,
+      "sha256": "82f89ea34821a96f8653f4f80449162d0cdb8b5dfb10f8e69c6fee1f5b8d1b53"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_REPORT_2026-10-15.md",
+      "role": "new_S8_file",
+      "previous_sha256": null,
+      "sha256": "0345c7b8aa1a97800b4b27aa1d009454ba4a2e6f09f6ea2715f16d1fddfff197"
+    }
+  ],
+  "environment": {
+    "os": "Ubuntu 24.04.4 LTS via WSL2",
+    "architecture": "x86_64",
+    "cmake": "3.28.3",
+    "compiler": "GCC 13.3.0",
+    "openssl": "3.0.13",
+    "build_type": "Release",
+    "build_directory": "/tmp/m6b-project-derived-5iter-s8-release",
+    "build_testing": true,
+    "emp_ot": false,
+    "select5_experimental": true
+  },
+  "configure_command": "cmake -S /mnt/c/Users/28641/.codex/worktrees/m6b-project-derived-5iter-s8/VFSS -B /tmp/m6b-project-derived-5iter-s8-release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_EMP_OT=OFF -DMOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL=ON",
+  "build_command": "cmake --build /tmp/m6b-project-derived-5iter-s8-release --target moe_topk_project_derived_select5_conformance_test moe_topk_project_derived_select5_material_store_test moe_topk_streamed_material_slot_store_test moe_topk_tls13_transport_conformance_test moe_topk_project_derived_select5_process_e2e_test moe_topk_m2_ucmp_conformance_test moe_topk_m2_parallel_shuffle_conformance_test -j2",
+  "run_command": "Run the six small conformance/store/transport targets serially, then run moe_topk_project_derived_select5_process_e2e_test with no args; exit statuses and stdout are in external evidence dir.",
+  "default_off_check": {
+    "configure_exit": 0,
+    "option": "MOE_TOPK_ENABLE_PROJECT_DERIVED_SELECT5_EXPERIMENTAL=OFF",
+    "target_help_result": "DEFAULT_OFF_SELECT5_TARGETS_ABSENT",
+    "exit_code": 0
+  },
+  "targets": [
+    {
+      "target": "moe_topk_project_derived_select5_conformance_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_project_derived_select5_conformance_test",
+      "sha256": "db90b8aa40b2b871771cd775587d62ef10d4d9b4e5539eacfe84f0b612784921"
+    },
+    {
+      "target": "moe_topk_project_derived_select5_material_store_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_project_derived_select5_material_store_test",
+      "sha256": "2c0f27c254e1058a37629dd1daf63cd55fd4e889d4264962ef8c0c70e4ed0af6"
+    },
+    {
+      "target": "moe_topk_streamed_material_slot_store_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_streamed_material_slot_store_test",
+      "sha256": "19e4fb9a975cffa95812426ab27ea4cb03fc5622d7502c41ad5fb53d95303129"
+    },
+    {
+      "target": "moe_topk_tls13_transport_conformance_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_tls13_transport_conformance_test",
+      "sha256": "069b9ffd089fb04c38d133d4634e1d0962fb6a5ac119563ec0d5e203c9d8cdc4"
+    },
+    {
+      "target": "moe_topk_project_derived_select5_process_e2e_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_project_derived_select5_process_e2e_test",
+      "sha256": "b72bc6a9df4e389abfe4d67d450ac40ecdc77a0dfe36d7a22f3e60957af8c1d6"
+    },
+    {
+      "target": "moe_topk_m2_ucmp_conformance_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_m2_ucmp_conformance_test",
+      "sha256": "73574e88208cea2e93d30de72468b7f3ad3c47ef12cf07e15fafd03b7b74cdf6"
+    },
+    {
+      "target": "moe_topk_m2_parallel_shuffle_conformance_test",
+      "exit_code": 0,
+      "path": "/tmp/m6b-project-derived-5iter-s8-release/moe_topk_m2_parallel_shuffle_conformance_test",
+      "sha256": "059b7272cb752ec147411105c2764830dc1b4c5bbf9fbee9cc4067ab0aac0192"
+    }
+  ],
+  "e2e": {
+    "exit_code": 0,
+    "cases_file": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S8_E2E_CASES_2026-10-15.json",
+    "case_count": 24,
+    "oracle_successes": 18,
+    "uniform_abort_no_mask": 6,
+    "n128_success_cases": 7,
+    "n256_success_cases": 8,
+    "n128_comparison_calls": [
+      298,
+      299,
+      303,
+      368,
+      747,
+      2094,
+      2479
+    ],
+    "n128_min_median_max": [
+      298,
+      747,
+      2479
+    ],
+    "n256_comparison_calls": [
+      600,
+      605,
+      607,
+      626,
+      765,
+      10967,
+      12271,
+      14723
+    ],
+    "n256_min_median_max": [
+      600,
+      695.5,
+      14723
+    ],
+    "faults": [
+      "tampered-package",
+      "disconnect",
+      "wrong-party-K",
+      "tls-wrong-peer-identity",
+      "T-exit-before-ready",
+      "sample-seed-invalid-magic"
+    ],
+    "preflight": {
+      "N256_monolithic": "REJECTED_BEFORE_GENERATION",
+      "N257_streamed": "REJECTED"
+    },
+    "case_json_sha256": "82f89ea34821a96f8653f4f80449162d0cdb8b5dfb10f8e69c6fee1f5b8d1b53"
+  },
+  "external_evidence": {
+    "directory": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final",
+    "files": [
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\e2e_exit_code.json",
+        "bytes": 90,
+        "sha256": "4c95fc8a7fc287f845659832adb70119619a470766dbef8f2e83daf66b5e3418"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\moe_topk_project_derived_select5_conformance_test.stdout",
+        "bytes": 64,
+        "sha256": "c5a2d29d7ecd0198bf035488b84a2c6d3f8a14f3647ed30197663b1cb635b714"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\moe_topk_project_derived_select5_material_store_test.stdout",
+        "bytes": 69,
+        "sha256": "5e82bce45aa6c8e617e9f69257a6ab1be31619b83548cf9dd001f2b288b39962"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\moe_topk_project_derived_select5_process_e2e_test.stdout",
+        "bytes": 21869,
+        "sha256": "69c9e8743e98a758ee9c37e05576bd842f11d325c73f70ba5880ae04bc515c3a"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\moe_topk_streamed_material_slot_store_test.stdout",
+        "bytes": 79,
+        "sha256": "b38856d736d900401f05cc1a25963f75373fe9b725d87d542fb6ece2f8a96487"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\moe_topk_tls13_transport_conformance_test.stdout",
+        "bytes": 63,
+        "sha256": "b37929853dad442c9b15d4f88fc71269bd39e83f4c0a50778dbb43748676375b"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\small_target_exit_codes.json",
+        "bytes": 567,
+        "sha256": "02b03a4badef1fbd559277972d424c3e1e07bcd7c98aedebb86a2869a9bfc0ce"
+      },
+      {
+        "path": "C:\\Users\\28641\\.codex\\evidence\\S8_SELECT5_V3_2026-10-15-final\\target_exit_codes.json",
+        "bytes": 666,
+        "sha256": "396fcb143605b2e8a2787ae32ea011877161b3ceeddc6327edc7ea0d114b1880"
+      }
+    ]
+  },
+  "failed_attempts": [
+    {
+      "attempt": "Unqualified WSL selected Ubuntu 20.04 / CMake 3.16.3",
+      "result": "configuration failed before build because repository requires CMake >=3.17",
+      "superseded_by": "explicit Ubuntu-24.04 invocation"
+    },
+    {
+      "attempt": "First malformed-seed hook draft combined plaintext-test flag with TLS runtime",
+      "result": "runtime validation rejected mixed transport before sample phase",
+      "superseded_by": "TEST_ONLY injection guarded by already-authenticated TLS endpoint and peer identity"
+    },
+    {
+      "attempt": "First full E2E used stale pre-correction binary",
+      "result": "incomplete/no complete case JSON; stopped and excluded",
+      "evidence": "partial stdout not retained after evidence directory reuse; limitation recorded in report"
+    }
+  ],
+  "s7_binary_provenance": "S7 reported five of seven FSS-linked binary hashes differed from S6 with matching compiler/flags; embedded absolute source paths explain only part of the byte differences. S8 does not assert S6/S7 binary equivalence.",
+  "gates": {
+    "S7_SOURCE_RECEIPT": "PASS_FOR_EXACT_S6_SNAPSHOT",
+    "S8_INDEPENDENT_ACCEPTANCE": "NOT_YET_RECEIVED",
+    "SAMPLE_RANDOMNESS_PUBLIC_AFTER_SHUFFLE": "PASS_BOUNDED",
+    "SAMPLE_RECONSTRUCTION_CONSISTENCY": "PASS_FUNCTIONAL",
+    "FUNCTIONAL_E2E_N256": "PASS_BOUNDED",
+    "DCF_SINGLE_KEY_PRIVACY": "OPEN",
+    "ADAPTIVE_FULL_POOL_VIEW": "OPEN",
+    "SHUFFLE_OUTPUT_COMPOSITION": "OPEN",
+    "JOINT_PARTY_VIEW": "OPEN",
+    "SECURE_ALIAS_READY": "NO",
+    "N_GT_256_ADMISSION": "NO_GO",
+    "V3_V4_PERFORMANCE_STATUS": "V3=OPEN; V4=NOT_ALLOWED/NOT_RUN",
+    "FORMAL_LAN_WAN": "NOT_ALLOWED/NOT_RUN"
+  },
+  "limitations": [
+    "No complete P0 or P1 simulator/hybrid for correlated DCF pools, adaptive addresses, shuffle/inverse and output shares.",
+    "SHA-256 expansion and getrandom distribution claims are not a finite-scale probability proof.",
+    "N>256 unsupported; N=257 streamed preflight rejects.",
+    "No formal LAN/WAN performance matrix was started.",
+    "S8 maintainer regression is not independent acceptance."
+  ],
+  "manifest_self_hash": "omitted to avoid self-reference; report artifact hash externally"
+}
