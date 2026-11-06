@@ -1,0 +1,144 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S20",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "repository": {
+    "worktree": "C:\\Users\\28641\\.codex\\worktrees\\m6b-project-select5-s20\\MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-project-select5-s20",
+    "base_revision": "c3926c68fd14f270faa8b55234311071947fa080",
+    "main_checkout_was_dirty_and_left_untouched": true,
+    "runtime_changes": false
+  },
+  "reviewer": {
+    "author": "S20 report author; also authored S19 and performed a non-independent adversarial self-review",
+    "non_author_reviewer": "/root/s18_independent_receipt",
+    "non_author_prior_involvement": "S18 functional receipt only",
+    "non_author_s19_authorship_or_s20_authoring": false,
+    "non_author_review_mode": "read-only cryptographic review; no build/tests/performance run; no files modified",
+    "non_author_disposition": "PASS_WITH_SCOPE for review process; CONDITIONAL single-call/key-only findings; OPEN adaptive pool and shuffle/output composition"
+  },
+  "runtime_snapshot": {
+    "origin": "S18 PASS_WITH_SCOPE receipt of S15 exact snapshot",
+    "external_source_root": "C:\\Users\\28641\\.codex\\evidence\\M6B_I_S18_20261016_02\\source",
+    "s15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "s18_manifest_sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+    "file_count": 72,
+    "reverified": 72,
+    "mismatches": 0,
+    "canonicalization": "UTF-8 slash-normalized relative path + TAB + lowercase SHA-256 + LF; paths sorted by StringComparer.Ordinal",
+    "canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "not_merged_to_main": true
+  },
+  "reviewed_runtime_files": [
+    {
+      "path": "VFSS/src/moe_topk/dcf_bcg21_fig1_aes128_v1.cpp",
+      "sha256": "b2bc67cbe26bd11b2fded7a3f10002970947694e001cbf16f2bbbd45ae83982f",
+      "reviewed": "G expansion, Convert_G, generation, keygen, serializer"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_ucmp.cpp",
+      "sha256": "8b2c68123db86e4ebfa976131895fdd6b383485a01f4d4bd64863a08e6d0aa64",
+      "reviewed": "alpha/beta, two Eval calls, party output share"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_score_input.cpp",
+      "sha256": "007b67cb498d714aa26761099680f4a1d0b56acd653fd14453af928a0c977c05",
+      "reviewed": "carry/sign exchange and local state flow"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_project_derived_select5.cpp",
+      "sha256": "d339c326efd4ab5dd3415f985a5c93b342c5c94cd0f79be86117084ef9a6f31a",
+      "reviewed": "adaptive endpoints, seed timing, membership, inverse, output, status"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_parallel_shuffle.cpp",
+      "sha256": "7576abc41ed2a7aade174940be4519b5de7064d82d0b1306cc606bcedabdba88",
+      "reviewed": "Pi/sigma/tau/a/e/r generation and two-phase shuffle"
+    },
+    {
+      "path": "VFSS/src/moe_topk/protocol_i_material_slot_store.cpp",
+      "sha256": "82cc87d8483ddaa85008fd14b0d685da5ad50460da4f27e041c12617d9938e28",
+      "reviewed": "slot/lease/restart/streamed store path"
+    }
+  ],
+  "prior_evidence": [
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json",
+      "sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_REPORT_2026-10-16.md",
+      "sha256": "27380f69ac4fdd71a6d7c0f98be097e8a74a89367d3ece054473bdfe17441f8c"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_GATES_2026-10-16.json",
+      "sha256": "ea2c9664d285eed59c361fb71750055d7ba271827d2391ca492fb8ea4e51f0fc"
+    },
+    {
+      "path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json",
+      "sha256": "cdc320708ae2f86a621fb8108d2df5eebbe8b9bbc6d36977bcdaf290d202c973"
+    }
+  ],
+  "paper": {
+    "title": "Function Secret Sharing for Mixed-Mode and Fixed-Point Secure Computation",
+    "source": "Microsoft Research author PDF",
+    "url": "https://www.microsoft.com/en-us/research/wp-content/uploads/2021/01/FSS.pdf",
+    "locations": "Figure 1 PDF p.13; Theorem 2 p.14; Appendix F.1 pp.42-46",
+    "local_copy_added": false
+  },
+  "checks": {
+    "command_summary": "PowerShell 7.6.5 Get-FileHash against all 72 paths from the S18 manifest; ordinal canonical digest re-computation; Get-Content/rg on exact runtime snapshot.",
+    "source_check_exit_code": 0,
+    "source_check_attempts": [
+      {
+        "attempt": 1,
+        "result": "FAILED_TOOLING_PATH_LOOKUP",
+        "detail": "The check script read snapshot_root as a top-level S18 manifest property; it is at receipt_object.snapshot_root, so path assembly failed for all 72 entries before any hash comparison."
+      },
+      {
+        "attempt": 2,
+        "result": "PASS",
+        "detail": "Corrected JSON property path; 72/72 file hashes matched and canonical SHA-256 matched the declared S15/S18 value."
+      }
+    ],
+    "build": "NOT_RUN",
+    "tests": "NOT_RUN",
+    "performance": "NOT_RUN",
+    "diff_check": "PASS (git diff --check exit 0; S20-authored files have no trailing whitespace)",
+    "vfss_baseline_diff": "NONE",
+    "runtime_paths_in_s20_diff": "NONE"
+  },
+  "s20_artifact_hashes": {
+    "PROJECT.md": "7bf84c2ce5eb4c2fa008c428242f96b4eb4c225782c252400c41893f402d658c",
+    "docs/IMPLEMENTATION_PLAN.md": "72f99bae832d4f5e12e0a39593b7e6e0c83ad6d1681eb7252724e7aebcd27dcc",
+    "docs/REFERENCE_MANIFEST.md": "dfaa569f9212308a388862751418b5176bb8adc8a2c217e2fa2592e55e36a890",
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_DECISION_2026-10-16.md": "4290e5527ac4957d3f48d0ddbcaef58a66a9793ca893bc1c947556d239f85ea0",
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_DECISION_2026-10-16.md": "f133629b7e0233c8f5ccd04baabadf1b7d9e2f7fb3ed366b6fae1542171baf6f",
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_DECISION_2026-10-16.md": "62f6a1c451460bdec6b187dade41f9ce50043001362048e50a6952aa6c684b40",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_REPORT_2026-10-16.md": "a8fd265ed7ed5d7c9c0866ca3033ec1a9fa07e063890c0c299ea21e02f778c0f",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_GATES_2026-10-16.json": "f687962f25076c3b237e3237d759878560cc4e8534ae14cfda563beff152acc5",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S18_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_REPORT_2026-10-16.md": "27380f69ac4fdd71a6d7c0f98be097e8a74a89367d3ece054473bdfe17441f8c",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_GATES_2026-10-16.json": "ea2c9664d285eed59c361fb71750055d7ba271827d2391ca492fb8ea4e51f0fc",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S19_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-16.json": "cdc320708ae2f86a621fb8108d2df5eebbe8b9bbc6d36977bcdaf290d202c973",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_REPORT_2026-10-16.md": "9668c67d37ecaed9558638f7a59300f7a3c27da99b088c8ddd38d156a48aac89",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S20_GATES_2026-10-16.json": "28b743824ca83beef911f111de8c46807e47955539dd9d7085b15759a7101b5e"
+  },
+  "manifest_self_hash": "EXCLUDED_TO_AVOID_SELF_REFERENCE",
+  "non_author_cryptographic_review": {
+    "record": "Reviewer final assessment summarized in S20 report; no separate signed artifact was produced",
+    "reviewer": "/root/s18_independent_receipt",
+    "source_identity": "72/72 S15 files reverified; canonical SHA-256 c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "s19_report_sha256_reviewed": "27380f69ac4fdd71a6d7c0f98be097e8a74a89367d3ece054473bdfe17441f8c",
+    "s20_author_report_sha256_at_review": "cf8654e9fc985a2eeddb24549f66d19f4a4b0106c778b3c4efa2f5c7a8e47885",
+    "findings": {
+      "single_key_and_single_call_ucmp": "CONDITIONAL; fixed alpha, target roots conditionally independent from complete pre-Eval state; same-key two Eval outputs are deterministic postprocessing; opened c must be correctness-determined",
+      "key_only_pool_projection_n128": "CONDITIONAL; 41024 slots; sum widths 1639424",
+      "key_only_pool_projection_n256": "CONDITIONAL; 163968 slots; sum widths 6719104",
+      "first_open_hybrid": "carry-to-sign continuation: unopened local carry share affects lift=x-((carry&3)<<32), which feeds the later sign operand frame; no continuation leakage sampler proves the joint conditional law after carry-key replacement",
+      "shuffle_inverse_output_crash": "OPEN/NO_GO; sigma/tau marginals do not simulate the joint shared Pi/Pi^-1 view with Y/Q, DCF carriers, output shares, lease and crash prefix"
+    },
+    "attack": "No reproducible distinguisher found; this is not a security PASS",
+    "runtime_defect": "None found; no runtime changes"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S20",
+  "date": "2026-10-16",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / PROJECT_DERIVED / EXPERIMENTAL",
+  "review_identity": {
+    "s19_author": "current S20 report author",
+    "author_self_review": "COMPLETED_NOT_INDEPENDENT",
+    "non_author_reviewer": {
+      "identity": "/root/s18_independent_receipt",
+      "prior_involvement": "S18 functional receipt only",
+      "s19_authorship_or_s20_authoring": false,
+      "review_mode": "read-only cryptographic review",
+      "build_or_test_run": false
+    },
+    "independent_review_satisfied": true,
+    "status": "PASS_WITH_SCOPE",
+    "consequence": "Non-author review confirms only conditional single-call/key-only claims; adaptive pool and shuffle/output composition remain OPEN/NO_GO."
+  },
+  "source_object": {
+    "runtime_origin": "S18 scoped independent receipt of S15 default-OFF repair snapshot",
+    "base_revision": "c3926c68fd14f270faa8b55234311071947fa080",
+    "s15_manifest_sha256": "4167e24096edc977464c89e407f15bb73ff9f9a9439baedbe31578e015da1816",
+    "s18_manifest_sha256": "5fffb54d36874fd3b35b30229e77a2de97f86ead78c294b911eb2b1ad59b9f78",
+    "file_count": 72,
+    "files_reverified": 72,
+    "hash_mismatches": 0,
+    "canonical_sha256": "c4a7df6c9ea67eb258ea9b44c17c9c89cbc0b1e22e82d3471b2a2feb8da17498",
+    "runtime_changed_in_s20": false
+  },
+  "gates": {
+    "S15_SOURCE_IDENTITY": {
+      "status": "PASS",
+      "evidence": "72/72 exact S15 source hashes and canonical digest rechecked against S18 manifest."
+    },
+    "S19_NONAUTHOR_CRYPTO_REVIEW": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "review process completed; not a full protocol security PASS",
+      "reviewer": "/root/s18_independent_receipt",
+      "prior_involvement": "S18 functional receipt only; no S19 authorship",
+      "evidence": "Non-author review completed read-only. Fixed-alpha single-key/single-call and key-only pool projection are CONDITIONAL; carry-to-sign continuation is the first OPEN hybrid."
+    },
+    "DCF_BCG21_M2B1_V1_BRIDGE": {
+      "status": "CONDITIONAL",
+      "evidence": "Source mapping to BCG+21 Figure 1, Theorem 2, Appendix F.1; AES-128 PRP and ideal joint random tape assumptions."
+    },
+    "UCMP_CONDITIONAL_VIEW_P0": {
+      "status": "CONDITIONAL",
+      "evidence": "Non-author reviewer confirms fixed-alpha replacement may be averaged over complete pre-Eval auxiliary state if target roots are conditionally independent; same-key two Eval outputs are deterministic postprocessing; opened c must be correctness-determined. AES/RNG assumptions remain conditional."
+    },
+    "UCMP_CONDITIONAL_VIEW_P1": {
+      "status": "CONDITIONAL",
+      "evidence": "Non-author reviewer confirms the same scoped conditional structure for party 1; this does not cover key-dependent continuation. AES/RNG assumptions remain conditional."
+    },
+    "DCF_POOL_KEY_ONLY_PROJECTION_N128_M6B5_V3_M2CM_V1_M6P2_V1": {
+      "status": "CONDITIONAL",
+      "scope": "KEY_ONLY_POOL_PROJECTION; excludes continuation transcript, adaptive addressing, shuffle/output composition",
+      "slots": 41024,
+      "sum_input_widths": 1639424,
+      "bound": "1639424 * epsilon_G + epsilon_RNG_joint(schema,T)",
+      "abort_crash_slot_ledger": "NOT_MEASURED",
+      "assumption": "independent fresh ideal roots conditional on alpha vector and non-key preprocessing tape; reviewer independently checked arithmetic"
+    },
+    "DCF_POOL_KEY_ONLY_PROJECTION_N256_M6S2_V2": {
+      "status": "CONDITIONAL",
+      "scope": "KEY_ONLY_POOL_PROJECTION; excludes continuation transcript, adaptive addressing, shuffle/output composition",
+      "slots": 163968,
+      "sum_input_widths": 6719104,
+      "bound": "6719104 * epsilon_G + epsilon_RNG_joint(schema,T)",
+      "abort_crash_slot_ledger": "NOT_MEASURED",
+      "assumption": "independent fresh ideal roots conditional on alpha vector and non-key preprocessing tape; reviewer independently checked arithmetic"
+    },
+    "ADAPTIVE_FULL_POOL_VIEW_N128_N256": {
+      "status": "OPEN_NO_GO",
+      "evidence": "Non-author reviewer identifies carry-to-sign continuation as the first open step: carry DCF local share is not opened and lift=x-((carry&3)<<32) feeds the later sign operand frame; S19 has no sampler proving the joint conditional law after carry-key replacement."
+    },
+    "SHUFFLE_INVERSE_OUTPUT_P0": {
+      "status": "OPEN_NO_GO",
+      "evidence": "Non-author reviewer confirms sigma/tau marginals do not simulate shared Pi/Pi^-1 with Y/Q frames, DCF carrier, output share, and crash/lease prefix jointly. No counterexample found; proof closure missing."
+    },
+    "SHUFFLE_INVERSE_OUTPUT_P1": {
+      "status": "OPEN_NO_GO",
+      "evidence": "Non-author reviewer confirms sigma/tau marginals do not simulate shared Pi/Pi^-1 with Y/Q frames, DCF carrier, output share, and crash/lease prefix jointly. No counterexample found; proof closure missing."
+    },
+    "CRASH_ABORT_NO_COMPLETE_MASK": {
+      "status": "OPEN_NO_GO",
+      "functional_evidence": "PASS_WITH_SCOPE (inherited S18 specified cases only)",
+      "evidence": "The specified test cases support no-complete-mask and may leave P1 an 8-byte orphan XOR share; S20 does not simulate its full restart/retry/local-store view. No atomic/all-or-nothing claim."
+    },
+    "REPRODUCIBLE_ATTACK": {
+      "status": "NOT_FOUND_NOT_A_PASS",
+      "evidence": "Neither the author review nor the non-author review found a reproducible distinguisher; absence of attack is not a proof."
+    },
+    "RUNTIME_DEFECT": {
+      "status": "NOT_FOUND",
+      "evidence": "Read-only source review found no reproducible runtime/contract defect; runtime unchanged."
+    },
+    "JOINT_PARTY_VIEW": {
+      "status": "OPEN_NO_GO",
+      "evidence": "Non-author review independently confirms the first open hybrid is H_pool^0 -> H_pool^1 at carry-to-sign continuation; no complete leakage sampler proves later frames/shares after target-key replacement. epsilon_RNG_joint and concrete epsilon_channel are unquantified."
+    },
+    "SECURE_ALIAS_READY": {
+      "status": "OPEN_NO_GO",
+      "evidence": "Route remains EXPERIMENTAL."
+    },
+    "N_GT_256_ADMISSION": {
+      "status": "OPEN_NO_GO",
+      "evidence": "No scope expansion."
+    },
+    "V3_V4_PERFORMANCE": {
+      "status": "NOT_RUN",
+      "evidence": "M6A V3 remains OPEN; V4 NOT_ALLOWED; no LAN/WAN matrix."
+    }
+  },
+  "validation": {
+    "source_hash_check": "PASS",
+    "compile": "NOT_RUN",
+    "ctest": "NOT_RUN",
+    "e2e": "NOT_RUN",
+    "runtime_hash_change": false,
+    "formal_performance": "NOT_RUN",
+    "diff_check": "PASS (git diff --check exit 0; S20-authored files have no trailing whitespace)"
+  }
+}
