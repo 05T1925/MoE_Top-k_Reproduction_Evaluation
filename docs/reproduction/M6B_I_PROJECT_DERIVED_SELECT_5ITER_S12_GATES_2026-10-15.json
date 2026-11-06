@@ -1,0 +1,48 @@
+{
+  "schema": "m6b-project-derived-select5-s12-gates/v1",
+  "date": "2026-10-15",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF / EXPERIMENTAL",
+  "tested_source": "S8 exact 58-path receipt + S12 runtime overlay; not main",
+  "independent_review": {
+    "S11_DCF_BRIDGE_INDEPENDENT_REVIEW": "NOT_CONFIRMED",
+    "reviewer": "separate current-turn review agent; not S11 proof author",
+    "FUNCTIONAL_RECEIPT": "S10 receipt covers S8 only; S12 tests are implementer regression"
+  },
+  "gates": {
+    "DCF_SINGLE_KEY_PRIVACY": "OPEN",
+    "CORRELATED_POOL_SIMULATION": "OPEN",
+    "ADAPTIVE_QUERY_SIMULATION": "OPEN",
+    "SHUFFLE_OUTPUT_COMPOSITION": "OPEN",
+    "JOINT_PARTY_VIEW": "OPEN_NO_GO_FOR_SECURE_CLAIM",
+    "LEAKAGE_L_MAPPING": "FIELD_AUDIT_COMPLETE_CRYPTOGRAPHIC_SIMULATION_OPEN",
+    "PARTY_MATERIAL_ISOLATION_N128": "PASS_TESTED_POSIX_DISTINCT_UID_LOCAL_MODEL",
+    "PARTY_MATERIAL_ISOLATION_N256": "PASS_TESTED_POSIX_DISTINCT_UID_LOCAL_MODEL",
+    "CRASH_SAFE_OUTPUT_CONTRACT": "PASS_NO_COMPLETE_MASK_FOR_SIX_TESTED_PREFIXES",
+    "ALL_OR_NOTHING": "NOT_CLAIMED",
+    "FUNCTIONAL_E2E_N256": "PASS_IMPLEMENTER_REGRESSION_8_SUCCESS_CASES",
+    "N_GT_256_ADMISSION": "NO_GO_N257_PREFLIGHT_REJECTED",
+    "SECURE_ALIAS_READY": "NO",
+    "V3_V4_PERFORMANCE_STATUS": "V3_OPEN_V4_NOT_ALLOWED_NOT_RUN_FORMAL_LAN_WAN_NOT_ALLOWED_NOT_RUN"
+  },
+  "first_security_break": "Actual dcf.cpp terminal Convert_G input s & notThreeBlock fixes low two bits in the projected 64-bit group output on tested x86_64 little-endian target. Predicate y mod 4 == 0 has probability 1 instead of 1/4 for uniform Z/(2^64), a theorem-mapping witness but not a serialized party-key distinguisher. Need a theorem for the restricted input distribution or a versioned construction.",
+  "package_schemas": {
+    "N128": "M6B5/v2 monolithic; party-isolated M6P2/v1 ready marker",
+    "N256": "M6S2 streamed; per-party manifest and 11 segments; separate lease schema"
+  },
+  "functional_evidence": {
+    "cases_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S12_E2E_CASES_2026-10-15.json",
+    "cases_sha256": "4de48c9e59e30167934ded9f4b2e6103d3d5d1fcd8be3515a866612e5d8687da",
+    "functional_cases": 24,
+    "oracle_success": 18,
+    "uniform_abort": 6,
+    "crash_prefixes": 6,
+    "n256_oracle_success": 8,
+    "sample_seed_phase": "after forward shuffle; runtime ordering trace; no seed values in evidence",
+    "n257": "preflight reject"
+  },
+  "formal_performance": {
+    "allowed": false,
+    "status": "NOT_ALLOWED_NOT_RUN",
+    "reason": "Existing M6A V3 is OPEN; V4 prerequisites have not been met. No new gate invented."
+  }
+}
