@@ -1,0 +1,140 @@
+{
+  "schema": "m6b-i-project-derived-select5-s64-environment/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S64",
+  "date": "2026-11-09",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "test_deployment": {
+    "classification": "reproducible local test deployment; not a target server profile",
+    "source_commit": "29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb",
+    "os": "Ubuntu 24.04.4 LTS in WSL2; Linux 6.6.87.2-microsoft-standard-WSL2 x86_64",
+    "host_observation": "read-only commands in Ubuntu-24.04 on 2026-11-09; process-specific receiver evidence recorded separately",
+    "resources_at_preflight": {
+      "ram_total": "7.6 GiB",
+      "ram_available": "6.7 GiB",
+      "swap_total": "2.0 GiB",
+      "tmp_mount": "/dev/sdf",
+      "tmp_available": "915 GiB",
+      "logical_cpus": 32,
+      "classification": "functional resource preflight, not a performance measurement"
+    },
+    "openssl_cli": {
+      "version": "OpenSSL 3.0.13 30 Jan 2024",
+      "ubuntu_package": "openssl 3.0.13-0ubuntu3.15",
+      "libssl_package": "libssl3t64:amd64 3.0.13-0ubuntu3.15",
+      "seeding_source_build_label": "os-specific",
+      "cli_active_providers": ["default 3.0.13"],
+      "cli_available_rngs": ["CTR-DRBG", "HASH-DRBG", "HMAC-DRBG"],
+      "openssl_conf_environment_in_observation_shell": "unset",
+      "openssl_modules_environment_in_observation_shell": "unset",
+      "openssl_conf_sha256": "529815b0dd4bd6608bafeeb3d410b0683374e61aef792b3e3f38b3767d26f747",
+      "caveat": "CLI provider/RNG listings and this shell environment do not establish which provider, DRBG or config the T/A/P test processes actually used."
+    },
+    "libraries_in_observation_shell": [
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libcrypto.so.3",
+        "sha256": "6a66c3ba6b3749aacc9497973fff00f6ba61c703ba7015d0d7ab3fd9510974b6",
+        "evidence_type": "file hash, not yet process map"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libssl.so.3",
+        "sha256": "8e49cebd373d90b55f3626da71dd97fe8e95c68dc4c064d8962b27907690736e",
+        "evidence_type": "file hash, not yet process map"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0",
+        "sha256": "eac351cf84d688d1f9235e6165bd57555b31a491cd2f65e0dca67daa69036370",
+        "ubuntu_package": "libsqlite3-0:amd64 3.45.1-1ubuntu2.5",
+        "evidence_type": "file hash, not yet process map"
+      }
+    ],
+    "process_specific_libcrypto_and_provider": {
+      "observed_processes": ["Dealer", "escrow service", "P0", "P1"],
+      "mapped_libcrypto_path": "/usr/lib/x86_64-linux-gnu/libcrypto.so.3",
+      "mapped_file_sha256": "6a66c3ba6b3749aacc9497973fff00f6ba61c703ba7015d0d7ab3fd9510974b6",
+      "observation": "Read-only /proc/<child-pid>/maps sampling during TEST_ONLY E2E; sampling wrapper exited 1 when a short-lived child disappeared, so process evidence and test results are recorded separately",
+      "actual_provider_or_drbg_in_each_process": "NOT_OBSERVED"
+    },
+    "drbg_type_in_actual_process": "NOT_OBSERVED",
+    "instantiate_reseed_and_entropy_events": "NOT_OBSERVED",
+    "process_fork_restart_thread_and_shared_context": "TEST_ONLY harness forks/execs Dealer, waits for its exit, starts separate A/P0/P1 processes, then restarts A for recovery. Source A uses detached per-connection threads. Actual OpenSSL DRBG sharing, thread-local state and reseed events were not instrumented.",
+    "test_signer_tls_recipient_sqlite_and_timeout": {
+      "signer": "Test harness creates local Ed25519 issuer keys in temporary sandbox; source reads PEM private key before marker; no key material retained in repo",
+      "tls": "Source fixes TLS 1.3 and mTLS CA/certificate/host verification; test creates temporary identities; negotiated cipher and RNG state not recorded",
+      "recipient_encryption": "Source uses RSA-OAEP-SHA256/MGF1-SHA256 wrapping with AES-256-GCM body; test identities are temporary; concrete encryption advantage not quantified",
+      "sqlite": "External 3.31.1 header for temporary test build; link /tmp/s64-receiver-2404/sqlite/lib/libsqlite3.so -> /lib/x86_64-linux-gnu/libsqlite3.so.0, runtime 3.45.1-1ubuntu2.5; WAL/FULL source setting is not power-loss durability proof",
+      "timeouts": "Source per-frame TLS deadline and signed escrow second-deposit wait; test API failure/timeout injections separate from natural network fault",
+      "target_scope": "Only this WSL test configuration, not an approved production deployment"
+    }
+  },
+  "target_deployment": {
+    "status": "NOT_AVAILABLE",
+    "target_server_or_container_identity": null,
+    "binary_and_image_digest": null,
+    "os_kernel_and_mount_model": null,
+    "process_mapped_libcrypto_path_hash_build": null,
+    "provider_property_query_fips_libctx_and_config": null,
+    "entropy_instantiate_reseed_error_model": null,
+    "fork_restart_thread_concurrency_and_rng_sharing": null,
+    "signer_and_key_protection_profile": null,
+    "tls_mtls_ciphers_ca_identity_and_certificate_lifecycle": null,
+    "recipient_encryption_key_and_provider_profile": null,
+    "sqlite_version_journal_mount_failure_and_recovery_model": null,
+    "issuer_file_publication_fsync_and_rollback_model": null,
+    "actual_dns_connect_frame_and_transaction_deadlines": null,
+    "success_probability_lower_bounds_or_unconditional_failure_model": null,
+    "note": "The local WSL test deployment is not substituted for the target deployment. No private key, seed, token, certificate private material or raw entropy is collected."
+  },
+  "source_observations": {
+    "dealer": "score_to_mask_v3_gmw.cpp:280-286 uses RAND_bytes in chunks <= 1 MiB; :874-933 allocates semantic materials and bounded Fisher-Yates; :944-1007 signs and publishes two packages then context sequentially.",
+    "party": "score_to_mask_v3_party.cpp:169 uses RAND_bytes for P0 active seeds, :444-445 for envelope AES key/nonce and :802 for P0 output refresh; EVP RSA-OAEP and TLS may use further internal randomness.",
+    "escrow": "score_to_mask_v3_escrow.cpp:249-254 uses one 32-byte RAND_bytes call for receipt/v2 when finalizing; :427-437 writes token with COMMITTED in the same SQL transaction; retries after rollback may request another token.",
+    "tls": "protocol_i_transport.cpp:211-238 configures TLS 1.3 mTLS; :245-370 wraps the connection and checks peer certificate/hostname; actual handshake cipher and deployment CA are not fixed by this source."
+  },
+  "collection_commands_executed": [
+    "wsl -d Ubuntu-24.04 -- sh -lc 'uname -srmo; openssl version -a; openssl list -providers -verbose'",
+    "wsl -d Ubuntu-24.04 -- sh -lc 'cat /etc/os-release; dpkg-query -W openssl libssl3t64 libsqlite3-0; sha256sum /usr/lib/x86_64-linux-gnu/libcrypto.so.3 /usr/lib/x86_64-linux-gnu/libssl.so.3 /usr/lib/x86_64-linux-gnu/libsqlite3.so.0 /usr/lib/ssl/openssl.cnf; openssl list -random-generators -verbose'",
+    "wsl -d Ubuntu-24.04 -- sh -lc 'free -h; df -h /tmp; nproc'"
+  ],
+  "owner_of_missing_target_evidence": [
+    "target deployment/SRE: service identity, process model, OS, mounts, deadlines and restart policy",
+    "build/release: binary and mapped library hashes, provider/config identity and compile flags",
+    "crypto maintainer: DRBG type, seeding/reseeding model, cross-process/context sharing and symbolic advantage parameters",
+    "database/signing owners: SQLite durability model and signer/publication failure behavior"
+  ],
+  "target_collection_plan_non_secret": [
+    {
+      "owner": "deployment/SRE",
+      "commands": [
+        "uname -srmo; cat /etc/os-release; cat /proc/self/mountinfo | sed -n '1,80p'",
+        "systemctl cat <T-service> <A-service> <P0-service> <P1-service> (redact credential paths and environment values before sharing)",
+        "cat /proc/<service-pid>/status | sed -n '1,45p'; ps -L -p <service-pid> -o pid,tid,comm (redact unrelated arguments)"
+      ],
+      "fields": "service/container identity, restart/fork/worker/thread policy, filesystem and mount model, actual deadlines and invocation concurrency"
+    },
+    {
+      "owner": "build/release",
+      "commands": [
+        "sha256sum <released-T-binary> <released-A-binary> <released-P0-binary> <released-P1-binary>",
+        "readlink -f /proc/<service-pid>/exe; awk '/libcrypto|libssl|providers/{print $6}' /proc/<service-pid>/maps | sort -u | while read -r p; do sha256sum \"$p\"; done",
+        "openssl version -a; openssl list -providers -verbose; openssl list -random-generators -verbose"
+      ],
+      "fields": "binary/image hash, mapped library and provider path/hash, exact build provenance; CLI queries are only supplemental"
+    },
+    {
+      "owner": "crypto maintainer",
+      "commands": [
+        "Provide a redacted OpenSSL config/property-query and OSSL_LIB_CTX description, not seeds or keys",
+        "Provide DRBG instantiate/reseed/fork behavior and an upper bound on shared context callers and requests"
+      ],
+      "fields": "actual DRBG mechanism, entropy/seed source model, reseed policy, request/error law, independent or shared T/A/P contexts and a defensible symbolic/numeric advantage source"
+    },
+    {
+      "owner": "database/signing owners",
+      "commands": [
+        "sqlite3 --version; identify deployed SQLite library via /proc/<A-pid>/maps and hash it",
+        "Provide redacted signer type/key storage, file publication/fsync/backup rollback and SQLite journal/mount/recovery policy"
+      ],
+      "fields": "signing failure model, package publication success law, transaction and receipt recovery semantics; do not share private keys, certificates, tokens or database contents"
+    }
+  ]
+}

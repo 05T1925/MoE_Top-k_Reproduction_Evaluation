@@ -1,6 +1,6 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-11-03
+更新日期：2026-11-09
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
@@ -1417,3 +1417,7 @@ cap-abort 的理想 IID 界仅适用于语义材料投影；marker EEXIST replay
 每个 AND layer 先按 gate-id 顺序构造，其 gate inputs 不依赖同一层前一 batch output；固定本方 package 和既往 history 后，对未消费 disjoint gate IDs 逐 batch 使用 S36/S50 H4 **联合条件核**采样 openings、peer partial 和本地输出。`layer/batch/count/phase/sequence/length` 固定于公开 tuple 和既有 `L_S29`，故无新增泄露。cut 在本地 share formation 之前不提供未来 `z_b`；P1 收到 output refresh frame 但尚未 XOR 形成 share 时抽均匀 `u`。本扩域没有重跑 S48/S52 功能矩阵或做实际 schedule trace 测试；历史 N=1000 功能案例只作为功能证据继承。
 
 S63 仅扩展理想成功模型。S62 的 cap-abort retry、发行错误通知/启动门和安全声明是否涵盖 protocol abort 均无新的 owner 决定，继续 `OPEN_CONFIRMATION`；`PAIRED_GENERIC_ABORT` 未获批准，测试 controller 启动屏障不等于生产接口。cap-abort delivery/start、A PENDING 后 ABORT/UNKNOWN/recovery failure、真实有限 timeout、T/A DRBG、签名/文件发布、SQLite、TLS/mTLS、recipient encryption、真实完整 party-view/部署优势均 OPEN。`N>1000` 未准入。BUILD/TEST、历史矩阵、正式 LAN/WAN/RTT/AAV86/性能=`NOT_RUN/NOT_MEASURED`；自然 I/O 本轮未测，既有 `NOT_REPRODUCED` 不变。runtime、tests、ABI、角色、输出、`L_S29`、默认开关及 `VFSS-baseline/` 均未改变。详见 S63 decision/report/gates/source/evidence manifest。
+
+### S64：远端功能接收与部署安全桥（2026-11-09）
+
+固定远端 S63 `29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb`，按 manifest/历史交接索引核验源码；由未参与 S63 的独立接收者 fresh Release 复建 OFF 与显式 FTv3/receipt-v2/API-v2 ON。default-OFF 无实验目标/符号，生产 ON 无 TEST_ONLY hook；两项 conformance exit 0，最终测试二进制 28/28 独立进程目标案例达预期（26 oracle/恢复 share、2 注入 no-share），详见 S64 cases。结论仅限逐案功能，不替代 S63 理想模型证明。S64 环境清单以 Ubuntu 24.04/WSL2 作为可复现测试部署；目标服务器的 process-mapped libcrypto/provider、熵/reseed、共享 DRBG、签名器、TLS、SQLite/挂载、发布/恢复、deadline 和并发资料待部署方提供。`RAND_bytes` 整段有序流替换需 `Adv_DRBG_T(Q,C;E_T,P)`，完整发行成功条件化需显式失败核或 `Pr_I[S_issue]≥p_min>ε_T`；均未由本机版本或成功案例证明。S62 三项 abort 合同仍 `OPEN_CONFIRMATION`；真实有限 timeout、实际联合安全与正式性能独立 OPEN/NOT_RUN。详见 S64 decision/report/gates/source-build-evidence manifest；不启动 LAN/WAN、RTT、AAV86，不创建 `secure` alias。

@@ -1,6 +1,6 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-11-03
+更新日期：2026-11-09
 
 ## 1. 项目目标与当前边界
 
@@ -1073,3 +1073,9 @@ S63 固定 S62 commit `c9c87799b0f27931249d5b82edce37a5f0f1814c`，重新核验 
 新增 `(layer,batch,count,phase,sequence,frame-length)` 在固定公开 tuple 与获准 `L_S29` 下是确定性后处理，未扩大泄露。逐批 Beaver openings 使用完整 H4 条件联合 kernel 归纳；每个 source-event cut 按其所在 batch/协议阶段采样。输出 share 形成前不提供 future `z_b`；P1 output-refresh receive-pre-share cut 使用均匀 refresh-frame kernel，形成后仅提供本方 staged share。S51 Kpost 仅在相同理想 A、诚实 endpoint、独立 token RNG 和 SuccessFence 下扩域；真实部署桥未关闭。
 
 S62 的 cap-abort 重试、发材失败通知/启动门、协议 abort 定理范围仍 `OPEN_CONFIRMATION`。生产 issuer/party API 没有共同的 all-or-none startup/notice 接口；TEST_ONLY 控制器不构成生产保证。`PAIRED_GENERIC_ABORT` 仅在负责人确认已属批准 `L_S29` 时才能采用。A PENDING 后的 ABORT/UNKNOWN/fetch-recovery 联合核仍 `OPEN`；真实有限 timeout、T/A DRBG、签名/发布/存储、SQLite、TLS/mTLS、recipient encryption 与完整实际 party-view 分别保持 OPEN。S48/S52 的 N=1000 是有限功能证据，不是安全证明。N>1000 未覆盖；BUILD/TEST、旧矩阵及正式 LAN/WAN/RTT/AAV86/性能本轮未运行/测量；不改 runtime/test/`VFSS-baseline/`，无 `secure` alias，不推送/合并。详细裁决见 S63 decision/report/gates/source-evidence manifest。
+
+## M6B-I PROJECT_DERIVED_SELECT_5ITER S64（2026-11-09，隔离分支未合入）
+
+S64 从远端 `m6b-i-project-select5-s63@29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb` 重新检出；S63 的 7 项运行时源码 blob、40 项继承证据与 5 项交付规范摘要逐项匹配，历史交接索引只用于定位原阶段来源，其归档日不替代原测试日期。非 S63 作者在另一隔离工作树 fresh Release 接收：default-OFF 实验目标/符号隔离、显式 ON 生产库与 TEST_ONLY 隔离、两项 conformance 通过；最终加入逐方 bit 断言的 TEST_ONLY 二进制 28/28 目标案例达预期，26 案有 share 并匹配 oracle，2 案为人工故障注入的 no-share 预期状态。N=128/256/1000 的边界 K、极值、负值、稳定同分与重启取回见 [S64 逐案记录](docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_CASES_2026-11-09.json)。有限样例仅支持该远端源码的功能接收，不推出安全证明。
+
+本轮选择 Ubuntu 24.04/WSL2 为可复现**测试部署**，记录 libcrypto/provider CLI 与库哈希，并区分实际测试进程观测。目标服务器配置尚未提供。Dealer 的整段自适应 `RAND_bytes` 流到理想 IID FTv3 字带缺目标 `E_T` 和可依据的 `Adv_DRBG_T(Q,C;E_T,P)`；完整发行成功条件化还需失败核或 `p_min`。S63 的理想 SuccessFence 正常成功视图仍为限定范围结论，真实超时、协议中止、T/A/P DRBG、签名/发布、SQLite、TLS/mTLS、recipient encryption 与完整部署 party-view 保持独立 `OPEN`。cap-abort 新调用重试、发行失败双方启动通知和 abort-aware 定理三项负责人决定仍 `OPEN_CONFIRMATION`。正式性能、RTT、AAV86 矩阵 `NOT_RUN/NOT_MEASURED`，无 `secure` alias；详见 [S64 决策](docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_DECISION_2026-11-09.md)、报告、gates 和环境/来源清单。

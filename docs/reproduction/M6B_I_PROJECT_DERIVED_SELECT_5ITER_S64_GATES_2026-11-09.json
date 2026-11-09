@@ -1,0 +1,96 @@
+{
+  "schema": "m6b-i-project-derived-select5-s64-gates/v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S64",
+  "date": "2026-11-09",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "baseline_commit": "29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb",
+  "baseline_tree": "2ad3d23ca1e6c555c1f65efb4a1fe431e8bca869",
+  "fixed_source_and_handoff": {
+    "S63_SOURCE_RECEIPT": "PASS",
+    "S63_RUNTIME_BLOBS_MATCHED": "7/7",
+    "S63_DELIVERY_CANONICAL_SHA256": "0e81f9520a4bcc1eaea35e8120ea82254dce8c42866c4e8bd510dc9feb73b563",
+    "HISTORICAL_HANDOFF_INDEX": "PASS_WITH_SCOPE; provenance index only; archive date is not original test date",
+    "VFSS_BASELINE_UNCHANGED": true
+  },
+  "claims": {
+    "REMOTE_FRESH_RELEASE_DEFAULT_OFF": {
+      "status": "PASS_WITH_SCOPE",
+      "meaning": "Fresh Release OFF library built; five related cache switches OFF, experimental targets and symbols absent; direct header inclusion without opt-in macro rejected by line-4 #error",
+      "library_sha256": "06b170dd5d6b3eba4246520747c9727c09cd2c72ce958a8c10e32bbfa7ff2f83"
+    },
+    "REMOTE_FRESH_RELEASE_OPT_IN": {
+      "status": "PASS_WITH_SCOPE",
+      "meaning": "Fresh Release production opt-in library built; execute_party_v2 symbol present; test_only/with_test_random symbols absent",
+      "library_sha256": "b4968191b95b73517985827fbab1093fef6e55412fdea10c2908325f4176c3c0"
+    },
+    "REMOTE_INDEPENDENT_CONFORMANCE": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Fresh TEST_ONLY Release v3 runtime and FTv3 bounded conformance, both exit 0; final command/hash in S64 cases"
+    },
+    "REMOTE_INDEPENDENT_ORACLE_E2E_N128_N256_N1000": {
+      "status": "PASS_WITH_SCOPE",
+      "scope": "Final bit-assert TEST_ONLY binary: 28/28 expected outcomes; 26 oracle/recovery share cases, two intentional no-share injection cases; N=1/128/256/1000 only, finite fixed fixtures",
+      "final_e2e_binary_sha256": "b2e7b0ae8fb61b2da07365c05e8cb28612dacf5a021e6ec757be70133da3d92a",
+      "limits": "Not all inputs or a security proof; fault injections are not natural business I/O failures"
+    },
+    "TEST_DEPLOYMENT_PROFILE": {
+      "status": "PASS_WITH_SCOPE",
+      "observed": "Ubuntu-24.04 WSL2, local library hashes and OpenSSL CLI; Dealer/A/P0/P1 child maps show /usr/lib/x86_64-linux-gnu/libcrypto.so.3",
+      "caveat": "Observed loaded library is only part of the test profile. CLI provider listing is not actual T/A/P DRBG state or target server profile."
+    },
+    "TARGET_DEPLOYMENT_PROFILE": {
+      "status": "OPEN_NOT_AVAILABLE",
+      "missing": "target service/container, process-mapped libraries/providers, entropy/reseed, lifecycle/concurrency, signer, TLS keys/CA lifecycle, SQLite/mount, file publication, deadlines"
+    },
+    "JOINT_DEALER_RNG_STREAM_BRIDGE": {
+      "status": "OPEN",
+      "first_gap": "No target E_T and defensible Adv_DRBG_T for the complete adaptive RAND_bytes request/return/error stream; source score_to_mask_v3_gmw.cpp:280-286",
+      "single_call_bounds": {
+        "n_le_256_m_256": {"max_bytes": 5296996, "max_api_calls": 1792},
+        "n_1000_m_1024": {"max_bytes": 88786404, "max_api_calls": 7247},
+        "max_single_request_bytes": 1048576
+      },
+      "deployment_aggregation": "OPEN; include other callers and concurrent/restarted invocations"
+    },
+    "ISSUANCE_SUCCESS_CONDITIONING": {
+      "status": "OPEN",
+      "needed": "Ideal failure-status kernel or Pr_I[S_issue] >= p_min > epsilon_T for RAND+sampler+signer+serialization+three-file publication"
+    },
+    "IDEAL_SUCCESS_APPLICATION_VIEW_N_LE_1000": {
+      "status": "INHERITED_PASS_WITH_SCOPE",
+      "source": "S63 ideal FTv3 successful issuance, ideal output refresh/A token, honest causal peer, one static semi-honest party and external SuccessFence"
+    },
+    "ACTUAL_FINITE_TIMEOUT_SUCCESS_VIEW": {"status": "OPEN"},
+    "ESCROW_ABORT_UNKNOWN_RECOVERY_JOINT_VIEW": {"status": "OPEN"},
+    "SIGNATURE_FILE_PUBLICATION_SQLITE_BRIDGE": {"status": "OPEN"},
+    "A_TOKEN_AND_PARTY_RNG_BRIDGES": {"status": "OPEN"},
+    "TLS_MTLS_RECIPIENT_ENCRYPTION_BRIDGE": {"status": "OPEN"},
+    "FULL_DEPLOYED_PARTY_VIEW_SECURITY": {"status": "OPEN"},
+    "LOW_PROBABILITY_ISSUANCE_ABORT_ACCEPTANCE": {"status": "OPEN_CONFIRMATION"},
+    "ISSUANCE_NOTICE_AND_BOTH_PARTY_START_CONTRACT": {"status": "OPEN_CONFIRMATION"},
+    "PROTOCOL_ABORT_THEOREM_SCOPE": {"status": "OPEN_CONFIRMATION"},
+    "PAIRED_GENERIC_ABORT": {"status": "NOT_APPROVED"},
+    "N_GT_1000": {"status": "NOT_ADMITTED"},
+    "NATURAL_BUSINESS_IO_FAILURE": {"status": "NOT_REPRODUCED_INHERITED; S64 evidence in cases"},
+    "FORMAL_LAN_WAN_RTT_AAV86_PERFORMANCE": {"status": "NOT_RUN", "measurement": "NOT_MEASURED"},
+    "SECURE_ALIAS": {"status": "NOT_CREATED"}
+  },
+  "execution": {
+    "runtime_code_changed": false,
+    "test_only_driver_changed": "S64 isolated harness change: per-party share bit assertions and N128/N256 boundary fixture; Git blob 3c3cc45e09609b1e9d57316c794ea1013d17c549; production runtime unchanged",
+    "independent_receiver": {
+      "agent": "/root/s64_remote_receiver",
+      "not_participant_in_s63_proof_or_evidence": true,
+      "fresh_build_and_tests": true,
+      "separate_read_only_bridge_review": "Checked RAND_bytes chunk/error, FY cap, signer and sequential three-file publication, conditional-advantage formula; confirmed missing target E_T and p_min; not complete cryptographic signoff"
+    },
+    "e2e_final_cases": "28/28 expected outcomes, 26 oracle share, 2 injected no-share",
+    "failed_attempts": [
+      "PowerShell combined conformance wrapper exit 1 from status variable expansion; separate direct commands exit 0",
+      "Process-map sampling wrapper exit 1 from short-lived child disappearance after five preliminary cases; all final cases rerun directly",
+      "Default-OFF header probe rejected as expected"
+    ],
+    "historical_195_211_case_matrices": "NOT_RUN",
+    "push_merge_pr": false
+  }
+}

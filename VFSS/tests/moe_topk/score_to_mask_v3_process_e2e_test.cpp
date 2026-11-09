@@ -1320,6 +1320,8 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     std::size_t selected_count = 0;
     for (std::size_t i = 0; i < scores.size(); ++i)
       {
+        require(output0.share[i] <= 1U && output1.share[i] <= 1U,
+                "party output share is not a bit");
         const auto recovered = static_cast<std::uint8_t>(
             output0.share[i] ^ output1.share[i]);
         require(recovered == oracle[i],
@@ -1449,9 +1451,12 @@ void run_one_e2e(const std::string& binary, const std::string& directory,
     }
     if (lose_receipt_p0 || fail_fetch_after_commit ||
         throw_nonstd_submit_after_commit || throw_nonstd_fetch_after_commit) {
-      for (std::size_t i = 0; i < scores.size(); ++i)
+      for (std::size_t i = 0; i < scores.size(); ++i) {
+        require(recovered0[i] <= 1U && recovered1[i] <= 1U,
+                "recovered party share is not a bit");
         require(static_cast<std::uint8_t>(recovered0[i] ^ recovered1[i]) == oracle[i],
                 "recovered shares after post-submit failure differ from the frozen oracle");
+      }
     }
   }
   restart_service.signal(SIGTERM);
@@ -2176,6 +2181,35 @@ int main(int argc, char** argv) {
           "s47-legacy-ft-v2-n256-k128");
 #endif
       std::cout << "S47_FT_V3_TARGETED_CASES PASS cases=" << count << '\n';
+      return 0;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--s64-ft-v3-n128-n256-boundary") {
+      std::size_t count = 0;
+      for (const auto n : {128U, 256U}) {
+        std::vector<std::int32_t> scores(n);
+        for (std::uint32_t i = 0; i < n; ++i) {
+          switch (i % 8U) {
+            case 0: scores[i] = INT32_MAX; break;
+            case 1: scores[i] = INT32_MIN; break;
+            case 2: scores[i] = -17; break;
+            case 3: scores[i] = 17; break;
+            case 4: scores[i] = 0; break;
+            case 5: scores[i] = INT32_MAX; break;
+            case 6: scores[i] = -1; break;
+            default: scores[i] = 4096; break;
+          }
+        }
+        for (const auto k : {1U, 8U, n / 2U, n - 1U, n}) {
+          const auto id = "s64-ft-v3-n" + std::to_string(n) + "-k" +
+              std::to_string(k);
+          const auto case_dir = (std::filesystem::path(directory.path) / id).string();
+          std::filesystem::create_directory(case_dir);
+          run_one_e2e(binary, case_dir, identities, scores, k, false,
+                      false, false, kScoreToMaskV3ReceiptFormatV2, id, 3U);
+          ++count;
+        }
+      }
+      std::cout << "S64_FT_V3_N128_N256_BOUNDARY PASS cases=" << count << '\n';
       return 0;
     }
     if (argc > 1 && std::string(argv[1]) == "--s48-ft-v3-n1000-extra") {
