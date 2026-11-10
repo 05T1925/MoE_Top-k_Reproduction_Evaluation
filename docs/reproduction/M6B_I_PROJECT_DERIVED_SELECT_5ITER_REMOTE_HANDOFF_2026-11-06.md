@@ -1,10 +1,10 @@
 # 项目自有五迭代 Select 远端交接索引
 
-归档日期：2026-11-06。当前交接分支从 S63 提交 `29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb` 派生。
+归档日期：2026-11-06；更新日期：2026-11-10。交接分支从 S63 提交 `29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb` 派生，现已纳入 S64 提交 `8debdcfa8e03527decaea13b956e3e18cf941ccd`。
 
 ## 如何读取阶段记录
 
-- S35–S63 是从 S35 起的连续 Git 提交链；远端 `m6b-i-project-select5-s35` 至 `m6b-i-project-select5-s63` 阶段分支指向对应提交。S39 有实现提交与后续审查提交，另设 `m6b-i-project-select5-s39-impl`。
+- S35–S64 是从 S35 起的连续 Git 提交链；远端 `m6b-i-project-select5-s35` 至 `m6b-i-project-select5-s64` 阶段分支指向对应提交。S39 有实现提交与后续审查提交，另设 `m6b-i-project-select5-s39-impl`。
 - S35 首次提交时带入了部分 S1–S34 的历史源码和报告快照。不能把这个提交解释为 S1–S34 当时已有独立 Git 提交。
 - 本归档分支在 S63 后，按阶段另行导入此前未入库的 91 份 Markdown/JSON 证据文件，并补入一份 S31 TEST_ONLY 原型源码。该源码的原始 SHA-256 与 S31 manifest 记录一致。导入提交是 2026-11-06 的历史快照归档，不是原阶段的提交日期或新测试。逐文件原始 SHA-256、来源及提交后的 Git blob ID 见同目录的 `M6B_I_PROJECT_DERIVED_SELECT_5ITER_HISTORICAL_IMPORT_MANIFEST_2026-11-06.json`。
 - S17、S27、S28 的完整原始交付文件未在当前可访问的工作树中找到；此处不重建或冒充原始证据。S32/S34 的报告随 S35 源码快照入库，S33 的报告在本归档中补入。远端旧 `m6b-i-project-select5-s32` 分支仍指向主线基线，不能当作 S32 运行时快照。
@@ -15,13 +15,14 @@
 | --- | --- |
 | 算法身份 | `Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL`；项目派生的稳定 Top-K mask 路线，未宣称复现 BB90/BMW16 原算法。 |
 | 功能 | S48/S52 指定 N≤1000 用例匹配冻结 oracle；这是有限用例接收，不是全输入证明。 |
+| 远端独立接收 | S64 从远端 S63 精确提交 fresh-build；最终 TEST_ONLY 二进制 28/28 预期结果，其中 26 案返回正确 share，2 案人工注入后预期无 share。生产运行时未改。 |
 | 理想模型安全 | S63 将正常成功应用/API 视图的限定条件模拟扩至 `1≤K≤N≤1000`；继承理想 FTv3、理想随机源、外生 SuccessFence 和单方静态半诚实等前提。 |
 | 尚未闭合 | 协议中止联合视图、真实有限超时、T/A 随机源、签名/文件发布、SQLite、TLS/mTLS、收件人加密、实际部署完整视图。 |
 | 性能 | 正式 LAN/WAN、RTT、AAV86 比较矩阵尚未运行；资源诊断不得写成正式性能。 |
 
 ## 接收顺序
 
-1. 从远端 `m6b-i-project-select5-s63` 获取当前源码和 S35–S63 已提交证据；核对 S63 决策、报告和 gates。
+1. 从远端 `m6b-i-project-select5-s64` 获取当前源码和 S35–S64 已提交证据；核对 S63/S64 决策、报告、gates 与 S64 独立进程逐案记录。
 2. 从本归档分支获取 S1–S34 的补充历史文档，并按各文档的原 manifest 核对其适用快照。归档分支包含 S63 全部内容。
 3. 复跑时另建目录，显式启用对应实验开关。不得用归档提交时间替代原运行时间，也不得把 S35 首次入库的旧源码当作各早期阶段的可运行版本。
 4. 正式比较前冻结同一实验 revision、输入/种子、环境、计量边界和安全/功能准入。项目派生路线作为独立实验项，不能默认为 BB90+DCF 原协议那一行。
