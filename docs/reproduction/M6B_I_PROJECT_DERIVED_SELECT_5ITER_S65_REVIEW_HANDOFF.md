@@ -42,13 +42,13 @@ cmake --build /tmp/select5-s65-build --target \
 如需脱离完整仓库转交**最小可构建源码包**，在已检出的固定 S65 提交上执行：
 
 ```bash
-git archive --format=tar.gz -o select5-s65-source.tar.gz HEAD \
+git -c core.autocrlf=false archive --format=tar.gz -o select5-s65-source.tar.gz HEAD \
   VFSS docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S65_REVIEW_HANDOFF.md \
   docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_CASES_2026-11-09.json \
   docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-11-09.json
 ```
 
-包内 `VFSS/` 是该仓库的自足 CMake 构建单元，含本路线及其依赖源码/TEST_ONLY 驱动；不含冻结的 `VFSS-baseline/`。压缩包本身只在本地生成，不加入 Git。
+包内 `VFSS/` 是该仓库的自足 CMake 构建单元，含本路线及其依赖源码/TEST_ONLY 驱动；不含冻结的 `VFSS-baseline/`。显式关闭 Git 行尾转换，使包内源码字节与 S64 Git blob 清单一致；压缩包本身只在本地生成，不加入 Git。
 
 ## 阅读入口、证据和待审点
 
