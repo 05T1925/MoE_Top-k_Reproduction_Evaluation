@@ -12,7 +12,7 @@
 | 在线计算方 P0/P1 | 各自的输入份额、材料包、GMW 转录、进程内短暂存在的本方输出份额；各自只持本方收件人私钥。 |
 | 在线托管方 A | 已签 context、会话/身份/交易元数据、两份**密文**、到达次序、PENDING/COMMITTED 状态与 receipt；不持双方解密密钥。 |
 
-五次**算法迭代**是 `project_derived_select5.cpp:369` 的 `iteration=0..4` 循环：前四次采样、比较与缩减，末次对剩余候选作精确比较（同文件 `:382-407`）。在线通信另有 `score_to_mask_v3_party.cpp:25-31` 的 READY、Beaver 批次、采样 seed/ACK、公开活动比较结果、输出刷新等消息，之后还有 A 的 submit/receipt/fetch。N=1000 源码/测试给出最多 **106 个 party exchange phase** 的上界；五次算法迭代不是五轮网络通信，phase 也不是实测 RTT。
+五次**算法迭代**是 `project_derived_select5.cpp:369` 的 `iteration=0..4` 循环：前四次采样、比较与缩减，末次对剩余候选作精确比较（同文件 `:382-407`）。在线通信另有 `score_to_mask_v3_party.cpp:25-31` 的 READY、Beaver 批次、采样 seed/ACK、公开活动比较结果、输出刷新等消息，之后还有 A 的 submit/receipt/fetch。S64 同一固定输入实测的 party exchange phase：N=128/K=64 为 **88**，N=256/K=128 为 **89**，N=1000/K=500 为 **106**；来源是 S64 逐案收据引用的 `final-n1000.log`（SHA-256 `3ad62b50…0cc2ee`），源码对 N=1000 的上界为 106。五次算法迭代不是五轮网络通信，phase 也不是实测 RTT。
 
 ## 从远端干净检出并最小运行（Ubuntu 24.04 x86_64）
 
