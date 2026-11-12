@@ -16,11 +16,11 @@
 
 ## 从远端干净检出并最小运行（Ubuntu 24.04 x86_64）
 
-依赖：`git cmake ninja-build g++ libeigen3-dev libssl-dev libsqlite3-dev`（须先安装）。以下命令从仓库根目录执行；构建及临时密钥/证书/材料只在 `/tmp`，E2E 驱动自行启动 Dealer、P0、P1、A 四类独立进程。
+依赖：`git cmake ninja-build g++ libeigen3-dev libssl-dev libsqlite3-dev`。Ubuntu 可先执行 `sudo apt-get install -y git cmake ninja-build g++ libeigen3-dev libssl-dev libsqlite3-dev`。以下命令从仓库根目录执行；构建及临时密钥/证书/材料只在 `/tmp`，E2E 驱动自行启动 Dealer、P0、P1、A 四类独立进程。
 
 ```bash
 git clone --branch codex/m6b-i-project-select5-s65 --single-branch \
-  https://github.com/05T1925/MoE_Top-k_Reproduction_Evaluation.git s65-review
+  git@github.com:05T1925/MoE_Top-k_Reproduction_Evaluation.git s65-review
 cd s65-review
 git rev-parse HEAD  # 与交接记录中的 S65 提交比对；其父级须为 8debdcfa...
 cmake -S VFSS -B /tmp/select5-s65-build -G Ninja -DCMAKE_BUILD_TYPE=Release \
