@@ -22,7 +22,8 @@
 git clone --branch codex/m6b-i-project-select5-s65 --single-branch \
   git@github.com:05T1925/MoE_Top-k_Reproduction_Evaluation.git s65-review
 cd s65-review
-git rev-parse HEAD  # 与交接记录中的 S65 提交比对；其父级须为 8debdcfa...
+git rev-parse HEAD  # 与交接记录中的 S65 提交比对
+git merge-base --is-ancestor 8debdcfa8e03527decaea13b956e3e18cf941ccd HEAD
 cmake -S VFSS -B /tmp/select5-s65-build -G Ninja -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_TESTING=ON \
   -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON \
