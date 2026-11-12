@@ -1,0 +1,115 @@
+{
+  "schema": "m6b_select5_s65_handoff_v1",
+  "task": "M6B-I-PROJECT-SELECT-5ITER-S65",
+  "route": "Protocol I + PROJECT_DERIVED_SELECT_5ITER + GMW/Beaver-v3 / EXPERIMENTAL",
+  "code_baseline": {
+    "remote_ref": "m6b-i-project-select5-s64",
+    "commit": "8debdcfa8e03527decaea13b956e3e18cf941ccd",
+    "tree": "c3227a79a04d109c4abba2b96f08b8034af145b8",
+    "parent": "29ac1c97ddf4fce3c9371e59d1fd259e381b3aeb",
+    "s64_selected_git_blob_files": 13,
+    "s64_selected_git_blob_sha256_mismatches": 0,
+    "s64_selected_canonical_sha256": "73dc2e00269e910107d3a8ec90c5a4bdb3875511eb9adac6481cd3ba1529c2dd",
+    "runtime_diff_from_s64": [],
+    "vfss_baseline_diff_from_s64": []
+  },
+  "handoff": {
+    "branch": "codex/m6b-i-project-select5-s65",
+    "guide_revision": "68d7d09f51780beefd29c1cf170b366dfa22df44",
+    "guide_path": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S65_REVIEW_HANDOFF.md",
+    "guide_git_blob_sha256": "1db709860edbeaa9a47517efa21754d350fdb26eb7e09b9d06bbcbc105394256",
+    "s64_cases_git_blob_sha256": "922b3d963fd47863836f2f19f279f6dd96e5440d2431b37c4448e9798071f78e",
+    "s64_source_manifest_git_blob_sha256": "e92293b2f9493192370b3096fb4fff890e2bd560082bece1ed9708ea59c814bb"
+  },
+  "source_archive": {
+    "local_path_outside_git": "../select5-s65-source.tar.gz",
+    "archive_revision": "68d7d09f51780beefd29c1cf170b366dfa22df44",
+    "source_prefix": "VFSS/",
+    "additional_files": [
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S65_REVIEW_HANDOFF.md",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_CASES_2026-11-09.json",
+      "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-11-09.json"
+    ],
+    "command_prefix": "git -c core.autocrlf=false archive --format=tar.gz",
+    "sha256": "10822c1eae65dd31f0176dd4caca8aeaa05a907f3892ea8f4c12465bce306b63",
+    "regular_files": 272,
+    "vfss_tracked_files": 269,
+    "extracted_s64_selected_sha256_matches": "13/13",
+    "forbidden_path_matches": 0,
+    "excluded": ["VFSS-baseline/", "private keys", "certificates", "material packages", "build artifacts", "raw logs"],
+    "note": "Archive SHA-256 is bound to archive_revision; running the guide's HEAD-based command from a later documentation commit can change tar metadata, while VFSS Git blobs remain identical."
+  },
+  "inherited_s64_receipt": {
+    "fresh_release_default_off": "PASS_WITH_SCOPE",
+    "fresh_release_explicit_on": "PASS_WITH_SCOPE",
+    "runtime_conformance": "PASS",
+    "ft_v3_bounded_conformance": "PASS",
+    "final_e2e_binary_sha256": "b2e7b0ae8fb61b2da07365c05e8cb28612dacf5a021e6ec757be70133da3d92a",
+    "cases_total": 28,
+    "share_oracle_cases": 26,
+    "intentional_no_share_fault_cases": 2,
+    "case_record": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S64_CASES_2026-11-09.json",
+    "normal_business_io_fault": "NOT_REPRODUCED",
+    "formal_performance": "NOT_MEASURED"
+  },
+  "s65_independent_minimal_run": {
+    "status": "PASS_WITH_SCOPE",
+    "reviewer_independence": "independent non-author of S63/S64 implementation and S65 guide; read-only guide review, fresh build and process E2E; no cryptographic proof review",
+    "remote_checkout_commit_tested": "11a2b1da734df8f3c09a7fbab4af471c865e3988",
+    "later_guide_revision_reviewed": "68d7d09f51780beefd29c1cf170b366dfa22df44",
+    "later_revision_code_or_build_command_diff": [],
+    "clone_path": "C:/Users/28641/.codex/worktrees/s65-independent-final-clone/MoE_Top-k_Reproduction_Evaluation",
+    "environment": {
+      "os": "Ubuntu 24.04.4 WSL2",
+      "gxx": "13.3.0",
+      "cmake": "3.28.3",
+      "ninja": "1.11.1",
+      "openssl_cli": "3.0.13",
+      "sqlite_dev_installed_after_first_configure_failure": "libsqlite3-dev 3.45.1-1ubuntu2.9"
+    },
+    "commands": {
+      "configure": "cmake -S VFSS -B /tmp/select5-s65-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_GMW_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_RECEIPT_V2_EXPERIMENTAL=ON -DMOE_TOPK_ENABLE_SCORE_TO_MASK_V3_FT_V3_BOUNDED_EXPERIMENTAL=ON",
+      "build": "cmake --build /tmp/select5-s65-build --target moe_topk_score_to_mask_v3_runtime_conformance_test moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test moe_topk_score_to_mask_v3_ft_v3_process_e2e_test -j 4",
+      "runtime_conformance": "/tmp/select5-s65-build/moe_topk_score_to_mask_v3_runtime_conformance_test",
+      "ft_v3_bounded_conformance": "/tmp/select5-s65-build/moe_topk_score_to_mask_v3_ft_v3_bounded_conformance_test",
+      "process_e2e": "/tmp/select5-s65-build/moe_topk_score_to_mask_v3_ft_v3_process_e2e_test --ft-v3-n1000"
+    },
+    "attempts": [
+      {"step": "first configure", "result": "FAILED_MISSING_SQLITE3_DEV", "exit_code": "NOT_RELIABLY_CAPTURED_BY_WRAPPER"},
+      {"step": "install libsqlite3-dev then same Release configure", "exit_code": 0},
+      {"step": "build three specified targets", "exit_code": 0},
+      {"step": "runtime conformance", "exit_code": 0},
+      {"step": "FTv3 bounded conformance", "exit_code": 0},
+      {"step": "--ft-v3-n1000 first run", "exit_code": 0, "cases": 8},
+      {"step": "--ft-v3-n1000 second run", "exit_code": 0, "cases": 8}
+    ],
+    "binary_sha256": {
+      "runtime_conformance": "d904828fcf1b23fd1bbbeee2e7bb251ca3023ee3c80d2876c880d4e95bbfe07f",
+      "ft_v3_bounded_conformance": "726258065bbad1a6818ad83881efa9d137a9530307168d1febb044bfcd9ccf5d",
+      "process_e2e": "8b6d2eab5c290bcafc12e39380bf4d243e27dce1f49659a3a0206e15019bdee4"
+    },
+    "second_raw_log_outside_git": "/tmp/select5-s65-e2e-receiver.log",
+    "second_raw_log_sha256": "1a37dda7e7d3c3c474f131e2dd853c8432fe00d569b6d3e079f603debbcfef07",
+    "case_outcomes": [
+      {"case_id": "s47-ft-v3-n1000-k1", "n": 1000, "k": 1, "party_phases": 96},
+      {"case_id": "s47-ft-v3-n1000-k8", "n": 1000, "k": 8, "party_phases": 106},
+      {"case_id": "s47-ft-v3-n1000-k500", "n": 1000, "k": 500, "party_phases": 106},
+      {"case_id": "s47-ft-v3-n1000-k999", "n": 1000, "k": 999, "party_phases": 106},
+      {"case_id": "s47-ft-v3-n1000-k1000", "n": 1000, "k": 1000, "party_phases": 106},
+      {"case_id": "s47-ft-v3-n1-k1", "n": 1, "k": 1, "party_phases": 72},
+      {"case_id": "s47-ft-v3-n128-k64", "n": 128, "k": 64, "party_phases": 88},
+      {"case_id": "s47-ft-v3-n256-k128", "n": 256, "k": 128, "party_phases": 89}
+    ],
+    "all_cases": "ORACLE_PASS_AND_BOTH_COMMITTED",
+    "all_case_exits": "Dealer=0,P0=0,P1=0,A=143,A_restart=143; A exits are test teardown SIGTERM"
+  },
+  "security_scope": {
+    "s63_ideal_success_application_view": "PASS_WITH_SCOPE_INHERITED",
+    "real_deployment_security": "OPEN",
+    "protocol_abort_contract": "OPEN_CONFIRMATION",
+    "actual_finite_timeout_view": "OPEN",
+    "secure_alias": "NOT_CREATED"
+  },
+  "merge_to_main": false,
+  "formal_lan_wan_rtt_aav86": "NOT_RUN"
+}
