@@ -28,7 +28,7 @@
 
 | 本地路径 | 当前角色 | Git 状态 | 原因 |
 | --- | --- | --- | --- |
-| `Papers/` | 论文、学习笔记及历史测试要求 | 本地保留、忽略 | 版权与再分发状态未逐项确认 |
+| `Papers/` | 论文、学习笔记及历史测试要求 | `Papers/siamjdiscrmath.pdf` 跟踪；其余继续本地忽略 | 本次仅纳入指定的公共书目汇编；其余资料版权与再分发状态未逐项确认 |
 | `ADSMPC/` | Protocol III 与 CipherGPT-style 旧原型 | 本地保留、忽略 | 含构建树、实验输出，且不是目标运行时 |
 | `Agarwal_TopK/` | Protocol I、CA、部分 Protocol III 算法参考 | 本地保留、忽略 | 历史工作包约 2.4GB，含归档、依赖、生成物和嵌套 Git 数据 |
 | `CipherGPT/` | 原生 Top-K 及旧实验的历史参考 | 本地保留、忽略 | 本轮已取消实施；原包仍包含依赖、构建树和实验结果 |
@@ -71,6 +71,10 @@ CipherGPT/
 | CipherGPT 原生历史参考 | `CipherGPT/src/globals.cpp`、`CipherGPT/test/Top_K_paper_test.cpp`、`CipherGPT/src/shuffle.cpp` | 历史原生 Top-K 行为及问题追踪；本轮不修复、不适配、不测性能 |
 | CipherGPT-style 旧实验 | `ADSMPC/src/ciphergpt_topk_dcf_shuffle.cpp` | 历史 FSS/DCF 对照原型，不是原生 CipherGPT，也不是 BB90 |
 | 历史测试要求 | `Papers/测试指标.md`、`Papers/Agarwal与CipherGPT实验对比.pdf` | 统一输出、矩阵和指标的历史来源；当前要求以更新后的项目文档为准 |
+
+### SIAM Journal on Discrete Mathematics 书目汇编快照（2026-11-20）
+
+用户指定的 `siamjdiscrmath.pdf` 是 535 页的 SIAM Journal on Discrete Mathematics 书目汇编，不是单篇研究论文或期刊卷册。副本位于 `Papers/siamjdiscrmath.pdf`，大小为 2,693,603 bytes；来源为 [Utah TeX bibliography archive](https://ftp.math.utah.edu/pub/tex/bib/siamjdiscrmath.pdf)，SHA-256 为 `07e9a9dbf58a3adc2a10545d8818af350b1360ed30ea8e28da9e68ac8b0890c4`。此书目汇编不包含其所列论文的全文。
 
 ### AAV86 原始论文与本地副本（M6A-P0，2026-09-27）
 
@@ -233,7 +237,7 @@ Agarwal 会议版提及 BB90 选择路线，不等于已完整给出本项目所
 
 已有副本发生变化时保留变更说明，不静默替换旧哈希。未知值标为待登记，不使用占位哈希。
 
-本次修改清单不表示已下载 BB90 PDF，也不表示已经更新 `docs/PAPERS.sha256`。
+本次加入的 `siamjdiscrmath.pdf` 是期刊书目汇编，不是 BB90 论文；该文件的路径及哈希已登记在 `docs/PAPERS.sha256`。
 
 ## 7. CipherGPT 历史参考边界
 
