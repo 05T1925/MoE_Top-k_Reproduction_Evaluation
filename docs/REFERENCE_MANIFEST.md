@@ -1,12 +1,16 @@
 # 本地参考资料清单
 
-更新日期：2026-09-13。
+更新日期：2026-11-20。
 
 ## 1. 状态与用途
 
 本清单定义远端仓库与本地参考资料的边界，记录资料用途、来源、版本和复用限制。
 
-本清单不删除、移动或修改本地参考目录。Git 忽略规则用于防止论文、完整参考工程和生成物被普通 `git add .` 意外加入远端历史。
+### 2026-11-20 归档快照
+
+按项目负责人本次明确指示，`Papers/` 当前作为研究资料归档快照纳入远端 `main`；SHA-256 清单为 `docs/PAPERS.sha256`。本次纳入不代表版权、许可或再分发权已逐项核验，也不改变引用和复用时的来源核对要求。BMW16 S2/S12 的 TEST_ONLY 原始 trace/tape 及关联报告已归档，见 `docs/EXPERIMENTAL_EVIDENCE_ARCHIVE_2026-11-20.md` 和对应的综合哈希清单。大型参考工程及两个压缩包仍不纳入仓库。
+
+本清单不删除、移动或修改本地参考目录。Git 忽略规则继续阻止完整参考工程及未审查生成物被普通 `git add .` 意外加入历史；`Papers/` 与本次登记的 TEST_ONLY trace/tape 是明确列明的归档例外。
 
 本次范围调整：
 
@@ -28,7 +32,7 @@
 
 | 本地路径 | 当前角色 | Git 状态 | 原因 |
 | --- | --- | --- | --- |
-| `Papers/` | 论文、学习笔记及历史测试要求 | `Papers/siamjdiscrmath.pdf` 跟踪；其余继续本地忽略 | 本次仅纳入指定的公共书目汇编；其余资料版权与再分发状态未逐项确认 |
+| `Papers/` | 论文、学习笔记及历史测试要求 | 15 个文件均作为归档快照跟踪 | 按项目负责人明确指示整体归档；文件来源、版权和再分发状态未逐项核验，使用前须按具体来源确认 |
 | `ADSMPC/` | Protocol III 与 CipherGPT-style 旧原型 | 本地保留、忽略 | 含构建树、实验输出，且不是目标运行时 |
 | `Agarwal_TopK/` | Protocol I、CA、部分 Protocol III 算法参考 | 本地保留、忽略 | 历史工作包约 2.4GB，含归档、依赖、生成物和嵌套 Git 数据 |
 | `CipherGPT/` | 原生 Top-K 及旧实验的历史参考 | 本地保留、忽略 | 本轮已取消实施；原包仍包含依赖、构建树和实验结果 |
@@ -44,7 +48,7 @@ Agarwal_TopK/
 CipherGPT/
 ```
 
-“被 Git 忽略”不等于“可以删除”，“取消实施”也不等于“删除历史资料”。
+本地参考工程被 Git 忽略不等于“可以删除”，“取消实施”也不等于“删除历史资料”。`Papers/` 已按 2026-11-20 归档指示进入 Git，不适用该忽略规则。
 
 既有目录继续用于论文核对、代码追踪、失败模式分析及历史结果解释。新环境只需准备当前分工必需的子集，不要求为推进 M2、M5、M6A 或 M6B 下载完整 CipherGPT 工作包。
 
@@ -80,7 +84,7 @@ CipherGPT/
 
 书目：Noga Alon、Yossi Azar、Uzi Vishkin，*Tight Complexity Bounds for Parallel Comparison Sorting*，27th Annual Symposium on Foundations of Computer Science (FOCS 1986)，pp. 502–510，DOI 10.1109/SFCS.1986.57。书目信息由 [Princeton 作者论文目录](https://web.math.princeton.edu/~nalon/PDFS/publications.html)、[Tel Aviv University 机构记录](https://cris.tau.ac.il/en/publications/tight-complexity-bounds-for-parallel-comparison-sorting) 和 IEEE DOI 记录核对。
 
-作者托管来源：[PDF](https://web.math.princeton.edu/~nalon/PDFS/Publications2/Tight%20complexity%20bounds%20for%20parallel%20comparison%20sorting.pdf)。于 2026-09-27 获取到本地忽略文件 `Papers/Alon_Azar_Vishkin_1986_Tight_Complexity_Bounds_for_Parallel_Comparison_Sorting_FOCS_AuthorHosted.pdf`；实测 9 页、1,063,055 bytes，SHA-256 为 `322f1bd761a987fd09e6b59b3a3ae77d6e4b1ca9dcb1c2765e45ac4a2a7e2b83`。本地副本为作者托管 PDF；本记录不指定其算法变体或项目映射。
+作者托管来源：[PDF](https://web.math.princeton.edu/~nalon/PDFS/Publications2/Tight%20complexity%20bounds%20for%20parallel%20comparison%20sorting.pdf)。于 2026-09-27 获取到 `Papers/Alon_Azar_Vishkin_1986_Tight_Complexity_Bounds_for_Parallel_Comparison_Sorting_FOCS_AuthorHosted.pdf`；实测 9 页、1,063,055 bytes，SHA-256 为 `322f1bd761a987fd09e6b59b3a3ae77d6e4b1ca9dcb1c2765e45ac4a2a7e2b83`。本地副本为作者托管 PDF；本记录不指定其算法变体或项目映射。
 
 本次盘点未核实到经作者、作者机构、出版方或正式 artifact 来源确认的 Agarwal CCS ’24 full version 或对应作者代码。`Agarwal_TopK/` 中存在 AAV86 参考代码，但其目录根部没有 Git 元数据，本地目录状态不能证明作者发布来源、revision 或许可证；详见 `docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md`。此状态表示本次未核实到，不表示公开世界不存在。
 
@@ -256,13 +260,13 @@ CipherGPT 原生代码和论文继续保留，用于解释旧计划、旧实验�
 
 保留资料不意味着将其作为已验收基线。取消任务也不意味着可以删除目录、改写旧报告或隐去原有代码来源。
 
-## 8. 普通 Git 历史明确排除项
+## 8. 普通 Git 历史排除项与例外
 
-- 论文 PDF 和未确认可再分发的资料；
+- 除 `Papers/` 中的已登记归档快照外，其他未经来源/许可审查的论文和资料；
 - `build/`、`CMakeFiles/`、对象文件、静态库和动态库；
 - 生成的 DCF/DPF keys、离线包、秘密掩码；
-- 临时通信文件和原始日志；
-- benchmark 原始输出、结果 CSV 和本地临时输入；
+- 临时通信文件和原始日志；BMW16 S2/S12 列入综合哈希清单的 TEST_ONLY trace/tape 是本次明确例外；
+- benchmark 原始输出、结果 CSV 和本地临时输入；S2/S12 已登记的历史结果目录是本次明确例外；
 - `Agarwal_TopK/protocol1_ca/frozen_b1_stage4c/` 等运行产物；
 - `Agarwal_TopK/frozen_inputs/` 下的压缩依赖或源码包；
 - 参考包内嵌套 `.git` 元数据；
@@ -270,7 +274,7 @@ CipherGPT 原生代码和论文继续保留，用于解释旧计划、旧实验�
 
 项目自己的实验脚本、来源说明和可审计汇总文档可以按正常评审追踪。它们不能包含秘密材料，也不能替代可定位的原始结果。
 
-完整资料存放于本地或另行约定的位置，不通过强制添加目录绕过忽略规则。
+未登记的完整资料继续存放于本地或另行约定的位置，不通过强制添加目录绕过忽略规则。
 
 ## 9. 后续共享方式
 

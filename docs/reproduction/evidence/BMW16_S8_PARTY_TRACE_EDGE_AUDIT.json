@@ -1,0 +1,647 @@
+{
+  "audit_source": "serialized party trace JSON; no algorithm imports",
+  "label": "BMW16_S8_INDEPENDENT_PARTY_TRACE_EDGE_AUDIT_TEST_ONLY",
+  "rows": [
+    {
+      "case_id": "n1_min_k1",
+      "dcf_eval_both_parties": 0,
+      "dummy_related_edges": 10,
+      "fss_slots": 0,
+      "full_online_message_phases": 1,
+      "logical_edges": 10,
+      "membership_slots": 0,
+      "real_real_edges": 0,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 2,
+          "logical_edges": 2,
+          "real_real_edges": 0,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 0,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 0
+        },
+        {
+          "cross_round_repeat_calls": 4,
+          "dummy_related_edges": 4,
+          "logical_edges": 4,
+          "real_real_edges": 0,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 0,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 0
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 2,
+          "logical_edges": 2,
+          "real_real_edges": 0,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 0,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 0
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 2,
+          "logical_edges": 2,
+          "real_real_edges": 0,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 0
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n2_extremes_k1",
+      "dcf_eval_both_parties": 28,
+      "dummy_related_edges": 21,
+      "fss_slots": 6,
+      "full_online_message_phases": 13,
+      "logical_edges": 28,
+      "membership_slots": 1,
+      "real_real_edges": 7,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 10,
+          "logical_edges": 12,
+          "real_real_edges": 2,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 2,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 12,
+          "dummy_related_edges": 9,
+          "logical_edges": 12,
+          "real_real_edges": 3,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 1,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 1,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 1
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 1
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n2_equal_k2",
+      "dcf_eval_both_parties": 28,
+      "dummy_related_edges": 21,
+      "fss_slots": 6,
+      "full_online_message_phases": 13,
+      "logical_edges": 28,
+      "membership_slots": 1,
+      "real_real_edges": 7,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 10,
+          "logical_edges": 12,
+          "real_real_edges": 2,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 2,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 12,
+          "dummy_related_edges": 9,
+          "logical_edges": 12,
+          "real_real_edges": 3,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 1,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 0,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 1
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 1
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n3_all_equal_k2",
+      "dcf_eval_both_parties": 72,
+      "dummy_related_edges": 10,
+      "fss_slots": 16,
+      "full_online_message_phases": 13,
+      "logical_edges": 28,
+      "membership_slots": 2,
+      "real_real_edges": 18,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 6,
+          "logical_edges": 12,
+          "real_real_edges": 6,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 1,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 6
+        },
+        {
+          "cross_round_repeat_calls": 12,
+          "dummy_related_edges": 4,
+          "logical_edges": 12,
+          "real_real_edges": 8,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 4,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 6
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 0,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 2
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n5_repeat_mixed_k1",
+      "dcf_eval_both_parties": 148,
+      "dummy_related_edges": 96,
+      "fss_slots": 33,
+      "full_online_message_phases": 13,
+      "logical_edges": 130,
+      "membership_slots": 4,
+      "real_real_edges": 34,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 70,
+          "logical_edges": 90,
+          "real_real_edges": 20,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 7,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 20
+        },
+        {
+          "cross_round_repeat_calls": 36,
+          "dummy_related_edges": 24,
+          "logical_edges": 36,
+          "real_real_edges": 12,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 2,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 11
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 1,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 1
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 1
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n5_repeat_mixed_k3",
+      "dcf_eval_both_parties": 168,
+      "dummy_related_edges": 14,
+      "fss_slots": 38,
+      "full_online_message_phases": 13,
+      "logical_edges": 54,
+      "membership_slots": 4,
+      "real_real_edges": 40,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 10,
+          "logical_edges": 30,
+          "real_real_edges": 20,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 11,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 20
+        },
+        {
+          "cross_round_repeat_calls": 20,
+          "dummy_related_edges": 4,
+          "logical_edges": 20,
+          "real_real_edges": 16,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 8,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 14
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 2,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 2
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n5_repeat_mixed_kn",
+      "dcf_eval_both_parties": 148,
+      "dummy_related_edges": 96,
+      "fss_slots": 33,
+      "full_online_message_phases": 13,
+      "logical_edges": 130,
+      "membership_slots": 4,
+      "real_real_edges": 34,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 70,
+          "logical_edges": 90,
+          "real_real_edges": 20,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 8,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 20
+        },
+        {
+          "cross_round_repeat_calls": 36,
+          "dummy_related_edges": 24,
+          "logical_edges": 36,
+          "real_real_edges": 12,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 9,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 11
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 0,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 1
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 1
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n8_repeat_k1",
+      "dcf_eval_both_parties": 340,
+      "dummy_related_edges": 225,
+      "fss_slots": 78,
+      "full_online_message_phases": 13,
+      "logical_edges": 304,
+      "membership_slots": 7,
+      "real_real_edges": 79,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 184,
+          "logical_edges": 240,
+          "real_real_edges": 56,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 32,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 56
+        },
+        {
+          "cross_round_repeat_calls": 60,
+          "dummy_related_edges": 39,
+          "logical_edges": 60,
+          "real_real_edges": 21,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 12,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 20
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 1,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 1
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 1
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n8_mixed_extremes_k3",
+      "dcf_eval_both_parties": 372,
+      "dummy_related_edges": 92,
+      "fss_slots": 86,
+      "full_online_message_phases": 13,
+      "logical_edges": 180,
+      "membership_slots": 7,
+      "real_real_edges": 88,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 76,
+          "logical_edges": 132,
+          "real_real_edges": 56,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 32,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 56
+        },
+        {
+          "cross_round_repeat_calls": 44,
+          "dummy_related_edges": 16,
+          "logical_edges": 44,
+          "real_real_edges": 28,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 19,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 26
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 1,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 2
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n8_all_equal_k4",
+      "dcf_eval_both_parties": 372,
+      "dummy_related_edges": 42,
+      "fss_slots": 86,
+      "full_online_message_phases": 13,
+      "logical_edges": 130,
+      "membership_slots": 7,
+      "real_real_edges": 88,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 34,
+          "logical_edges": 90,
+          "real_real_edges": 56,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 26,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 56
+        },
+        {
+          "cross_round_repeat_calls": 36,
+          "dummy_related_edges": 8,
+          "logical_edges": 36,
+          "real_real_edges": 28,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 5,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 26
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 2,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 2
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 0,
+          "logical_edges": 2,
+          "real_real_edges": 2,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 2
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n8_boundary_k8",
+      "dcf_eval_both_parties": 340,
+      "dummy_related_edges": 225,
+      "fss_slots": 78,
+      "full_online_message_phases": 13,
+      "logical_edges": 304,
+      "membership_slots": 7,
+      "real_real_edges": 79,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 184,
+          "logical_edges": 240,
+          "real_real_edges": 56,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 15,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 56
+        },
+        {
+          "cross_round_repeat_calls": 60,
+          "dummy_related_edges": 39,
+          "logical_edges": 60,
+          "real_real_edges": 21,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 10,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 20
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 1,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 1
+        },
+        {
+          "cross_round_repeat_calls": 2,
+          "dummy_related_edges": 1,
+          "logical_edges": 2,
+          "real_real_edges": 1,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 1
+        }
+      ],
+      "trace_audit": "PASS"
+    },
+    {
+      "case_id": "n64_k2_seed2026",
+      "dcf_eval_both_parties": 21880,
+      "dummy_related_edges": 13964,
+      "fss_slots": 5407,
+      "full_online_message_phases": 13,
+      "logical_edges": 19371,
+      "membership_slots": 63,
+      "real_real_edges": 5407,
+      "rounds": [
+        {
+          "cross_round_repeat_calls": 0,
+          "dummy_related_edges": 5706,
+          "logical_edges": 8010,
+          "real_real_edges": 2304,
+          "requires_results_through_round": 0,
+          "reverse_share_complement_calls": 1142,
+          "round": 1,
+          "unique_task_real_edges_and_key_slots": 2304
+        },
+        {
+          "cross_round_repeat_calls": 381,
+          "dummy_related_edges": 374,
+          "logical_edges": 500,
+          "real_real_edges": 126,
+          "requires_results_through_round": 1,
+          "reverse_share_complement_calls": 117,
+          "round": 2,
+          "unique_task_real_edges_and_key_slots": 126
+        },
+        {
+          "cross_round_repeat_calls": 6357,
+          "dummy_related_edges": 7870,
+          "logical_edges": 10843,
+          "real_real_edges": 2973,
+          "requires_results_through_round": 2,
+          "reverse_share_complement_calls": 1486,
+          "round": 3,
+          "unique_task_real_edges_and_key_slots": 2973
+        },
+        {
+          "cross_round_repeat_calls": 16,
+          "dummy_related_edges": 14,
+          "logical_edges": 18,
+          "real_real_edges": 4,
+          "requires_results_through_round": 3,
+          "reverse_share_complement_calls": 0,
+          "round": 4,
+          "unique_task_real_edges_and_key_slots": 4
+        }
+      ],
+      "trace_audit": "PASS"
+    }
+  ],
+  "summary": {
+    "not_applicable_non_success": 0,
+    "pass": 12,
+    "total": 12
+  }
+}

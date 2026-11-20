@@ -1,0 +1,27 @@
+TEST_ONLY_HANDLE_TO_ORIGINAL=0,4,1,5,2,3
+PUBLIC_Z=735008623,1515813056,1746370612,68632895298,3285139001,43511027496
+R1_PLAN task=0 edges=9-0,9-5,9-2,9-8,9-1,9-6,9-3,9-4,9-7,0-5,0-2,0-8,0-1,0-6,0-3,0-4,0-7,5-2,5-8,5-1,5-6,5-3,5-4,5-7,2-8,2-1,2-6,2-3,2-4,2-7,8-1,8-6,8-3,8-4,8-7,1-6,1-3,1-4,1-7,6-3,6-4,6-7,3-4,3-7,4-7
+R1_PLAN task=1 edges=0-12,0-1,0-3,0-5,0-2,0-11,0-10,0-13,0-4,12-1,12-3,12-5,12-2,12-11,12-10,12-13,12-4,1-3,1-5,1-2,1-11,1-10,1-13,1-4,3-5,3-2,3-11,3-10,3-13,3-4,5-2,5-11,5-10,5-13,5-4,2-11,2-10,2-13,2-4,11-10,11-13,11-4,10-13,10-4,13-4
+R1_RESULT task=0 bits=111010110110101100010100010110101100100111000
+R1_RESULT task=1 bits=011110011111100111000010000010000100011011110
+R1_STATE task=0 sample=9,0,5,2,8,1,6,3,4,7 pivot_low=0 pivot_high=2 status=PENDING reason=
+R1_STATE task=1 sample=0,12,1,3,5,2,11,10,13,4 pivot_low=2 pivot_high=4 status=PENDING reason=
+R2_PLAN task=0 edges=6-0,7-0,8-0,9-0,1-0,2-0,3-0,4-0,5-0,6-2,7-2,8-2,9-2,0-2,1-2,3-2,4-2,5-2
+R2_PLAN task=1 edges=10-2,11-2,12-2,0-2,1-2,3-2,4-2,5-2,13-2,10-4,11-4,12-4,0-4,1-4,2-4,3-4,5-4,13-4
+R2_RESULT task=0 bits=111100000111110000
+R2_RESULT task=1 bits=111100000111101000
+R2_STATE task=0 prefix=6,7,8,9 suffix=1,3,4,5 U=0,2 q=1 status=R2_READY reason=
+R2_STATE task=1 prefix=10,11,12,0 suffix=1,3,5,13 U=2,4 q=1 status=R2_READY reason=
+R3_PLAN task=0 edges=0-2
+R3_PLAN task=1 edges=2-4
+R3_RESULT task=0 bits=1
+R3_RESULT task=1 bits=1
+R3_STATE task=0 V=0,2 x=0 x_rank=1 y=2 y_rank=2 W=0,2 qW=1 status=R3_READY reason=
+R3_STATE task=1 V=2,4 x=2 x_rank=1 y=4 y_rank=2 W=2,4 qW=1 status=R3_READY reason=
+R4_PLAN task=0 edges=0-2
+R4_PLAN task=1 edges=2-4
+R4_RESULT task=0 bits=1
+R4_RESULT task=1 bits=1
+R4_STATE task=0 reject=6,7,8,9,0 accept=1,3,4,5,2 status=SUCCESS reason=R4_EXACT_RANK
+R4_STATE task=1 reject=10,11,12,0,2 accept=1,3,5,13,4 status=SUCCESS reason=R4_EXACT_RANK
+SELECTED handle=2

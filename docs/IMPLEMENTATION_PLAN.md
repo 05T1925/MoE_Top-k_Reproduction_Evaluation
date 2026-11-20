@@ -1,11 +1,15 @@
 # MoE Top-K 详细实施计划
 
-更新日期：2026-09-26
+更新日期：2026-11-20
+
+## 暂停状态（2026-11-20）
+
+项目当前暂停归档。下文记录的阶段门和执行顺序仍是历史实施规范，不表示 M6A、M6B 或 M7 已完成；归档在 `main` 的 TEST_ONLY/EXPERIMENTAL 文件也不替代相关阶段验收。若后续恢复，须先由项目负责人明确新范围，并以对应源码 revision 和证据更新状态。
 
 本文是 `PROJECT.md` 的执行版。`PROJECT.md` 定义项目范围、论文边界、统一语义和长期指标；本文将工作拆成可分配、可验证、可交接的阶段。
 
 若本文与项目总纲冲突，以更新后的 `PROJECT.md` 和团队明确决定为准，并同步修正文档。不得仅在代码、分支名称或口头约定中形成新的协议和计量规则。
-当前状态：M2 已完成；三轮 C-INSTANTIATION、独立评审与 Theorem 4.1 逻辑通信匹配不改变 `AUTHOR_EXACT = NOT_PROVEN` 的证据边界。接收方复跑后 M5 已完成，M6A 为当前阶段。M5-H1 通过用户指定的数量级门槛，但 Theorem 4.2 精确逻辑成本仍相差 `254n` bits。F1 经 PR #25 合入；接收方在 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过 F2/G3 和 41/41 回归。dated strict-gate 与 H2 初始 FAIL 记录保留为历史。M5-FIX-F1 = COMPLETED；F2 / G3 = PASS。详见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。
+历史基线记录：M2 的三轮 C-INSTANTIATION、独立评审与 Theorem 4.1 逻辑通信匹配不改变 `AUTHOR_EXACT = NOT_PROVEN` 的证据边界。接收方复跑后 M5 已完成；M5-H1 通过用户指定的数量级门槛，但 Theorem 4.2 精确逻辑成本仍相差 `254n` bits。F1 经 PR #25 合入；接收方在 9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 通过 F2/G3 和 41/41 回归。dated strict-gate 与 H2 初始 FAIL 记录保留为历史。M5-FIX-F1 = COMPLETED；F2 / G3 = PASS。详见 [G3 接收签收](reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。项目自 2026-11-20 起暂停，M6A/M6B/M7 未完成主分支验收。
 
 Dealer-DPF Candidate B 已 **STOPPED / SUPERSEDED**。活动路线复用 Chase
 OPV -> Share Translation -> Beneš -> Permute+Share -> two-pass
@@ -15,7 +19,7 @@ three-round candidate 保持为准确标记的 C-INSTANTIATION。详见
 
 本次修订取消 M4 CipherGPT 实施及性能任务，保留 M2、M3、M5 的编号和历史记录，将后续图升级分为 M6A AAV86、M6B BB90+DCF。
 
-## 1. 当前结论与执行主线
+## 1. 历史结论与执行主线
 
 ### 1.1 已完成基础
 
@@ -26,7 +30,7 @@ three-round candidate 保持为准确标记的 C-INSTANTIATION。详见
 | M2 | **COMPLETED / 已完成** | three-round C-INSTANTIATION、independent review PASS、Theorem 4.1 online logical communication match、Protocol I PR merged；`AUTHOR_EXACT = NOT_PROVEN` |
 | M3 | 三轮模块化核心及 raw-score 五轮扩展已完成并冻结 | 作为 M5 的基础和对照 |
 | M5 | 已完成 | F1 标准 raw-score-to-mask 入口及 G1/G2/G3 接收方复跑完成；保留 author-exact 与精确成本限制 |
-| M6A | 进行中 | Protocol I、Protocol III 的 AAV86 升级与完整性能验收 |
+| M6A | 未完成，项目已暂停 | Protocol I、Protocol III 的 AAV86 升级与完整性能验收尚未在 main 完成 |
 
 当前 M2 工程实现标签为：
 
@@ -43,7 +47,7 @@ moe_topk_protocol_iii_raw_score_modular_5round
 
 M2.16 完成的是 paper-exact 可行性与泄露审计，没有实现精确核心。M3 已在 `main@bb0d0e8` 完成整改；不得继续将 M3 写成尚待开始。
 
-### 1.2 当前待完成目标
+### 1.2 原计划待完成目标（项目暂停前）
 
 - Protocol I、Protocol III 各自的 AAV86 升级及完整性能验收。
 - Protocol I、Protocol III 各自的 BB90+DCF 升级及完整性能验收。
@@ -959,7 +963,7 @@ README.md
 - 一个 PR 只处理一个明确实现步骤或治理变更。
 - 不在一个 PR 中混合 Protocol I、Protocol III 和下一种升级算法的无关改动。
 - 文档与设计可以提前合并，依赖 runtime 的验收服从阶段门。
-- 原始密钥、日志、论文、构建产物和参考工程不进入普通 Git 历史。
+- 原始密钥、未登记日志、构建产物和参考工程不进入普通 Git 历史。`Papers/` 与 BMW16 S2/S12 TEST_ONLY trace/tape 只按明确授权的归档清单例外纳入。
 - 计划中的目标名称不代表已有 executable 或已完成状态。
 
 ### 6.2 当前合并顺序
@@ -996,7 +1000,7 @@ M4 不再出现在合并顺序中。旧 M2→M3 交接作为已完成历史保�
 - 是否影响另一条协议线或公共接口？
 - 文档状态是否与 main/分支实际状态一致？
 - `VFSS-baseline/` 是否保持不变？
-- 是否避免提交参考工程、论文、密钥、日志和构建物？
+- 是否避免提交参考工程、密钥、未登记日志和构建物？论文及 TEST_ONLY trace/tape 是否严格限定在已授权归档清单？
 - 是否运行相关回归及 `git diff --check`？
 
 文档 PR 不声称重新执行历史测试。新性能结果必须有自己的 revision、输入、环境、命令和原始计数。

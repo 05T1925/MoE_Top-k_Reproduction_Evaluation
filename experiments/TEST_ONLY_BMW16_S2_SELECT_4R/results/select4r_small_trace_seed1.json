@@ -1,0 +1,4762 @@
+{
+  "summary": {
+    "A5": {
+      "SELECT_HIGH_SENTINEL:A5_HIGH": {
+        "N": 24,
+        "S1_size": 9,
+        "T1_size": 3,
+        "failure_reason": null,
+        "pivot_a": "select-sentinel:high",
+        "pivot_b": "SELECT_HIGH_SENTINEL:a7-high:3",
+        "pivot_x": "SELECT_HIGH_SENTINEL:a7-high:3",
+        "sample_seed": 623124591649632796,
+        "target_lower_count_in_S1": 4
+      },
+      "SELECT_HIGH_SENTINEL:A5_LOW": {
+        "N": 24,
+        "S1_size": 9,
+        "T1_size": 3,
+        "failure_reason": null,
+        "pivot_a": "real:1",
+        "pivot_b": "real:4",
+        "pivot_x": "real:1",
+        "sample_seed": 5610862930671827781,
+        "target_lower_count_in_S1": 4
+      },
+      "SELECT_LOW_SENTINEL:A5_HIGH": {
+        "N": 24,
+        "S1_size": 9,
+        "T1_size": 3,
+        "failure_reason": null,
+        "pivot_a": "rank-high:0",
+        "pivot_b": "rank-high:0",
+        "pivot_x": "rank-high:0",
+        "sample_seed": 2126533286581907525,
+        "target_lower_count_in_S1": 4
+      },
+      "SELECT_LOW_SENTINEL:A5_LOW": {
+        "N": 24,
+        "S1_size": 9,
+        "T1_size": 3,
+        "failure_reason": null,
+        "pivot_a": "SELECT_LOW_SENTINEL:a7-low:8",
+        "pivot_b": "SELECT_LOW_SENTINEL:a7-low:8",
+        "pivot_x": "SELECT_LOW_SENTINEL:a7-low:8",
+        "sample_seed": 6046124748688994042,
+        "target_lower_count_in_S1": 4
+      }
+    },
+    "K": 3,
+    "algorithm_seed": 1,
+    "candidate_ids": [
+      "real:0"
+    ],
+    "comparison_rounds": 4,
+    "effective_expansion": {
+      "K": 3,
+      "N_with_one_sentinel": 9,
+      "algorithm_epsilon": "1/36",
+      "algorithm_seed": 1,
+      "ascending_rank_1_based": 6,
+      "effective_median_size": 12,
+      "high_padding": 3,
+      "input_seed": 17,
+      "low_padding": 0,
+      "median_reject_count": 6,
+      "n": 8,
+      "two_select_partitions_parallel": true
+    },
+    "epsilon": "1/36",
+    "failure_reasons": [],
+    "input_seed": 17,
+    "label": "BMW16_DERIVED_SELECT_4R_TEST_ONLY",
+    "n": 8,
+    "oracle_validation": {
+      "status": "NOT_RUN_BY_ALGORITHM"
+    },
+    "partitions": {
+      "SELECT_HIGH_SENTINEL": {
+        "D": 6,
+        "Rstar_real_input_count_before_R4": null,
+        "U_size": 11,
+        "V_size": 11,
+        "W_size": 0,
+        "h": 6,
+        "m": 12,
+        "random_branch": null,
+        "reason": "PROJECT_DERIVED_R3_ALL_PAIRS_EXACT_RESIDUAL_ORDER",
+        "rejected_count": 6,
+        "residual_reject_count_in_U": 5,
+        "status": "SUCCESS",
+        "x_id": null,
+        "y_id": null
+      },
+      "SELECT_LOW_SENTINEL": {
+        "D": 6,
+        "Rstar_real_input_count_before_R4": null,
+        "U_size": 10,
+        "V_size": 10,
+        "W_size": 0,
+        "h": 6,
+        "m": 12,
+        "random_branch": null,
+        "reason": "PROJECT_DERIVED_R3_ALL_PAIRS_EXACT_RESIDUAL_ORDER",
+        "rejected_count": 6,
+        "residual_reject_count_in_U": 6,
+        "status": "SUCCESS",
+        "x_id": null,
+        "y_id": null
+      }
+    },
+    "protocol_I_full_online_rounds": "NOT_REVIEWED",
+    "round_metrics": {
+      "0": {
+        "repeated_comparison_calls": 97,
+        "total_comparison_calls": 276,
+        "unique_unordered_edges_all_rounds": 179
+      },
+      "1": {
+        "comparison_calls": 84,
+        "cross_task_repeated_calls_same_round": 5,
+        "dummy_related_calls": 70,
+        "duplicate_calls_same_round": 5,
+        "real_real_calls": 14,
+        "repeated_calls_from_prior_rounds": 0,
+        "unique_unordered_edges_this_round": 79
+      },
+      "2": {
+        "comparison_calls": 92,
+        "cross_task_repeated_calls_same_round": 1,
+        "dummy_related_calls": 85,
+        "duplicate_calls_same_round": 1,
+        "real_real_calls": 7,
+        "repeated_calls_from_prior_rounds": 33,
+        "unique_unordered_edges_this_round": 91
+      },
+      "3": {
+        "comparison_calls": 100,
+        "cross_task_repeated_calls_same_round": 28,
+        "dummy_related_calls": 51,
+        "duplicate_calls_same_round": 28,
+        "real_real_calls": 49,
+        "repeated_calls_from_prior_rounds": 30,
+        "unique_unordered_edges_this_round": 72
+      },
+      "4": {
+        "comparison_calls": 0,
+        "cross_task_repeated_calls_same_round": 0,
+        "dummy_related_calls": 0,
+        "duplicate_calls_same_round": 0,
+        "real_real_calls": 0,
+        "repeated_calls_from_prior_rounds": 0,
+        "unique_unordered_edges_this_round": 0
+      }
+    },
+    "selected_original_index": 0,
+    "status": "SUCCESS"
+  },
+  "trace": {
+    "events": [
+      {
+        "K": 3,
+        "algorithm_seed": 1,
+        "effective_expansion": {
+          "K": 3,
+          "N_with_one_sentinel": 9,
+          "algorithm_epsilon": "1/36",
+          "algorithm_seed": 1,
+          "ascending_rank_1_based": 6,
+          "effective_median_size": 12,
+          "high_padding": 3,
+          "input_seed": 17,
+          "low_padding": 0,
+          "median_reject_count": 6,
+          "n": 8,
+          "two_select_partitions_parallel": true
+        },
+        "epsilon": "1/36",
+        "epsilon_A5_analysis": "1/72",
+        "event": "TRACE_HEADER",
+        "input_scores": [
+          5,
+          0,
+          7,
+          1,
+          6,
+          2,
+          4,
+          3
+        ],
+        "input_seed": 17,
+        "items": [
+          {
+            "id": "real:0",
+            "kind": "real",
+            "order_key": [
+              1,
+              5,
+              0,
+              "real:0"
+            ],
+            "original_index": 0,
+            "score": 5
+          },
+          {
+            "id": "real:1",
+            "kind": "real",
+            "order_key": [
+              1,
+              0,
+              -1,
+              "real:1"
+            ],
+            "original_index": 1,
+            "score": 0
+          },
+          {
+            "id": "real:2",
+            "kind": "real",
+            "order_key": [
+              1,
+              7,
+              -2,
+              "real:2"
+            ],
+            "original_index": 2,
+            "score": 7
+          },
+          {
+            "id": "real:3",
+            "kind": "real",
+            "order_key": [
+              1,
+              1,
+              -3,
+              "real:3"
+            ],
+            "original_index": 3,
+            "score": 1
+          },
+          {
+            "id": "real:4",
+            "kind": "real",
+            "order_key": [
+              1,
+              6,
+              -4,
+              "real:4"
+            ],
+            "original_index": 4,
+            "score": 6
+          },
+          {
+            "id": "real:5",
+            "kind": "real",
+            "order_key": [
+              1,
+              2,
+              -5,
+              "real:5"
+            ],
+            "original_index": 5,
+            "score": 2
+          },
+          {
+            "id": "real:6",
+            "kind": "real",
+            "order_key": [
+              1,
+              4,
+              -6,
+              "real:6"
+            ],
+            "original_index": 6,
+            "score": 4
+          },
+          {
+            "id": "real:7",
+            "kind": "real",
+            "order_key": [
+              1,
+              3,
+              -7,
+              "real:7"
+            ],
+            "original_index": 7,
+            "score": 3
+          },
+          {
+            "id": "rank-high:0",
+            "kind": "rank_high",
+            "order_key": [
+              2,
+              1,
+              0,
+              "rank-high:0"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "rank-high:1",
+            "kind": "rank_high",
+            "order_key": [
+              2,
+              1,
+              0,
+              "rank-high:1"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "rank-high:2",
+            "kind": "rank_high",
+            "order_key": [
+              2,
+              1,
+              0,
+              "rank-high:2"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "select-sentinel:low",
+            "kind": "select_low",
+            "order_key": [
+              0,
+              1,
+              0,
+              "select-sentinel:low"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "select-sentinel:high",
+            "kind": "select_high",
+            "order_key": [
+              2,
+              0,
+              0,
+              "select-sentinel:high"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:0",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:0"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:0",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:0"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:1",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:1"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:1",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:1"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:2",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:2"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:2",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:2"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:3",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:3"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:3",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:3"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:4",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:4"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:4",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:4"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:5",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:5"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:5",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:5"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:6",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:6"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:6",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:6"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:7",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:7"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:7",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:7"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:8",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:8"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:8",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:8"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:9",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:9"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:9",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:9"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:10",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:10"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:10",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:10"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-low:11",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-low:11"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_LOW_SENTINEL:a7-high:11",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_LOW_SENTINEL:a7-high:11"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:0",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:0"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:0",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:0"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:1",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:1"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:1",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:1"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:2",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:2"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:2",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:2"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:3",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:3"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:3"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:4",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:4"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:4",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:4"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:5",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:5"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:5",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:5"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:6",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:6"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:6",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:6"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:7",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:7"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:7",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:7"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:8",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:8"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:8",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:8"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:9",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:9"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:9",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:9"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:10",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:10"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:10",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:10"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-low:11",
+            "kind": "a7_scratch_low",
+            "order_key": [
+              -1,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-low:11"
+            ],
+            "original_index": null,
+            "score": null
+          },
+          {
+            "id": "SELECT_HIGH_SENTINEL:a7-high:11",
+            "kind": "a7_scratch_high",
+            "order_key": [
+              3,
+              0,
+              0,
+              "SELECT_HIGH_SENTINEL:a7-high:11"
+            ],
+            "original_index": null,
+            "score": null
+          }
+        ],
+        "label": "BMW16_DERIVED_SELECT_4R_TEST_ONLY",
+        "summary": {
+          "A5": {
+            "SELECT_HIGH_SENTINEL:A5_HIGH": {
+              "N": 24,
+              "S1_size": 9,
+              "T1_size": 3,
+              "failure_reason": null,
+              "pivot_a": "select-sentinel:high",
+              "pivot_b": "SELECT_HIGH_SENTINEL:a7-high:3",
+              "pivot_x": "SELECT_HIGH_SENTINEL:a7-high:3",
+              "sample_seed": 623124591649632796,
+              "target_lower_count_in_S1": 4
+            },
+            "SELECT_HIGH_SENTINEL:A5_LOW": {
+              "N": 24,
+              "S1_size": 9,
+              "T1_size": 3,
+              "failure_reason": null,
+              "pivot_a": "real:1",
+              "pivot_b": "real:4",
+              "pivot_x": "real:1",
+              "sample_seed": 5610862930671827781,
+              "target_lower_count_in_S1": 4
+            },
+            "SELECT_LOW_SENTINEL:A5_HIGH": {
+              "N": 24,
+              "S1_size": 9,
+              "T1_size": 3,
+              "failure_reason": null,
+              "pivot_a": "rank-high:0",
+              "pivot_b": "rank-high:0",
+              "pivot_x": "rank-high:0",
+              "sample_seed": 2126533286581907525,
+              "target_lower_count_in_S1": 4
+            },
+            "SELECT_LOW_SENTINEL:A5_LOW": {
+              "N": 24,
+              "S1_size": 9,
+              "T1_size": 3,
+              "failure_reason": null,
+              "pivot_a": "SELECT_LOW_SENTINEL:a7-low:8",
+              "pivot_b": "SELECT_LOW_SENTINEL:a7-low:8",
+              "pivot_x": "SELECT_LOW_SENTINEL:a7-low:8",
+              "sample_seed": 6046124748688994042,
+              "target_lower_count_in_S1": 4
+            }
+          },
+          "K": 3,
+          "algorithm_seed": 1,
+          "candidate_ids": [
+            "real:0"
+          ],
+          "comparison_rounds": 4,
+          "effective_expansion": {
+            "K": 3,
+            "N_with_one_sentinel": 9,
+            "algorithm_epsilon": "1/36",
+            "algorithm_seed": 1,
+            "ascending_rank_1_based": 6,
+            "effective_median_size": 12,
+            "high_padding": 3,
+            "input_seed": 17,
+            "low_padding": 0,
+            "median_reject_count": 6,
+            "n": 8,
+            "two_select_partitions_parallel": true
+          },
+          "epsilon": "1/36",
+          "failure_reasons": [],
+          "input_seed": 17,
+          "label": "BMW16_DERIVED_SELECT_4R_TEST_ONLY",
+          "n": 8,
+          "oracle_validation": {
+            "status": "NOT_RUN_BY_ALGORITHM"
+          },
+          "partitions": {
+            "SELECT_HIGH_SENTINEL": {
+              "D": 6,
+              "Rstar_real_input_count_before_R4": null,
+              "U_size": 11,
+              "V_size": 11,
+              "W_size": 0,
+              "h": 6,
+              "m": 12,
+              "random_branch": null,
+              "reason": "PROJECT_DERIVED_R3_ALL_PAIRS_EXACT_RESIDUAL_ORDER",
+              "rejected_count": 6,
+              "residual_reject_count_in_U": 5,
+              "status": "SUCCESS",
+              "x_id": null,
+              "y_id": null
+            },
+            "SELECT_LOW_SENTINEL": {
+              "D": 6,
+              "Rstar_real_input_count_before_R4": null,
+              "U_size": 10,
+              "V_size": 10,
+              "W_size": 0,
+              "h": 6,
+              "m": 12,
+              "random_branch": null,
+              "reason": "PROJECT_DERIVED_R3_ALL_PAIRS_EXACT_RESIDUAL_ORDER",
+              "rejected_count": 6,
+              "residual_reject_count_in_U": 6,
+              "status": "SUCCESS",
+              "x_id": null,
+              "y_id": null
+            }
+          },
+          "protocol_I_full_online_rounds": "NOT_REVIEWED",
+          "round_metrics": {
+            "0": {
+              "repeated_comparison_calls": 97,
+              "total_comparison_calls": 276,
+              "unique_unordered_edges_all_rounds": 179
+            },
+            "1": {
+              "comparison_calls": 84,
+              "cross_task_repeated_calls_same_round": 5,
+              "dummy_related_calls": 70,
+              "duplicate_calls_same_round": 5,
+              "real_real_calls": 14,
+              "repeated_calls_from_prior_rounds": 0,
+              "unique_unordered_edges_this_round": 79
+            },
+            "2": {
+              "comparison_calls": 92,
+              "cross_task_repeated_calls_same_round": 1,
+              "dummy_related_calls": 85,
+              "duplicate_calls_same_round": 1,
+              "real_real_calls": 7,
+              "repeated_calls_from_prior_rounds": 33,
+              "unique_unordered_edges_this_round": 91
+            },
+            "3": {
+              "comparison_calls": 100,
+              "cross_task_repeated_calls_same_round": 28,
+              "dummy_related_calls": 51,
+              "duplicate_calls_same_round": 28,
+              "real_real_calls": 49,
+              "repeated_calls_from_prior_rounds": 30,
+              "unique_unordered_edges_this_round": 72
+            },
+            "4": {
+              "comparison_calls": 0,
+              "cross_task_repeated_calls_same_round": 0,
+              "dummy_related_calls": 0,
+              "duplicate_calls_same_round": 0,
+              "real_real_calls": 0,
+              "repeated_calls_from_prior_rounds": 0,
+              "unique_unordered_edges_this_round": 0
+            }
+          },
+          "selected_original_index": 0,
+          "status": "SUCCESS"
+        },
+        "trace_version": 1
+      },
+      {
+        "edges": [
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:11",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:1",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:1",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:1",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "rank-high:2",
+            "left_kind": "rank_high",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "rank-high:2",
+            "left_kind": "rank_high",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "rank-high:2",
+            "left_kind": "rank_high",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:7",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:7",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:7",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:10",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:10",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-low:10",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:6",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:6",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:6",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:4",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:4",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:0",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:0",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:0",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:2",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:2",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_LOW_SENTINEL:a7-high:2",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:4",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:4",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:4",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:1",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:1",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:1",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:6",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:6",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-low:6",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 0,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "select-sentinel:high",
+            "left_kind": "select_high",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:7",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:7",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:7",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:1",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:1",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:1",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:11",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:11",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:11",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:2",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:2",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_S1_x_T1",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:2",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 0,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          }
+        ],
+        "event": "ROUND_PLAN_FROZEN",
+        "plan_sha256": "c8522a5817d79855b8fb6d235ac63326e7f1d2e18375d3762e76911b95e93fa5",
+        "round": 1,
+        "tasks": [
+          {
+            "S1_ids": [
+              "SELECT_LOW_SENTINEL:a7-low:8",
+              "real:4",
+              "SELECT_LOW_SENTINEL:a7-low:11",
+              "SELECT_LOW_SENTINEL:a7-low:1",
+              "rank-high:2",
+              "real:5",
+              "SELECT_LOW_SENTINEL:a7-low:7",
+              "SELECT_LOW_SENTINEL:a7-low:10",
+              "real:2"
+            ],
+            "T1_ids": [
+              "SELECT_LOW_SENTINEL:a7-low:8",
+              "real:2",
+              "SELECT_LOW_SENTINEL:a7-low:11"
+            ],
+            "input_ids": [
+              "SELECT_LOW_SENTINEL:a7-low:0",
+              "SELECT_LOW_SENTINEL:a7-low:1",
+              "SELECT_LOW_SENTINEL:a7-low:2",
+              "SELECT_LOW_SENTINEL:a7-low:3",
+              "SELECT_LOW_SENTINEL:a7-low:4",
+              "SELECT_LOW_SENTINEL:a7-low:5",
+              "SELECT_LOW_SENTINEL:a7-low:6",
+              "SELECT_LOW_SENTINEL:a7-low:7",
+              "SELECT_LOW_SENTINEL:a7-low:8",
+              "SELECT_LOW_SENTINEL:a7-low:9",
+              "SELECT_LOW_SENTINEL:a7-low:10",
+              "SELECT_LOW_SENTINEL:a7-low:11",
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "phase": "A5_R1",
+            "requires_results_through_round": 0,
+            "sample_seed": 6046124748688994042,
+            "target_lower_count_in_S1": 4,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "S1_ids": [
+              "real:0",
+              "real:6",
+              "SELECT_LOW_SENTINEL:a7-high:6",
+              "SELECT_LOW_SENTINEL:a7-high:4",
+              "SELECT_LOW_SENTINEL:a7-high:0",
+              "real:2",
+              "SELECT_LOW_SENTINEL:a7-high:2",
+              "rank-high:0",
+              "real:1"
+            ],
+            "T1_ids": [
+              "SELECT_LOW_SENTINEL:a7-high:4",
+              "rank-high:0",
+              "real:2"
+            ],
+            "input_ids": [
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2",
+              "SELECT_LOW_SENTINEL:a7-high:0",
+              "SELECT_LOW_SENTINEL:a7-high:1",
+              "SELECT_LOW_SENTINEL:a7-high:2",
+              "SELECT_LOW_SENTINEL:a7-high:3",
+              "SELECT_LOW_SENTINEL:a7-high:4",
+              "SELECT_LOW_SENTINEL:a7-high:5",
+              "SELECT_LOW_SENTINEL:a7-high:6",
+              "SELECT_LOW_SENTINEL:a7-high:7",
+              "SELECT_LOW_SENTINEL:a7-high:8",
+              "SELECT_LOW_SENTINEL:a7-high:9",
+              "SELECT_LOW_SENTINEL:a7-high:10",
+              "SELECT_LOW_SENTINEL:a7-high:11"
+            ],
+            "phase": "A5_R1",
+            "requires_results_through_round": 0,
+            "sample_seed": 2126533286581907525,
+            "target_lower_count_in_S1": 4,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "S1_ids": [
+              "real:1",
+              "real:0",
+              "SELECT_HIGH_SENTINEL:a7-low:4",
+              "rank-high:0",
+              "real:7",
+              "real:4",
+              "SELECT_HIGH_SENTINEL:a7-low:1",
+              "real:2",
+              "SELECT_HIGH_SENTINEL:a7-low:6"
+            ],
+            "T1_ids": [
+              "real:4",
+              "real:1",
+              "rank-high:0"
+            ],
+            "input_ids": [
+              "SELECT_HIGH_SENTINEL:a7-low:0",
+              "SELECT_HIGH_SENTINEL:a7-low:1",
+              "SELECT_HIGH_SENTINEL:a7-low:2",
+              "SELECT_HIGH_SENTINEL:a7-low:3",
+              "SELECT_HIGH_SENTINEL:a7-low:4",
+              "SELECT_HIGH_SENTINEL:a7-low:5",
+              "SELECT_HIGH_SENTINEL:a7-low:6",
+              "SELECT_HIGH_SENTINEL:a7-low:7",
+              "SELECT_HIGH_SENTINEL:a7-low:8",
+              "SELECT_HIGH_SENTINEL:a7-low:9",
+              "SELECT_HIGH_SENTINEL:a7-low:10",
+              "SELECT_HIGH_SENTINEL:a7-low:11",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "phase": "A5_R1",
+            "requires_results_through_round": 0,
+            "sample_seed": 5610862930671827781,
+            "target_lower_count_in_S1": 4,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "S1_ids": [
+              "real:3",
+              "select-sentinel:high",
+              "SELECT_HIGH_SENTINEL:a7-high:7",
+              "SELECT_HIGH_SENTINEL:a7-high:1",
+              "real:4",
+              "SELECT_HIGH_SENTINEL:a7-high:3",
+              "SELECT_HIGH_SENTINEL:a7-high:11",
+              "real:0",
+              "SELECT_HIGH_SENTINEL:a7-high:2"
+            ],
+            "T1_ids": [
+              "real:3",
+              "select-sentinel:high",
+              "SELECT_HIGH_SENTINEL:a7-high:3"
+            ],
+            "input_ids": [
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2",
+              "SELECT_HIGH_SENTINEL:a7-high:0",
+              "SELECT_HIGH_SENTINEL:a7-high:1",
+              "SELECT_HIGH_SENTINEL:a7-high:2",
+              "SELECT_HIGH_SENTINEL:a7-high:3",
+              "SELECT_HIGH_SENTINEL:a7-high:4",
+              "SELECT_HIGH_SENTINEL:a7-high:5",
+              "SELECT_HIGH_SENTINEL:a7-high:6",
+              "SELECT_HIGH_SENTINEL:a7-high:7",
+              "SELECT_HIGH_SENTINEL:a7-high:8",
+              "SELECT_HIGH_SENTINEL:a7-high:9",
+              "SELECT_HIGH_SENTINEL:a7-high:10",
+              "SELECT_HIGH_SENTINEL:a7-high:11"
+            ],
+            "phase": "A5_R1",
+            "requires_results_through_round": 0,
+            "sample_seed": 623124591649632796,
+            "target_lower_count_in_S1": 4,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          }
+        ]
+      },
+      {
+        "event": "ROUND_RESULTS",
+        "left_lt_right": [
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          false,
+          false,
+          true,
+          false,
+          true,
+          true,
+          false,
+          false,
+          true
+        ],
+        "round": 1
+      },
+      {
+        "edges": [
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:0",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:1",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:2",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:3",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:4",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:5",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:6",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:7",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:9",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:10",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "select-sentinel:low",
+            "right_kind": "select_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:0",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_LOW_SENTINEL:a7-low:8",
+            "left_kind": "a7_scratch_low",
+            "max_info_round": 1,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "select-sentinel:low",
+            "right_kind": "select_low",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:0",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:0",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:1",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:2",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:3",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:5",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:6",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:7",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:8",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:9",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:10",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 1,
+            "right": "SELECT_LOW_SENTINEL:a7-high:11",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:0",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:1",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:2",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:3",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:4",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:5",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:6",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:7",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:8",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:9",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:10",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-low:11",
+            "right_kind": "a7_scratch_low",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:0",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 1,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:0",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:0",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:1",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:2",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:4",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:5",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:6",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:7",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:8",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:9",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:10",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          },
+          {
+            "generator": "A5_all_to_selected_pivot",
+            "left": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "left_kind": "a7_scratch_high",
+            "max_info_round": 1,
+            "right": "SELECT_HIGH_SENTINEL:a7-high:11",
+            "right_kind": "a7_scratch_high",
+            "round": 2,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          }
+        ],
+        "event": "ROUND_PLAN_FROZEN",
+        "plan_sha256": "0273959719e1543a9af56446a81df9e4695301deee43edf041cb36ead14c1830",
+        "round": 2,
+        "tasks": [
+          {
+            "input_ids": [
+              "SELECT_LOW_SENTINEL:a7-low:0",
+              "SELECT_LOW_SENTINEL:a7-low:1",
+              "SELECT_LOW_SENTINEL:a7-low:2",
+              "SELECT_LOW_SENTINEL:a7-low:3",
+              "SELECT_LOW_SENTINEL:a7-low:4",
+              "SELECT_LOW_SENTINEL:a7-low:5",
+              "SELECT_LOW_SENTINEL:a7-low:6",
+              "SELECT_LOW_SENTINEL:a7-low:7",
+              "SELECT_LOW_SENTINEL:a7-low:8",
+              "SELECT_LOW_SENTINEL:a7-low:9",
+              "SELECT_LOW_SENTINEL:a7-low:10",
+              "SELECT_LOW_SENTINEL:a7-low:11",
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "phase": "A5_R2",
+            "pivot_a": "SELECT_LOW_SENTINEL:a7-low:8",
+            "pivot_b": "SELECT_LOW_SENTINEL:a7-low:8",
+            "pivot_x": "SELECT_LOW_SENTINEL:a7-low:8",
+            "requires_results_through_round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_LOW"
+          },
+          {
+            "input_ids": [
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2",
+              "SELECT_LOW_SENTINEL:a7-high:0",
+              "SELECT_LOW_SENTINEL:a7-high:1",
+              "SELECT_LOW_SENTINEL:a7-high:2",
+              "SELECT_LOW_SENTINEL:a7-high:3",
+              "SELECT_LOW_SENTINEL:a7-high:4",
+              "SELECT_LOW_SENTINEL:a7-high:5",
+              "SELECT_LOW_SENTINEL:a7-high:6",
+              "SELECT_LOW_SENTINEL:a7-high:7",
+              "SELECT_LOW_SENTINEL:a7-high:8",
+              "SELECT_LOW_SENTINEL:a7-high:9",
+              "SELECT_LOW_SENTINEL:a7-high:10",
+              "SELECT_LOW_SENTINEL:a7-high:11"
+            ],
+            "phase": "A5_R2",
+            "pivot_a": "rank-high:0",
+            "pivot_b": "rank-high:0",
+            "pivot_x": "rank-high:0",
+            "requires_results_through_round": 1,
+            "task": "SELECT_LOW_SENTINEL:A5_HIGH"
+          },
+          {
+            "input_ids": [
+              "SELECT_HIGH_SENTINEL:a7-low:0",
+              "SELECT_HIGH_SENTINEL:a7-low:1",
+              "SELECT_HIGH_SENTINEL:a7-low:2",
+              "SELECT_HIGH_SENTINEL:a7-low:3",
+              "SELECT_HIGH_SENTINEL:a7-low:4",
+              "SELECT_HIGH_SENTINEL:a7-low:5",
+              "SELECT_HIGH_SENTINEL:a7-low:6",
+              "SELECT_HIGH_SENTINEL:a7-low:7",
+              "SELECT_HIGH_SENTINEL:a7-low:8",
+              "SELECT_HIGH_SENTINEL:a7-low:9",
+              "SELECT_HIGH_SENTINEL:a7-low:10",
+              "SELECT_HIGH_SENTINEL:a7-low:11",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "phase": "A5_R2",
+            "pivot_a": "real:1",
+            "pivot_b": "real:4",
+            "pivot_x": "real:1",
+            "requires_results_through_round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_LOW"
+          },
+          {
+            "input_ids": [
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2",
+              "SELECT_HIGH_SENTINEL:a7-high:0",
+              "SELECT_HIGH_SENTINEL:a7-high:1",
+              "SELECT_HIGH_SENTINEL:a7-high:2",
+              "SELECT_HIGH_SENTINEL:a7-high:3",
+              "SELECT_HIGH_SENTINEL:a7-high:4",
+              "SELECT_HIGH_SENTINEL:a7-high:5",
+              "SELECT_HIGH_SENTINEL:a7-high:6",
+              "SELECT_HIGH_SENTINEL:a7-high:7",
+              "SELECT_HIGH_SENTINEL:a7-high:8",
+              "SELECT_HIGH_SENTINEL:a7-high:9",
+              "SELECT_HIGH_SENTINEL:a7-high:10",
+              "SELECT_HIGH_SENTINEL:a7-high:11"
+            ],
+            "phase": "A5_R2",
+            "pivot_a": "select-sentinel:high",
+            "pivot_b": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "pivot_x": "SELECT_HIGH_SENTINEL:a7-high:3",
+            "requires_results_through_round": 1,
+            "task": "SELECT_HIGH_SENTINEL:A5_HIGH"
+          }
+        ]
+      },
+      {
+        "event": "ROUND_RESULTS",
+        "left_lt_right": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false
+        ],
+        "round": 2
+      },
+      {
+        "edges": [
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:0",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:low",
+            "left_kind": "select_low",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:1",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:1",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:2",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:0",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:3",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:2",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:4",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:3",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:5",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:4",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:6",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:5",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "real:7",
+            "right_kind": "real",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:6",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "select-sentinel:high",
+            "right_kind": "select_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "real:7",
+            "left_kind": "real",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:high",
+            "left_kind": "select_high",
+            "max_info_round": 2,
+            "right": "rank-high:0",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:high",
+            "left_kind": "select_high",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "select-sentinel:high",
+            "left_kind": "select_high",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 2,
+            "right": "rank-high:1",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "rank-high:0",
+            "left_kind": "rank_high",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          },
+          {
+            "generator": "PROJECT_DERIVED_R3_ALL_PAIRS",
+            "left": "rank-high:1",
+            "left_kind": "rank_high",
+            "max_info_round": 2,
+            "right": "rank-high:2",
+            "right_kind": "rank_high",
+            "round": 3,
+            "task": "SELECT_HIGH_SENTINEL"
+          }
+        ],
+        "event": "ROUND_PLAN_FROZEN",
+        "plan_sha256": "36f33cd8f23c0171a846b705065b7c7c0ec787dd728b3256b7446da44cf4bfd1",
+        "round": 3,
+        "tasks": [
+          {
+            "U_ids": [
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0"
+            ],
+            "V_ids": [
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0"
+            ],
+            "input_ids": [
+              "select-sentinel:low",
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "m": 12,
+            "phase": "A7_R3_ALL_U_PAIRS",
+            "q_reject_in_U_1_based_count": 6,
+            "requires_results_through_round": 2,
+            "sample_seed": null,
+            "task": "SELECT_LOW_SENTINEL"
+          },
+          {
+            "U_ids": [
+              "real:0",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "V_ids": [
+              "real:0",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "input_ids": [
+              "real:0",
+              "real:1",
+              "real:2",
+              "real:3",
+              "real:4",
+              "real:5",
+              "real:6",
+              "real:7",
+              "select-sentinel:high",
+              "rank-high:0",
+              "rank-high:1",
+              "rank-high:2"
+            ],
+            "m": 12,
+            "phase": "A7_R3_ALL_U_PAIRS",
+            "q_reject_in_U_1_based_count": 5,
+            "requires_results_through_round": 2,
+            "sample_seed": null,
+            "task": "SELECT_HIGH_SENTINEL"
+          }
+        ]
+      },
+      {
+        "event": "ROUND_RESULTS",
+        "left_lt_right": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          true,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          false,
+          true,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          false,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          false,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "round": 3
+      },
+      {
+        "edges": [],
+        "event": "ROUND_PLAN_FROZEN",
+        "plan_sha256": "9db4295491fcc0b2ee24e6892c27060ae65359f374292d43bd04c3fd0c757690",
+        "round": 4,
+        "tasks": []
+      },
+      {
+        "event": "ROUND_RESULTS",
+        "left_lt_right": [],
+        "round": 4
+      }
+    ],
+    "summary": {
+      "A5": {
+        "SELECT_HIGH_SENTINEL:A5_HIGH": {
+          "N": 24,
+          "S1_size": 9,
+          "T1_size": 3,
+          "failure_reason": null,
+          "pivot_a": "select-sentinel:high",
+          "pivot_b": "SELECT_HIGH_SENTINEL:a7-high:3",
+          "pivot_x": "SELECT_HIGH_SENTINEL:a7-high:3",
+          "sample_seed": 623124591649632796,
+          "target_lower_count_in_S1": 4
+        },
+        "SELECT_HIGH_SENTINEL:A5_LOW": {
+          "N": 24,
+          "S1_size": 9,
+          "T1_size": 3,
+          "failure_reason": null,
+          "pivot_a": "real:1",
+          "pivot_b": "real:4",
+          "pivot_x": "real:1",
+          "sample_seed": 5610862930671827781,
+          "target_lower_count_in_S1": 4
+        },
+        "SELECT_LOW_SENTINEL:A5_HIGH": {
+          "N": 24,
+          "S1_size": 9,
+          "T1_size": 3,
+          "failure_reason": null,
+          "pivot_a": "rank-high:0",
+          "pivot_b": "rank-high:0",
+          "pivot_x": "rank-high:0",
+          "sample_seed": 2126533286581907525,
+          "target_lower_count_in_S1": 4
+        },
+        "SELECT_LOW_SENTINEL:A5_LOW": {
+          "N": 24,
+          "S1_size": 9,
+          "T1_size": 3,
+          "failure_reason": null,
+          "pivot_a": "SELECT_LOW_SENTINEL:a7-low:8",
+          "pivot_b": "SELECT_LOW_SENTINEL:a7-low:8",
+          "pivot_x": "SELECT_LOW_SENTINEL:a7-low:8",
+          "sample_seed": 6046124748688994042,
+          "target_lower_count_in_S1": 4
+        }
+      },
+      "K": 3,
+      "algorithm_seed": 1,
+      "candidate_ids": [
+        "real:0"
+      ],
+      "comparison_rounds": 4,
+      "effective_expansion": {
+        "K": 3,
+        "N_with_one_sentinel": 9,
+        "algorithm_epsilon": "1/36",
+        "algorithm_seed": 1,
+        "ascending_rank_1_based": 6,
+        "effective_median_size": 12,
+        "high_padding": 3,
+        "input_seed": 17,
+        "low_padding": 0,
+        "median_reject_count": 6,
+        "n": 8,
+        "two_select_partitions_parallel": true
+      },
+      "epsilon": "1/36",
+      "failure_reasons": [],
+      "input_seed": 17,
+      "label": "BMW16_DERIVED_SELECT_4R_TEST_ONLY",
+      "n": 8,
+      "oracle_validation": {
+        "status": "NOT_RUN_BY_ALGORITHM"
+      },
+      "partitions": {
+        "SELECT_HIGH_SENTINEL": {
+          "D": 6,
+          "Rstar_real_input_count_before_R4": null,
+          "U_size": 11,
+          "V_size": 11,
+          "W_size": 0,
+          "h": 6,
+          "m": 12,
+          "random_branch": null,
+          "reason": "PROJECT_DERIVED_R3_ALL_PAIRS_EXACT_RESIDUAL_ORDER",
+          "rejected_count": 6,
+          "residual_reject_count_in_U": 5,
+          "status": "SUCCESS",
+          "x_id": null,
+          "y_id": null
+        },
+        "SELECT_LOW_SENTINEL": {
+          "D": 6,
+          "Rstar_real_input_count_before_R4": null,
+          "U_size": 10,
+          "V_size": 10,
+          "W_size": 0,
+          "h": 6,
+          "m": 12,
+          "random_branch": null,
+          "reason": "PROJECT_DERIVED_R3_ALL_PAIRS_EXACT_RESIDUAL_ORDER",
+          "rejected_count": 6,
+          "residual_reject_count_in_U": 6,
+          "status": "SUCCESS",
+          "x_id": null,
+          "y_id": null
+        }
+      },
+      "protocol_I_full_online_rounds": "NOT_REVIEWED",
+      "round_metrics": {
+        "0": {
+          "repeated_comparison_calls": 97,
+          "total_comparison_calls": 276,
+          "unique_unordered_edges_all_rounds": 179
+        },
+        "1": {
+          "comparison_calls": 84,
+          "cross_task_repeated_calls_same_round": 5,
+          "dummy_related_calls": 70,
+          "duplicate_calls_same_round": 5,
+          "real_real_calls": 14,
+          "repeated_calls_from_prior_rounds": 0,
+          "unique_unordered_edges_this_round": 79
+        },
+        "2": {
+          "comparison_calls": 92,
+          "cross_task_repeated_calls_same_round": 1,
+          "dummy_related_calls": 85,
+          "duplicate_calls_same_round": 1,
+          "real_real_calls": 7,
+          "repeated_calls_from_prior_rounds": 33,
+          "unique_unordered_edges_this_round": 91
+        },
+        "3": {
+          "comparison_calls": 100,
+          "cross_task_repeated_calls_same_round": 28,
+          "dummy_related_calls": 51,
+          "duplicate_calls_same_round": 28,
+          "real_real_calls": 49,
+          "repeated_calls_from_prior_rounds": 30,
+          "unique_unordered_edges_this_round": 72
+        },
+        "4": {
+          "comparison_calls": 0,
+          "cross_task_repeated_calls_same_round": 0,
+          "dummy_related_calls": 0,
+          "duplicate_calls_same_round": 0,
+          "real_real_calls": 0,
+          "repeated_calls_from_prior_rounds": 0,
+          "unique_unordered_edges_this_round": 0
+        }
+      },
+      "selected_original_index": 0,
+      "status": "SUCCESS"
+    },
+    "trace_version": 1
+  }
+}

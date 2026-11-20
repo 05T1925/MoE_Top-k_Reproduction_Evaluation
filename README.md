@@ -2,7 +2,9 @@
 
 本仓库以 **VFSS** 为唯一活动实现框架，建立统一语义、可复现、可横向比较的安全 Top-K 实验环境。
 
-M2 Protocol I 和 M5 Protocol III 已完成当前工程验收。当前开始 M6A AAV86 实现与完整性能评估。
+项目于 2026-11-20 暂停并归档。M2 Protocol I、M5 Protocol III 已完成各自记录的工程验收；M6A、M6B、M7 尚未在 `main` 完成验收。隔离实验分支中的结果只按其原有 TEST_ONLY 或 EXPERIMENTAL 身份保存，不视作安全协议接收或正式性能结论。
+
+本次归档将 `Papers/` 中 15 个资料文件、BMW16 S2/S12 的原始 TEST_ONLY trace/tape 与关联报告加入 `main`。校验清单见 [论文文件哈希](docs/PAPERS.sha256) 和 [trace/tape 归档哈希](docs/reproduction/evidence/RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt)，归档范围与限制见 [实验原始证据归档说明](docs/EXPERIMENTAL_EVIDENCE_ARCHIVE_2026-11-20.md)。两个压缩包仍是本地文件，不在 Git 历史中。
 
 M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参考，不作为后续阶段的前置条件。
 
@@ -17,9 +19,9 @@ M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参�
 | M3 | 已完成并冻结 | priority-key 三轮入口，以及 raw-score 五轮扩展 |
 | M4 | 已取消 | 不实施 CipherGPT，不安排其性能实验 |
 | M5 | 已完成 | F1 标准 mask 入口与独立 F2/G3 接收方签收通过；见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md) |
-| M6A | 进行中 | Protocol I+AAV86、Protocol III+AAV86 实现及完整性能验收 |
-| M6B | 后续目标 | I+BB90+DCF、III+BB90+DCF 实现及完整性能验收 |
-| M7 | 后续目标 | 六种方案统一汇总与报告 |
+| M6A | 未完成，项目已暂停 | 主分支未完成 Protocol I/III+AAV86 全量实现与性能验收；实验分支材料按各自证据级别保留 |
+| M6B | 未完成，项目已暂停 | 主分支未完成 BB90+DCF 全量实现与性能验收；BMW16-derived/项目派生实验不等同 BB90 |
+| M7 | 未完成 | 尚无六种方案统一汇总与报告 |
 
 M5-H1 在 n=2–128 的独立进程 Fselect/Fsort 测量中通过用户指定的数量级门槛；实现与论文逻辑位数之比约为 1.42–1.44，精确式相差 `254n` bits。H2 评审最初因 F1/F2 关闭 FAIL；F1 经 PR #25 合入后，接收方在 main@9b3ce3747b1734602e3edf4c644ae1b6da52e8c1 独立复跑，41/41 回归、raw-score-to-mask E2E、进程隔离、成本 smoke 和失败 smoke 均通过。见 [G3 接收签收](docs/reviews/M5_TO_M6A_G3_RECEIVER_ACCEPTANCE_2026-09-25.md)。`AUTHOR_EXACT = NOT_PROVEN`，Theorem 4.2 精确成本仍不匹配。
 
@@ -118,6 +120,8 @@ BB90 迭代参数按采用算法单独定义。
 
 - [项目范围、六种方案、论文映射与统一指标](PROJECT.md)
 - [详细实施计划与阶段门](docs/IMPLEMENTATION_PLAN.md)
+- [代码架构与数据边界](docs/ARCHITECTURE.md)
+- [2026-11-20 实验原始证据归档](docs/EXPERIMENTAL_EVIDENCE_ARCHIVE_2026-11-20.md)
 - [双人职责、公共文件所有权与交接契约](docs/TEAM_WORK_PLAN.md)
 - [M3 冻结契约及后续双人执行计划](docs/M3_ONWARD_TEAM_WORK_PLAN.md)
 - [项目实现约束](AGENTS.md)
@@ -158,28 +162,17 @@ docs/                 计划、决策、来源与验收记录
 .agents/skills/       仓库级协议复现工作流
 ```
 
-本地可按任务需要准备 `Papers/`、`ADSMPC/`、`Agarwal_TopK/` 和 `CipherGPT/`。这些目录被 `.gitignore` 排除，新环境不会自动拥有它们。
+`Papers/` 是本次纳入 Git 的资料归档快照；文件清单与 SHA-256 见 `docs/PAPERS.sha256`。`experiments/TEST_ONLY_BMW16_S2_SELECT_4R/` 和 `experiments/TEST_ONLY_BMW16_S12/` 保存原始测试资料，不属于 `VFSS/` 活动安全实现路径。
 
-`CipherGPT/` 仅保留为历史参考，本轮不要求准备其工作包以推进实施。论文和大型参考工程不进入普通远端 Git 历史。
+`ADSMPC/`、`Agarwal_TopK/` 和 `CipherGPT/` 仍是被 `.gitignore` 排除的本地参考工程；两个压缩包也不进入远端仓库。归档 `Papers/` 不代表这些文件的版权或再分发权已逐项核验，来源和复用边界见 `docs/REFERENCE_MANIFEST.md`。
 
 资料准备与版本校验见 `docs/LOCAL_REFERENCES_SETUP.md`；新增来源和再分发边界见 `docs/REFERENCE_MANIFEST.md`。
 
-## 当前协作起点
+## 暂停状态
 
-- **角色 A（Protocol I）**：负责 Protocol I+AAV86 设计、公共比较预处理与性能评估。
-- **角色 B（Protocol III）**：M5 交接已完成；负责 Protocol III+AAV86 设计与实现。
-- **双方**：交叉复跑、维护公共契约，随后分别推进两条协议路线的 AAV86 和 BB90+DCF 升级。
-
-开始工作前：
-
-1. 阅读 `PROJECT.md`、`AGENTS.md` 和当前阶段决策。
-2. 按分工准备必要资料并校验版本。
-3. 从最新 main 建短生命周期分支。
-4. 按 `docs/TEAM_WORK_PLAN.md` 确认共享接口、metrics 和文档的主写负责人。
-5. 新协议实现进入 `VFSS/`，不修改 `VFSS-baseline/`。
-6. 按实施计划的实现、通信核验和交接门验收。
+项目目前处于暂停归档状态，没有活动中的 M6/M7 验收安排。若后续恢复，先核对最新 `main`、`PROJECT.md`、`docs/IMPLEMENTATION_PLAN.md` 和相关决策，再明确恢复范围；既有分支和归档文件只提供历史证据，不自动构成当前实现或安全结论。
 7. PR 使用仓库模板，结果保留 revision、环境、输入、种子、命令和原始计数。
-8. 不提交生成密钥、日志、论文、参考工程和本地构建产物。
+8. 不提交生成密钥、未登记原始日志、参考工程和本地构建产物；论文及 TEST_ONLY trace/tape 仅按本次归档清单维护。
 
 `vfss-baseline-2026-09-03` 只用于恢复与回归比较，不作为新开发起点。
 

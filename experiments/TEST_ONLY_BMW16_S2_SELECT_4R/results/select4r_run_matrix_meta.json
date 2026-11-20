@@ -1,0 +1,23 @@
+{
+  "failures": "select4r_failed_or_non-success_runs.jsonl",
+  "family_counts": {
+    "adversarial_all_equal": 3,
+    "adversarial_boundaries": 5,
+    "adversarial_fixed_example": 1,
+    "adversarial_random": 3,
+    "adversarial_ties": 5,
+    "exhaustive_strict_order_permutations": 719,
+    "official_random_matrix": 40
+  },
+  "label": "BMW16_DERIVED_SELECT_4R_TEST_ONLY",
+  "seeds_per_official_config": 8,
+  "small_permutation_max_n": 5,
+  "status_counts": {
+    "PAPER_RANDOM_FAILURE_PATH": 47,
+    "SUCCESS": 570,
+    "UNDEFINED/INVALID_FINITE_CASE": 159
+  },
+  "summaries": "select4r_run_summaries.jsonl",
+  "total_runs": 776,
+  "traces": "select4r_edge_traces.jsonl.gz"
+}

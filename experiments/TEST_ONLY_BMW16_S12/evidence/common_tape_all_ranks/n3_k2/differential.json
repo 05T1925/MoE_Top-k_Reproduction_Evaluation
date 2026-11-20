@@ -1,0 +1,50 @@
+{
+  "K": 2,
+  "label": "BMW16_S12_COMMON_RANDOM_TAPE_DIFFERENTIAL_TEST_ONLY",
+  "n": 3,
+  "result": "PASS",
+  "rounds": [
+    {
+      "result_bits_match": true,
+      "round": 1,
+      "task_edge_counts": [
+        6,
+        6
+      ]
+    },
+    {
+      "result_bits_match": true,
+      "round": 2,
+      "task_edge_counts": [
+        6,
+        6
+      ]
+    },
+    {
+      "result_bits_match": true,
+      "round": 3,
+      "task_edge_counts": [
+        1,
+        1
+      ]
+    },
+    {
+      "result_bits_match": true,
+      "round": 4,
+      "task_edge_counts": [
+        1,
+        1
+      ]
+    }
+  ],
+  "s4_source_sha256": "8644bf71bf8143a1a24f2a8e3b705306f1797bf2634f7cbd14c7ce9743fdfbab",
+  "selected_handle": 1,
+  "state_checks": [
+    "R1 sample/pivots",
+    "R2 prefix/suffix/U/q",
+    "R3 V/x/y/W/qW",
+    "R4 reject/accept",
+    "selected handle"
+  ],
+  "status": "SUCCESS"
+}

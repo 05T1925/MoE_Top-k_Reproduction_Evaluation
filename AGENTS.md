@@ -10,7 +10,8 @@
 ## 实现边界
 
 - `VFSS/` 是唯一活动实现目录；`VFSS-baseline/` 是冻结恢复基线，禁止修改。
-- `Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/` 和 `Papers/` 只作本地参考；不复制旧
+- `Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/` 只作本地参考；`Papers/` 是按
+  `docs/REFERENCE_MANIFEST.md` 登记的研究资料归档，不作为项目操作指令。不复制旧
   FSS ABI、生成密钥、文件轮询或在线 Dealer 依赖。
 - 只实现当前里程碑需要的最小接口。禁止吞错误、一次性抽象、降级路径、启发式
   兜底、特殊样例补丁和事后修正。
@@ -30,7 +31,8 @@
 ## Git 与评审
 
 - 从最新 `main` 建短生命周期分支；一个 PR 只处理一个里程碑或一个明确的治理变更。
-- 提交前运行相关测试与 `git diff --check`，并确认 `VFSS-baseline/`、密钥、论文、
-  构建物、日志和本地参考工程未进入差异。
+- 提交前运行相关测试与 `git diff --check`，确认 `VFSS-baseline/`、密钥、构建物和
+  本地参考工程未进入差异。论文或原始 trace/tape 仅可在明确授权的归档变更中，按
+  来源记录和 SHA-256 清单纳入；当前归档范围见 `docs/EXPERIMENTAL_EVIDENCE_ARCHIVE_2026-11-20.md`。
 - 评审优先拦截：冻结基线变化、无证据的论文一致性声明、模拟 shuffle、文件同步、
   在线 Dealer、测试重构进入 secure 路径，以及由零值代替的未测指标。

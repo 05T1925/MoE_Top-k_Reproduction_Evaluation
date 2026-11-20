@@ -1,8 +1,12 @@
 # 本地论文与参考仓库配置
 
-更新日期：2026-09-13。
+更新日期：2026-11-20。
 
-远端仓库有意不包含论文 PDF 和大型参考工程。参与协议阅读、实现或实验的队友，应根据当前任务准备获准使用的资料，不要求下载全部历史工作包。
+## 本地资料状态更新（2026-11-20）
+
+按项目负责人明确指示，当前 `main` 已追踪 `Papers/` 下 15 个归档文件；哈希见 `docs/PAPERS.sha256`。因此，下文关于“论文不追踪”、`git check-ignore Papers/...` 和论文不出现在索引中的预期均已被本节替代。`ADSMPC/`、`Agarwal_TopK/`、`CipherGPT/` 等完整参考工程仍为本地资料，不纳入本次归档。
+
+远端仓库包含已登记的 `Papers/` 归档快照和大型参考工程以外的项目文档。参与协议阅读、实现或实验时仍需核对来源与适用版本，不要求下载全部历史工作包。下文的角色与阶段清单是历史准备说明，当前没有活动中的 M6/M7 验收安排。
 
 本文件描述目录、来源登记和校验方式，不授予任何资料的再分发权，也不删除、移动或修改既有本地资料。
 
@@ -28,7 +32,7 @@ M3 已完成。M4 CipherGPT 已取消，不再要求为推进后续阶段准备 
   VFSS/                    远端追踪的活动实现
   VFSS-baseline/           远端追踪的冻结基线
   docs/                    计划、来源、决策和验收规范
-  Papers/                  按需准备的本地论文，不追踪
+  Papers/                  已追踪的论文与学习资料归档快照
   Agarwal_TopK/             本地 Agarwal 历史实现参考，不追踪
   ADSMPC/                  本地旧 Protocol III 原型，不追踪
   CipherGPT/               可保留的历史参考，不是本轮必需资料
@@ -290,12 +294,12 @@ test -f CipherGPT/test/Top_K_paper_test.cpp
 
 缺少必要入口时先核对包版本和布局，不在协议代码中增加猜测路径或 fallback，也不将其他算法目录冒充 BB90。
 
-## 7. 确认本地资料不会上传
+## 7. 确认大型本地参考工程不会上传
 
 在仓库根目录检查忽略规则：
 
 ```bash
-git check-ignore -v --no-index Papers/__ignore_probe__ Agarwal_TopK/__ignore_probe__ CipherGPT/__ignore_probe__ ADSMPC/__ignore_probe__
+git check-ignore -v --no-index Agarwal_TopK/__ignore_probe__ CipherGPT/__ignore_probe__ ADSMPC/__ignore_probe__
 ```
 
 以上使用代表性路径测试规则，不需要创建这些文件。输出应显示它们命中预期忽略规则。
@@ -306,7 +310,7 @@ git check-ignore -v --no-index Papers/__ignore_probe__ Agarwal_TopK/__ignore_pro
 git ls-files -- Papers Agarwal_TopK CipherGPT ADSMPC
 ```
 
-预期没有输出。Git 忽略规则不会自动停止追踪已进入索引的文件。
+预期只列出 `Papers/` 的归档文件；完整参考工程不应出现在输出中。Git 忽略规则不会自动停止追踪已进入索引的文件。
 
 提交前检查：
 
@@ -316,13 +320,13 @@ git diff --cached --name-only
 git add -n .
 ```
 
-不得出现本地论文、完整参考工程、生成密钥或实验产物。
+除已登记的 `Papers/` 归档快照外，不得出现完整参考工程、生成密钥或未审查的实验产物。TEST_ONLY trace/tape 归档须有对应的来源说明及哈希清单。
 
-发现已追踪资料时，先记录并处理仓库追踪问题，不据此删除本地副本，也不使用 `git add -f`。
+对 `Papers/` 按 `docs/REFERENCE_MANIFEST.md` 和哈希清单维护。对完整参考工程仍按本地资料规则处理，不据此删除本地副本，也不使用 `git add -f`。
 
-需要共享阅读结论时，在 `docs/` 编写来源明确的总结，不直接强制加入 `Papers/`。原文引用及资料分发遵循其使用权限。
+需要共享阅读结论时，在 `docs/` 编写来源明确的总结。原文引用及资料分发遵循具体来源的使用权限；本次 Git 归档不改变其权限状态。
 
-## 8. 两人当前所需子集
+## 8. 历史分工的资料子集
 
 ### 8.1 双方共同
 
@@ -424,6 +428,6 @@ git add -n .
 7. 清楚 M3 已完成，当前核心目标为 Protocol I 三轮、Protocol III 两轮。
 8. 清楚 CipherGPT 不再是当前必备资料或实施任务。
 9. 清楚 BB90 的文献基准、采用变体和代码来源是不同登记事项。
-10. 不修改 `VFSS-baseline/`，不提交论文、参考工作包、密钥和构建产物。
+10. 不修改 `VFSS-baseline/`；`Papers/` 与 BMW16 S2/S12 原始 evidence 只按归档清单维护，不提交生成密钥、未审查参考工作包或构建产物。
 
 准备完成不等于协议验收完成。实现、通信核验、接口交接和性能实验分别按对应阶段门执行。

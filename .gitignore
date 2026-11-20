@@ -40,11 +40,8 @@
 /CipherGPT/logs_paper/
 /CipherGPT/results_paper.csv
 
-# Raw reference packages are intentionally local-only in the initial Git
-# baseline.  Their roles, paths, and later distribution decisions are recorded
-# in docs/REFERENCE_MANIFEST.md.  Add a reviewed, source-only snapshot later
-# with an explicit force-add or a dedicated external archive workflow.
-/Papers/
+# Papers/ is tracked as an explicit archival snapshot; see docs/PAPERS.sha256.
+# Large reference source packages remain local-only and are not tracked.
 /ADSMPC/
 /Agarwal_TopK/
 /CipherGPT/

@@ -1,0 +1,8 @@
+# Keep paper and generated test evidence byte-for-byte stable across platforms.
+/Papers/** -text
+/experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/** -text
+/experiments/TEST_ONLY_BMW16_S12/evidence/** -text
+/docs/reproduction/evidence/BMW16_S11_CPP_PARTY_RUN.txt -text
+/docs/reproduction/evidence/BMW16_S12_TEST_ONLY_TAPE_MATRIX_2026-10-06.txt -text
+/docs/reproduction/evidence/BMW16_S12_TP0P1_E2E_2026-10-06.txt -text
+/docs/reproduction/evidence/BMW16_S8_PARTY_TRACE_EDGE_AUDIT.json -text

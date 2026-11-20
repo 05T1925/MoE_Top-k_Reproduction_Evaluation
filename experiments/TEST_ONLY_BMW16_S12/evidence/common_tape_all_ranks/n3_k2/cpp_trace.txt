@@ -1,0 +1,27 @@
+TEST_ONLY_HANDLE_TO_ORIGINAL=2,1,0
+PUBLIC_Z=20358503699,2065864359,30951533599
+R1_PLAN task=0 edges=3-2,3-0,3-1,2-0,2-1,0-1
+R1_PLAN task=1 edges=1-4,1-2,1-0,4-2,4-0,2-0
+R1_RESULT task=0 bits=111110
+R1_RESULT task=1 bits=101001
+R1_STATE task=0 sample=3,2,0,1 pivot_low=2 pivot_high=1 status=PENDING reason=
+R1_STATE task=1 sample=1,4,2,0 pivot_low=1 pivot_high=0 status=PENDING reason=
+R2_PLAN task=0 edges=3-2,0-2,1-2,3-1,0-1,2-1
+R2_PLAN task=1 edges=0-1,2-1,4-1,1-0,2-0,4-0
+R2_RESULT task=0 bits=100101
+R2_RESULT task=1 bits=010110
+R2_STATE task=0 prefix=3 suffix=0 U=1,2 q=1 status=R2_READY reason=
+R2_STATE task=1 prefix=2 suffix=4 U=0,1 q=1 status=R2_READY reason=
+R3_PLAN task=0 edges=2-1
+R3_PLAN task=1 edges=0-1
+R3_RESULT task=0 bits=1
+R3_RESULT task=1 bits=0
+R3_STATE task=0 V=2,1 x=2 x_rank=1 y=1 y_rank=2 W=1,2 qW=1 status=R3_READY reason=
+R3_STATE task=1 V=0,1 x=1 x_rank=1 y=0 y_rank=2 W=0,1 qW=1 status=R3_READY reason=
+R4_PLAN task=0 edges=1-2
+R4_PLAN task=1 edges=0-1
+R4_RESULT task=0 bits=0
+R4_RESULT task=1 bits=0
+R4_STATE task=0 reject=3,2 accept=0,1 status=SUCCESS reason=R4_EXACT_RANK
+R4_STATE task=1 reject=2,1 accept=4,0 status=SUCCESS reason=R4_EXACT_RANK
+SELECTED handle=1

@@ -1,6 +1,12 @@
 # MoE Top-K 协议统一项目
 
-更新日期：2026-09-26
+更新日期：2026-11-20
+
+## 暂停与归档状态（2026-11-20）
+
+项目已暂停收尾。`main` 中的 M2、M5 状态保持原记录；M6A、M6B、M7 尚未完成主分支验收。BMW16-derived Select 的 TEST_ONLY/EXPERIMENTAL 结果以及其安全门结论只适用于各自的历史版本，不将它们升级为 BB90、论文精确复现或安全协议结论。
+
+本次归档把 15 个 `Papers/` 文件和 BMW16 S2/S12 原始 trace/tape 与配套报告加入仓库。归档文件不改变协议实现、既有指标或里程碑状态。完整文件清单见 [论文哈希](docs/PAPERS.sha256) 与 [原始 trace/tape 哈希](docs/reproduction/evidence/RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt)；代码布局见 [架构说明](docs/ARCHITECTURE.md)。
 
 ## 当前方向补充（2026-10-12）
 
@@ -61,7 +67,7 @@
 
 ### 1.3 当前执行顺序
 
-M0、M1/M1.1、M2、M3 和 M5 已完成。当前里程碑为 M6A，后续顺序为：
+以下是原定执行顺序，保留为项目计划记录；项目现已暂停，不代表当前仍在推进 M6A：
 
 ```text
 M2：COMPLETED（Protocol I 三轮 C-INSTANTIATION、独立评审和通信核验）
