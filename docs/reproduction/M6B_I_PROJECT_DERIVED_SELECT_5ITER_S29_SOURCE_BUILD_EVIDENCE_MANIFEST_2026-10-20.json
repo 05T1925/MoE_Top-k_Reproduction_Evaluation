@@ -1,0 +1,70 @@
+{
+  "schema": "m6b-project-derived-select5-s29-source-build-evidence/v1",
+  "date": "2026-10-20",
+  "route": "PROJECT_DERIVED_SELECT_5ITER",
+  "review_scope": "Ideal functionality, party-view simulation, composition, and versioned architecture; no runtime changes.",
+  "source_identity": {
+    "candidate_worktree": "C:/Users/28641/.codex/worktrees/m6b-project-select5-s25/MoE_Top-k_Reproduction_Evaluation",
+    "branch": "codex/m6b-project-select5-s25",
+    "base_head": "c3926c68fd14f270faa8b55234311071947fa080",
+    "candidate_committed": false,
+    "source_manifest": "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S25_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-19.json",
+    "source_manifest_sha256": "c96450eb62b186e866291b6c4415441e0ef3216703612314542e1d2ee25372eb",
+    "candidate_file_count": 74,
+    "hash_mismatches": 0,
+    "canonicalization": "UTF-8 bytes; relative path ordinal ascending; path<TAB>lowercase_sha256<LF>",
+    "canonical_sha256": "64f32993b12bcd8692ed089f5dcdb8ce1be9f181ff217b508b8b0470eb8e440d"
+  },
+  "inherited_evidence": {
+    "S27": {
+      "source_snapshot": "identical S25 manifest object",
+      "result": "PASS_WITH_SCOPE functional receiver acceptance",
+      "S29_rerun": false
+    },
+    "S28": {
+      "source_snapshot": "S25 manifest snapshot; S27/S28 docs are review overlays",
+      "same_executor_as_S27": true,
+      "new_independent_signoff": false,
+      "tests_rerun_in_S28": false
+    }
+  },
+  "S29_hash_verification": {
+    "command_class": "PowerShell Get-Content/ConvertFrom-Json + Get-FileHash SHA256 + UTF-8 ordinal canonical hash",
+    "result": "PASS: 74/74 matching, canonical and manifest hashes match",
+    "worktree_write": false
+  },
+  "independent_receiver": {
+    "not_involved_in_S19_S28": true,
+    "reviewed_S25_S27_S28_evidence": true,
+    "tests_rerun": false,
+    "review_scope": "F_TOPK output contract, P0/P1 simulator inputs, modular composition, A/B/C decision, abort probe interpretation"
+  },
+  "ideal_output_contract": {
+    "single_party_share_law": "NOT_FROZEN_IN_PROJECT_CONTRACT",
+    "candidates": ["F_TOPK-U", "F_TOPK-C"],
+    "pre_admission_gate": "Confirm S25 adapter/approved contract law; do not treat either candidate as established without that check."
+  },
+  "source_changes_this_turn": 0,
+  "builds": "NOT_RUN",
+  "conformance_and_ctest": "NOT_RUN",
+  "oracle_differential": "NOT_RUN",
+  "independent_process_e2e": "NOT_RUN",
+  "N_gt_256": "NOT_RUN/OUT_OF_SCOPE",
+  "formal_LAN_WAN": "NOT_RUN",
+  "performance": "NOT_MEASURED",
+  "binary_hashes": "NOT_BUILT_THIS_TURN",
+  "secure_alias": "NOT_CREATED",
+  "modified_runtime_files": [],
+  "deliverables": [
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_DECISION_2026-10-20.md",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_REPORT_2026-10-20.md",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_GATES_2026-10-20.json",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_SOURCE_BUILD_EVIDENCE_MANIFEST_2026-10-20.json"
+  ],
+  "deliverable_sha256": {
+    "docs/decisions/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_DECISION_2026-10-20.md": "e486f80f968f8eeb353823fb26be904c35fa63339c79a31a7a79c13fd43044e7",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_REPORT_2026-10-20.md": "aa8dde4bde549c59bffa4ce2f2d2343e52d53912f734d7cc2134c6e15cccf717",
+    "docs/reproduction/M6B_I_PROJECT_DERIVED_SELECT_5ITER_S29_GATES_2026-10-20.json": "e47543b477121304ccaa279a31ce35436b533800706a050513c47aaf761173ba"
+  },
+  "manifest_self_hash": "OMITTED_TO_AVOID_SELF_REFERENCE"
+}

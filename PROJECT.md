@@ -2,6 +2,28 @@
 
 更新日期：2026-09-26
 
+## 当前方向补充（2026-10-12）
+
+本节记录项目负责人对选择算法路线的最新决定，优先于下文仍将 M6B 描述为 BB90+DCF 的历史计划文字；历史方案、编号和证据不因此被改写。
+
+- BB90 原文与 2024 年论文中“五迭代 BB90”的具体步骤、参数和概率分析尚未闭合。不得把新构造称作 BB90、BB90 复现或 BMW16 算法。
+- 当前获准推进的是 **`PROJECT_DERIVED_SELECT_5ITER`**：依据项目自定规则构造五个比较层，目标是稳定选择并最终形成 Protocol I 的 Top-K mask。若接入，名称写作 **`Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF`**。它是项目派生路线，不自动替代原六方案计划中的 BB90 项；要改变比较方案清单，须另行明确修订范围。
+- 截至本补充日期，S1 报告所述 Stage A 仅是隔离 worktree 中的 TEST_ONLY 明文候选及其有界验证。该候选未进入本 checkout，尚无独立接收，也没有 Protocol I runtime 接入。S1 报告给出的最坏比较数为 `12n + C(n,2)`，属于二次上界；目标矩阵的期望比较成本尚未闭合。不得将“随机性不影响答案”扩写为线性比较量或高效性结论。
+- 项目负责人暂不要求为此路线设定数值化随机失败上限。该决定不免除对所有随机 tape 的正确性分析、异常/资源中止合同，亦不影响比较成本和资源准入审查。
+- 该路线须独立完成 Protocol I 消息 DAG、输入与原序 mask 适配、自适应比较图的材料覆盖/寻址/一次性消费、泄露字段映射及联合单方视图审查。BMW16-derived 路线已有的条件安全结论不转移到此路线。
+- 加快推进时，将明文算法独立接收、有限规模成本分析和 Protocol I 接口/泄露设计合并在同一工作阶段；前置门通过后，同阶段实现最小 opt-in 实验入口并做必要功能验证。此安排不等于跳过安全门或正式性能验收。
+- S34 的结论限于其报告明确列出的 schema-v3 诊断技术复核；其报告仍记载 V3 OPEN、V4 NOT_ALLOWED/NOT_RUN。不得将 S34 描述成新五迭代路线的安全验收或正式性能验收。
+
+### 跨路线实现经验
+
+- **AAV86：** 将 AAV86 的算法迭代数、CA 比较层、Protocol I/III 核心轮数和 raw-score→原序 mask 端到端消息轮数分别记录。E19 的全池内存实现资源拒绝是特定实现与资源快照下的结论；E20 的流式材料路线随后完成了 n=1000 的有限实测，但 n≥10⁴ 仍在预检阶段，且 LAN/WAN 来自同主机模拟。不同 revision、材料架构、计时边界和网络环境的数据不可拼成一张同版本矩阵，也不能据单个规模宣称全部性能完成。
+- **BMW16-derived Select：** 2016 年论文 Algorithm 5/7 的纸面缺口和早期有限规模失败不能被静默修补成“论文算法”。后续 sample-bracket 构造属于项目派生路线，不继承 Theorem 8 的正确率、概率或比较常数。其 conditional v2 的有界接收、安全假设与 n≤1000 范围只适用于被接收的那一版本；不得转移给新的五迭代 Select。
+- **项目派生五迭代 Select：** 五个算法层数不等于 Protocol I 的在线轮数；当前明文候选最坏比较界含 `C(n,2)`，目标规模的期望成本仍需分析。数值化随机失败上限暂不作为负责人要求，但成本、全随机 tape 正确性、Protocol I 材料与泄露设计仍须审查。
+- **跨路线安全与验收：** 共用 Q20.12、稳定同分、原序秘密 mask 和指标 schema，不代表共用安全证明。每个算法、DCF ABI、材料池、shuffle/逆路由、泄露函数、运行时版本均需按实际组合审查。条件安全接收、功能独立接收、技术复核、PR 审批/合入和正式性能验收是不同状态。
+- **性能证据：** 区分资源预检、单次功能运行、诊断计时、正式矩阵和独立接收；预检拒绝的指标写 `NOT_MEASURED`。逐次原始记录必须绑定源码 revision、实现标签、二进制、输入/种子、网络与环境、命令和计时边界。主机 netem 只能标同主机模拟网络，不能写成物理双机 LAN/WAN。
+
+本节是方向和状态补充，不把隔离分支报告当作 main 已合入证据。其后续状态须由对应 revision、独立接收记录和运行证据更新。
+
 ## 1. 项目目标与当前边界
 
 本项目在 **VFSS** 中建立统一、可验证、可复现的安全 Top-K 实验环境。先完成 Agarwal Protocol I、Protocol III 的论文精确核心与通信核验，再分别实现 AAV86 和 BB90+DCF 两条升级路线，最后完成统一性能比较。
@@ -124,8 +146,12 @@ AAV86 和 BB90 的原始文献用于补充算法来源。引用时必须区分�
 Protocol I 依赖 Chase、Ghosh、Poburinnaya 的两方静态半诚实
 secret-shared shuffle。当前实际论文为 `Papers/Secret-Shared Shuffle.pdf`。
 
-本 checkout 未安装 `Agarwal_TopK/`、`ADSMPC/` 或 `CipherGPT/`。本次结论只引用
-本地论文和 tracked VFSS 实现，不引用缺失参考树的行为。
+Git 管理的干净 checkout 不包含或固定 `Agarwal_TopK/`、`ADSMPC/`、`CipherGPT/`
+参考树。本机可能另有被 `.gitignore` 忽略的本地副本；这些目录的存在不证明其上游、
+revision、许可证或作者来源。本机 2026-09-27 的实际目录状态和可核验边界见
+[`docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md`](docs/reproduction/M6A_BASELINE_AND_SOURCE_INVENTORY_2026-09-27.md)。
+在来源链得到核验前，项目结论仍只引用本地论文和 tracked `VFSS/` 实现，不把参考树
+行为当作论文定义或作者实现。
 
 VFSS 已有通过验收的 C 级两遍 secret-shared shuffle，但当前冻结实现尚未满足论文所需的完整 public masked-list 契约。
 

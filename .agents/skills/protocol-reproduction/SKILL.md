@@ -1,6 +1,6 @@
 ---
 name: protocol-reproduction
-description: Implement or review this repository's secure Top-K protocols and adapters, including Agarwal Protocol I/III, AAV86 and BB90+DCF upgrades, protocol audits, communication validation, and benchmarks. Do not use for generic C++ maintenance or documentation-only edits.
+description: Implement or review this repository's secure Top-K protocols and adapters, including Agarwal Protocol I/III, AAV86, BB90+DCF source audits, project-derived Select routes, protocol audits, communication validation, and benchmarks. Do not use for generic C++ maintenance or documentation-only edits.
 ---
 
 # Protocol reproduction workflow
@@ -41,6 +41,8 @@ The target comparison contains six distinct variants:
 4. Protocol III+AAV86.
 5. Protocol I+BB90+DCF.
 6. Protocol III+BB90+DCF.
+
+Treat this as the historical comparison target recorded in the original roadmap. The current dated direction in `PROJECT.md` permits a separately labeled `PROJECT_DERIVED_SELECT_5ITER` route. It is not BB90 and does not silently replace a BB90 row in the six-variant comparison. Update the project scope before counting it as a replacement or changing the comparison set.
 
 M4 CipherGPT implementation, adaptation, and benchmarks are canceled. CipherGPT materials remain historical references. Do not rename an existing Direct Top-K, QuickSelect, or pivot-pruning prototype as BB90.
 
@@ -94,9 +96,23 @@ Audit adaptive graph construction and the timing of edge-material generation. A 
 
 Record local-rank/bucket disclosures, edge and round binding, actual edge and vertex complexity, and one-shot material consumption.
 
+Keep the resource conclusion tied to the implementation. E19's rejection applied to its in-memory full-pool layout and recorded host snapshot; E20's streamed encrypted-store version later ran a bounded n=1000 matrix. Do not carry the E19 rejection forward as proof that every AAV86 layout is infeasible, and do not treat E20's n=1000 result as completion of n≥10^4 or the full matrix. Separate material generation, sealing, delivery, disk footprint, ready payload, online reads, and RSS; report derived layout budgets separately from observed resource use.
+
+E20's LAN/WAN evidence used same-host network emulation. Label it accordingly; it is not a physical two-host network result. Keep E15/E16/E17 and later revisions in separate rows unless a same-revision bridge was actually run. A lower online communication count does not imply lower end-to-end time when offline generation and delivery dominate.
+
 The shuffle-based CA construction has a `2r+1` core target. Protocol III+AAV86's `2r` is a project combination target requiring its own argument and message audit.
 
 Online-Dealer prototypes, full-graph preallocation controls, and plaintext graph oracles must remain separately identified and cannot substitute for the target protocol.
+
+Do not equate AAV86 iteration count `r`, CA comparison layers, Protocol I/III core rounds, and full raw-score-to-mask online rounds. Derive the complete causal message DAG, including score conversion, shuffle, output inversion, and mask sharing.
+
+### BMW16-derived Select
+
+Keep paper algorithms and project constructions separate. BMW16 Algorithm 5/7 has documented finite-case ambiguities and an earlier derived implementation had incorrect/undefined cases. Never silently patch those cases and report the result as a corrected BMW16 algorithm. The later sample-bracket Select is `PROJECT_DERIVED`; its TEST_ONLY differential coverage and idealized probability analysis do not inherit Theorem 8 unless a proof explicitly establishes that transfer.
+
+The conditional v1/v2 Protocol I candidate accepted for a bounded range is tied to its exact runtime revision, DCF ABI, sampler assumptions, leakage function, and party-view argument. It cannot establish security for another Select graph or material schedule. Re-check the exact accepted revision and scope before reusing its code or conclusions.
+
+Keep algorithm iteration count separate from complete protocol online phases. BMW16-derived Select's four comparison layers and any five-layer project-derived Select do not by themselves determine the raw-score-to-mask message rounds. Include the DCF membership boundary, inverse routing, and output sharing in the end-to-end DAG.
 
 ### BB90+DCF
 
@@ -118,6 +134,18 @@ Audit how an online-generated secret threshold interacts with input-independent 
 Separate BB90 selection, DCF membership, and output-adaptation costs. Derive rounds from the full composition rather than importing an AAV86 formula or assuming one extra DCF round.
 
 Distinguish output-correctness guarantees from probabilistic work or cost bounds. Preserve failed seeds and configurations in evaluation records.
+
+### Project-derived five-iteration Select
+
+Use the exact label `PROJECT_DERIVED_SELECT_5ITER`; for a future Protocol I composition use `Protocol I + PROJECT_DERIVED_SELECT_5ITER + DCF`. Never call it BB90, BB90 reproduction, or BMW16. The 2024 paper's mention of a five-iteration BB90 variant does not supply the missing algorithm steps for this project construction, and BMW16's Algorithm 5/7 and probability theorem do not transfer to it.
+
+The S1 Stage A candidate is a TEST_ONLY plaintext algorithm, not a Protocol I implementation. Its reported structure is four sample/pivot candidate-reduction layers followed by an exact fifth-layer comparison over the remaining candidates. The reported worst-case comparison bound `12n + C(n,2)` is quadratic; target-matrix expected cost was not closed. Do not infer linear or efficient expected work from zero wrong answers or from randomness affecting cost only. Independently check the actual revision, rank invariant, edge trace, and fifth-layer exactness before relying on the report.
+
+The project owner has temporarily waived a numeric random-abort upper-bound requirement for this route. That waiver is narrow: still verify correctness for every random tape, malformed-input handling, resource/time abort behavior, and the output contract. Report comparison-cost distributions and resource bounds separately from output failure probability.
+
+For faster progress, combine independent Stage A receipt, target-size comparison-cost analysis, and Protocol I interface/leakage design into one work stage. Do not repeat the already completed BB90 source search unless new source material appears. If the design and material gates close, implement the smallest opt-in EXPERIMENTAL adapter in the same stage and run conformance, frozen-oracle differential, and independent-process E2E. If a gate fails, create a minimal reproducible blocker/prototype and name the exact missing edge, material slot, DCF boundary, message dependency, or leakage field; avoid another open-ended documentation-only cycle.
+
+Do not transfer the BMW16-derived candidate's conditional security acceptance to this route. Re-derive the full adaptive graph, party-specific material coverage and one-shot use, DCF threshold membership, inverse routing, original-order mask, causal message DAG, and joint single-party view for the actual new implementation. A prior disclosure approval applies only to the fields and route it explicitly covered; map the new transcript against the recorded leakage function and isolate any new field for confirmation.
 
 ## Communication validation and handoff
 
@@ -152,6 +180,8 @@ For G3, provide the frozen revision, interface and material contracts, minimal e
 M6A covers both AAV86 variants and their full performance acceptance. M6B covers both BB90+DCF variants afterward. M7 consolidates results; do not defer all upgrade benchmarks to M7.
 
 Use `docs/BENCHMARK_VALIDATION_PLAN.md` for the maintained matrix, repetitions, environment, timing boundaries, and acceptance rules rather than defining a second benchmark standard.
+
+The current M6B project-derived research direction in `PROJECT.md` does not override V3/V4 prerequisites or authorize formal performance claims. Keep functional diagnostics, cost analysis, and formal LAN/WAN measurements in separate evidence classes. A server benchmark can begin only after its actual route, revision, input matrix, security/functional gates, and metric contract are admitted.
 
 Record all applicable unified metrics and provenance, including:
 

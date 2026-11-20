@@ -1,0 +1,69 @@
+LOCAL WSL BUILD AND PROVIDER FACTS
+UTC 2026-10-22T11:40:40Z
+Linux 05T-1925 6.6.87.2-microsoft-standard-WSL2 #1 SMP PREEMPT_DYNAMIC Thu Jun  5 18:30:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+cmake version 3.28.3
+1.11.1
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)
+built on: Tue Aug 18 12:10:36 2026 UTC
+platform: debian-amd64
+options:  bn(64,64)
+compiler: gcc -fPIC -pthread -m64 -Wa,--noexecstack -Wall -fzero-call-used-regs=used-gpr -DOPENSSL_TLS_SECURITY_LEVEL=2 -Wa,--noexecstack -g -O2 -fno-omit-frame-pointer -mno-omit-leaf-frame-pointer -ffile-prefix-map=/build/openssl-Bh92mR/openssl-3.0.13=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -fdebug-prefix-map=/build/openssl-Bh92mR/openssl-3.0.13=/usr/src/openssl-3.0.13-0ubuntu3.15 -DOPENSSL_USE_NODELETE -DL_ENDIAN -DOPENSSL_PIC -DOPENSSL_BUILDING_OPENSSL -DNDEBUG -Wdate-time -D_FORTIFY_SOURCE=3
+OPENSSLDIR: "/usr/lib/ssl"
+ENGINESDIR: "/usr/lib/x86_64-linux-gnu/engines-3"
+MODULESDIR: "/usr/lib/x86_64-linux-gnu/ossl-modules"
+Seeding source: os-specific
+CPUINFO: OPENSSL_ia32cap=0xfffa32235f8bffff:0x184007a4219c27ab
+Providers:
+  default
+    name: OpenSSL Default Provider
+    version: 3.0.13
+    status: active
+    build info: 3.0.13
+    gettable provider parameters:
+      name: pointer to a UTF8 encoded string (arbitrary size)
+      version: pointer to a UTF8 encoded string (arbitrary size)
+      buildinfo: pointer to a UTF8 encoded string (arbitrary size)
+      status: integer (arbitrary size)
+pkg-config openssl=3.0.13
+openssl config symlink=/etc/ssl/openssl.cnf
+provider config directives:
+6:# but may be used for auto loading of providers
+16: # Use this in order to automatically load providers.
+17:openssl_conf = openssl_init
+33:[ new_oids ]
+48:# fips provider. It contains a named section e.g. [fips_sect] which is
+49:# referenced from the [provider_sect] below.
+53:[openssl_init]
+54:providers = provider_sect
+56:# List of providers to load
+57:[provider_sect]
+63:# If no providers are activated explicitly, the default one is activated implicitly.
+66:# If you add a section explicitly activating any other provider(s), you most
+67:# probably need to explicitly activate the default provider, otherwise it
+71:[default_sect]
+72:# activate = 1
+76:[ ca ]
+80:[ CA_default ]
+123:[ policy_match ]
+134:[ policy_anything ]
+144:[ req ]
+166:[ req_distinguished_name ]
+195:[ req_attributes ]
+202:[ usr_cert ]
+231:[ v3_req ]
+238:[ v3_ca ]
+268:[ crl_ext ]
+276:[ proxy_cert_ext ]
+305:[ tsa ]
+309:[ tsa_config1 ]
+336:[insta] # CMP using Insta Demo CA
+362:[pbm] # Password-based protection for Insta CA
+367:[signature] # Signature-based protection for Insta CA
+376:[ir]
+379:[cr]
+382:[kur]
+387:[rr]
+override env vars:
+sqlite support header hash=41e066ccd4f89e938f136ceb48c996c54dc381b59fe566dea48864c3750b779e  /tmp/m6b-s45-sqlite/sqlite3.h
+sqlite library=/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
