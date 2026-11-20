@@ -1,5 +1,6 @@
 # Keep paper and generated test evidence byte-for-byte stable across platforms.
 /Papers/** -text
+/docs/reproduction/evidence/reference-runtime-traces/ADSMPC_build_dealer_strace.log -text
 /experiments/TEST_ONLY_BMW16_S2_SELECT_4R/results/** -text
 /experiments/TEST_ONLY_BMW16_S12/evidence/** -text
 /docs/reproduction/evidence/BMW16_S11_CPP_PARTY_RUN.txt -text

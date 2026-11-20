@@ -20,6 +20,8 @@
 **/*.bin
 **/*.pkg
 **/*.log
+# Explicitly registered historical runtime trace archive.
+!docs/reproduction/evidence/reference-runtime-traces/ADSMPC_build_dealer_strace.log
 **/logs/
 **/logs_*/
 **/__pycache__/

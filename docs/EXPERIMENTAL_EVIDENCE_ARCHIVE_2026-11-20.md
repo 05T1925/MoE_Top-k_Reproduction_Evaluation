@@ -1,6 +1,6 @@
 # BMW16 TEST_ONLY 原始证据归档
 
-归档日期：2026-11-20
+归档日期：2026-11-20；补充记录：2026-11-21
 
 本说明记录按项目负责人要求加入 `main` 的论文资料和 BMW16 S2/S12 原始 trace/tape。归档只增加资料、校验清单和说明文档；没有改动 `VFSS/`，没有重新运行历史测试，也没有升级任何阶段、安全或性能状态。
 
@@ -11,11 +11,12 @@
 | `Papers/` | 论文、研究笔记和历史测试要求 | 15 |
 | `experiments/TEST_ONLY_BMW16_S2_SELECT_4R/` | 测试脚本/README 与历史生成结果；其中 `results/` 原始结果 10 个文件 | 18 |
 | `experiments/TEST_ONLY_BMW16_S12/` | 共用 tape runner、README 与逐案 evidence；其中 `evidence/` 235 个文件 | 238 |
+| `docs/reproduction/evidence/reference-runtime-traces/` | 从本地 ADSMPC 参考目录归档的历史系统调用 trace | 1 |
 | `docs/decisions/`、`docs/reproduction/` | S2/S12 的决策、验证报告、原始运行记录和旧阶段哈希清单 | 配套说明 |
 
-S2 与 S12 两个实验目录共 256 个文件、23,028,940 bytes。综合 SHA-256 清单包含 245 个 `results/` 与 `evidence/` 数据文件，以及 4 个关联的原始运行/矩阵/trace-audit 记录；见 [`RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt`](reproduction/evidence/RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt)。
+S2 与 S12 两个实验目录共 256 个文件、23,028,940 bytes。综合 SHA-256 清单现有 250 项：245 个 `results/` 与 `evidence/` 数据文件、4 个关联的原始运行/矩阵/trace-audit 记录，以及 1 个历史系统调用 trace；见 [`RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt`](reproduction/evidence/RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt)。
 
-关联实现/历史记录分支使用已整理的远端名称 `m6b-i-bmw16-s2` 与 `m6b-i-bmw16-s12`；原始数据现集中归档在 `main`。`.gitattributes` 为论文和原始 evidence 关闭换行转换，使哈希在不同操作系统上对应相同字节。S12 的 235 行局部清单 `BMW16_S12_TRACE_ARTIFACTS_SHA256SUMS.txt` 已按本次归档的实际字节重算；综合清单另含 4 个配套运行和审计记录。
+关联实现/历史记录分支使用已整理的远端名称 `m6b-i-bmw16-s2` 与 `m6b-i-bmw16-s12`；原始数据现集中归档在 `main`。额外的 `ADSMPC_build_dealer_strace.log` 原始副本来自本地路径 `ADSMPC/build/dealer_strace.log`，文件时间为 2026-08-18，大小 1,587,162 bytes；首条 `execve` 记录为 `./ciphergpt_topk_dcf_shuffle 1 10 3 test_manual`。该系统调用记录只作为来源留档，不构成协议正确性或性能结论。`.gitattributes` 为论文和原始 evidence 关闭换行转换，使哈希在不同操作系统上对应相同字节。S12 的 235 行局部清单 `BMW16_S12_TRACE_ARTIFACTS_SHA256SUMS.txt` 已按本次归档的实际字节重算；综合清单另含 4 个配套运行和审计记录及这份系统调用 trace。
 
 `Papers/` 共 15 个文件、22,171,904 bytes，哈希清单为 [`PAPERS.sha256`](PAPERS.sha256)。其中 `siamjdiscrmath.pdf` 是书目汇编，不是单篇论文。`测试指标.md` 使用当前本地副本重新计算 SHA-256（`4a5945f4…a3701587`），与旧清单中的值不同；本次清单以实际归档字节为准。资料具体来源、版本和再分发状态见 [`REFERENCE_MANIFEST.md`](REFERENCE_MANIFEST.md)；入库本身不等于版权或许可核查。
 

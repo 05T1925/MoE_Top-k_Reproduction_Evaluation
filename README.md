@@ -4,7 +4,7 @@
 
 项目于 2026-11-20 暂停并归档。M2 Protocol I、M5 Protocol III 已完成各自记录的工程验收；M6A、M6B、M7 尚未在 `main` 完成验收。隔离实验分支中的结果只按其原有 TEST_ONLY 或 EXPERIMENTAL 身份保存，不视作安全协议接收或正式性能结论。
 
-本次归档将 `Papers/` 中 15 个资料文件、BMW16 S2/S12 的原始 TEST_ONLY trace/tape 与关联报告加入 `main`。校验清单见 [论文文件哈希](docs/PAPERS.sha256) 和 [trace/tape 归档哈希](docs/reproduction/evidence/RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt)，归档范围与限制见 [实验原始证据归档说明](docs/EXPERIMENTAL_EVIDENCE_ARCHIVE_2026-11-20.md)。两个压缩包仍是本地文件，不在 Git 历史中。
+本次归档将 `Papers/` 中 15 个资料文件、BMW16 S2/S12 的原始 TEST_ONLY trace/tape、1 份历史系统调用 trace 与关联报告加入 `main`。校验清单见 [论文文件哈希](docs/PAPERS.sha256) 和 [trace/tape 归档哈希](docs/reproduction/evidence/RAW_TRACE_TAPE_ARCHIVE_SHA256SUMS.txt)，归档范围与限制见 [实验原始证据归档说明](docs/EXPERIMENTAL_EVIDENCE_ARCHIVE_2026-11-20.md)。两个压缩包仍是本地文件，不在 Git 历史中。
 
 M4 CipherGPT 实施和性能任务已取消。其历史资料继续保留为参考，不作为后续阶段的前置条件。
 
@@ -172,7 +172,7 @@ docs/                 计划、决策、来源与验收记录
 
 项目目前处于暂停归档状态，没有活动中的 M6/M7 验收安排。若后续恢复，先核对最新 `main`、`PROJECT.md`、`docs/IMPLEMENTATION_PLAN.md` 和相关决策，再明确恢复范围；既有分支和归档文件只提供历史证据，不自动构成当前实现或安全结论。
 7. PR 使用仓库模板，结果保留 revision、环境、输入、种子、命令和原始计数。
-8. 不提交生成密钥、未登记原始日志、参考工程和本地构建产物；论文及 TEST_ONLY trace/tape 仅按本次归档清单维护。
+8. 不提交生成密钥、未登记原始日志、参考工程和本地构建产物；论文、TEST_ONLY trace/tape 与历史系统调用记录仅按本次归档清单维护。
 
 `vfss-baseline-2026-09-03` 只用于恢复与回归比较，不作为新开发起点。
 
